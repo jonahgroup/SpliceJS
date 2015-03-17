@@ -26,14 +26,15 @@ SOFTWARE.
 
 */
 
+
 var _ = (function(window, document){
 	"use strict";
+
 	
-	/* Loading indicator 
+	/* Cache loading indicator 
 	 * */
-	
-	new Image().src = ( window.SPLICE_PUBLIC_ROOT || '') + 'public/jscript/sengiloading.gif';
-	
+	new Image().src = ( window.SPLICE_PUBLIC_ROOT || '') + '/resources/images/bootloading.gif';
+
 	
 	if(!window.console) { 
 		window.console = {log:function(){}}; 
@@ -45,6 +46,7 @@ var _ = (function(window, document){
 	 * must support Function.prototype.apply()
 	 * */
 	if(!Function.prototype.bind) {
+		if(!Function.prototype.apply) return;
 		Function.prototype.bind = function(t){
 			var foo = this;
 			return function(){ foo.apply(t,arguments); };
@@ -75,22 +77,57 @@ var _ = (function(window, document){
 	}
 	
 	
+	/* IE Object.keys fill*/
+	if(typeof Object.keys !== 'function' ){
+		
+		Object.keys = function(obj){
+			if(!obj) return null;
+			var _keys = [];
+			for(var key in  obj){
+				if(obj.hasOwnProperty(key)) _keys.push(key);
+			}
+			return _keys;
+		};
+	}
+	
+	
+	
+	var tempBodyContent = '';
+	var progressLabel = null;
+	function showPreloader(){
+		tempBodyContent = document.body.innerHTML;
+		document.body.innerHTML = 
+		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:0.7em; color:#101010;">'+
+		'<div style="position:relative; top:-20px">'+
+			'<div style="display:inline;"><img style="vertical-align:middle;" src="'+window.SPLICE_PUBLIC_ROOT+'/resources/images/bootloading.gif"/></div>'+
+			'<div style="display:inline; padding-left:0.5em;"><span></span></div>'+
+		'</div>'+
+		'</div>';
+
+		
+		progressLabel = document.body.querySelectorAll('span')[0];
+	}
+	
+	function removePreloader(){
+		document.body.innerHTML = tempBodyContent;
+	}
+	
+	/*
+	 * Core Object
+	 * */
 	function Splice(){
 		/*
 		 * loader initializers
 		 * */
-		this.PUBLIC_ROOT = window.SENGI_PUBLIC_ROOT || '';
+		this.PUBLIC_ROOT = window.SPLICE_PUBLIC_ROOT || '';
 		
 		window.onload = (function(){
-			/*!!!! dont remove main page dom, thats just NOT COOL, rework */
-			/*
-			document.body.innerHTML = 
-				'<div style="position:absolute; left:50%; top:50%; font-family:Arial; font-size:11px; color:#101010;">' + 
-				'<img style="position:absolute; top:-21px; left:-21px;" src="'+this.PUBLIC_ROOT+'public/jscript/sengiloading.gif"/>'+
-				'</div>';
-			*/
+			
+			console.log('Window loaded');
+			
 			if(typeof(this.run) === 'function') this.run();
 		}).bind(this);
+	
 	};
 	
 	
@@ -206,6 +243,9 @@ var _ = (function(window, document){
 	Splice.prototype.Namespace = function(namespace) {
 		var ns = getNamespace(namespace,false, false);
 		
+		if(ns && !(ns instanceof Namespace)) 
+			throw "Namespace " + namespace + " is ocupied by an object ";
+		
 		/* 
 		 * return Namespace proxy with Class constructor
 		 * */
@@ -234,13 +274,13 @@ var _ = (function(window, document){
 		/* 
 		 * get owened properties on the global window object 
 		 * */
-		var keys = Object.keys(global);
+		var keys = Object.keys(window);
 		
 		for(var i = 0; i < keys.length; i++ ) {
 			var prop = keys[i];
-			var foo =  global[prop];
+			var foo =  window[prop];
 			if(foo instanceof Splice.prototype.Interface.Namespace) {
-				var a = {};a[prop] = global[prop];
+				var a = {};a[prop] = window[prop];
 				Namespace.prototype.list.call(a);
 			}
 		}
@@ -330,7 +370,7 @@ var _ = (function(window, document){
 	 * @constructor
 	 * @this {Loader}
 	 * @param {Array} resources 	Resource URLs
-	 * @param {Function} oncomplete  Callback, invoked when last resource in the list is loaded
+	 * @param {Function} oncomplete Callback, invoked when last resource in the list is loaded
 	 * @param {Function} onitemloaded Callback, called on each loaded item from the resource list	
 	 */
 	
@@ -356,7 +396,9 @@ var _ = (function(window, document){
 		if(!this.isActive) return;
 		var loader = this;
 		
-		//loading is complete run oncomplete handler
+		/*
+		 * loading is complete run oncomplete handler
+		 */
 		if(loader.progress <= 0) {
 			this.iterator = null; this.oncomplete(); this.oncomplete = null; this.onitemloaded = null;
 			return;
@@ -372,6 +414,10 @@ var _ = (function(window, document){
 		}
 		
 		/*
+		 * qualify filename
+		 * */
+		filename = window.SPLICE_PUBLIC_ROOT +'/'+filename;
+		/*
 		 * */
 		if(filename._endswith(".css") || filename._endswith(".js") )
 		if(_url_cache[filename] === true){
@@ -384,11 +430,14 @@ var _ = (function(window, document){
 		
 		var head = document.getElementsByTagName('head')[0];
 		
+		/*
+		 * Load CSS Files
+		 * */
 		if(filename._endswith(".css")){
 			var linkref = document.createElement('link');
 			
 			//tell Splice what is loading
-			watcher.notifyCurrentlyLoading(linkref);
+			watcher.notifyCurrentlyLoading({name:filename,obj:linkref});
 			
 			linkref.setAttribute("rel", "stylesheet");
 			linkref.setAttribute("type", "text/css");
@@ -411,12 +460,14 @@ var _ = (function(window, document){
 			head.appendChild(linkref);
 		}
 
-		
+		/*
+		 * Load javascript files
+		 * */
 		if(filename._endswith(".js")) {
 			var script = document.createElement('script');
 			
 			//tell Splice what is loading
-			watcher.notifyCurrentlyLoading(script);
+			watcher.notifyCurrentlyLoading({name:filename,obj:script});
 			
 			script.setAttribute("type", "text/javascript");
 			script.setAttribute("src", filename);
@@ -431,11 +482,16 @@ var _ = (function(window, document){
 			head.appendChild(script); 
 		}
 		
-		if(filename._endswith('.html')){
+		/*
+		 * Load html templates
+		 * */
+		if(filename._endswith('.htmlt')){
+			//tell Splice what is loading
+			watcher.notifyCurrentlyLoading({name:filename,obj:null});
 			_.HttpRequest.post({
 				url: filename,
 				onok:function(response){
-					loader.onitemloaded({name:obj.name, data:response.text});
+					loader.onitemloaded({name:filename, data:response.text});
 					loader.progress--; loader.loadNext(watcher);
 				}
 			});
@@ -451,37 +507,54 @@ var _ = (function(window, document){
 		return null;
 	};
 	
-	Splice.prototype.include = function(resources, oncomplete, isnested, onitemloaded){
+	Splice.prototype.include = function(resources, oncomplete, onitemloaded){
+		
+		/*
+		 * Initial bootstrap
+		 * */
+		
+		if(!this.isInitialInclude) {
+			showPreloader();
+			
+			var foo = oncomplete;
+			var oncomplete = function(){
+				removePreloader();
+				foo();
+			}
+			this.isInitialInclude = true;
+		}
+
+		/*
+		 * Always perform nested loading
+		 * */
+		Splice.prototype.debug.log('Nested loading...');
+		var loader = new Loader(resources, (function(){
+			Loader.loaders.pop();
+			if(typeof(oncomplete)  === 'function') oncomplete();
+			
+			var queuedLoader = 	peek(Loader.loaders);
+
+			if(queuedLoader) queuedLoader.enable().loadNext(this);
+			
+		}).bind(this), onitemloaded);
+		 
+		//suspend current loader
+		var currentLoader = peek(Loader.loaders);
+		if(currentLoader) currentLoader.disable();
+		
+		Loader.loaders.push(loader); 
+		loader.loadNext(this);
 
 		
-		if(isnested) { 
-			Splice.prototype.debug.log('Nested loading...');
-			var loader = new Loader(resources, (function(){
-				Loader.loaders.pop();
-				if(typeof(oncomplete)  === 'function') oncomplete();
-				
-				var queuedLoader = 	peek(Loader.loaders);
-
-				if(queuedLoader) queuedLoader.enable().loadNext(this);
-				
-			}).bind(this), onitemloaded);
-			 
-			//suspend current loader
-			var currentLoader = peek(Loader.loaders);
-			if(currentLoader) currentLoader.disable();
-			
-			Loader.loaders.push(loader); 
-			loader.loadNext(this);
-
-		} else {
-			new Loader(resources, oncomplete,onitemloaded).loadNext(this);
-		}
 		
 	};
 
 	
-	Splice.prototype.notifyCurrentlyLoading = function(obj){
-		this.currentlyLoading = obj;
+	Splice.prototype.notifyCurrentlyLoading = function(current){
+		this.currentlyLoading = current;
+		if(progressLabel)
+		progressLabel.innerHTML = current.name;
+		
 	};
 	
 	
@@ -499,8 +572,10 @@ var _ = (function(window, document){
 		if(foo.name) return foo.name;
 		
 		if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
-					
-		var match = /function\s+([\w\$])\(/igm.exec(foo.toString());
+		
+		var regex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
+		var functionString = foo.toString();
+		var match = regex.exec(functionString);
 		
 		if(!match)  throw 'Unable to obtain function name';
 		return match[1];
@@ -522,15 +597,19 @@ var _ = (function(window, document){
 		
 		var parts = namespace.split('.');
 		
-		var ns = global;
+		var ns = window;
 		var last = null;
-		
+		//userapplications.basicapplication.clock
 		for(var i=0; i<parts.length; i++){
+			
+			
 			if(!ns[parts[i]]) { 
 				if(isCreate === true) ns[parts[i]] = new Namespace();
 				else return null;
 			}
+			
 			ns = ns[parts[i]];
+			
 			
 			/* 
 			 * if current object is not Namespace
@@ -543,8 +622,12 @@ var _ = (function(window, document){
 			}
 		}
 		
-		if(isLookup === true) return ns;
-		return last;
+		if(isLookup === true){ 
+			if(i+1 == parts.length) return ns;
+			else return null;
+		}
+		
+		return ns;
 	};
 	
 	

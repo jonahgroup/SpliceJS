@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="../../splicejs/splice.config.js"></script>
+<script src="../../splicejs/splice.js"></script>
+
+<script>
+	
+	_.run = function(){
+		
+		_.include(['modules/splice.typextension.js',
+		           'modules/splice.animation.js',
+		           'modules/splice.document.js',
+		           'modules/splice.network.js',
+		           'modules/splice.modular.js',
+		           
+		           '../examples/BasicApplication/basicapplication.js'
+		           ], function(){
+		
+			new UserApplications.BasicApplication();
+			
+		});
+	};
+</script>
+
+</head>
+</html>

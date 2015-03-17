@@ -1,0 +1,16 @@
+<!-- @template:{name:'UserControls.Clock'} -->
+<div class="-center">
+	<span class="-clock-label" data-sgi-ref="clockLabel"></span>
+	<span style="font-family:Arial;"> UTC -5</span>
+	
+	<!-- @include:{name:'UserApplications.RowTemplate'} -->
+</div>
+
+
+<!-- @template:{name:'UserApplications.RowTemplate'} -->
+<div>
+	<span>@name</span>
+</div>
+<span>@name</span>
+<span>@name</span>
+<span>@name</span>

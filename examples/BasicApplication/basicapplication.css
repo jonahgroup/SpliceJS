@@ -1,0 +1,14 @@
+.-center {
+	
+	margin-left:auto;
+	margin-right:auto;
+	width:auto;
+	text-align:center;
+	
+}
+
+.-clock-label {
+	
+	font-family:Arial;
+	font-size:8em;
+}
