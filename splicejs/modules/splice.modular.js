@@ -2,24 +2,43 @@ _.Module = (function(document){
 	//enable strict mode
 	"use strict"; 
 	
-	_.Doc.display = function(control){
+	_.Doc.display = function(control,ondisplay){
 		if(!control) return;
 		
 		document.body.innerHTML = '';
 		
 		if(control.concrete && control.concrete.dom) {
 			document.body.appendChild(control.concrete.dom);
+			if(typeof ondisplay === 'function') ondisplay(control);
 			return;
 		}
 		
 		if(control.dom) {
 			document.body.appendChild(control.dom);
+			if(typeof ondisplay === 'function') ondisplay(control);
 			return;
 		}
 	}
 	
 	
-	var Concrete = _.Namespace('Sengi.Modular').Class(function Concrete(dom){
+	_.Animate = function(obj){
+		if(!obj) return;
+		
+		return {
+			opacity:function(from, to, duration){
+			new _.StoryBoard([
+			new _.Animation(0 | from, 100 | to, (duration | 300), _.Animation.cubicEaseIn, 
+					function(value){
+  						obj.style.opacity = value * 0.1 / 10;
+  					}
+  			)]).animate();
+				
+			}
+		}
+	}
+	
+	
+	var Concrete = _.Namespace('SpliceJS.Modular').Class(function Concrete(dom){
 		this.dom = dom;
 		
 		/* tie instances hashmap */
@@ -30,7 +49,7 @@ _.Module = (function(document){
 		
 	});
 	
-	var Template = _.Namespace('Sengi.Modular').Class(function Template(dom){
+	var Template = _.Namespace('SpliceJS.Modular').Class(function Template(dom){
 		this.dom = dom;
 		dom._template = this;
 		/*
@@ -108,7 +127,7 @@ _.Module = (function(document){
 		deepClone._concrete = instance; // DOM get a reference to the concrete instance
 		
 		/* process dom references */
-		var elements = deepClone.querySelectorAll('[data-sgi-ref]');
+		var elements = deepClone.querySelectorAll('[data-sp-ref]');
 		var element = deepClone;
 		
 		if(tieInstance)
@@ -116,7 +135,7 @@ _.Module = (function(document){
 			
 			if(i > -1) element = elements[i];
 			
-			var ref = element.getAttribute('data-sgi-ref'); 
+			var ref = element.getAttribute('data-sp-ref'); 
 			if(ref) tieInstance.elements[ref] = element; 	
 		}
 		
@@ -275,12 +294,6 @@ _.Module = (function(document){
 	ModularApi.prototype = {
 	
 			constructor:ModularApi,
-			
-			
-			load:function(moduleUrls, oncomplete){
-				_.include(moduleUrls, oncomplete, true);
-			},
-			
 	
 			/**
 			 * Builds module and compiles template(s) from module definition. 
@@ -751,5 +764,5 @@ _.Module = (function(document){
 		this.domText = domText;
 	};
 	
-	return new ModularApi();
+	return (new ModularApi()).define;
 })(document);

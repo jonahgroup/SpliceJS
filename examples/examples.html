@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="config/splice.config.js"></script>
+<script src="../splicejs/splice.js"></script>
+
+<script>
+	
+	_.run = function(){
+		_.include(['modules/splice.typextension.js',
+		           'modules/splice.animation.js',
+		           'modules/splice.document.js',
+		           'modules/splice.network.js',
+		           'modules/splice.modular.js',
+		           ]);
+	};
+	
+	function BasicApplication(){
+		_.load(['../examples/BasicApplication/basicapplication.js'],function(){
+			new UserApplications.BasicApplication();
+		});
+	}
+	
+</script>
+</head>
+<body>
+<!-- @template{name:'MainMenu'} -->
+<div>
+	<a onclick="BasicApplication();">Basic Application</a>
+</div>
+
+</body>
+
+</html>
+

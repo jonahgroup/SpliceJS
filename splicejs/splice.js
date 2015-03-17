@@ -95,6 +95,7 @@ var _ = (function(window, document){
 	var tempBodyContent = '';
 	var progressLabel = null;
 	function showPreloader(){
+		if(window.SPLICE_SUPPRESS_PRELOADER) return;
 		tempBodyContent = document.body.innerHTML;
 		document.body.innerHTML = 
 		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:0.7em; color:#101010;">'+
@@ -109,6 +110,7 @@ var _ = (function(window, document){
 	}
 	
 	function removePreloader(){
+		if(window.SPLICE_SUPPRESS_PRELOADER) return;
 		document.body.innerHTML = tempBodyContent;
 	}
 	
@@ -519,7 +521,7 @@ var _ = (function(window, document){
 			var foo = oncomplete;
 			var oncomplete = function(){
 				removePreloader();
-				foo();
+				if(typeof foo === 'function') foo();
 			}
 			this.isInitialInclude = true;
 		}
@@ -558,7 +560,9 @@ var _ = (function(window, document){
 	};
 	
 	
-	
+	Splice.prototype.load = function(moduleUrls, oncomplete){
+		this.include(moduleUrls, oncomplete);
+	};
 	
 	var _names = new Namespace(); //namespace container
 	
@@ -609,7 +613,6 @@ var _ = (function(window, document){
 			}
 			
 			ns = ns[parts[i]];
-			
 			
 			/* 
 			 * if current object is not Namespace

@@ -1,1 +1,0 @@
-var SPLICE_PUBLIC_ROOT = '../../splicejs';
