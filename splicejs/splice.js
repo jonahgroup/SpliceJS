@@ -630,26 +630,6 @@ var _ = (function(window, document){
 		return ns;
 	};
 	
-	
-	
-	/*
-	 * Interfaces name space
-	 * */
-	Splice.prototype.Interface = {};
-	Splice.prototype.Interface.Namespace = Namespace;
-	
-	
-	
-	/**
-	 * Application API
-	 * */
-	Splice.prototype.Application = {};
-	Splice.prototype.Application.start = function(args){
-		/* break out of the initializer stack*/
-		setTimeout(function(){_.Application.main(args);},10);
-	};
-
-	
 	return new Splice();
 })(window,document);
 
