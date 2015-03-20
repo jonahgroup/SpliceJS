@@ -195,6 +195,34 @@ _.Module = (function(document){
 		return instance;
 	};
 	
+	/*
+	 * Alter include behavior to understand templates
+	 * */
+	var originalInclude = _.include;
+	_.include = function(resources, oncomplete, onitemloaded){
+		
+		var handler = function(){
+			if(typeof onitemloaded === 'function')
+			onitemloaded.apply(this,arguments);
+			
+			var arg = arguments[0];
+			if(!arg) return;
+			if(arg.ext !== 'htmlt') return;
+			
+			var t = extractTemplates(arg.data);
+			if(!t) return;
+			
+			var templates = {};
+			for(var i=0; i< t.length; i++){
+				templates[t[i].spec.name] = t[i];
+			}
+			
+			compileTemplates({templates:templates});
+			_.info.log(arg.name);
+		}
+		originalInclude.call(_,resources, oncomplete,handler);
+	}
+	
 	
 	function resolveBinding(binding, instance){
 		if( !(binding instanceof _.Binding) ) throw 'May to resolve binding, source property is not a binding object';
@@ -346,7 +374,7 @@ _.Module = (function(document){
 				 * If dependents list is empty, callback will be invoked
 				 * imediatelly 
 				 * */
-				_.include(required, function(){	
+				 originalInclude.call(_,required, function(){	
 					
 					/*
 					 * Define a module

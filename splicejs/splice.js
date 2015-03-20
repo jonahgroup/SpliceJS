@@ -124,12 +124,8 @@ var _ = (function(window, document){
 		this.PUBLIC_ROOT = window.SPLICE_PUBLIC_ROOT || '';
 		
 		window.onload = (function(){
-			
-			console.log('Window loaded');
-			
 			if(typeof(this.run) === 'function') this.run();
 		}).bind(this);
-	
 	};
 	
 	
@@ -493,11 +489,10 @@ var _ = (function(window, document){
 			_.HttpRequest.post({
 				url: filename,
 				onok:function(response){
-					loader.onitemloaded({name:filename, data:response.text});
+					loader.onitemloaded({ext: 'htmlt', filename:filename, data:response.text});
 					loader.progress--; loader.loadNext(watcher);
 				}
 			});
-			
 		}
 		
 	};
@@ -507,6 +502,12 @@ var _ = (function(window, document){
 		if(!a) return null;
 		if(a.length > 0) return a[a.length - 1];
 		return null;
+	};
+	
+	/* Extendable map of the extension handlers */
+	var extHandlers = {};
+	Splice.prototype.addExtensionHandler = function(extension,handler){
+		extHandler[extension] = handler;
 	};
 	
 	Splice.prototype.include = function(resources, oncomplete, onitemloaded){
@@ -546,11 +547,9 @@ var _ = (function(window, document){
 		
 		Loader.loaders.push(loader); 
 		loader.loadNext(this);
-
-		
-		
 	};
 
+	
 	
 	Splice.prototype.notifyCurrentlyLoading = function(current){
 		this.currentlyLoading = current;
