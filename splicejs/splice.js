@@ -277,7 +277,7 @@ var _ = (function(window, document){
 		for(var i = 0; i < keys.length; i++ ) {
 			var prop = keys[i];
 			var foo =  window[prop];
-			if(foo instanceof Splice.prototype.Interface.Namespace) {
+			if(foo instanceof Namespace) {
 				var a = {};a[prop] = window[prop];
 				Namespace.prototype.list.call(a);
 			}
@@ -504,11 +504,6 @@ var _ = (function(window, document){
 		return null;
 	};
 	
-	/* Extendable map of the extension handlers */
-	var extHandlers = {};
-	Splice.prototype.addExtensionHandler = function(extension,handler){
-		extHandler[extension] = handler;
-	};
 	
 	Splice.prototype.include = function(resources, oncomplete, onitemloaded){
 		
