@@ -1,21 +1,31 @@
 _.Module({
 
-required:['../examples/BasicApplication/basicapplication.css',
-          '../examples/BasicApplication/main.htmlt'],
+required:['../examples/resources/fontfaces.css',
+          '../examples/BasicApplication/basicapplication.css',
+          '../examples/BasicApplication/basicapplication.htmlt'],
 
 definition:function(){
 
 	var BasicApplication = _.Namespace('UserApplications').Class(function BasicApplication(){
 		
-		var clock = new UserControls.Clock();
-		clock.start();
+		//var clock = new UserControls.Clock();
+		this.ref.clock.start();
 		
-		_.Doc.display(clock,function(x){
+		_.Doc.display(this,function(x){
 			_.Animate(x.concrete.dom).opacity(0, 100, 900);
 		});
+		
+		var self = this;
+		this.elements.mainMenuButton.onclick = function(){
+			self.exitApplication();
+		};
 
 	});
 	
+	
+	BasicApplication.prototype.exitApplication = function(){
+		
+	};
 	
 	
 	/*

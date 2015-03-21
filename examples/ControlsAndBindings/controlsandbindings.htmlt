@@ -1,0 +1,14 @@
+<!-- @template:{name:'UserApplications.ControlsAndBindings'} -->
+<div>
+	<a>Directory</a>
+	<!-- @include:{
+		name:'SpliceJS.Controls.DataTable',
+		ref:'ordersTable',
+		parameters:{
+			onData:	_.Binding.To('onOrderData').Parent
+			//rowTemplate: 'OrderRow'
+		}
+	} -->
+</div>
+
+

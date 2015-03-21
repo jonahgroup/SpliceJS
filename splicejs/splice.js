@@ -260,11 +260,7 @@ var _ = (function(window, document){
 			}
 		}
 		
-		/*
-		if(!ns.Class) ns.Class = function(constructor){
-			return Splice.prototype.Class.call({namespace:this},constructor);
-		};
-		*/
+		
 		return ns;
 	};
 	

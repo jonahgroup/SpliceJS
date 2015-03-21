@@ -178,13 +178,10 @@ _.Module = (function(document){
 				
 				/* remaining parameters are for the child instance */
 				if(parameters[key] instanceof _.Binding) {
-					var target = resolveBinding(parameters[key], c_instance);
+					var binding = parameters[key]; 
+					resolveBinding(binding, c_instance, key);
 					
-					if(typeof target.prop  == 'function' ) { 
-						c_instance[key] = function(){
-							target.prop.apply(target.instance,arguments);
-						} 
-					}
+					
 					
 				}
 				
@@ -218,14 +215,16 @@ _.Module = (function(document){
 			}
 			
 			compileTemplates({templates:templates});
-			_.info.log(arg.name);
+			_.info.log(arg.filename);
 		}
 		originalInclude.call(_,resources, oncomplete,handler);
 	}
 	
 	
-	function resolveBinding(binding, instance){
+	function resolveBinding(binding, instance, key){
 		if( !(binding instanceof _.Binding) ) throw 'May to resolve binding, source property is not a binding object';
+		
+		var result = null;
 		
 		switch(binding.type){
 		case _.Binding.SELF:
@@ -233,8 +232,8 @@ _.Module = (function(document){
 		
 		case _.Binding.PARENT:
 			if(!instance.parent) throw 'Cannot resolve parent binding, instance parent is not null';
-			return { instance: instance.parent,
-					 prop:instance.parent[binding.prop]};
+			result = { instance: instance.parent,
+					   prop:instance.parent[binding.prop]};
 			break;
 			
 		case _.Binding.FIRST_PARENT:
@@ -243,6 +242,36 @@ _.Module = (function(document){
 		case _.Binding.ROOT:
 			break;
 		}
+		
+		/* Assignment direction */
+		switch(binding.direction){
+		case _.Binding.Direction.TO:
+			if(typeof instance[key] === 'function')
+				result.instance[binding.prop] = function(){
+					instance[key].apply(instance,arguments);
+				}
+			else
+				result.instance[binding.prop] = instance[key];
+			break;
+			
+		case _.Binding.Direction.FROM:
+			if(typeof instance[key] === 'function')
+				instance[key] = function(){
+					result.instance[binding.prop].apply(instance,arguments);
+				}
+			else
+				instance[key] = result.instance[binding.prop]; 
+			break;
+		}
+
+/*
+		if(typeof target.prop  == 'function' ) { 
+			c_instance[key] = function(){
+				target.prop.apply(target.instance,arguments);
+			} 
+		}
+*/		
+		
 	}
 	
 	
@@ -365,14 +394,12 @@ _.Module = (function(document){
 				 * Module has no required includes
 				 * */
 				if(!required || required.length < 1) {
-					ModularApi.prototype.register({name:moduleName, definition:definition}); 
+					definition(); 
 					return;
 				}
 				
 				/* 
-				 * Load recursively templates and compile once everything is loaded
-				 * If dependents list is empty, callback will be invoked
-				 * imediatelly 
+				 * Load dependencies
 				 * */
 				 originalInclude.call(_,required, function(){	
 					
@@ -760,33 +787,66 @@ _.Module = (function(document){
 			compileTemplate.call(module,templateSource[key],module.name);
 		}
 	}
-		
 	
-
 	
-	/**/
-	_.Binding = function Binding(propName,type){
-		if(!(this instanceof Binding)) return new Binding(propName, type);
+	
+	/* 
+	 * !!! Bidirectional bindings are not allowed 
+	 * */
+	var Binding = function Binding(propName,type,dir){
+		if(!(this instanceof Binding)) return new Binding(propName, type, dir);
 		
 		this.prop = propName;
 		this.type = type;
+		this.direction = dir;
+		
 	};
+	
+	
+	Binding.From = function(propName){
+		return {
+			Self:   		new Binding(propName,	Binding.SELF,   Binding.Direction.FROM),
+			Parent: 		new Binding(propName,	Binding.PARENT, Binding.Direction.FROM),
+			FirstParent: 	new Binding(propName,	Binding.FIRST_PARENT, Binding.Direction.FROM),
+			Root:			new Binding(propName,	Binding.ROOT, Binding.Direction.FROM)
+		}
+	};
+	
+	Binding.To = function(propName){
+		return {
+			Self:   		new Binding(propName, 	Binding.SELF,   Binding.Direction.TO),
+			Parent: 		new Binding(propName, 	Binding.PARENT, Binding.Direction.TO),
+			FirstParent: 	new Binding(propName, 	Binding.FIRST_PARENT, Binding.Direction.TO),
+			Root:			new Binding(propName, 	Binding.ROOT, 	Binding.Direction.TO)
+		}
+	};
+	
 	
 	/*
 	 *	Binding type constants 
 	 * */
 	
-	_.Binding.SELF 			= 1;
+	Binding.Direction = {
+			FROM : 1,
+	/* Left assignment */
+			TO: 2
+	};
+	/* Right assignment */
+	
+	Binding.SELF 			= 1;
 	/* Look for properties within immediate instance */
 	
-	_.Binding.PARENT 		= 2;
+	Binding.PARENT 		= 2;
 	/* Look for properties within direct parent of the immediate instance*/
 	
-	_.Binding.FIRST_PARENT 	= 3;
+	Binding.FIRST_PARENT 	= 3;
 	/* Look for properties within a first parent  where property if found */
 	
-	_.Binding.ROOT 			= 4;
+	Binding.ROOT 			= 4;
 	/* Look for properties within a root of the parent chain */
+	
+	/* assigna global reference */
+	_.Binding = Binding;
 	
 	_.Dom = function Dom(domText){
 		this.domText = domText;

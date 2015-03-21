@@ -1,0 +1,15 @@
+<!-- @template:{name:'UserApplications.BasicApplication'} -->
+<div>	
+	<div><a data-sp-ref="mainMenuButton">Main Menu</a></div>
+	<!-- @include:{name:'UserControls.Clock', ref:'clock'} -->
+</div>
+
+
+
+<!-- @template:{name:'UserControls.Clock'} -->
+	<div class="-center" data-sp-ref="mainContainer">
+		<span class="-clock-label" data-sp-ref="clockLabel"></span>
+		<span style="font-family:Arial;"> UTC -5</span>
+	</div>
+
+

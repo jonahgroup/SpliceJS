@@ -1,0 +1,2 @@
+<!-- @template:{name:'SpliceJS.Controls.DataTable'} -->
+<table data-sp-ref="dataTableContainer"></table>

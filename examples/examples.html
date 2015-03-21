@@ -13,24 +13,21 @@
 		           'modules/splice.document.js',
 		           'modules/splice.network.js',
 		           'modules/splice.modular.js',
-		           ]);
-	};
+		           ], function(){
+			
+			_.include(['../examples/resources/fontfaces.css',
+			           '../examples/Main/examples.css',
+			           '../examples/Main/examples.js',
+			           '../examples/Main/mainmenu.htmlt'], function(){
+				
+				_.Doc.display(new UserApplications.MainMenu());
+				
+			});	
+			
+		});};
 	
-	function BasicApplication(){
-		_.load(['../examples/BasicApplication/basicapplication.js'],function(){
-			new UserApplications.BasicApplication();
-		});
-	}
 	
 </script>
 </head>
-<body>  
-<!-- @template{name:'MainMenu'} -->
-<div>
-	<a onclick="BasicApplication();">Basic Application</a>
-</div>
-
-</body>
-
 </html>
 
