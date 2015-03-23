@@ -23,6 +23,7 @@
 		name:'SpliceJS.Controls.Button', 
 		ref:'cancelButton',
 		parameters:{
+			isDisabled:true,
 			onClick:_.Binding.From('onCancel').Parent,
 			content:{label:'Cancel'}
 		}

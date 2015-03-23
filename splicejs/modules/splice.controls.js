@@ -15,14 +15,27 @@ definition:function(){
 		
 		var self = this;
 		this.elements.buttonContainer.onclick = function(){
+			if(this.isDisabled == true) return;
 			self.onClick();
 		};
+		
+		
+		
 	});
 
 	
 	Button.prototype.onClick = function(){
 		_.debug.log('Event is not assigned');
 	};
+	
+	Button.prototype.enable = function(){
+		this.isDisabled = false;
+	};
+	
+	Button.prototype.display = function(){
+		this.isDisabled = true;
+	}
+	
 	
 	
 	

@@ -107,7 +107,7 @@ _.Module = (function(document){
 	}
 	
 	
-	Template.prototype.getInstance = function(tieInstance){
+	Template.prototype.getInstance = function(tieInstance,incParam){
 		
 		 
 		var build = this.dom;
@@ -140,6 +140,42 @@ _.Module = (function(document){
 		}
 		
 		
+		/* Attach include arguments 
+		 * before calling a constructor
+		 * */
+		
+		/* attache name reference */
+		if(incParam && incParam.ref){
+			tieInstance.parent.ref[incParam.ref] = tieInstance;
+		}
+
+		
+		/* process include parameters */
+		var parameters = incParam?incParam.parameters:null;
+		
+		if(parameters) {
+		var keys = Object.keys(parameters);
+		for(var k=0; k< keys.length; k++) {
+			
+			var key = keys[k];
+			
+			_.debug.log("Processing include property: " + key);
+			
+			/* remaining parameters are for the child instance */
+			if(parameters[key] instanceof _.Binding) {
+				var binding = parameters[key]; 
+				resolveBinding(binding, tieInstance, key);
+				continue;
+			}
+			
+			/* default property assignment */
+			tieInstance[key] = parameters[key];
+			
+		}
+		}
+
+		
+		
 		
 		/* 
 		 * Anchor elements with data-splice-tmp-anchor attibute
@@ -157,40 +193,11 @@ _.Module = (function(document){
 			
 			/*
 			 * Child instance
-			 * Include parameters are passed 
+			 * Include parameters are passed to 
 			 * the constructor as arguments
 			 * */
-			var c_instance = new (coupler.invokeByParent(tieInstance))(include.parameters);		
+			var c_instance = new (coupler.invokeByParent(tieInstance,include))(include.parameters);		
 			anchors[i].parentNode.replaceChild((c_instance.dom || c_instance.concrete.dom), anchors[i]);
-			
-			/* attache name reference */
-			if(tieInstance && include.ref){
-				tieInstance.ref[include.ref] = c_instance;
-			}
-			
-			
-			
-			/* process include parameters */
-			var parameters = include.parameters;
-			
-			if(!parameters) continue;
-			var keys = Object.keys(parameters);
-			for(var k=0; k< keys.length; k++) {
-				
-				var key = keys[k];
-				
-				_.debug.log("Processing include property: " + key);
-				
-				/* remaining parameters are for the child instance */
-				if(parameters[key] instanceof _.Binding) {
-					var binding = parameters[key]; 
-					resolveBinding(binding, c_instance, key);
-					
-					
-					
-				}
-				
-			}
 			
 		}
 		
@@ -267,16 +274,7 @@ _.Module = (function(document){
 			else
 				instance[key] = result.instance[binding.prop]; 
 			break;
-		}
-
-/*
-		if(typeof target.prop  == 'function' ) { 
-			c_instance[key] = function(){
-				target.prop.apply(target.instance,arguments);
-			} 
-		}
-*/		
-		
+		}	
 	}
 	
 	
@@ -303,8 +301,6 @@ _.Module = (function(document){
 					
 					obj.concrete = template.getInstance(obj);
 					
-				//	obj.ref = obj.concrete.ref;
-				//	obj.elements = obj.concrete.elements;
 					
 					tie.apply(obj, arguments);
 					return obj; 
@@ -316,7 +312,7 @@ _.Module = (function(document){
 		
 		if(tie) Coupler.base = tie.base;
 		
-		Coupler.invokeByParent = function(parent){
+		Coupler.invokeByParent = function(parent,incParam){
 			return function Coupler(){
 				if(this instanceof Coupler) {
 					if(typeof tie === 'function'){
@@ -324,11 +320,9 @@ _.Module = (function(document){
 						obj.constructor = tie;
 						
 						obj.ref = {};
-						obj.elements = {};
-						
+						obj.elements = {};						
 						obj.parent = parent;
-						
-						obj.concrete = template.getInstance(obj);
+						obj.concrete = template.getInstance(obj,incParam);
 						
 						tie.apply(obj, arguments);
 						return obj; 
