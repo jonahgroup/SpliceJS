@@ -141,22 +141,27 @@ _.Module = (function(document){
 		
 		
 		
-		/* process clone and attach templates */
+		/* 
+		 * Anchor elements with data-splice-tmp-anchor attibute
+		 * are placeholders for included templates
+		 * Process clone and attach templates 
+		 * */
 		var anchors = deepClone.querySelectorAll('[data-splice-tmp-anchor]');
 		
 		for(var i=0; i < anchors.length; i++){
 			
 			var childId = anchors[i].getAttribute('data-splice-child-id');
-			
 			var include = this.children[childId];
-			
 			
 			var coupler = _.Namespace.lookup(include.name);
 			
-			var c_instance = new (coupler.invokeByParent(tieInstance))(include.parameters);
-			var dom = c_instance.dom || c_instance.concrete.dom;
-			
-			anchors[i].parentNode.replaceChild(dom, anchors[i]);
+			/*
+			 * Child instance
+			 * Include parameters are passed 
+			 * the constructor as arguments
+			 * */
+			var c_instance = new (coupler.invokeByParent(tieInstance))(include.parameters);		
+			anchors[i].parentNode.replaceChild((c_instance.dom || c_instance.concrete.dom), anchors[i]);
 			
 			/* attache name reference */
 			if(tieInstance && include.ref){
@@ -257,7 +262,7 @@ _.Module = (function(document){
 		case _.Binding.Direction.FROM:
 			if(typeof instance[key] === 'function')
 				instance[key] = function(){
-					result.instance[binding.prop].apply(instance,arguments);
+					result.instance[binding.prop].apply(result.instance,arguments);
 				}
 			else
 				instance[key] = result.instance[binding.prop]; 
@@ -630,7 +635,7 @@ _.Module = (function(document){
 		
 		var notations = _.Doc.selectComments(template.dom);
 		
-		var include  = /@include:\s*(\{[\s\S]+\})/igm;
+		var include  = /@include:\s*(\{[\s\S]+\})/im;
 				
 		_.debug.log('Template annotations found: ' + (notations ? notations.length : 0));
 		if(!notations) return function(){};

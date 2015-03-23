@@ -1,21 +1,49 @@
 _.Module({
 	
-required:['modules/splice.controls/splice.controls.htmlt'],	
+required:['modules/splice.controls/splice.controls.css',
+          'modules/splice.controls/splice.controls.htmlt'],	
 	
 definition:function(){
 	
+	
+	var Button = _.Namespace('SpliceJS.Controls').Class(function Button(args){
+		_.info.log('Creating Button');
+		
+		if(args.content && args.content['label']){
+			this.elements.buttonContainer.value = args.content['label']; 
+		}
+		
+		var self = this;
+		this.elements.buttonContainer.onclick = function(){
+			self.onClick();
+		};
+	});
+
+	
+	Button.prototype.onClick = function(){
+		_.debug.log('Event is not assigned');
+	};
 	
 	
 	
 	var DataTable = _.Namespace('SpliceJS.Controls').Class(function DataTable(){
 	
 		_.info.log('Constructing date table');
-		
+		this.dom = this.elements.dataTableContainer;
 		
 	});
 	
 	DataTable.prototype.onData = function(data){
-		_.info.log('Call from control class ');
+		
+		/*process array of things */
+		_.info.log('onData Called ');
+	
+		if(!(data instanceof Array)) return;
+		for(var i=0; i<data.length; i++){
+			var r = data[i];
+			this.addRow(r);
+		}
+		
 	};
 	
 	DataTable.prototype.addHeader = function(headers){
