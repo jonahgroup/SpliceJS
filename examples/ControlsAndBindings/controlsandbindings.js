@@ -22,6 +22,9 @@ definition:function(){
 	ControlsAndBindings.prototype.onNewRecord = function(){
 		_.info.log('Creating new record');
 		
+		this.ref.deleteButton.disable();
+		this.ref.cancelButton.enable();
+		
 		this.orderData.push(['2344','Test test', 3432]);
 		
 		this.updateOrders();
@@ -32,7 +35,9 @@ definition:function(){
 	};
 	
 	ControlsAndBindings.prototype.onCancel = function(){
-		_.info.log('Deleting record...');
+		_.info.log('Cancel record edit...');
+		this.ref.cancelButton.disable();
+		this.ref.deleteButton.enable();
 	};
 	
 	ControlsAndBindings.prototype.updateOrders = function(){

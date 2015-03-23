@@ -15,11 +15,11 @@ definition:function(){
 		
 		var self = this;
 		this.elements.buttonContainer.onclick = function(){
-			if(this.isDisabled == true) return;
+			if(self.isDisabled == true) return;
 			self.onClick();
 		};
 		
-		
+		if(this.isDisabled) this.disable();
 		
 	});
 
@@ -29,10 +29,12 @@ definition:function(){
 	};
 	
 	Button.prototype.enable = function(){
+		this.elements.buttonContainer.className = '-splicejs-button';
 		this.isDisabled = false;
 	};
 	
-	Button.prototype.display = function(){
+	Button.prototype.disable = function(){
+		this.elements.buttonContainer.className = '-splicejs-button-disabled';
 		this.isDisabled = true;
 	}
 	

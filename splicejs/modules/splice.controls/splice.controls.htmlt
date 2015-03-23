@@ -1,5 +1,5 @@
 <!-- @template:{name:'SpliceJS.Controls.Button'} -->
-<input data-sp-ref="buttonContainer" class="-splicejs-controls-button" type = "button" value="Add"/>
+<input data-sp-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
 
 <!-- @template:{name:'SpliceJS.Controls.DataTable'} -->
 <table data-sp-ref="dataTableContainer"></table>

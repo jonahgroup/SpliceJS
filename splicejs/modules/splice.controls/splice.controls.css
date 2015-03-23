@@ -1,4 +1,4 @@
-.-splicejs-controls-button {
+.-splicejs-button {
 	background: none;
 	border: 1px solid #0091D0;
 	border-radius: 3px;
@@ -10,7 +10,20 @@
 	cursor:pointer;
 }
 
-.-splicejs-controls-button:hover {
+.-splicejs-button-disabled {
+	background: none;
+	border: 1px solid #cecece;
+	border-radius: 3px;
+	padding: 8px;
+	padding-left: 10px;
+	padding-right: 10px;
+	background-color: #cecece;
+	color: #ffffff;
+	cursor:pointer;
+}
+
+
+.-splicejs-button:hover {
 	background-color: #1CD0FA;
 	border: 1px solid #1CD0FA;	
 }
