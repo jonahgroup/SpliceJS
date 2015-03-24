@@ -9,7 +9,8 @@ definition:function(){
 
 		this.orderData = [
 		   ['345341', 'Basketball', 40.99],
-		   ['987633', 'Kayak', 		2340.99]
+		   ['987633', 'Kayak', 		2340.99],
+		   ['2341', 'Hiking Pole', 40.99]
 		];
 		
 		

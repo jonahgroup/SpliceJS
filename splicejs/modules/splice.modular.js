@@ -154,24 +154,23 @@ _.Module = (function(document){
 		var parameters = incParam?incParam.parameters:null;
 		
 		if(parameters) {
-		var keys = Object.keys(parameters);
-		for(var k=0; k< keys.length; k++) {
+			var keys = Object.keys(parameters);
+			for(var k=0; k< keys.length; k++) {
 			
-			var key = keys[k];
+				var key = keys[k];
 			
-			_.debug.log("Processing include property: " + key);
+				_.debug.log("Processing include property: " + key);
 			
-			/* remaining parameters are for the child instance */
-			if(parameters[key] instanceof _.Binding) {
-				var binding = parameters[key]; 
-				resolveBinding(binding, tieInstance, key);
-				continue;
+				/* remaining parameters are for the child instance */
+				if(parameters[key] instanceof _.Binding) {
+					var binding = parameters[key]; 
+					resolveBinding(binding, tieInstance, key);
+					continue;
+				}
+			
+				/* default property assignment */
+				tieInstance[key] = parameters[key];
 			}
-			
-			/* default property assignment */
-			tieInstance[key] = parameters[key];
-			
-		}
 		}
 
 		
@@ -191,12 +190,14 @@ _.Module = (function(document){
 			
 			var coupler = _.Namespace.lookup(include.name);
 			
+			if(!coupler ) coupler = include.coupler;
 			/*
 			 * Child instance
 			 * Include parameters are passed to 
 			 * the constructor as arguments
 			 * */
 			var c_instance = new (coupler.invokeByParent(tieInstance,include))(include.parameters);		
+			
 			anchors[i].parentNode.replaceChild((c_instance.dom || c_instance.concrete.dom), anchors[i]);
 			
 		}
@@ -315,6 +316,7 @@ _.Module = (function(document){
 		Coupler.invokeByParent = function(parent,incParam){
 			return function Coupler(){
 				if(this instanceof Coupler) {
+					/* this is a template with coupler */
 					if(typeof tie === 'function'){
 						var obj = Object.create(tie.prototype);
 						obj.constructor = tie;
@@ -633,6 +635,7 @@ _.Module = (function(document){
 				
 		_.debug.log('Template annotations found: ' + (notations ? notations.length : 0));
 		if(!notations) return function(){};
+		/* module argument stand for scope */
 		return function(module){
 			
 			for(var i=0; i < notations.length; i++ ){
@@ -651,7 +654,11 @@ _.Module = (function(document){
 					var childTemplate = includeTemplate.call(module,result);
 					if(!childTemplate) {_.debug.log('Could not include template '); return;}
 					
-					var childName = childTemplate.declaration.name;
+					var childName = childTemplate.template.declaration.name;
+					
+					if(childTemplate.template.isLocal) 
+						result.coupler = childTemplate;
+					
 					var childId = template.addChild(result);
 					
 					var a = document.createElement('a');
@@ -665,23 +672,27 @@ _.Module = (function(document){
 		}
 	}
 
-
+	/**
+	 * @return: Coupler
+	 * */
 	function includeTemplate(args){
 		if(!args) throw 'Unspecified include arguments';
 		if(!args.name) throw 'Invalid include argument, unspecified template name:' + args; 
 			
 		var module = this; //reffers to current module
 		
-		/* lookup template by name*/
+		/* lookup namespace template by name*/
 		var template = _.Namespace.lookup(args.name);
-		if(!template || (
-		   !(template instanceof Template) && !template.isCoupler)) { //template is not compiled compile template
+		/* for local template lookup in module scope*/
+		if(!template ) { 
+			template = module.templates[args.name].build;
+		}
 		
+		if(!template ) { //template is not compiled compile template
 			var declaration = module.templates[args.name];
 			template = compileTemplate.call(module,declaration);
 		}
-		if(template.isCoupler) template = template.template;
- 		
+
 		return template;
 	}
 	
@@ -729,45 +740,50 @@ _.Module = (function(document){
 		/*
 		 * setting module reference
 		 * */
-		template.dom.setAttribute('data-sgi-module',moduleName);
+		template.dom.setAttribute('data-sp-module',moduleName);
 		
 
 		/* copy template declaration attributes */		
 		template.declaration = declaration.spec;
 		
-		declaration.build = template;
+		
 		
 		/* Attempt Template-to-Code coupling */
-		if(template.declaration){
-			var name = template.declaration.name;
-			var tie  = template.declaration.tie; 
+		if(!template.declaration) return template;
 			
-			var splitname = _.splitQualifiedName(name);
-			if(!splitname.namespace || splitname.namespace === '') return template;
-			
-			var nameLookup 	= _.Namespace.lookup(name);
-			
-			/* 
-			 * found object by the same name 
-			 * */
-			if(nameLookup instanceof Template) throw 'Template declaration name: '+ name + ' already exists!';
-			if(nameLookup && typeof nameLookup !== 'function') throw 'Template declaration name: '+ name + ' is ocupied by another object!'; 
-			
-			if(nameLookup && !tie) tie = name;
-			/* 
-			 * If no tie code, add template object to a namespace
-			 * and return
-			 * */
-			
-			var tieLookup 	= (!tie)?null:_.Namespace.lookup(tie);	
-			
-			var coupler = createCoupler(tieLookup, template);
-			var ns = _.Namespace(splitname.namespace);
-			ns.add(splitname.name,coupler);
+		
+		var name = template.declaration.name;
+		var tie  = template.declaration.tie; 
+		
+		var splitname = _.splitQualifiedName(name);
+		
+		/* this is a local scope template declaration */
+		if(!splitname.namespace || splitname.namespace === '') { 	
+			template.isLocal = true;
+			return declaration.build = createCoupler(null,template); 
 		}
 		
+		var nameLookup 	= _.Namespace.lookup(name);
 		
-		return template;
+		/* 
+		 * found object by the same name 
+		 * */
+		if(nameLookup instanceof Template) throw 'Template declaration name: '+ name + ' already exists!';
+		if(nameLookup && typeof nameLookup !== 'function') throw 'Template declaration name: '+ name + ' is ocupied by another object!'; 
+		
+		if(nameLookup && !tie) tie = name;
+		/* 
+		 * If no tie code, add template object to a namespace
+		 * and return
+		 * */
+		
+		var tieLookup 	= (!tie)?null:_.Namespace.lookup(tie);	
+		
+		var coupler = createCoupler(tieLookup, template);
+		var ns = _.Namespace(splitname.namespace);
+		ns.add(splitname.name,coupler);
+		
+		return declaration.build = coupler;
 	}
 		
 

@@ -39,9 +39,24 @@
 		ref:'ordersTable',
 		parameters:{
 			onData:	_.Binding.To('onOrderData').Parent
-			//rowTemplate: 'OrderRow'
+			//rowTemplate: {name:'UserApplication.OrderRowTemplate'}
 		}
 	} -->
+	
+	<!-- @include:{
+		name:'OrderRowTemplate'
+	} -->
+	
 </div>
 
 
+<!-- @template:{name:'OrderRowTemplate'} -->
+	<div>@0</div>
+	<div>@ordeId</div>
+	<!-- @include: {name:'RandomNess'} -->
+	<div>@2</div>
+	<div>@3</div>
+
+
+<!-- @template:{name:'RandomNess'} -->
+	<div>@randomField</div>
