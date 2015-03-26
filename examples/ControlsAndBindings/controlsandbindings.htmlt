@@ -38,25 +38,28 @@
 		name:'SpliceJS.Controls.DataTable',
 		ref:'ordersTable',
 		parameters:{
-			onData:	_.Binding.To('onOrderData').Parent
-			//rowTemplate: {name:'UserApplication.OrderRowTemplate'}
+			onData:			_.Binding.To('onOrderData').Parent,
+			rowTemplate: 	_.Binding.Template('OrderRowTemplate')
 		}
 	} -->
 	
-	<!-- @include:{
-		name:'OrderRowTemplate'
-	} -->
 	
 </div>
 
 
-<!-- @template:{name:'OrderRowTemplate'} -->
+<!-- @template:{name:'OrderRowTemplate', tie:'OrderRow'} -->
 	<div>@0</div>
-	<div>@ordeId</div>
-	<!-- @include: {name:'RandomNess'} -->
-	<div>@2</div>
+	<div>@1</div>
 	<div>@3</div>
+	<div>@4</div>
+	<!-- @include: {
+		name:'DeleteButton',
+		parameters:{
+			onClick: _.Binding.From('onDeleteRecord').Parent,
+			content:{label:'del'}
+		}
+	} -->
 
 
-<!-- @template:{name:'RandomNess'} -->
-	<div>@randomField</div>
+<!-- @template:{name:'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
+<input style="background-color:#ff0000;" data-sp-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>

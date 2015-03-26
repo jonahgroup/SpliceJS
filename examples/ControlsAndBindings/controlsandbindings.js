@@ -4,6 +4,7 @@ required:['modules/splice.controls.js',
           '../examples/ControlsAndBindings/controlsandbindings.htmlt'],	
 	
 definition:function(){
+	var LocalScope = this;
 	
 	var ControlsAndBindings = _.Namespace('UserApplications').Class(function ControlsAndBindings(){
 
@@ -48,5 +49,10 @@ definition:function(){
 	ControlsAndBindings.prototype.onOrderData = function(data){
 		_.info.log('Unassigned onOrderData function');
 	};
+	
+	
+	var OrderRow = LocalScope.OrderRow = _.Class(function OrderRow(){
+		
+	});
 	
 }});

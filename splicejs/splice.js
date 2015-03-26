@@ -162,7 +162,7 @@ var _ = (function(window, document){
 	
 	Splice.prototype.splitQualifiedName = function(name){
 		
-		if(!name) return;
+		if(!name) return null;
 		var parts = name.split('.');
 		
 		var ns = '';

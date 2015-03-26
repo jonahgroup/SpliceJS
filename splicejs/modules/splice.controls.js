@@ -9,8 +9,10 @@ definition:function(){
 	var Button = _.Namespace('SpliceJS.Controls').Class(function Button(args){
 		_.info.log('Creating Button');
 		
-		if(args.content && args.content['label']){
+		if(this.content && this.content['label']){
 			this.elements.buttonContainer.value = args.content['label']; 
+		} else {
+			this.elements.buttonContainer.value = 'button';
 		}
 		
 		var self = this;
@@ -41,12 +43,20 @@ definition:function(){
 	
 	
 	
-	var DataTable = _.Namespace('SpliceJS.Controls').Class(function DataTable(){
-	
+	var DataTable = _.Namespace('SpliceJS.Controls').Class(function DataTable(args){
+		/* call parent constructor */
+		SpliceJS.Controls.UIControl.call(this,args);
+		
 		_.info.log('Constructing date table');
 		this.dom = this.elements.dataTableContainer;
 		
-	});
+		
+		
+		
+	}).extend(SpliceJS.Controls.UIControl);
+	
+	
+
 	
 	DataTable.prototype.onData = function(data){
 		
@@ -56,6 +66,14 @@ definition:function(){
 		if(!(data instanceof Array)) return;
 		for(var i=0; i<data.length; i++){
 			var r = data[i];
+			
+			/* insert templated row */
+			if(this.rowTemplate) {
+				var dataRow = new this.rowTemplate();
+				if(! (dataRow.concrete instanceof SpliceJS.Modular.Concrete)) throw 'DataTable: rowTemplate type is invalid must be concrete';
+				this.addDomRow(dataRow.concrete.dom);
+				continue;
+			}
 			this.addRow(r);
 		}
 		
@@ -95,7 +113,13 @@ definition:function(){
 		}
 	};
 
-	
+	DataTable.prototype.addDomRow = function(dom){
+		var row = [];	
+		for(var i=0; i< dom.childNodes.length; i++){
+			row.push(dom.childNodes[i]);
+		}
+		this.addRow(row);
+	};
 	
 	
 }	

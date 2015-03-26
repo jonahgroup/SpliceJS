@@ -49,6 +49,9 @@ _.Module = (function(document){
 		
 	});
 	
+	
+
+	
 	var Template = _.Namespace('SpliceJS.Modular').Class(function Template(dom){
 		this.dom = dom;
 		dom._template = this;
@@ -106,8 +109,10 @@ _.Module = (function(document){
 		}
 	}
 	
-	
-	Template.prototype.getInstance = function(tieInstance,incParam){
+	/**
+	 * @tieInstance - instance of a tie class that is associated with the template
+	 * */
+	Template.prototype.getInstance = function(tieInstance, incParam, scope){
 		
 		 
 		var build = this.dom;
@@ -164,7 +169,7 @@ _.Module = (function(document){
 				/* remaining parameters are for the child instance */
 				if(parameters[key] instanceof _.Binding) {
 					var binding = parameters[key]; 
-					resolveBinding(binding, tieInstance, key);
+					resolveBinding(binding, tieInstance, key, scope.templates);
 					continue;
 				}
 			
@@ -196,7 +201,7 @@ _.Module = (function(document){
 			 * Include parameters are passed to 
 			 * the constructor as arguments
 			 * */
-			var c_instance = new (coupler.invokeByParent(tieInstance,include))(include.parameters);		
+			var c_instance = new (coupler.invokeByParent(tieInstance,include,scope))(include.parameters);		
 			
 			anchors[i].parentNode.replaceChild((c_instance.dom || c_instance.concrete.dom), anchors[i]);
 			
@@ -204,6 +209,18 @@ _.Module = (function(document){
 		
 		return instance;
 	};
+	
+	
+	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(args){
+		
+		if(this.content) {
+			_.debug.log('Processing element\'s content');
+		}
+		
+		
+	});
+	
+	
 	
 	/*
 	 * Alter include behavior to understand templates
@@ -234,7 +251,7 @@ _.Module = (function(document){
 	}
 	
 	
-	function resolveBinding(binding, instance, key){
+	function resolveBinding(binding, instance, key, scope){
 		if( !(binding instanceof _.Binding) ) throw 'May to resolve binding, source property is not a binding object';
 		
 		var result = null;
@@ -253,6 +270,13 @@ _.Module = (function(document){
 			break;
 			
 		case _.Binding.ROOT:
+			break;
+			
+		case _.Binding.TEMPLATE:
+			var t = _.Namespace.lookup(binding.prop);
+			if(!t) { t = scope[binding.prop]; t = t?t.build:undefined;}
+			result = {instance:[]};
+			result.instance[binding.prop] = t;
 			break;
 		}
 		
@@ -279,11 +303,18 @@ _.Module = (function(document){
 	}
 	
 	
-	/* 
-	 * !!!! try wrapping this into some crazy closure thing !!!!! 
-	 * to allow passing include parameters,etc...
+	/** 
+	 * 
+	 * @tie
+	 * 
+	 * @template
+	 * 
+	 * @module is a scope object where modules have been declared
+	 * used for resolving references to local-scoped templates
+	 * when invoked by parent, module points to the parent's context
+	 * 
 	 * */
-	function createCoupler(tie, template){
+	function createCoupler(tie, template, scope){
 		/*
 		 * Coupler function is assigned to the variable of the same name
 		 * "Coupler" because otherwise in IE8 instanceof operation on "this"
@@ -300,20 +331,21 @@ _.Module = (function(document){
 					obj.ref = {};
 					obj.elements = {};
 					
-					obj.concrete = template.getInstance(obj);
+					
+					obj.concrete = template.getInstance(obj,undefined,scope);
 					
 					
 					tie.apply(obj, arguments);
 					return obj; 
 				}
-				return template.getInstance();
+				return template.getInstance(undefined,undefined,scope);
 			}
 			throw 'Coupler function must be invoked with [new] keyword';
 		};
 		
 		if(tie) Coupler.base = tie.base;
 		
-		Coupler.invokeByParent = function(parent,incParam){
+		Coupler.invokeByParent = function(parent,incParam,scope){
 			return function Coupler(){
 				if(this instanceof Coupler) {
 					/* this is a template with coupler */
@@ -324,12 +356,13 @@ _.Module = (function(document){
 						obj.ref = {};
 						obj.elements = {};						
 						obj.parent = parent;
-						obj.concrete = template.getInstance(obj,incParam);
+						
+						obj.concrete = template.getInstance(obj,incParam, scope);
 						
 						tie.apply(obj, arguments);
 						return obj; 
 					}
-					return template.getInstance();
+					return template.getInstance(undefined,undefined,scope);
 				}
 				throw 'Coupler function must be invoked with [new] keyword';
 			};
@@ -409,10 +442,9 @@ _.Module = (function(document){
 					 * and create template scope 
 					 * for template compilation
 					 * */
-					definition();
-					var scope = {
-						templates:templateDefinitions
-					};
+					var scope = {}; 
+					definition.call(scope);
+					scope.templates = templateDefinitions;
 					
 					/* 
 					 * Templates are compiled after module has been defined
@@ -707,14 +739,11 @@ _.Module = (function(document){
 	 * @param moduleName - a module where template can be located
 	 * @returns {HTMLElement|*} a DOM of the template (aka build version).
 	 */
-	function compileTemplate(declaration,moduleName){
+	function compileTemplate(declaration){
 		
 		if(declaration.build) return declaration.build;
 		
-		
-		if(!moduleName) moduleName = this.name;
-		
-		var module = this;
+		var scope = this;
 		
 		var html = declaration.src;
 		var wrapper = document.createElement('span');
@@ -728,60 +757,80 @@ _.Module = (function(document){
 		 * Run notations and scripts to form a 
 		 * final template DOM
 		 * */
-		_.debug.log('Processing template notations for module: ' + moduleName);		
-		AnnotationRunner(template)(module);
+		_.debug.log('Processing template notations for module: ');		
+		AnnotationRunner(template)(scope);
 		
-		_.debug.log('Processing template scripts for module: ' + moduleName);
-		new ScriptDomRunner(wrapper).run({module:moduleName});
-
+		_.debug.log('Processing template scripts for module: ' );
+		new ScriptDomRunner(wrapper).run({module:''});
 		
 		template.normalize();
-		
-		/*
-		 * setting module reference
-		 * */
-		template.dom.setAttribute('data-sp-module',moduleName);
-		
 
 		/* copy template declaration attributes */		
 		template.declaration = declaration.spec;
+
+		
+		var template_name 	= template.declaration.name;
+		var tie_name  		= template.declaration.tie; 
+		
+		var split_name 	= _.splitQualifiedName(template_name);
+		var split_tie 	= _.splitQualifiedName(tie_name);
+		
+		
+		/* 
+		 * 4 options
+		 * 
+		 * local 	local
+		 * local 	global
+		 * 
+		 * 
+		 * global 	local
+		 * global 	global
+		 * */
 		
 		
 		
-		/* Attempt Template-to-Code coupling */
-		if(!template.declaration) return template;
-			
-		
-		var name = template.declaration.name;
-		var tie  = template.declaration.tie; 
-		
-		var splitname = _.splitQualifiedName(name);
-		
-		/* this is a local scope template declaration */
-		if(!splitname.namespace || splitname.namespace === '') { 	
+		/* 
+		 * this is a local scope template declaration 
+		 * local templates may only couple with explicitly defined ties
+		 * same-name linkage is not possible
+		 * */
+		if(!split_name.namespace || split_name.namespace === '') { 	
 			template.isLocal = true;
-			return declaration.build = createCoupler(null,template); 
-		}
+			
+			var tie = tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : null;
+			
+			if(tie && tie.isCoupler) tie = tie.tie;
+			
+			return declaration.build = createCoupler(tie,template, scope);
 		
-		var nameLookup 	= _.Namespace.lookup(name);
+		}
+
+		/*
+		 * Namespace bound template declaration
+		 * allow same-name binding
+		 * */
+		
+		
+		var nameLookup 	= _.Namespace.lookup(template_name);
 		
 		/* 
 		 * found object by the same name 
 		 * */
-		if(nameLookup instanceof Template) throw 'Template declaration name: '+ name + ' already exists!';
 		if(nameLookup && typeof nameLookup !== 'function') throw 'Template declaration name: '+ name + ' is ocupied by another object!'; 
 		
-		if(nameLookup && !tie) tie = name;
+		if(nameLookup && !tie) tie_name = template_name;
 		/* 
 		 * If no tie code, add template object to a namespace
 		 * and return
 		 * */
 		
-		var tieLookup 	= (!tie)?null:_.Namespace.lookup(tie);	
+		var tie 	= tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : null;	
 		
-		var coupler = createCoupler(tieLookup, template);
-		var ns = _.Namespace(splitname.namespace);
-		ns.add(splitname.name,coupler);
+		if(tie && tie.isCoupler) tie = tie.tie;
+		
+		var coupler = createCoupler(tie, template, scope);
+		var ns = _.Namespace(split_name.namespace);
+		ns.add(split_name.name,coupler);
 		
 		return declaration.build = coupler;
 	}
@@ -799,7 +848,7 @@ _.Module = (function(document){
 		for(var i=0; i< keys.length; i++) {
 			var key = keys[i];
 			if(!templateSource[key]) continue;
-			compileTemplate.call(module,templateSource[key],module.name);
+			compileTemplate.call(module,templateSource[key]);
 		}
 	}
 	
@@ -817,6 +866,10 @@ _.Module = (function(document){
 		
 	};
 	
+	
+	Binding.Template = function(templateName){
+		return new Binding(templateName, Binding.TEMPLATE, Binding.Direction.FROM);
+	};
 	
 	Binding.From = function(propName){
 		return {
@@ -851,7 +904,7 @@ _.Module = (function(document){
 	Binding.SELF 			= 1;
 	/* Look for properties within immediate instance */
 	
-	Binding.PARENT 		= 2;
+	Binding.PARENT 			= 2;
 	/* Look for properties within direct parent of the immediate instance*/
 	
 	Binding.FIRST_PARENT 	= 3;
@@ -859,6 +912,9 @@ _.Module = (function(document){
 	
 	Binding.ROOT 			= 4;
 	/* Look for properties within a root of the parent chain */
+	
+	Binding.TEMPLATE 		= 5;
+	/* Indicates template lookup */
 	
 	/* assigna global reference */
 	_.Binding = Binding;
