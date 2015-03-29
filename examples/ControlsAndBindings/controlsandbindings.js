@@ -32,7 +32,7 @@ definition:function(){
 		this.updateOrders();
 	};
 	
-	ControlsAndBindings.prototype.onDeleteRecord = function(){
+	ControlsAndBindings.prototype.onDeleteRecord = function(args){
 		_.info.log('Deleting record...');
 	};
 	
@@ -51,8 +51,37 @@ definition:function(){
 	};
 	
 	
-	var OrderRow = LocalScope.OrderRow = _.Class(function OrderRow(){
+	var OrderRow = LocalScope.OrderRow = _.Class(function OrderRow(args){
+		
+		var db = this.ref.deleteButton;
+		_.debug.log(db);
 		
 	});
+	
+	OrderRow.prototype.onDeleteClick = function(){
+		this.onDelete(this);
+	};
+	
+	OrderRow.prototype.setDataItem = function(dataItem){
+		var textNodes = _.Doc.selectTextNodes(this.concrete.dom);
+	
+		for(var i=0; i<textNodes.length; i++){
+			var value = textNodes[i].nodeValue;
+			if(!value) continue;
+			if(!value.startsWith('@')) continue;
+			
+			var key = value.substring(1,value.length);
+			var data = dataItem[key];
+			
+			if(data){
+				var text = document.createTextNode(data);
+				textNodes[i].parentNode.replaceChild(text, textNodes[i]);
+			}
+			
+		}
+	
+	};
+	
+	
 	
 }});

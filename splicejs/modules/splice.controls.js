@@ -68,8 +68,9 @@ definition:function(){
 			var r = data[i];
 			
 			/* insert templated row */
-			if(this.rowTemplate) {
-				var dataRow = new this.rowTemplate();
+			if(this.itemTemplate) {
+				var dataRow = new this.itemTemplate({parent:this});
+				dataRow.setDataItem(r);
 				if(! (dataRow.concrete instanceof SpliceJS.Modular.Concrete)) throw 'DataTable: rowTemplate type is invalid must be concrete';
 				this.addDomRow(dataRow.concrete.dom);
 				continue;

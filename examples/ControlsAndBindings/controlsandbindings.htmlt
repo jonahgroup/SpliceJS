@@ -1,65 +1,65 @@
-<!-- @template:{name:'UserApplications.ControlsAndBindings'} -->
+<!-- @template:{type:'UserApplications.ControlsAndBindings'} -->
+<div>
 <div class="menubar">
 	
 	<!-- @include:{
-		name:'SpliceJS.Controls.Button', 
+		type:'SpliceJS.Controls.Button', 
+
 		ref:'addButton',
-		parameters:{
-			onClick:_.Binding.From('onNewRecord').Parent,
-			content:{label:'Add'}
-		}
+		onClick:_.Binding.From('onNewRecord').Parent,
+		content:{label:'Add'}
 	} -->
 	
 	<!-- @include:{
-		name:'SpliceJS.Controls.Button', 
+		type:'SpliceJS.Controls.Button', 
+
 		ref:'deleteButton',
-		parameters:{
-			onClick:_.Binding.From('onDeleteRecord').Parent,
-			content:{label:'Delete'}
-		}
+		onClick:_.Binding.From('onDeleteRecord').Parent,
+		content:{label:'Delete'}
 	} -->
 
 	<!-- @include:{
-		name:'SpliceJS.Controls.Button', 
+		type:'SpliceJS.Controls.Button', 
+
 		ref:'cancelButton',
-		parameters:{
-			isDisabled:true,
-			onClick:_.Binding.From('onCancel').Parent,
-			content:{label:'Cancel'}
-		}
+		isDisabled:true,
+		onClick:_.Binding.From('onCancel').Parent,
+		content:{label:'Cancel'}
 	} -->
-	
-	
+
 </div>
 
 <div class="directory">
 	<a>Directory</a>
-	<!-- @include:{
-		name:'SpliceJS.Controls.DataTable',
+	<!-- @include: {
+		type:'SpliceJS.Controls.DataTable',
+
 		ref:'ordersTable',
-		parameters:{
-			onData:			_.Binding.To('onOrderData').Parent,
-			rowTemplate: 	_.Binding.Template('OrderRowTemplate')
-		}
+		onData:			_.Binding.To('onOrderData').Parent,
+		itemTemplate: 	_.Obj({
+			type:'OrderRowTemplate',
+			onDelete: _.Binding.From('onDeleteRecord').Type('UserApplications.ControlsAndBindings')
+		})
+		
 	} -->
-	
-	
+</div>
 </div>
 
-
-<!-- @template:{name:'OrderRowTemplate', tie:'OrderRow'} -->
+<!-- @template:{type:'OrderRowTemplate', tie:'OrderRow'} -->
 	<div>@0</div>
 	<div>@1</div>
-	<div>@3</div>
-	<div>@4</div>
+	<div>@2</div>
 	<!-- @include: {
-		name:'DeleteButton',
-		parameters:{
-			onClick: _.Binding.From('onDeleteRecord').Parent,
-			content:{label:'del'}
+		type:'DeleteButton',
+		
+		ref:'deleteButton',
+		onClick: _.Binding.From('onDeleteClick').Parent,
+		content:{
+			label:'Delete'
 		}
 	} -->
 
 
-<!-- @template:{name:'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
-<input style="background-color:#ff0000;" data-sp-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
+<!-- @template:{type:'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
+<input style="background-color:#ff0000; border:1px solid #ff0000;" data-sp-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
+
