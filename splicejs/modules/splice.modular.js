@@ -284,6 +284,11 @@ _.Module = (function(document){
 		switch(binding.direction){
 		case _.Binding.Direction.TO:
 			if(result.instance[binding.prop] && result.instance[binding.prop].addHandler ){
+				if(!result.instance[binding.prop].isInitialized) {
+					result.instance[binding.prop] = new _.Multicaster();
+					result.instance[binding.prop].isInitialized = true;
+				}
+				
 				result.instance[binding.prop].addHandler(instance, instance[key]);
 				break;
 			}

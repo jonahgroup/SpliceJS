@@ -79,13 +79,17 @@ definition:function(){
 	var TextField = _.Namespace('SpliceJS.Controls').Class(function TextField(){
 		var self = this;
 		this.elements.textFieldContainer.onchange = function(){
-			self.onValueChanged({value:this.value});
+			self.onValueChanged({
+					dataItem:self.dataItem,
+					value:this.value
+			});
 		}
 	});
 	
 	TextField.prototype.onValueChanged = function(){}
 	
 	TextField.prototype.onDataItem = function(dataItem){
+		this.dataItem = dataItem;
 		_.debug.log('TextField on Data item ' + dataItem);
 	};
 	
