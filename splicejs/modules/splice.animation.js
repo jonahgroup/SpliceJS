@@ -136,3 +136,31 @@ Animation.bezier = function(origin, distance, time, duration){
 
 )();
 
+_.Animate = function(obj){
+	if(!obj) return;
+	
+	var objStyle = obj.style;
+	
+	return {
+		opacity:function(from, to, duration,oncomplete){
+		new _.StoryBoard([
+		new _.Animation(from,  to, duration, _.Animation.cubicEaseIn, 
+				function(value){
+						objStyle.opacity = value * 0.1 / 10;
+					},
+				oncomplete	
+			)]).animate();
+			
+		},
+	
+		width:function(from, to, duration,oncomplete){
+		new _.StoryBoard([
+		new _.Animation(from,  to, duration ? duration: 300, _.Animation.qubicEaseInOut, 
+			    function(value){
+			    	objStyle.width = value+'px';
+			    },
+			    oncomplete	
+			)]).animate();
+		}
+	}
+}

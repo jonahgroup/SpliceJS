@@ -166,6 +166,29 @@ SengiDocument.prototype.getHeight = function(){
 	return document.documentElement.clientHeight;
 };
 
+
+SengiDocument.prototype.display = function(control,ondisplay){
+	if(!control) return;
+	
+	document.body.innerHTML = '';
+	
+	if(control.concrete && control.concrete.dom) {
+		document.body.appendChild(control.concrete.dom);
+		if(typeof ondisplay === 'function') ondisplay(control);
+		return;
+	}
+	
+	if(control.dom) {
+		document.body.appendChild(control.dom);
+		if(typeof ondisplay === 'function') ondisplay(control);
+		return;
+	}
+}
+
+
+
+
+
 /*
  * use this where treewalker is not supported
  * IE8 for example.

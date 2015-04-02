@@ -22,6 +22,7 @@ definition:function(){
 		};
 		
 		if(this.isDisabled) this.disable();
+		if(this.isHidden) 	this.hide();
 		
 	});
 
@@ -29,6 +30,39 @@ definition:function(){
 	Button.prototype.onClick = function(){
 		_.debug.log('Event is not assigned');
 	};
+	
+	
+	Button.prototype.changeState = function(args){
+		_.debug.log('Chaning button\'s state');
+		if(args && args.isHidden)
+			this.hide();
+		else 
+			this.show();
+	};
+	
+	
+	Button.prototype.hide = function(){
+		var self = this;
+		if(this.animate){
+			_.Animate(this.elements.buttonContainer).opacity(100, 0, 300,function(){
+				self.elements.buttonContainer.style.display = 'none';
+			});
+		}
+		else {
+			this.elements.buttonContainer.style.display = 'none';
+		}
+	}
+	
+	Button.prototype.show = function(){
+		if(this.animate) {
+			this.elements.buttonContainer.style.opacity = 0;
+		}
+		this.elements.buttonContainer.style.display = 'block';
+		
+		if(this.animate) {
+			_.Animate(this.elements.buttonContainer).opacity(0, 100, 300);
+		}
+	}
 	
 	Button.prototype.enable = function(){
 		this.elements.buttonContainer.className = '-splicejs-button';
@@ -42,6 +76,19 @@ definition:function(){
 	
 	
 	
+	var TextField = _.Namespace('SpliceJS.Controls').Class(function TextField(){
+		var self = this;
+		this.elements.textFieldContainer.onchange = function(){
+			self.onValueChanged({value:this.value});
+		}
+	});
+	
+	TextField.prototype.onValueChanged = function(){}
+	
+	TextField.prototype.onDataItem = function(dataItem){
+		_.debug.log('TextField on Data item ' + dataItem);
+	};
+	
 	
 	var DataTable = _.Namespace('SpliceJS.Controls').Class(function DataTable(args){
 		/* call parent constructor */
@@ -49,16 +96,15 @@ definition:function(){
 		
 		_.info.log('Constructing date table');
 		this.dom = this.elements.dataTableContainer;
-		
-		
-		
-		
+	
 	}).extend(SpliceJS.Controls.UIControl);
 	
 	
 
 	
 	DataTable.prototype.onData = function(data){
+		
+		var data = data.data;
 		
 		/*process array of things */
 		_.info.log('onData Called ');
@@ -76,7 +122,12 @@ definition:function(){
 				continue;
 			}
 			this.addRow(r);
+			
 		}
+		
+	};
+	
+	DataTable.prototype.clear = function(){
 		
 	};
 	
@@ -92,7 +143,6 @@ definition:function(){
 	};
 	
 	DataTable.prototype.addRow = function(row){
-		
 		
 		if(!row) return;
 		if(!(row instanceof Array)) throw 'Argument must be of type Array';

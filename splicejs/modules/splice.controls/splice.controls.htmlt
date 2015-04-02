@@ -3,3 +3,7 @@
 
 <!-- @template:{type:'SpliceJS.Controls.DataTable'} -->
 <table data-sp-ref="dataTableContainer"></table>
+
+
+<!-- @template:{type:'SpliceJS.Controls.TextField'} -->
+<input type="text" data-sp-ref="textFieldContainer"/>

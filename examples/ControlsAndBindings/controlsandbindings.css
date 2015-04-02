@@ -1,0 +1,40 @@
+.applicationpanel {
+	
+	position:absolute;
+	left:0px;
+	top:0px;
+	bottom:0px;
+	right:0px;
+}
+
+.menubar {
+	position:relative;
+	padding:10px;
+}
+
+.bodypanel {
+	position:absolute;
+	left:0px; top:50px;
+	right:0px; bottom:0px;
+	
+}
+
+.editpanel {	
+	 position:absolute;
+	 left:0px; top:0px;
+	 bottom:0px;
+	 
+	 width:0px;
+	
+	overflow:hidden;
+}
+
+.datapanel {
+	position:absolute;
+	left:0px;
+	top:0px;
+	right:0px;
+	bottom:0px;
+	
+	overflow-y:auto;
+}

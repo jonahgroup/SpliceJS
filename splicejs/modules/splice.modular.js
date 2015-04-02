@@ -48,43 +48,6 @@ _.Module = (function(document){
 	_.Obj = Obj;
 
 	
-	
-	_.Doc.display = function(control,ondisplay){
-		if(!control) return;
-		
-		document.body.innerHTML = '';
-		
-		if(control.concrete && control.concrete.dom) {
-			document.body.appendChild(control.concrete.dom);
-			if(typeof ondisplay === 'function') ondisplay(control);
-			return;
-		}
-		
-		if(control.dom) {
-			document.body.appendChild(control.dom);
-			if(typeof ondisplay === 'function') ondisplay(control);
-			return;
-		}
-	}
-	
-	
-	_.Animate = function(obj){
-		if(!obj) return;
-		
-		return {
-			opacity:function(from, to, duration){
-			new _.StoryBoard([
-			new _.Animation(0 | from, 100 | to, (duration | 300), _.Animation.cubicEaseIn, 
-					function(value){
-  						obj.style.opacity = value * 0.1 / 10;
-  					}
-  			)]).animate();
-				
-			}
-		}
-	}
-	
-	
 	var Concrete = _.Namespace('SpliceJS.Modular').Class(function Concrete(dom){
 		this.dom = dom;
 		
@@ -320,6 +283,11 @@ _.Module = (function(document){
 		/* Assignment direction */
 		switch(binding.direction){
 		case _.Binding.Direction.TO:
+			if(result.instance[binding.prop] && result.instance[binding.prop].addHandler ){
+				result.instance[binding.prop].addHandler(instance, instance[key]);
+				break;
+			}
+			
 			if(typeof instance[key] === 'function')
 				result.instance[binding.prop] = function(){
 					instance[key].apply(instance,arguments);
@@ -329,7 +297,7 @@ _.Module = (function(document){
 			break;
 			
 		case _.Binding.Direction.FROM:
-			if(typeof instance[key] === 'function')
+			if(typeof result.instance[binding.prop] === 'function')
 				instance[key] = function(){
 					result.instance[binding.prop].apply(result.instance,arguments);
 				}
@@ -916,6 +884,31 @@ _.Module = (function(document){
 		}
 	};
 	
+	
+	var Multicaster = function Multicaster(){
+		
+		var _caster = function _caster() {
+			
+			var hC = {handlers:[], instances:[]};
+		
+			this.Multicaster = function Multicaster(){
+				for(var i=0; i<hC.handlers.length; i++){
+					if(typeof hC.handlers[i] !== 'function') continue;
+					hC.handlers[i].apply(hC.instances[i],arguments);
+				}
+			};
+		
+			this.Multicaster.addHandler = function(instance, handler){
+				hC.handlers.push(handler);
+				hC.instances.push(instance);
+			};
+		}
+		
+		
+		return (new _caster()).Multicaster;
+		
+	}
+	_.Multicaster = Multicaster;
 	
 	/*
 	 *	Binding type constants 

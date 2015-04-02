@@ -1,20 +1,28 @@
 <!-- @template:{type:'UserApplications.ControlsAndBindings'} -->
-<div>
+<div class="applicationpanel">
 <div class="menubar">
 	
 	<!-- @include:{
 		type:'SpliceJS.Controls.Button', 
 
 		ref:'addButton',
-		onClick:_.Binding.From('onNewRecord').Parent,
+		onClick:_.Binding.From('onAddRecord').Parent,
 		content:{label:'Add'}
+	} -->
+
+	<!-- @include:{
+		type:'SpliceJS.Controls.Button', 
+
+		ref:'editButton',
+		onClick:_.Binding.From('onEdit').Parent,
+		content:{label:'Edit'}
 	} -->
 	
 	<!-- @include:{
 		type:'SpliceJS.Controls.Button', 
 
 		ref:'deleteButton',
-		onClick:_.Binding.From('onDeleteRecord').Parent,
+		onClick:_.Binding.From('onDelete').Parent,
 		content:{label:'Delete'}
 	} -->
 
@@ -28,8 +36,26 @@
 	} -->
 
 </div>
+<div class="bodypanel">
+<div class="editpanel" data-sp-ref="editPanel">
 
-<div class="directory">
+	<!-- @include: {
+		type:'SpliceJS.Controls.DataTable',
+
+		ref:'editTable',
+		onData: _.Binding.To('onNewRecordData').Parent,		
+		itemTemplate: 	_.Obj({
+			type:'NewRecordRow',
+		})
+		
+	} -->
+
+
+	
+
+</div>
+<div class="datapanel" data-sp-ref="dataPanel">
+	<div>
 	<a>Directory</a>
 	<!-- @include: {
 		type:'SpliceJS.Controls.DataTable',
@@ -42,24 +68,43 @@
 		})
 		
 	} -->
+	</div>
 </div>
+</div>
+
+</div>
+
+
+<!-- @template:{type:'NewRecordRow', tie:'OrderRow'} -->
+<div><div>@0</div>
+	<div><!-- @include:{
+		type:'SpliceJS.Controls.TextField',
+		onDataItem: _.Binding.To('onDataItem').Parent,
+		onValueChanged:_.Binding.From('onNewRecordValue').Type('UserApplications.ControlsAndBindings')
+	} --></div>
 </div>
 
 <!-- @template:{type:'OrderRowTemplate', tie:'OrderRow'} -->
 	<div>@0</div>
 	<div>@1</div>
 	<div>@2</div>
+		
 	<!-- @include: {
 		type:'DeleteButton',
 		
 		ref:'deleteButton',
 		onClick: _.Binding.From('onDeleteClick').Parent,
+		isHidden:true,
+		animate:true,
+		changeState: _.Binding.To('onToggleDelete').Type('UserApplications.ControlsAndBindings'),
 		content:{
 			label:'Delete'
 		}
 	} -->
 
+<!-- @template:{type: 'CheckBox', tie:'SimpleCheckBox'} -->
+<input type="checkbox">
 
-<!-- @template:{type:'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
-<input style="background-color:#ff0000; border:1px solid #ff0000;" data-sp-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
+<!-- @template:{type: 'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
+<input style="background-color:#ff0000; border:1px solid #ff0000; font-size:10px; padding:4px; display:none;" data-sp-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
 
