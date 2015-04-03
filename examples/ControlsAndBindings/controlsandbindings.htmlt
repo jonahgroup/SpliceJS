@@ -35,6 +35,16 @@
 		content:{label:'Cancel'}
 	} -->
 
+	<div class="search">
+		<!-- @include:{
+		type:'SpliceJS.Controls.TextField',
+		dataPath:'value',
+		dataIn: _.Binding.To('dataOut').Parent,
+		dataOut:_.Binding.From('onSearchValue').Type('UserApplications.ControlsAndBindings')
+		} -->
+	
+	</div>
+
 </div>
 <div class="bodypanel">
 <div class="editpanel" data-sp-ref="editPanel">
@@ -45,7 +55,7 @@
 		ref:'editTable',
 		dataIn: _.Binding.To('onNewRecordData').Parent,		
 		itemTemplate: 	_.Obj({
-			type:'NewRecordRow',
+			type:'NewRecordRow'
 		})
 		
 	} -->
@@ -54,15 +64,18 @@
 </div>
 <div class="datapanel" data-sp-ref="dataPanel">
 	<div>
-	<a>Directory</a>
+	
 	<!-- @include: {
 		type:'SpliceJS.Controls.DataTable',
 
 		ref:'ordersTable',
 		dataIn:			_.Binding.To('onOrderData').Parent,
-		itemTemplate: 	_.Obj({
-			type:'OrderRowTemplate',
-			onDelete: _.Binding.From('onDeleteRecord').Type('UserApplications.ControlsAndBindings')
+		headerTemplate: _.Obj({
+			type:'HeaderRowTemplate'
+		}),
+			
+		itemTemplate: _.Obj({
+			type:'OrderRowTemplate'
 		})
 		
 	} -->
@@ -84,7 +97,8 @@
 	} --></div>
 </div>
 
-<!-- @template:{type:'OrderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
+<!-- @template:{type:'HeaderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
+	<div data-sp-ref="controlColumn"></div>
 	<div>@0</div>
 	<div>@1</div>
 	<div>@2</div>
@@ -94,21 +108,24 @@
 	<div>@6</div>
 	<div>@7</div>
 	<div>@8</div>
-	<!-- @include: {
-		type:'DeleteButton',
-		
-		ref:'deleteButton',
-		onClick: _.Binding.From('onDeleteClick').Parent,
-		isHidden:true,
-		animate:true,
-		changeState: _.Binding.To('onToggleDelete').Type('UserApplications.ControlsAndBindings'),
-		content:{
-			label:'Delete'
-		}
-	} -->
 
-<!-- @template:{type: 'CheckBox', tie:'SimpleCheckBox'} -->
-<input type="checkbox">
+
+<!-- @template:{type:'OrderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
+	<!-- @include: {
+		dataPath: '_del_flag',
+		dataIn: _.Binding.To('dataOut').Parent,
+		type: 'SpliceJS.Controls.CheckBox'
+	} -->
+	<div>@0</div>
+	<div>@1</div>
+	<div>@2</div>
+	<div>@3</div>
+	<div>@4</div>
+	<div>@5</div>
+	<div>@6</div>
+	<div>@7</div>
+	<div>@8</div>
+
 
 <!-- @template:{type: 'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
 <input style="background-color:#ff0000; border:1px solid #ff0000; font-size:10px; padding:4px; display:none;" data-sp-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>

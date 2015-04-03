@@ -7,3 +7,6 @@
 
 <!-- @template:{type:'SpliceJS.Controls.TextField'} -->
 <input class="-splicejs-textfield" type="text" data-sp-ref="textFieldContainer"/>
+
+<!-- @template:{type: 'SpliceJS.Controls.CheckBox'} -->
+<input type="checkbox">

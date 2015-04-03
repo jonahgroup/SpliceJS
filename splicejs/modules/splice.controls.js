@@ -91,12 +91,39 @@ definition:function(){
 	TextField.prototype.dataOut = function(){
 		throw 'Data out interface is not assigned';
 	}
-	
-	
+		
 	TextField.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
 		_.debug.log('TextField on Data item ' + dataItem);
 	};
+	
+	
+	
+	var CheckBox = _.Namespace('SpliceJS.Controls').Class(function CheckBox(args){
+		
+		var self = this;
+		this.concrete.dom.onclick = function(){
+			_.debug.log('I am check box');
+			var isChecked = self.concrete.dom.checked; 
+			if(self.dataItem) {
+				self.dataItem[self.dataPath] = isChecked;
+			}
+			
+			if(self.dataOut) 	self.dataOut(self.dataItem);
+			if(self.onCheck)	self.onCheck(isChecked);
+		};
+	
+	});
+
+	
+	CheckBox.prototype.dataIn = function(dataItem){
+		this.dataItem = dataItem;
+	};
+	
+	
+	
+	
+	
 	
 	
 	var DataTable = _.Namespace('SpliceJS.Controls').Class(function DataTable(args){
@@ -120,29 +147,38 @@ definition:function(){
 	 * - if new rows create new rows in the table 
 	 * 
 	 * */
-	DataTable.prototype.dataIn = function(data){
+	DataTable.prototype.dataIn = function(dataInput){
 		
-		var data = data.data;
+		var data 	= dataInput.data;
+		var headers = dataInput.headers;
 		
-		/*process array of things */
-		_.info.log('onData Called ');
-	
+		/* add columns */
+		if(headers instanceof Array) {
+			this.addHeader(headers);
+		}
+		
+		
+		/* data must be an array of objects */
 		if(!(data instanceof Array)) return;
 		
 		
 		/* udpate existing rows */
 		for(var j=0; j < this.dataRows.length; j++){
 			if(!data[j]){
-				this.removeRowByIndex(j);
-				continue;
+				/* remove extra dataRows and table rows*/
+				
+				for(var k=this.dataRows.length-1; k>=j; k--){
+					
+					this.removeRowByIndex(k+1); //!!!!! this is because of the header row
+					this.dataRows.splice(k,1);
+				}
+				
+				break;
 			}
 			this.dataRows[j].dataIn(data[j]);
-			
 		}
 
-		
-		
-		
+				
 		/* add new rows*/
 		for(var i=j; i<data.length; i++){
 			var r = data[i];
@@ -159,13 +195,14 @@ definition:function(){
 				continue;
 			}
 			this.addRow(r);
-
 		}
 		
 	};
 	
 	
-	
+	DataTable.prototype.removeRowByIndex = function(rowIndex){
+		this.dom.deleteRow(rowIndex);
+	};
 	
 	DataTable.prototype.clear = function(){
 		
@@ -207,7 +244,9 @@ definition:function(){
 	DataTable.prototype.addDomRow = function(dom){
 		var row = [];	
 		for(var i=0; i< dom.childNodes.length; i++){
-			row.push(dom.childNodes[i]);
+			var node = dom.childNodes[i];
+			/* element nodes only */
+			if(node.nodeType === 1) row.push(node);
 		}
 		this.addRow(row);
 	};
@@ -253,13 +292,7 @@ definition:function(){
 			
 			var node = this.contentMap[key];
 			var value = data[key];
-			
-			if(value){
-				node.nodeValue = value;
-				//var text = document.createTextNode(value);
-				//textNodes[i].parentNode.replaceChild(text, textNodes[i]);
-			}
-			
+			node.nodeValue = value;
 		}
 		
 		this.dataOut(this.data);

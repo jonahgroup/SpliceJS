@@ -20,7 +20,8 @@ _.Module = (function(document){
 			 * local scope lookup takes priority
 			 */
 			var obj = scope[args.type] || _.Namespace.lookup(args.type);
-			if(typeof obj !== 'function') throw 'Proxy is already an object';
+			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
+			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
 			
 			/* copy args*/
 			var parameters = {};
@@ -654,14 +655,15 @@ _.Module = (function(document){
 	};
 	
 	function applyScope(source){
-		var objscop = /_.Obj(\([\s\S]+\))/img;
+		var objscop = /_.Obj(\([\s\S]+\))/im; //!!! inefficient will match from the begining
 		var match = null;
 		
-		while((match = objscop.exec(source)) != null){
+		while(match = objscop.exec(source)){
 			_.debug.log('Found match ');
 			
 			source = source.substring(0,match.index + 5) + '.call(scope,' +
 					 source.substring(match.index + 6,source.length);
+			match.index = 0; // !!!inefficient, matching from the begining on every cycle
 		}
 	
 		return source;

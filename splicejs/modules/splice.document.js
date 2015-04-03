@@ -118,8 +118,6 @@ SengiDocument.prototype.cloneNodeAndProperties = function(domSource, args){
 		for(var p = 0; p < args.properties.length; p++ ){
 			// found property
 			if(args.properties[p] in node) {
-				_.debug.log('Found property ' + args.properties[p]);
-				
 				var sgiId = node.getAttribute('data-sgi-id');
 				if(!sgiId) { 
 					sgiId = currentId;

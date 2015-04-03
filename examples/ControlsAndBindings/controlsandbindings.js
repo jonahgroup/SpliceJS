@@ -17,6 +17,9 @@ definition:function(){
 			
 				self.orderData = sampleData.data;
 				self.dataColumns = sampleData.cols;
+				
+				self.dataColumns.splice(0,0,' ');
+				
 				self.updateOrders();
 			}
 		});
@@ -48,7 +51,7 @@ definition:function(){
 		//this.updateOrders();
 		this.newRecord = [];
 		
-		for(var i=0; i < this.dataColumns.length; i++){
+		for(var i=1; i < this.dataColumns.length; i++){
 			this.newRecord.push({field:this.dataColumns[i], value:''});
 		}
 		
@@ -63,9 +66,10 @@ definition:function(){
 	ControlsAndBindings.prototype.onDelete = function(args){
 		this.ref.cancelButton.enable();
 		
-		this.ref.deleteButton.disable();
 		this.ref.addButton.disable();
 		this.ref.editButton.disable();
+		
+		this.ref.deleteButton.onClick = this.onDeleteRecords.bind(this);
 		
 		this.isDeleteMode = true;
 		
@@ -73,18 +77,30 @@ definition:function(){
 		
 	};
 	
+	
+	ControlsAndBindings.prototype.onDeleteRecords = function(args){
+		_.debug.log('Deleting Records');
+		for(var i=this.orderData.length-1; i >= 0; i--){
+			if(!this.orderData[i]['_del_flag']) continue;
+			
+			_.debug.log('Deleting record: ' + i);
+			this.orderData.splice(i,1);
+		}
+		this.updateOrders();
+	};
+	
 	ControlsAndBindings.prototype.onSaveNewRecord = function(args){
 		
-		var r = this.newRecord;
-		this.orderData.push([ r[0].value, r[1].value, r[2].value]);
+		var r = []; 
+		for(var i=0; i<this.dataColumns.length-1; i++){
+			r.push(this.newRecord[i].value);
+		}
+		
+		this.orderData.splice(0,0,r);
 		
 		this.updateOrders();
 	};
 	
-	ControlsAndBindings.prototype.onDeleteRecord = function(args){
-		var dataItem = args.dataItem;
-		_.info.log('Deleting record...');
-	};
 	
 	ControlsAndBindings.prototype.onCancel = function(){
 		_.info.log('Cancel button pressed');
@@ -107,6 +123,9 @@ definition:function(){
 		if(this.isDeleteMode) {
 			this.isDeleteMode = false;
 			this.onToggleDelete({isHidden:!this.isDeleteMode});
+			
+			this.ref.deleteButton.onClick = this.onDelete.bind(this);
+			
 			return;
 		}
 		
@@ -117,20 +136,19 @@ definition:function(){
 		
 			this.ref.addButton.setLabel('Add');
 			this.ref.addButton.onClick = this.onAddRecord.bind(this);
-		
-		
 		}
 		
 		
 	};
 	
 	ControlsAndBindings.prototype.updateOrders = function(){
-		this.onOrderData({data:this.orderData});
+		this.onOrderData({data:this.orderData, headers:this.dataColumns});
 	}
 	
 	ControlsAndBindings.prototype.onOrderData = function(data){
 		_.info.log('Unassigned onOrderData function');
 	};
+	
 	
 	ControlsAndBindings.prototype.onNewRecordData = function(data){
 		
@@ -185,14 +203,6 @@ definition:function(){
 	
 	
 	
-	var SimpleCheckBox = LocalScope.SimpleCheckBox = _.Class(function SimpleCheckBox(args){
-		
-		var self = this;
-		this.concrete.dom.onclick = function(){
-			_.debug.log('I am check box');
-			self.onCheck();
-		};
-	});
 	
 
 	
