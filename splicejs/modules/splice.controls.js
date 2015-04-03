@@ -134,6 +134,7 @@ definition:function(){
 		this.dom = this.elements.dataTableContainer;
 	
 		this.dataRows = [];
+		this.haderRow = null;
 		
 	}).extend(SpliceJS.Controls.UIControl);
 	
@@ -154,7 +155,21 @@ definition:function(){
 		
 		/* add columns */
 		if(headers instanceof Array) {
-			this.addHeader(headers);
+			
+			if(this.headerRow) this.headerRow.dataIn(headers);
+			else {
+				/* custom header row content */
+				if(this.headerTemplate){
+					this.headerRow = new this.headerTemplate({parent:this});
+					this.headerRow.dataIn(headers);
+					
+					this.addDomHeader(this.headerRow.concrete.dom);
+				}
+				/* standard table header row */
+				else {
+					this.addHeaderRow(headers);
+				}
+			}
 		}
 		
 		
@@ -208,26 +223,11 @@ definition:function(){
 		
 	};
 	
-	DataTable.prototype.addHeader = function(headers){
-		
-		if(!headers) return;
-		if(this.dom.tHead) this.dom.deleteTHead();
-		
-		var headRow = this.dom.createTHead().insertRow();
-		for(var i=0; i<headers.length; i++){
-			headRow.insertCell().innerHTML = headers[i];
-		}
-	};
+
 	
-	DataTable.prototype.addRow = function(row){
+	DataTable.prototype.addRowTo = function(destination, row){
 		
-		if(!row) return;
-		if(!(row instanceof Array)) throw 'Argument must be of type Array';
-		
-		var tBody = this.dom.tBodies[0]; 
-		if(!tBody) tBody = this.dom.createTBody();
-		
-		var newrow =  tBody.insertRow();
+		var newrow =  destination.insertRow();
 		
 		for(var i=0; i < row.length; i++ ){
 			
@@ -241,6 +241,30 @@ definition:function(){
 		}
 	};
 
+	DataTable.prototype.addHeaderRow = function(headers){
+		
+		if(!headers) return;
+		if(this.dom.tHead) this.dom.deleteTHead();
+		
+		var tHead = this.dom.createTHead();
+		
+		this.addRowTo(tHead, headers);
+	};
+	
+	
+	
+	
+	DataTable.prototype.addBodyRow = function(row){
+		
+		if(!row) return;
+		if(!(row instanceof Array)) throw 'Argument must be of type Array';
+		
+		var tBody = this.dom.tBodies[0]; 
+		if(!tBody) tBody = this.dom.createTBody();
+		
+		this.addRowTo(tBody,row);
+	};
+
 	DataTable.prototype.addDomRow = function(dom){
 		var row = [];	
 		for(var i=0; i< dom.childNodes.length; i++){
@@ -248,9 +272,19 @@ definition:function(){
 			/* element nodes only */
 			if(node.nodeType === 1) row.push(node);
 		}
-		this.addRow(row);
+		this.addBodyRow(row);
 	};
-	
+
+	DataTable.prototype.addDomHeader = function(dom){
+		var row = [];	
+		for(var i=0; i< dom.childNodes.length; i++){
+			var node = dom.childNodes[i];
+			/* element nodes only */
+			if(node.nodeType === 1) row.push(node);
+		}
+		this.addHeaderRow(row);
+	};
+
 	
 	var DataTableRow =  _.Namespace('SpliceJS.Controls').Class(function DataTableRow(args){
 		

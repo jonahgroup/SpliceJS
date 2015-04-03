@@ -18,7 +18,7 @@ definition:function(){
 				self.orderData = sampleData.data;
 				self.dataColumns = sampleData.cols;
 				
-				self.dataColumns.splice(0,0,' ');
+				//self.dataColumns.splice(0,0,' ');
 				
 				self.updateOrders();
 			}
@@ -35,22 +35,15 @@ definition:function(){
 		/* reconfigure buttons */
 		this.ref.deleteButton.disable();
 		this.ref.editButton.disable();
-		
 		this.ref.cancelButton.enable();
-		
 		this.ref.addButton.setLabel('Save');
 		this.ref.addButton.onClick = this.onSaveNewRecord.bind(this);
 		
 		
 		this.actuateEditPanel().open();
-		
 		this.isAddMode = true;
 		
-		//this.orderData.push(['2344','Test test', 3432]);
-		
-		//this.updateOrders();
 		this.newRecord = [];
-		
 		for(var i=1; i < this.dataColumns.length; i++){
 			this.newRecord.push({field:this.dataColumns[i], value:''});
 		}
@@ -202,7 +195,9 @@ definition:function(){
 	
 	
 	
-	
+	var FancyHeaderRow = LocalScope.FancyHeaderRow = _.Class(function FancyHeaderRow(){
+		SpliceJS.Controls.DataTableRow.call(this);
+	}).extend(SpliceJS.Controls.DataTableRow);
 	
 
 	

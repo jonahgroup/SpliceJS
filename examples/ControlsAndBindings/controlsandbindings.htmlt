@@ -70,14 +70,9 @@
 
 		ref:'ordersTable',
 		dataIn:			_.Binding.To('onOrderData').Parent,
-		headerTemplate: _.Obj({
-			type:'HeaderRowTemplate'
-		}),
-			
-		itemTemplate: _.Obj({
-			type:'OrderRowTemplate'
-		})
-		
+		headerTemplate: _.Obj({type:'HeaderRowTemplate'}),
+		itemTemplate: 	_.Obj({type:'OrderRowTemplate'})
+	
 	} -->
 	</div>
 </div>
@@ -97,7 +92,7 @@
 	} --></div>
 </div>
 
-<!-- @template:{type:'HeaderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
+<!-- @template:{type:'HeaderRowTemplate', tie:'FancyHeaderRow'} -->
 	<div data-sp-ref="controlColumn"></div>
 	<div>@0</div>
 	<div>@1</div>
@@ -112,9 +107,9 @@
 
 <!-- @template:{type:'OrderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
 	<!-- @include: {
+		type: 'SpliceJS.Controls.CheckBox',
 		dataPath: '_del_flag',
-		dataIn: _.Binding.To('dataOut').Parent,
-		type: 'SpliceJS.Controls.CheckBox'
+		dataIn: _.Binding.To('dataOut').Parent
 	} -->
 	<div>@0</div>
 	<div>@1</div>
