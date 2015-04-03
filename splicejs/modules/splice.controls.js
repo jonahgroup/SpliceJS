@@ -102,6 +102,9 @@ definition:function(){
 	var CheckBox = _.Namespace('SpliceJS.Controls').Class(function CheckBox(args){
 		
 		var self = this;
+		
+		if(this.isHidden) this.elements.checkBoxContainer.style.display = 'none';
+		
 		this.concrete.dom.onclick = function(){
 			_.debug.log('I am check box');
 			var isChecked = self.concrete.dom.checked; 

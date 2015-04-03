@@ -66,6 +66,7 @@ definition:function(){
 		
 		this.isDeleteMode = true;
 		
+		this.activateHeader({isExpanded:true});
 		this.onToggleDelete({isHidden:!this.isDeleteMode});
 		
 	};
@@ -108,7 +109,8 @@ definition:function(){
 		if(this.isEditMode) {
 			this.isEditMode = false;
 			this.onToggleEdit({isHidden:!this.isEditMode});
-			this.actuateEditPanel().close();
+			this.actuateEditPanel({isEdit:true}).close();
+			
 			return;
 		}
 		
@@ -118,7 +120,7 @@ definition:function(){
 			this.onToggleDelete({isHidden:!this.isDeleteMode});
 			
 			this.ref.deleteButton.onClick = this.onDelete.bind(this);
-			
+			this.activateHeader({isExpanded:false});
 			return;
 		}
 		
@@ -162,16 +164,16 @@ definition:function(){
 		this.ref.editButton.disable();
 		
 		
-		this.actuateEditPanel().open();
-		
+		this.actuateEditPanel({isEdit:true}).open();
 	};
 
 	
-	ControlsAndBindings.prototype.actuateEditPanel = function(){
+	ControlsAndBindings.prototype.actuateEditPanel = function(args){
 		
 		var objStyle = this.elements.editPanel.style;
 		var objDataStyle = this.elements.dataPanel.style;
 
+		var self = this;
 		
 		var actuate = function(from, to){
 			
@@ -181,7 +183,12 @@ definition:function(){
 			    	objStyle.width = value+'px';
 			    	objDataStyle.left = value + 'px';
 			},
-			    function(){}	
+			function(){
+				if(args && args.isEdit){
+					if(from < to) self.activateHeader({isExpanded:true});
+					if(from > to) self.activateHeader({isExpanded:false});
+				}
+			}	
 			)]).animate();
 			
 		}
@@ -195,9 +202,21 @@ definition:function(){
 	
 	
 	
+	
 	var FancyHeaderRow = LocalScope.FancyHeaderRow = _.Class(function FancyHeaderRow(){
 		SpliceJS.Controls.DataTableRow.call(this);
 	}).extend(SpliceJS.Controls.DataTableRow);
+	
+	
+	FancyHeaderRow.prototype.activate = function(args){
+		_.debug.log('Activating header');
+		
+		if(args.isExpanded){
+			_.Animate(this.elements.controlColumn).width(0,30,600);
+		} else {
+			_.Animate(this.elements.controlColumn).width(30,0,600);
+		}
+	};
 	
 
 	

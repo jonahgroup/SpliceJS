@@ -9,4 +9,4 @@
 <input class="-splicejs-textfield" type="text" data-sp-ref="textFieldContainer"/>
 
 <!-- @template:{type: 'SpliceJS.Controls.CheckBox'} -->
-<input type="checkbox">
+<input type="checkbox" data-sp-ref="checkBoxContainer">

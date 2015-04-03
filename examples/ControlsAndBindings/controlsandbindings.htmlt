@@ -70,7 +70,10 @@
 
 		ref:'ordersTable',
 		dataIn:			_.Binding.To('onOrderData').Parent,
-		headerTemplate: _.Obj({type:'HeaderRowTemplate'}),
+		headerTemplate: _.Obj({
+			type:'HeaderRowTemplate',
+			activate:_.Binding.To('activateHeader').Type('UserApplications.ControlsAndBindings')
+		}),
 		itemTemplate: 	_.Obj({type:'OrderRowTemplate'})
 	
 	} -->
@@ -108,8 +111,9 @@
 <!-- @template:{type:'OrderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
 	<!-- @include: {
 		type: 'SpliceJS.Controls.CheckBox',
-		dataPath: '_del_flag',
-		dataIn: _.Binding.To('dataOut').Parent
+		isHidden:	true,
+		dataPath: 	'_del_flag',
+		dataIn: 	_.Binding.To('dataOut').Parent
 	} -->
 	<div>@0</div>
 	<div>@1</div>
