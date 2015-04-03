@@ -29,3 +29,18 @@
 	background-color: #1CD0FA;
 	border: 1px solid #1CD0FA;	
 }
+
+
+
+
+.-splicejs-textfield {
+	font-size: 13px;
+  	padding: 5px;
+ 	border: 1px solid #cecece;
+ 	border-radius: 3px;
+}
+
+
+.-splicejs-datatable {
+	white-space:nowrap;
+}

@@ -9,14 +9,18 @@ definition:function(){
 	
 	var ControlsAndBindings = _.Namespace('UserApplications').Class(function ControlsAndBindings(){
 
-		this.orderData = [
-		   ['345341', 'Basketball', 40.99],
-		   ['987633', 'Kayak', 		2340.99],
-		   ['2341', 'Hiking Pole', 40.99]
-		];
+		var self = this;
+		_.HttpRequest.post({
+			url:SPLICE_PUBLIC_ROOT + '/../examples/ControlsAndBindings/data/dataApr-2-2015.json',
+			onok:function(data){
+				eval('var sampleData = ' + data.text);
+			
+				self.orderData = sampleData.data;
+				self.dataColumns = sampleData.cols;
+				self.updateOrders();
+			}
+		});
 		
-		
-		this.updateOrders();
 		
 		_.Doc.display(this);
 	});
@@ -25,11 +29,14 @@ definition:function(){
 	ControlsAndBindings.prototype.onAddRecord = function(){
 		_.info.log('Creating new record');
 		
+		/* reconfigure buttons */
 		this.ref.deleteButton.disable();
 		this.ref.editButton.disable();
-		this.ref.addButton.disable();
+		
 		this.ref.cancelButton.enable();
 		
+		this.ref.addButton.setLabel('Save');
+		this.ref.addButton.onClick = this.onSaveNewRecord.bind(this);
 		
 		
 		this.actuateEditPanel().open();
@@ -39,8 +46,13 @@ definition:function(){
 		//this.orderData.push(['2344','Test test', 3432]);
 		
 		//this.updateOrders();
-		var newRecordTemplate = [['SKU'],['Name'],['Price']];
-		this.onNewRecordData({data:newRecordTemplate});
+		this.newRecord = [];
+		
+		for(var i=0; i < this.dataColumns.length; i++){
+			this.newRecord.push({field:this.dataColumns[i], value:''});
+		}
+		
+		this.onNewRecordData({data:this.newRecord});
 	};
 	
 	
@@ -59,6 +71,14 @@ definition:function(){
 		
 		this.onToggleDelete({isHidden:!this.isDeleteMode});
 		
+	};
+	
+	ControlsAndBindings.prototype.onSaveNewRecord = function(args){
+		
+		var r = this.newRecord;
+		this.orderData.push([ r[0].value, r[1].value, r[2].value]);
+		
+		this.updateOrders();
 	};
 	
 	ControlsAndBindings.prototype.onDeleteRecord = function(args){
@@ -94,6 +114,11 @@ definition:function(){
 		if(this.isAddMode) {
 			this.isAddMode = false;
 			this.actuateEditPanel().close();
+		
+			this.ref.addButton.setLabel('Add');
+			this.ref.addButton.onClick = this.onAddRecord.bind(this);
+		
+		
 		}
 		
 		
@@ -169,47 +194,6 @@ definition:function(){
 		};
 	});
 	
-	
-	var OrderRow = LocalScope.OrderRow = _.Class(function OrderRow(args){
-		
-		var db = this.ref.deleteButton;
-		_.debug.log(db);
-		
-	});
-	
-	OrderRow.prototype.selectRow = function(){
-		_.debug.log('select row');
-	};
-	
-	OrderRow.prototype.onDeleteClick = function(){
-		this.onDelete(this.dataItem);
-	};
-	
-	OrderRow.prototype.setDataItem = function(dataItem){
-		
-		var textNodes = _.Doc.selectTextNodes(this.concrete.dom);
-		this.dataItem = dataItem;
-		
-		for(var i=0; i<textNodes.length; i++){
-			var value = textNodes[i].nodeValue;
-			if(!value) continue;
-			if(!value.startsWith('@')) continue;
-			
-			var key = value.substring(1,value.length);
-			var data = dataItem[key];
-			
-			if(data){
-				var text = document.createTextNode(data);
-				textNodes[i].parentNode.replaceChild(text, textNodes[i]);
-			}
-			
-		}
-		
-		this.onDataItem(this.dataItem);
-	
-	};
-	
-	OrderRow.prototype.onDataItem = new _.Multicaster();
-	
+
 	
 }});

@@ -27,6 +27,10 @@ definition:function(){
 	});
 
 	
+	Button.prototype.setLabel = function(label){
+		this.elements.buttonContainer.value = label;
+	}
+	
 	Button.prototype.onClick = function(){
 		_.debug.log('Event is not assigned');
 	};
@@ -79,16 +83,17 @@ definition:function(){
 	var TextField = _.Namespace('SpliceJS.Controls').Class(function TextField(){
 		var self = this;
 		this.elements.textFieldContainer.onchange = function(){
-			self.onValueChanged({
-					dataItem:self.dataItem,
-					value:this.value
-			});
+			self.dataItem[self.dataPath] = this.value;
+			
+			self.dataOut(self.dataItem);
 		}
 	});
+	TextField.prototype.dataOut = function(){
+		throw 'Data out interface is not assigned';
+	}
 	
-	TextField.prototype.onValueChanged = function(){}
 	
-	TextField.prototype.onDataItem = function(dataItem){
+	TextField.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
 		_.debug.log('TextField on Data item ' + dataItem);
 	};
@@ -101,12 +106,21 @@ definition:function(){
 		_.info.log('Constructing date table');
 		this.dom = this.elements.dataTableContainer;
 	
+		this.dataRows = [];
+		
 	}).extend(SpliceJS.Controls.UIControl);
 	
 	
 
-	
-	DataTable.prototype.onData = function(data){
+	/*
+	 * Updating data model
+	 * - keep count of existing rows
+	 * - keep references to individual rows
+	 * - iterate over existing rows to update row's calling dataIn on the row object
+	 * - if new rows create new rows in the table 
+	 * 
+	 * */
+	DataTable.prototype.dataIn = function(data){
 		
 		var data = data.data;
 		
@@ -114,22 +128,44 @@ definition:function(){
 		_.info.log('onData Called ');
 	
 		if(!(data instanceof Array)) return;
-		for(var i=0; i<data.length; i++){
+		
+		
+		/* udpate existing rows */
+		for(var j=0; j < this.dataRows.length; j++){
+			if(!data[j]){
+				this.removeRowByIndex(j);
+				continue;
+			}
+			this.dataRows[j].dataIn(data[j]);
+			
+		}
+
+		
+		
+		
+		/* add new rows*/
+		for(var i=j; i<data.length; i++){
 			var r = data[i];
 			
 			/* insert templated row */
 			if(this.itemTemplate) {
 				var dataRow = new this.itemTemplate({parent:this});
-				dataRow.setDataItem(r);
+				
+				this.dataRows.push(dataRow);
+				
+				dataRow.dataIn(r);
 				if(! (dataRow.concrete instanceof SpliceJS.Modular.Concrete)) throw 'DataTable: rowTemplate type is invalid must be concrete';
 				this.addDomRow(dataRow.concrete.dom);
 				continue;
 			}
 			this.addRow(r);
-			
+
 		}
 		
 	};
+	
+	
+	
 	
 	DataTable.prototype.clear = function(){
 		
@@ -176,6 +212,62 @@ definition:function(){
 		this.addRow(row);
 	};
 	
+	
+	var DataTableRow =  _.Namespace('SpliceJS.Controls').Class(function DataTableRow(args){
+		
+		/* 
+		 * process content placeholders before they are 
+		 * pulled by parent control
+		 * */
+		var textNodes = _.Doc.selectTextNodes(this.concrete.dom);
+		this.contentMap = [];
+		
+		for(var i=0; i<textNodes.length; i++){
+			var value = textNodes[i].nodeValue;
+			if(!value) continue;
+			if(!value.startsWith('@')) continue;
+		
+			var key = value.substring(1,value.length);
+			
+			this.contentMap[key] = textNodes[i];
+		}
+		
+		
+		
+	});
+	
+	DataTableRow.prototype.selectRow = function(){
+		_.debug.log('select row');
+	};
+	
+	DataTableRow.prototype.onDeleteClick = function(){
+		this.onDelete(this.data);
+	};
+	
+	DataTableRow.prototype.dataIn = function(data){
+		
+		var textNodes = _.Doc.selectTextNodes(this.concrete.dom);
+		this.data = data;
+		
+		for(var key in this.contentMap){
+			
+			var node = this.contentMap[key];
+			var value = data[key];
+			
+			if(value){
+				node.nodeValue = value;
+				//var text = document.createTextNode(value);
+				//textNodes[i].parentNode.replaceChild(text, textNodes[i]);
+			}
+			
+		}
+		
+		this.dataOut(this.data);
+	
+	};
+	
+	DataTableRow.prototype.dataOut = new _.Multicaster();
+
 	
 }	
 });

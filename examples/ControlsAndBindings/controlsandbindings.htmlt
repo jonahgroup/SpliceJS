@@ -43,14 +43,12 @@
 		type:'SpliceJS.Controls.DataTable',
 
 		ref:'editTable',
-		onData: _.Binding.To('onNewRecordData').Parent,		
+		dataIn: _.Binding.To('onNewRecordData').Parent,		
 		itemTemplate: 	_.Obj({
 			type:'NewRecordRow',
 		})
 		
 	} -->
-
-
 	
 
 </div>
@@ -61,7 +59,7 @@
 		type:'SpliceJS.Controls.DataTable',
 
 		ref:'ordersTable',
-		onData:			_.Binding.To('onOrderData').Parent,
+		dataIn:			_.Binding.To('onOrderData').Parent,
 		itemTemplate: 	_.Obj({
 			type:'OrderRowTemplate',
 			onDelete: _.Binding.From('onDeleteRecord').Type('UserApplications.ControlsAndBindings')
@@ -75,20 +73,27 @@
 </div>
 
 
-<!-- @template:{type:'NewRecordRow', tie:'OrderRow'} -->
-<div><div>@0</div>
+<!-- @template:{type:'NewRecordRow', tie:'SpliceJS.Controls.DataTableRow'} -->
+<div>
+	<div style="font-size:12px;">@field</div>
 	<div><!-- @include:{
 		type:'SpliceJS.Controls.TextField',
-		onDataItem: _.Binding.To('onDataItem').Parent,
-		onValueChanged:_.Binding.From('onNewRecordValue').Type('UserApplications.ControlsAndBindings')
+		dataPath:'value',
+		dataIn: _.Binding.To('dataOut').Parent,
+		dataOut:_.Binding.From('onNewRecordValue').Type('UserApplications.ControlsAndBindings')
 	} --></div>
 </div>
 
-<!-- @template:{type:'OrderRowTemplate', tie:'OrderRow'} -->
+<!-- @template:{type:'OrderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
 	<div>@0</div>
 	<div>@1</div>
 	<div>@2</div>
-		
+	<div>@3</div>
+	<div>@4</div>
+	<div>@5</div>
+	<div>@6</div>
+	<div>@7</div>
+	<div>@8</div>
 	<!-- @include: {
 		type:'DeleteButton',
 		
