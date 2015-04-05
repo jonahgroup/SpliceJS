@@ -203,14 +203,6 @@ _.Module = (function(document){
 	
 
 	
-	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(args){
-		
-		if(this.content) {
-			_.debug.log('Processing element\'s content');
-		}
-		
-		
-	});
 	
 	
 	
@@ -325,16 +317,16 @@ _.Module = (function(document){
 	 * when invoked by parent, module points to the parent's context
 	 * 
 	 * */
-	function createCoupler(tie, template, scope){
+	function createComponent(tie, template, scope){
 		/*
-		 * Coupler function is assigned to the variable of the same name
-		 * "Coupler" because otherwise in IE8 instanceof operation on "this"
-		 * implicit object does not return true on this instanceof Coupler
+		 * Component function is assigned to the variable of the same name
+		 * "Component" because otherwise in IE8 instanceof operation on "this"
+		 * implicit object does not return true on this instanceof Component
 		 * IE8 seems to evaluare the operator against the name of the
 		 * function that created the object
 		 * */
-		var Coupler = function Coupler(args){
-			if(this instanceof Coupler) {
+		var Component = function Component(args){
+			if(this instanceof Component) {
 				if(typeof tie === 'function'){
 					var args = args || {};
 					
@@ -359,17 +351,17 @@ _.Module = (function(document){
 				}
 				return template.getInstance(undefined,undefined,scope);
 			}
-			throw 'Coupler function must be invoked with [new] keyword';
+			throw 'Component function must be invoked with [new] keyword';
 		};
 		
-		if(tie) Coupler.base = tie.base;
+		if(tie) Component.base = tie.base;
 		
-		Coupler.isCoupler = true;
-		Coupler.template = template;
-		Coupler.tie = tie;
-		Coupler.prototype = tie.prototype;
-		Coupler.constructor = tie;
-		return Coupler;
+		Component.isComponent = true;
+		Component.template = template;
+		Component.tie = tie;
+		Component.prototype = tie.prototype;
+		Component.constructor = tie;
+		return Component;
 	}; 
 	
 	
@@ -790,9 +782,9 @@ _.Module = (function(document){
 			
 			var tie = tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : Concrete;
 			
-			if(tie && tie.isCoupler) tie = tie.tie;
+			if(tie && tie.isComponent) tie = tie.tie;
 			
-			return scope.templates[declaration.spec.type] = createCoupler(tie,template, scope);
+			return scope.templates[declaration.spec.type] = createComponent(tie,template, scope);
 		
 		}
 
@@ -817,13 +809,13 @@ _.Module = (function(document){
 		
 		var tie 	= tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : Concrete;	
 		
-		if(tie && tie.isCoupler) tie = tie.tie;
+		if(tie && tie.isComponent) tie = tie.tie;
 		
-		var coupler = createCoupler(tie, template, scope);
+		var component = createComponent(tie, template, scope);
 		var ns = _.Namespace(split_name.namespace);
-		ns.add(split_name.name,coupler);
+		ns.add(split_name.name,component);
 		
-		return scope.templates[declaration.spec.type] = coupler;
+		return scope.templates[declaration.spec.type] = component;
 	}
 		
 
