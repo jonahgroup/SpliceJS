@@ -5,18 +5,56 @@ required:['modules/splice.controls/splice.controls.css',
 	
 definition:function(){
 	
+	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(){
+		
+	});
+	
+	UIControl.prototype.hide = function(){
+		var self = this;
+		if(this.animate){
+			_.Animate(this.elements.controlContainer).opacity(100, 0, 300,function(){
+				self.elements.controlContainer.style.display = 'none';
+			});
+		}
+		else {
+			this.elements.controlContainer.style.display = 'none';
+		}
+	}
+	
+	UIControl.prototype.show = function(){
+		if(this.animate) {
+			this.elements.controlContainer.style.opacity = 0;
+		}
+		this.elements.controlContainer.style.display = 'block';
+		
+		if(this.animate) {
+			_.Animate(this.elements.controlContainer).opacity(0, 100, 300);
+		}
+	}
+	
+	UIControl.prototype.changeState = function(args){
+		_.debug.log('Changing button\'s state');
+		if(args && args.isHidden)
+			this.hide();
+		else 
+			this.show();
+	};
+
+	
+	
+	
 	
 	var Button = _.Namespace('SpliceJS.Controls').Class(function Button(args){
 		_.info.log('Creating Button');
 		
 		if(this.content && this.content['label']){
-			this.elements.buttonContainer.value = args.content['label']; 
+			this.elements.controlContainer.value = args.content['label']; 
 		} else {
-			this.elements.buttonContainer.value = 'button';
+			this.elements.controlContainer.value = 'button';
 		}
 		
 		var self = this;
-		this.elements.buttonContainer.onclick = function(){
+		this.elements.controlContainer.onclick = function(){
 			if(self.isDisabled == true) return;
 			self.onClick();
 		};
@@ -24,11 +62,11 @@ definition:function(){
 		if(this.isDisabled) this.disable();
 		if(this.isHidden) 	this.hide();
 		
-	});
+	}).extend(SpliceJS.Controls.UIControl);
 
 	
 	Button.prototype.setLabel = function(label){
-		this.elements.buttonContainer.value = label;
+		this.elements.controlContainer.value = label;
 	}
 	
 	Button.prototype.onClick = function(){
@@ -36,45 +74,17 @@ definition:function(){
 	};
 	
 	
-	Button.prototype.changeState = function(args){
-		_.debug.log('Chaning button\'s state');
-		if(args && args.isHidden)
-			this.hide();
-		else 
-			this.show();
-	};
 	
 	
-	Button.prototype.hide = function(){
-		var self = this;
-		if(this.animate){
-			_.Animate(this.elements.buttonContainer).opacity(100, 0, 300,function(){
-				self.elements.buttonContainer.style.display = 'none';
-			});
-		}
-		else {
-			this.elements.buttonContainer.style.display = 'none';
-		}
-	}
 	
-	Button.prototype.show = function(){
-		if(this.animate) {
-			this.elements.buttonContainer.style.opacity = 0;
-		}
-		this.elements.buttonContainer.style.display = 'block';
-		
-		if(this.animate) {
-			_.Animate(this.elements.buttonContainer).opacity(0, 100, 300);
-		}
-	}
 	
 	Button.prototype.enable = function(){
-		this.elements.buttonContainer.className = '-splicejs-button';
+		this.elements.controlContainer.className = '-splicejs-button';
 		this.isDisabled = false;
 	};
 	
 	Button.prototype.disable = function(){
-		this.elements.buttonContainer.className = '-splicejs-button-disabled';
+		this.elements.controlContainer.className = '-splicejs-button-disabled';
 		this.isDisabled = true;
 	}
 	
@@ -82,7 +92,7 @@ definition:function(){
 	
 	var TextField = _.Namespace('SpliceJS.Controls').Class(function TextField(){
 		var self = this;
-		this.elements.textFieldContainer.onchange = function(){
+		this.elements.controlContainer.onchange = function(){
 			self.dataItem[self.dataPath] = this.value;
 			
 			self.dataOut(self.dataItem);
@@ -98,12 +108,15 @@ definition:function(){
 	};
 	
 	
-	
+	/**
+	 * 
+	 * Check box
+	 * */
 	var CheckBox = _.Namespace('SpliceJS.Controls').Class(function CheckBox(args){
 		
 		var self = this;
 		
-		if(this.isHidden) this.elements.checkBoxContainer.style.display = 'none';
+		if(this.isHidden) this.elements.controlContainer.style.display = 'none';
 		
 		this.concrete.dom.onclick = function(){
 			_.debug.log('I am check box');
@@ -116,25 +129,40 @@ definition:function(){
 			if(self.onCheck)	self.onCheck(isChecked);
 		};
 	
-	});
+	}).extend(SpliceJS.Controls.UIControl);
 
 	
 	CheckBox.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
+		if(this.dataItem && (this.dataItem[this.dataPath] === true)){
+			this.concrete.dom.checked = true;
+		}
+		else this.concrete.dom.checked = false; 
 	};
 	
+	CheckBox.prototype.clear = function(){
+		this.concrete.dom.checked = false;
+	};
+	
+
+	/**
+	 * RadioButton
+	 * */
+	var RadioButton = _.Namespace('SpliceJS.Controls').Class(function RadioButton(args){
+		
+	}).extend(SpliceJS.Controls.UIControl);
 	
 	
 	
-	
-	
-	
+	/**
+	 * DataTable
+	 * */
 	var DataTable = _.Namespace('SpliceJS.Controls').Class(function DataTable(args){
 		/* call parent constructor */
 		SpliceJS.Controls.UIControl.call(this,args);
 		
 		_.info.log('Constructing date table');
-		this.dom = this.elements.dataTableContainer;
+		this.dom = this.elements.controlContainer;
 	
 		this.dataRows = [];
 		this.haderRow = null;
