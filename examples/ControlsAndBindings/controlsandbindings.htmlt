@@ -109,12 +109,17 @@
 
 
 <!-- @template:{type:'OrderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
+	<div>
 	<!-- @include: {
 		type: 'SpliceJS.Controls.CheckBox',
 		isHidden:	true,
+		animate:	true,
+		clear:		 _.Binding.To('onClearDelete').Type('UserApplications.ControlsAndBindings'),
+		changeState: _.Binding.To('onToggleDelete').Type('UserApplications.ControlsAndBindings'),
 		dataPath: 	'_del_flag',
 		dataIn: 	_.Binding.To('dataOut').Parent
 	} -->
+	</div>
 	<div>@0</div>
 	<div>@1</div>
 	<div>@2</div>
