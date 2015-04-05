@@ -1,12 +1,14 @@
 <!-- @template:{type:'SpliceJS.Controls.Button'} -->
-<input class="-splicejs-button" data-sp-ref="buttonContainer"  type = "button" value="@label"/>
+<input class="-splicejs-button" data-sp-ref="controlContainer"  type = "button" value="@label"/>
 
 <!-- @template:{type:'SpliceJS.Controls.DataTable'} -->
-<table class="-splicejs-datatable" data-sp-ref="dataTableContainer"></table>
-
+<table class="-splicejs-datatable" data-sp-ref="controlContainer"></table>
 
 <!-- @template:{type:'SpliceJS.Controls.TextField'} -->
-<input class="-splicejs-textfield" type="text" data-sp-ref="textFieldContainer"/>
+<input class="-splicejs-textfield" type="text" data-sp-ref="controlContainer"/>
 
 <!-- @template:{type: 'SpliceJS.Controls.CheckBox'} -->
-<input type="checkbox" data-sp-ref="checkBoxContainer">
+<input type="checkbox" data-sp-ref="controlContainer">
+
+<!-- @template:{type: 'SpliceJS.Controls.RadioButton'} -->
+<input type="radio" data-sp-ref="controlContainer">

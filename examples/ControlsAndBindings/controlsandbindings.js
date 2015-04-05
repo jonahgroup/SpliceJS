@@ -53,6 +53,7 @@ definition:function(){
 	
 	
 	ControlsAndBindings.prototype.onToggleDelete 	= new _.Multicaster();
+	ControlsAndBindings.prototype.onClearDelete 	= new _.Multicaster();
 	ControlsAndBindings.prototype.onToggleEdit 		= new _.Multicaster();
 	
 	
@@ -66,8 +67,12 @@ definition:function(){
 		
 		this.isDeleteMode = true;
 		
-		this.activateHeader({isExpanded:true});
-		this.onToggleDelete({isHidden:!this.isDeleteMode});
+		var self = this;
+		
+		this.activateHeader({isExpanded:true, oncomplete:function(){
+			self.onToggleDelete({isHidden:false});
+		}});
+		
 		
 	};
 	
@@ -187,6 +192,7 @@ definition:function(){
 				if(args && args.isEdit){
 					if(from < to) self.activateHeader({isExpanded:true});
 					if(from > to) self.activateHeader({isExpanded:false});
+					
 				}
 			}	
 			)]).animate();
@@ -212,9 +218,9 @@ definition:function(){
 		_.debug.log('Activating header');
 		
 		if(args.isExpanded){
-			_.Animate(this.elements.controlColumn).width(0,30,600);
+			_.Animate(this.elements.controlColumn).width(0,18,600,args.oncomplete);
 		} else {
-			_.Animate(this.elements.controlColumn).width(30,0,600);
+			_.Animate(this.elements.controlColumn).width(18,0,600,args.oncomplete);
 		}
 	};
 	
