@@ -31,8 +31,6 @@
 }
 
 
-
-
 .-splicejs-textfield {
 	font-size: 13px;
   	padding: 5px;
@@ -44,3 +42,17 @@
 .-splicejs-datatable {
 	white-space:nowrap;
 }
+
+
+.-splicejs-datatable thead td {
+	padding:10px;	
+}
+
+
+.-splicejs-datatable tbody td {
+	height:25px;
+}
+
+
+
+

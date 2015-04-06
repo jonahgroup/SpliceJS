@@ -53,9 +53,9 @@
 		type:'SpliceJS.Controls.DataTable',
 
 		ref:'editTable',
-		dataIn: _.Binding.To('onNewRecordData').Parent,		
+		dataIn: _.Binding.To('onEditRecordData').Parent,		
 		itemTemplate: 	_.Obj({
-			type:'NewRecordRow'
+			type:'EditRecordRow'
 		})
 		
 	} -->
@@ -84,14 +84,15 @@
 </div>
 
 
-<!-- @template:{type:'NewRecordRow', tie:'SpliceJS.Controls.DataTableRow'} -->
+<!-- @template:{type:'EditRecordRow', tie:'SpliceJS.Controls.DataTableRow'} -->
 <div>
 	<div style="font-size:12px;">@field</div>
 	<div><!-- @include:{
 		type:'SpliceJS.Controls.TextField',
 		dataPath:'value',
 		dataIn: _.Binding.To('dataOut').Parent,
-		dataOut:_.Binding.From('onNewRecordValue').Type('UserApplications.ControlsAndBindings')
+		clear:	_.Binding.To('resetEditForm').Type('UserApplications.ControlsAndBindings')
+		
 	} --></div>
 </div>
 
@@ -118,6 +119,15 @@
 		changeState: _.Binding.To('onToggleDelete').Type('UserApplications.ControlsAndBindings'),
 		dataPath: 	'_del_flag',
 		dataIn: 	_.Binding.To('dataOut').Parent
+	} -->
+	<!-- @include: {
+		type: 'SpliceJS.Controls.RadioButton',
+		isHidden:	true,
+		animate:	true,
+		changeState: _.Binding.To('onToggleEdit').Type('UserApplications.ControlsAndBindings'),
+		
+		dataIn:		_.Binding.To('dataOut').Parent,
+		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
 	} -->
 	</div>
 	<div>@0</div>

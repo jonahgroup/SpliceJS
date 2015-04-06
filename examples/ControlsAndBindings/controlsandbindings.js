@@ -18,8 +18,6 @@ definition:function(){
 				self.orderData = sampleData.data;
 				self.dataColumns = sampleData.cols;
 				
-				//self.dataColumns.splice(0,0,' ');
-				
 				self.updateOrders();
 			}
 		});
@@ -44,17 +42,18 @@ definition:function(){
 		this.isAddMode = true;
 		
 		this.newRecord = [];
-		for(var i=1; i < this.dataColumns.length; i++){
+		for(var i=0; i < this.dataColumns.length; i++){
 			this.newRecord.push({field:this.dataColumns[i], value:''});
 		}
 		
-		this.onNewRecordData({data:this.newRecord});
+		this.onEditRecordData({data:this.newRecord});
 	};
 	
 	
 	ControlsAndBindings.prototype.onToggleDelete 	= new _.Multicaster();
 	ControlsAndBindings.prototype.onClearDelete 	= new _.Multicaster();
 	ControlsAndBindings.prototype.onToggleEdit 		= new _.Multicaster();
+	ControlsAndBindings.prototype.resetEditForm 	= new _.Multicaster();
 	
 	
 	ControlsAndBindings.prototype.onDelete = function(args){
@@ -101,6 +100,17 @@ definition:function(){
 	};
 	
 	
+	
+	ControlsAndBindings.prototype.onSaveEditRecord = function(args){
+		
+		for(var i =0; i<this.editRecord.length; i++){
+			this.currentEditItem[i] = this.editRecord[i].value;
+		}
+		
+		
+		this.updateOrders();
+	};
+	
 	ControlsAndBindings.prototype.onCancel = function(){
 		_.info.log('Cancel button pressed');
 		
@@ -115,6 +125,11 @@ definition:function(){
 			this.isEditMode = false;
 			this.onToggleEdit({isHidden:!this.isEditMode});
 			this.actuateEditPanel({isEdit:true}).close();
+			
+			this.ref.editButton.setLabel('Edit');
+			this.ref.editButton.onClick = this.onEdit.bind(this);
+
+			this.resetEditForm();
 			
 			return;
 		}
@@ -136,6 +151,9 @@ definition:function(){
 		
 			this.ref.addButton.setLabel('Add');
 			this.ref.addButton.onClick = this.onAddRecord.bind(this);
+			
+			this.resetEditForm();
+		
 		}
 		
 		
@@ -149,14 +167,21 @@ definition:function(){
 		_.info.log('Unassigned onOrderData function');
 	};
 	
+			
 	
-	ControlsAndBindings.prototype.onNewRecordData = function(data){
+	
+	ControlsAndBindings.prototype.onEditItemSelected = function(dataItem){
+		if(!dataItem) return;
+		this.editRecord = [];
+		this.currentEditItem = dataItem;
 		
+		for(var i=0; i < this.dataColumns.length; i++){
+			this.editRecord.push({field:this.dataColumns[i], value:dataItem[i]});
+		}
+		
+		this.onEditRecordData({data:this.editRecord});
 	}
 	
-	ControlsAndBindings.prototype.onNewRecordValue = function(dataItem){
-		_.debug.log('Data item change ' + dataItem);
-	}
 	
 	ControlsAndBindings.prototype.onEdit = function(){
 		
@@ -166,7 +191,10 @@ definition:function(){
 		
 		this.ref.deleteButton.disable();
 		this.ref.addButton.disable();
-		this.ref.editButton.disable();
+		
+		this.ref.editButton.setLabel('Save');
+		this.ref.editButton.onClick = this.onSaveEditRecord.bind(this);
+
 		
 		
 		this.actuateEditPanel({isEdit:true}).open();
@@ -190,8 +218,16 @@ definition:function(){
 			},
 			function(){
 				if(args && args.isEdit){
-					if(from < to) self.activateHeader({isExpanded:true});
-					if(from > to) self.activateHeader({isExpanded:false});
+					if(from < to) self.activateHeader({
+						isExpanded:true,
+						oncomplete:function(){self.onToggleEdit({isHidden:false})}
+					});
+					if(from > to) self.activateHeader({
+						isExpanded:false,
+						oncomplete:function(){self.onToggleEdit({isHidden:true})}
+					});
+					
+					
 					
 				}
 			}	

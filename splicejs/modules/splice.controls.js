@@ -6,7 +6,7 @@ required:['modules/splice.controls/splice.controls.css',
 definition:function(){
 	
 	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(){
-		
+		if(this.isHidden) this.elements.controlContainer.style.display = 'none';
 	});
 	
 	UIControl.prototype.hide = function(){
@@ -46,6 +46,7 @@ definition:function(){
 	
 	var Button = _.Namespace('SpliceJS.Controls').Class(function Button(args){
 		_.info.log('Creating Button');
+		SpliceJS.Controls.UIControl.apply(this,arguments);
 		
 		if(this.content && this.content['label']){
 			this.elements.controlContainer.value = args.content['label']; 
@@ -60,7 +61,7 @@ definition:function(){
 		};
 		
 		if(this.isDisabled) this.disable();
-		if(this.isHidden) 	this.hide();
+		
 		
 	}).extend(SpliceJS.Controls.UIControl);
 
@@ -91,6 +92,8 @@ definition:function(){
 	
 	
 	var TextField = _.Namespace('SpliceJS.Controls').Class(function TextField(){
+		SpliceJS.Controls.UIControl.apply(this,arguments);
+
 		var self = this;
 		this.elements.controlContainer.onchange = function(){
 			self.dataItem[self.dataPath] = this.value;
@@ -98,13 +101,20 @@ definition:function(){
 			self.dataOut(self.dataItem);
 		}
 	});
+	
 	TextField.prototype.dataOut = function(){
 		throw 'Data out interface is not assigned';
 	}
 		
 	TextField.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
-		_.debug.log('TextField on Data item ' + dataItem);
+		var value = this.dataItem[this.dataPath];
+		
+		if(value) this.elements.controlContainer.value = value;
+	};
+	
+	TextField.prototype.clear = function(){
+		this.elements.controlContainer.value = '';
 	};
 	
 	
@@ -113,10 +123,11 @@ definition:function(){
 	 * Check box
 	 * */
 	var CheckBox = _.Namespace('SpliceJS.Controls').Class(function CheckBox(args){
-		
+		SpliceJS.Controls.UIControl.apply(this,arguments);
+
 		var self = this;
 		
-		if(this.isHidden) this.elements.controlContainer.style.display = 'none';
+		
 		
 		this.concrete.dom.onclick = function(){
 			_.debug.log('I am check box');
@@ -149,8 +160,20 @@ definition:function(){
 	 * RadioButton
 	 * */
 	var RadioButton = _.Namespace('SpliceJS.Controls').Class(function RadioButton(args){
-		
+		SpliceJS.Controls.UIControl.apply(this,arguments);
+	
+		var self = this;
+		this.elements.controlContainer.onclick = function(){
+			self.dataOut(self.dataItem);
+		}
+	
 	}).extend(SpliceJS.Controls.UIControl);
+	
+	
+	RadioButton.prototype.dataIn = function(dataItem){
+		this.dataItem = dataItem;
+	} 
+	
 	
 	
 	
@@ -159,7 +182,7 @@ definition:function(){
 	 * */
 	var DataTable = _.Namespace('SpliceJS.Controls').Class(function DataTable(args){
 		/* call parent constructor */
-		SpliceJS.Controls.UIControl.call(this,args);
+		SpliceJS.Controls.UIControl.apply(this,arguments);
 		
 		_.info.log('Constructing date table');
 		this.dom = this.elements.controlContainer;
