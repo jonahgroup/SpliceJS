@@ -54,6 +54,8 @@ definition:function(){
 	ControlsAndBindings.prototype.onClearDelete 	= new _.Multicaster();
 	ControlsAndBindings.prototype.onToggleEdit 		= new _.Multicaster();
 	ControlsAndBindings.prototype.resetEditForm 	= new _.Multicaster();
+	ControlsAndBindings.prototype.onOrderData 		= new _.Multicaster();
+	
 	
 	
 	ControlsAndBindings.prototype.onDelete = function(args){
@@ -163,9 +165,6 @@ definition:function(){
 		this.onOrderData({data:this.orderData, headers:this.dataColumns});
 	}
 	
-	ControlsAndBindings.prototype.onOrderData = function(data){
-		_.info.log('Unassigned onOrderData function');
-	};
 	
 			
 	

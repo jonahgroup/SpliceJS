@@ -69,6 +69,7 @@
 		type:'SpliceJS.Controls.DataTable',
 
 		ref:'ordersTable',
+		style: 'cool-blue-table',
 		dataIn:			_.Binding.To('onOrderData').Parent,
 		headerTemplate: _.Obj({
 			type:'HeaderRowTemplate',
@@ -77,11 +78,13 @@
 		itemTemplate: 	_.Obj({type:'OrderRowTemplate'})
 	
 	} -->
+
 	</div>
 </div>
 </div>
 
 </div>
+
 
 
 <!-- @template:{type:'EditRecordRow', tie:'SpliceJS.Controls.DataTableRow'} -->

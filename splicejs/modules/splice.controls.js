@@ -1,12 +1,19 @@
 _.Module({
 	
 required:['modules/splice.controls/splice.controls.css',
-          'modules/splice.controls/splice.controls.htmlt'],	
+          'modules/splice.controls/splice.controls.htmlt',
+          'modules/splice.controls/splice.controls.datatable.js'
+          ],	
 	
 definition:function(){
 	
-	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(){
+	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(args){
 		if(this.isHidden) this.elements.controlContainer.style.display = 'none';
+
+		/* attach style to the controlContainer */
+		if(args.style)
+		this.elements.controlContainer.className += ' ' + args.style; 
+
 	});
 	
 	UIControl.prototype.hide = function(){

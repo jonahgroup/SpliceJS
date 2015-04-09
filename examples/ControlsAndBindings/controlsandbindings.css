@@ -43,3 +43,30 @@
 .search {
 	float:right;
 }
+
+
+
+table.cool-blue-table {
+	width:100%;
+	border-collapse: collapse;
+}
+
+table.cool-blue-table td {
+	border:1px solid rgb(54,83,112);
+	color:rgb(114,141,176);
+}
+
+table.cool-blue-table thead td {
+	background-color:rgb(37,62,93);
+}
+
+table.cool-blue-table tbody td {
+	font-size:13px;
+	padding:6px;
+	background-color:rgb(28,50,73);
+}
+
+
+table.cool-blue-table td:first-child {
+	text-align: middle;
+}
