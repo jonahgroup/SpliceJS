@@ -23,11 +23,11 @@
 	 position:absolute;
 	 left:0px; top:0px;
 	 bottom:0px;
-	 
-	 padding-left:10px;
 	 width:0px;
 	
 	overflow:hidden;
+
+	background-color:rgb(28,50,73);
 }
 
 .datapanel {
@@ -44,6 +44,16 @@
 	float:right;
 }
 
+
+
+.edit-field {
+	color:rgb(114,141,176);
+}
+
+
+table.edit-fields-table {
+	color:rgb(114,141,176);
+}
 
 
 table.cool-blue-table {

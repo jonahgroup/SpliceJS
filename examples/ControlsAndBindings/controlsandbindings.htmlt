@@ -53,6 +53,7 @@
 		type:'SpliceJS.Controls.DataTable',
 
 		ref:'editTable',
+		style:'edit-fields-table',
 		dataIn: _.Binding.To('onEditRecordData').Parent,		
 		itemTemplate: 	_.Obj({
 			type:'EditRecordRow'
@@ -92,6 +93,7 @@
 	<div style="font-size:12px;">@field</div>
 	<div><!-- @include:{
 		type:'SpliceJS.Controls.TextField',
+		style:'edit-field',
 		dataPath:'value',
 		dataIn: _.Binding.To('dataOut').Parent,
 		clear:	_.Binding.To('resetEditForm').Type('UserApplications.ControlsAndBindings')
@@ -102,7 +104,7 @@
 <!-- @template:{type:'HeaderRowTemplate', tie:'FancyHeaderRow'} -->
 	<div data-sp-ref="controlColumn"></div>
 	<div>@0</div>
-	<div>@1</div>
+	<div><div style="display:inline;">@1</div> <div style="display:inline; float:right;">X</div></div>
 	<div>@2</div>
 	<div>@3</div>
 	<div>@4</div>
