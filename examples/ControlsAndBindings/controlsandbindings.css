@@ -78,5 +78,8 @@ table.cool-blue-table tbody td {
 
 
 table.cool-blue-table td:first-child {
-	text-align: middle;
+	text-align: center;
+	padding:0px;
+	border-left:none;
+
 }

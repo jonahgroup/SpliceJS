@@ -1,9 +1,6 @@
 <!-- @template:{type:'SpliceJS.Controls.Button'} -->
 <input class="-splicejs-button" data-sp-ref="controlContainer"  type = "button" value="@label"/>
 
-<!-- @template:{type:'SpliceJS.Controls.DataTable'} -->
-<table class="-splicejs-datatable" data-sp-ref="controlContainer"></table>
-
 <!-- @template:{type:'SpliceJS.Controls.TextField'} -->
 <input class="-splicejs-textfield" type="text" data-sp-ref="controlContainer"/>
 

@@ -1,4 +1,5 @@
 _.Module = (function(document){	
+
 	//enable strict mode
 	"use strict"; 
 	
@@ -383,11 +384,12 @@ _.Module = (function(document){
 			 * their result be injected into DOM, by replacing underlying script tag.
 			 * @param moduleDefinition
 			 */
-			define : function(moduleDefinition, ondefined){
+			define : function(moduleDefinition){
 				
 				var required 	= moduleDefinition.required;
 				var moduleName 	= moduleDefinition.name;
 				var definition  = moduleDefinition.definition;
+				var follows 	= moduleDefinition.follows; 
 			
 				var node = _.currentlyLoading;
 								
@@ -445,7 +447,9 @@ _.Module = (function(document){
 					 * Invoke callback when definition is
 					 * complete
 					 * */
-					if(typeof(ondefined) === 'function') ondefined(m);
+					if(follows && follows.length > 0) {
+						_.include(follows);
+					}
 					
 				},collectTemplates);
 			},
