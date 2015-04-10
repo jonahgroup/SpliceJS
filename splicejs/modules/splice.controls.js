@@ -22,6 +22,9 @@ definition:function(){
 		if(args.style)
 		this.elements.controlContainer.className += ' ' + args.style; 
 
+
+		this.dataItem = null;
+
 	});
 	
 	UIControl.prototype.hide = function(){
@@ -55,12 +58,15 @@ definition:function(){
 			this.show();
 	};
 
+	UIControl.prototype.dataIn = function(data){
+		this.dataItem = data;
+	};
 	
-	
+	UIControl.prototype.dataOut = function(){};
 	
 	
 	var Button = _.Namespace('SpliceJS.Controls').Class(function Button(args){
-		_.info.log('Creating Button');
+		
 		SpliceJS.Controls.UIControl.apply(this,arguments);
 		
 		if(this.content && this.content['label']){
@@ -72,7 +78,8 @@ definition:function(){
 		var self = this;
 		this.elements.controlContainer.onclick = function(){
 			if(self.isDisabled == true) return;
-			self.onClick();
+			self.onClick(self.dataItem);
+
 		};
 		
 		if(this.isDisabled) this.disable();
@@ -122,7 +129,7 @@ definition:function(){
 	}
 		
 	TextField.prototype.dataIn = function(dataItem){
-		this.dataItem = dataItem;
+		UIControl.prototype.dataIn.call(this,dataItem);
 		var value = this.dataItem[this.dataPath];
 		
 		if(value) this.elements.controlContainer.value = value;
@@ -179,6 +186,14 @@ definition:function(){
 	
 		var self = this;
 		this.elements.controlContainer.onclick = function(){
+
+			if(self.elements.controlContainer.checked) {
+				if(self.dataPath)
+				self.dataItem[self.dataPath] = true
+			} else {
+				if(self.dataPath)
+				self.dataItem[self.dataPath] = false;
+			}
 			self.dataOut(self.dataItem);
 		}
 	
@@ -186,7 +201,20 @@ definition:function(){
 	
 	
 	RadioButton.prototype.dataIn = function(dataItem){
-		this.dataItem = dataItem;
-	} 
+		UIControl.prototype.dataIn.call(this,dataItem);
+
+		if(!this.dataPath) {
+			this.elements.controlContainer.checked = false;
+			return;
+		}
+
+		if(this.dataItem[this.dataPath] === true) {
+			this.elements.controlContainer.checked = true;
+		}
+		else {
+			this.elements.controlContainer.checked = false;	
+		}
+	};
+
 // end module definition		
 }});

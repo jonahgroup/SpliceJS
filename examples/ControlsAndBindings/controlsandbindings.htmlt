@@ -38,6 +38,7 @@
 	<div class="search">
 		<!-- @include:{
 		type:'SpliceJS.Controls.TextField',
+		style: 'edit-field',
 		dataPath:'value',
 		dataIn: _.Binding.To('dataOut').Parent,
 		dataOut:_.Binding.From('onSearchValue').Type('UserApplications.ControlsAndBindings')
@@ -104,7 +105,10 @@
 <!-- @template:{type:'HeaderRowTemplate', tie:'FancyHeaderRow'} -->
 	<div data-sp-ref="controlColumn"></div>
 	<div>@0</div>
-	<div><div style="display:inline;">@1</div> <div style="display:inline; float:right;">X</div></div>
+	<div>
+		<div style="display:inline;">@1</div> 
+		<div style="display:inline; float:right;">X</div>
+	</div>
 	<div>@2</div>
 	<div>@3</div>
 	<div>@4</div>
@@ -130,7 +134,7 @@
 		isHidden:	true,
 		animate:	true,
 		changeState: _.Binding.To('onToggleEdit').Type('UserApplications.ControlsAndBindings'),
-		
+		dataPath:	'_edit_flag',
 		dataIn:		_.Binding.To('dataOut').Parent,
 		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
 	} -->

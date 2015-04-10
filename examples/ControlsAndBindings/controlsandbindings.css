@@ -10,6 +10,7 @@
 .menubar {
 	position:relative;
 	padding:10px;
+	background-color:rgb(28,50,73);
 }
 
 .bodypanel {
@@ -47,7 +48,13 @@
 
 
 .edit-field {
-	color:rgb(114,141,176);
+  color: rgb(114,141,176);
+  background: none;
+  border: none;
+  border-bottom: 1px solid;
+  border-radius: 0px;
+  border-color: #365370;
+  width: 165px;
 }
 
 
@@ -80,6 +87,6 @@ table.cool-blue-table tbody td {
 table.cool-blue-table td:first-child {
 	text-align: center;
 	padding:0px;
-	border-left:none;
+	
 
 }

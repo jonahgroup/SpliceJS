@@ -133,6 +133,11 @@ definition:function(){
 
 			this.resetEditForm();
 			
+			if(this.currentEditItem) {
+				this.currentEditItem['_edit_flag'] = false;
+				this.currentEditItem = null;
+			}
+			this.updateOrders();
 			return;
 		}
 		
@@ -172,12 +177,20 @@ definition:function(){
 	ControlsAndBindings.prototype.onEditItemSelected = function(dataItem){
 		if(!dataItem) return;
 		this.editRecord = [];
+		
+		if(this.currentEditItem === dataItem) return;
+
+		if(this.currentEditItem) {
+			this.currentEditItem['_edit_flag'] = false;
+		}
+
 		this.currentEditItem = dataItem;
 		
 		for(var i=0; i < this.dataColumns.length; i++){
 			this.editRecord.push({field:this.dataColumns[i], value:dataItem[i]});
 		}
 		
+		this.updateOrders();
 		this.onEditRecordData({data:this.editRecord});
 	}
 	
