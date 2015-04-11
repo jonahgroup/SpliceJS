@@ -6,6 +6,7 @@
 		type:'SpliceJS.Controls.Button', 
 
 		ref:'addButton',
+		style: 'button',
 		onClick:_.Binding.From('onAddRecord').Parent,
 		content:{label:'Add'}
 	} -->
@@ -14,6 +15,7 @@
 		type:'SpliceJS.Controls.Button', 
 
 		ref:'editButton',
+		style: 'button',
 		onClick:_.Binding.From('onEdit').Parent,
 		content:{label:'Edit'}
 	} -->
@@ -22,6 +24,7 @@
 		type:'SpliceJS.Controls.Button', 
 
 		ref:'deleteButton',
+		style: 'button',
 		onClick:_.Binding.From('onDelete').Parent,
 		content:{label:'Delete'}
 	} -->
@@ -30,6 +33,7 @@
 		type:'SpliceJS.Controls.Button', 
 
 		ref:'cancelButton',
+		style: 'button',
 		isDisabled:true,
 		onClick:_.Binding.From('onCancel').Parent,
 		content:{label:'Cancel'}
@@ -65,7 +69,6 @@
 
 </div>
 <div class="datapanel" data-sp-ref="dataPanel">
-	<div>
 	
 	<!-- @include: {
 		type:'SpliceJS.Controls.DataTable',
@@ -81,7 +84,7 @@
 	
 	} -->
 
-	</div>
+
 </div>
 </div>
 

@@ -227,6 +227,7 @@ definition:function(){
 			    function(value){
 			    	objStyle.width = value+'px';
 			    	objDataStyle.left = value + 'px';
+			    	self.ref.ordersTable.reflow();
 			},
 			function(){
 				if(args && args.isEdit){

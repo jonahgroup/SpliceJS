@@ -1,4 +1,22 @@
 <!-- @template:{type:'SpliceJS.Controls.DataTable'} -->
-<div>
-<table class="-splicejs-datatable" data-sp-ref="controlContainer"></table>
+<div style="position:relative;" data-sp-ref="controlContainer">
+	<!-- @include: {
+		type:'SpliceJS.Controls.ScrollPanel',
+		ref:'scrollPanel',
+		content:{
+			scrollContent:_.Obj({
+				type:'DataTableBody',
+				ref:'tableBody'
+			})
+		}
+	} -->
+</div>
+
+
+<!-- @template:{type:'DataTableBody'} -->
+<div class="-splicejs-datatable-headercontainer" style="position:absolute; z-index:10;">
+	<table class="-splicejs-datatable" data-sp-ref="columnHeaderTable"></table>
+</div>
+<div style="position:relative;">
+	<table class="-splicejs-datatable" data-sp-ref="dataTable"></table>
 </div>

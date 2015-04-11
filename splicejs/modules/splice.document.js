@@ -55,26 +55,56 @@ _.className = function(node, className){
 	return result;
 };
 
+_.unit = function(value){
+	if(!value) return;
+
+	value = value.toLowerCase();
+
+	var index = value.indexOf('px');
+	if(index >= 0) {
+		return {value:1*value.substring(0,index), 
+				unit:value.substring(index,value.length)};
+	}
+};
+
+_.Doc = new Doc();
+
+function Doc(){}
 
 
+Doc.prototype.style = function(element){
+	var css = window.getComputedStyle(element,null);
 
-_.Doc = new SengiDocument;
+	var getValue = function(valueName){
+		return _.unit(css.getPropertyValue(valueName));
+	}
+
+	return {
+		
+		height:getValue('height'),
+		padding:{
+			left: 	getValue('padding-left'),
+			right:  getValue('padding-right'),
+			top: 	getValue('padding-top'), 
+			bottom: getValue('padding-bottom')
+		}
+
+	}
+
+}
 
 
-
-function SengiDocument(){}
-
-SengiDocument.prototype.setTitle = function(documentTitle){
+Doc.prototype.setTitle = function(documentTitle){
 	document.title = documentTitle;
 };
 
 
-SengiDocument.prototype.dom = function(element){
+Doc.prototype.dom = function(element){
 	return new DomWrapper(element);
 };
 
 
-SengiDocument.prototype.elementPosition = function(element){
+Doc.prototype.elementPosition = function(element){
 
 	var n = element;
 	var location  = new Array(0,0);
@@ -92,11 +122,11 @@ SengiDocument.prototype.elementPosition = function(element){
 };
 
 
-SengiDocument.prototype.elementSize = function(element){
+Doc.prototype.elementSize = function(element){
 	return {width:element.offsetWidth,height:element.offsetHeight};
 };
 
-SengiDocument.prototype.cloneNodeAndProperties = function(domSource, args){
+Doc.prototype.cloneNodeAndProperties = function(domSource, args){
 	
 	// noop on void property lists
 	if(!args.properties || args.properties.length < 1 ) return;
@@ -160,12 +190,12 @@ SengiDocument.prototype.cloneNodeAndProperties = function(domSource, args){
 	return clonedDom;
 };
 
-SengiDocument.prototype.getHeight = function(){
+Doc.prototype.getHeight = function(){
 	return document.documentElement.clientHeight;
 };
 
 
-SengiDocument.prototype.display = function(control,ondisplay){
+Doc.prototype.display = function(control,ondisplay){
 	if(!control) return;
 	
 	document.body.innerHTML = '';
@@ -191,17 +221,25 @@ SengiDocument.prototype.display = function(control,ondisplay){
  * use this where treewalker is not supported
  * IE8 for example.
  * */
-function dfs(dom, target, nodeType){
+function dfs(dom, target, nodeType, filterFn){
 	if(!dom) return;
-	if(dom.nodeType == nodeType) {target.push(dom); return;}
+	if(dom.nodeType == nodeType) {
+		if(typeof filterFn === 'function') {
+			dom = filterFn(dom);  
+			if(dom)	target.push(dom);
+		} else {
+			target.push(dom);
+		} 
+		return;
+	}
 	
 	for(var i=0; i < dom.childNodes.length; i++){
 		var n = dom.childNodes[i];
-		dfs(n,target,nodeType);
+		dfs(n,target,nodeType,filterFn);
 	}
 }; 
 
-SengiDocument.prototype.selectComments = function selectComments(dom){
+Doc.prototype.selectComments = function selectComments(dom){
 	var nodes = new Array();
 	//nodeType 8 is comment node
 	dfs(dom,nodes,8);
@@ -210,20 +248,58 @@ SengiDocument.prototype.selectComments = function selectComments(dom){
 };
 
 
-SengiDocument.prototype.selectTextNodes = function selectTextNodes(dom){
+Doc.prototype.selectTextNodes = function selectTextNodes(dom,filterFn){
 	var nodes = new Array();
 	//nodeType 3 is a text node
-	dfs(dom,nodes,3);
+	dfs(dom,nodes,3,filterFn);
 	if(nodes.length < 1) nodes = null;
 	return nodes;
 };
 
 
-SengiDocument.prototype.stopEventPropagation = function(event){
+Doc.prototype.stopEventPropagation = function(event){
 	event.cancelBubble = true;
 	if(event.stopPropagation) event.stopPropagation();
 };
 
+Doc.prototype.firstNonText = function(dom){
+	for(var i=0; i < dom.childNodes.length; i++){
+		var n = dom.childNodes[i];
+		if(n.nodeType != 3) return n;
+	}
+};
+
+Doc.prototype.element = function(config){
+if(!config) return;
+	if(!config.element) return;	
+	var e = document.createElement(config.element);
+	
+	if(config.id) e.id = config.id;
+	if(config.cssclass) e.className = config.cssclass;
+	
+	if(config.parent){
+		config.parent.appendChild(e);
+	}
+	
+	e.hide = function(){
+		this.style.display = 'none';
+	};
+	
+	e.show = function(){
+		this.style.display = 'block';
+	};
+	
+	e.reflow = function(l,t,w,h){
+		var s = this.style;
+		s.height 	= h + 'px';
+		s.width 	= w + 'px';
+		s.left 		= l + 'px';
+		s.top 		= t + 'px';
+		
+	};
+	
+	return e;
+};
 
 function DomWrapper(domElement) {
 	this.dom = domElement;

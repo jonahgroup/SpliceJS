@@ -12,11 +12,22 @@ definition:function(){
 		/* call parent constructor */
 		SpliceJS.Controls.UIControl.apply(this,arguments);
 		
-		_.info.log('Constructing date table');
-		this.dom = this.elements.controlContainer;
-	
+		var self = this;
+		
+
+		window.onresize = function(){
+			self.reflow();
+		}
+
+		this.dom = this.ref.scrollPanel.ref.tableBody.elements.dataTable;
+		this.elements.dataTable = this.ref.scrollPanel.ref.tableBody.elements.dataTable;
+		this.elements.columnHeaderTable = this.ref.scrollPanel.ref.tableBody.elements.columnHeaderTable;
+
 		this.dataRows = [];
 		this.haderRow = null;
+
+
+
 		
 	}).extend(SpliceJS.Controls.UIControl);
 	
@@ -94,6 +105,9 @@ definition:function(){
 			this.addRow(r);
 		}
 		
+		
+		this.reflow();
+
 	};
 	
 	
@@ -123,15 +137,18 @@ definition:function(){
 		}
 	};
 
-	DataTable.prototype.addHeaderRow = function(headers){
+	DataTable.prototype.addHeaderRow = function(dom,headers){
+
+		if(!headers) 	return;
+		if(!dom)		return;
+		if(dom.tHead) dom.deleteTHead();
 		
-		if(!headers) return;
-		if(this.dom.tHead) this.dom.deleteTHead();
-		
-		var tHead = this.dom.createTHead();
+		var tHead = dom.createTHead();
 		
 		this.addRowTo(tHead, headers);
 	};
+
+
 	
 	
 	
@@ -157,6 +174,8 @@ definition:function(){
 		this.addBodyRow(row);
 	};
 
+
+
 	DataTable.prototype.addDomHeader = function(dom){
 		var row = [];	
 		for(var i=0; i< dom.childNodes.length; i++){
@@ -164,8 +183,71 @@ definition:function(){
 			/* element nodes only */
 			if(node.nodeType === 1) row.push(node);
 		}
-		this.addHeaderRow(row);
+
+		if(!this.elements.columnHeaderTable) {
+			this.addHeaderRow(this.elements.dataTable, row);
+			return;
+		}
+
+		/*
+			Data table gets cloned row
+		*/
+		var cloned = [];
+		for(var i=0; i<row.length; i++){
+			cloned[i] = row[i].cloneNode(true);
+		}
+
+		this.addHeaderRow(this.elements.columnHeaderTable, row);
+		this.addHeaderRow(this.elements.dataTable, cloned);
+
 	};
+
+
+
+	DataTable.prototype.reflow = function(){
+		/* user offsetWidth it included border sizes */
+		this.elements.columnHeaderTable.style.width = this.elements.dataTable.offsetWidth  + 'px';
+		/* measure column sizes */
+		var body = this.elements.dataTable.tHead;
+		var head = this.elements.columnHeaderTable.tHead;
+		
+		if(!body || !head) return;
+		
+		var cells = body.rows[0].cells;
+		for(var i=0; i< cells.length; i++){
+			
+			var cellWidth = cells[i].clientWidth;
+			var style = _.Doc.style(cells[i]);
+
+			head.rows[0].cells[i].width = (cellWidth 
+				 - style.padding.left.value 
+				 - style.padding.right.value) + 'px';
+		}
+		
+		this.ref.scrollPanel.reflow();
+
+		/* careful its a prototype call */
+		/*
+		var scrollBar = ScrollPanel.prototype.attachScrollBars(
+				
+				this.ref.scrollContainer,{
+					scrollClient:this.ref.scrollClient
+				}
+		);
+		
+		if(scrollBar.vertical) { 
+			this.ref.scrollClient.className = 'client -sc-scrolling-vertical';
+			this.ref.columnHeaderContainer.className = 'static-column-header -sc-scrolling-vertical';
+		} 
+		else { 
+			this.ref.scrollClient.className = 'client';
+			this.ref.columnHeaderContainer.className = 'static-column-header';
+		}
+		*/	
+	};
+
+
+
 
 	
 	var DataTableRow =  _.Namespace('SpliceJS.Controls').Class(function DataTableRow(args){

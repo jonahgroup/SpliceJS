@@ -52,13 +52,6 @@ _.Module = (function(document){
 	
 	var Concrete = _.Namespace('SpliceJS.Modular').Class(function Concrete(dom){
 		this.dom = dom;
-		
-		/* tie instances hashmap */
-		this.ref = Object.create(null);
-		
-		/* elements hashmap */
-		this.elements = Object.create(null);
-		
 	});
 	
 	
@@ -157,12 +150,20 @@ _.Module = (function(document){
 			if(ref) tieInstance.elements[ref] = element; 	
 		}
 		
+		
+		/*
+		 * Bind declarative parameters
+		 *
+		 */
 		if(parameters) {
 			var keys = Object.keys(parameters);
 			for(var k=0; k< keys.length; k++) {
 			
 				var key = keys[k];
-			
+
+				if(key === 'ref') 		continue;
+				if(key === 'content') 	continue; //content is processed separately
+
 				_.debug.log("Processing include property: " + key);
 			
 				/* remaining parameters are for the child instance */
@@ -178,8 +179,56 @@ _.Module = (function(document){
 		}
 
 		
+	   /*
+		* Handle content declaration
+		* Getcontent nodes
+		*/
+		var contentNodes = null;
 		
+		if(parameters.content) 
+		contentNodes = _.Doc.selectTextNodes(deepClone, function(node){
+			if(node.nodeValue.startsWith('@')) 
+				return node;
+			return null;
+		});	
 		
+
+		if(contentNodes) {
+			for(var i=0; i < contentNodes.length; i++){
+				var value = contentNodes[i].nodeValue; 
+				value = value.substring(1,value.length);
+
+				var obj = parameters.content[value];
+				var newNode = null;
+
+				if(typeof obj === 'function') {
+					var contentInstance = new obj({parent:tieInstance});
+					if(contentInstance.concrete) 
+						newNode = contentInstance.concrete.dom; 
+					
+				}
+
+				if(typeof obj === 'string'){
+					newNode = document.createTextNode(obj);		
+				}
+
+				if(typeof obj === 'number'){
+					newNode = document.createTextNode(obj);			
+				}
+
+				if(newNode) contentNodes[i].parentNode.replaceChild(
+						newNode, 
+						contentNodes[i]
+				);	
+			}
+		}
+
+
+		if(typeof tieInstance.handleContent === 'function'){
+			tieInstance.handleContent(parameters.content);
+		}
+		
+
 		/* 
 		 * Anchor elements with data-splice-tmp-anchor attibute
 		 * are placeholders for included templates
