@@ -1,6 +1,9 @@
 _.Module({
 	
-required:['modules/splice.controls/splice.controls.datatable.htmlt'],
+required:[
+	'modules/splice.controls/splice.controls.css',
+	'modules/splice.controls/splice.controls.scrollpanel.js',
+	'modules/splice.controls/splice.controls.datatable.htmlt'],
 
 definition:function(){
 	
@@ -21,7 +24,7 @@ definition:function(){
 
 		this.dom = this.ref.scrollPanel.ref.tableBody.elements.dataTable;
 		this.elements.dataTable = this.ref.scrollPanel.ref.tableBody.elements.dataTable;
-		this.elements.columnHeaderTable = this.ref.scrollPanel.ref.tableBody.elements.columnHeaderTable;
+		this.elements.columnHeaderTable = this.ref.scrollPanel.ref.tableHeader.elements.columnHeaderTable;
 
 		this.dataRows = [];
 		this.haderRow = null;

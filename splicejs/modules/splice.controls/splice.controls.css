@@ -78,6 +78,12 @@
 	top:0px; bottom:0px; left:0px; right:0px;
 }
 
+.-splicejs-scrollpanel .static {
+	position:absolute;
+	top:0px; left:0px;
+}
+
+
 /* 	default client size does not allocate scroll bar margins 
 	margins are set at runtime by the API
 */

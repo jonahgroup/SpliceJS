@@ -413,7 +413,9 @@ var _ = (function(window, document){
 		filename = window.SPLICE_PUBLIC_ROOT +'/'+filename;
 		/*
 		 * */
-		if(filename._endswith(".css") || filename._endswith(".js") )
+		if(	filename._endswith(".css") || 
+			filename._endswith(".js")  || 
+			filename._endswith(".htmlt") )
 		if(_url_cache[filename] === true){
 			Splice.prototype.debug.log('File ' + filename + ' is already loaded, skipping...');
 			loader.progress--; loader.loadNext(watcher);
@@ -485,6 +487,7 @@ var _ = (function(window, document){
 			_.HttpRequest.post({
 				url: filename,
 				onok:function(response){
+					_url_cache[filename] = true;
 					loader.onitemloaded({ext: 'htmlt', filename:filename, data:response.text});
 					loader.progress--; loader.loadNext(watcher);
 				}

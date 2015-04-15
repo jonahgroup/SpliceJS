@@ -7,16 +7,22 @@
 			scrollContent:_.Obj({
 				type:'DataTableBody',
 				ref:'tableBody'
+			}),
+			staticContent:_.Obj({
+				type:'DataTableHeader',
+				ref:'tableHeader'
 			})
 		}
 	} -->
 </div>
 
 
-<!-- @template:{type:'DataTableBody'} -->
+<!-- @template:{type:'DataTableHeader'} -->
 <div class="-splicejs-datatable-headercontainer" style="position:absolute; z-index:10;">
 	<table class="-splicejs-datatable" data-sp-ref="columnHeaderTable"></table>
 </div>
+
+<!-- @template:{type:'DataTableBody'} -->
 <div style="position:relative;">
 	<table class="-splicejs-datatable" data-sp-ref="dataTable"></table>
 </div>
