@@ -1,20 +1,10 @@
 _.Module({
-	
+
 required:[	
+			
+	{	name:'modules/splice.controls.base.js', 
+		source: function(){
 
-			'modules/splice.controls/splice.controls.css',
-          	'modules/splice.controls/splice.controls.htmlt'
- 
- ],
-
-follows:[
-						
-			'modules/splice.controls/splice.controls.datatable.js',
-			'modules/splice.controls/splice.controls.scrollpanel.js'
-],          	
-	
-definition:function(){
-	
 	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(args){
 		if(this.isHidden) this.elements.controlContainer.style.display = 'none';
 
@@ -63,6 +53,17 @@ definition:function(){
 	};
 	
 	UIControl.prototype.dataOut = function(){};
+
+	}},
+
+	'modules/splice.controls/splice.controls.css',
+  	'modules/splice.controls/splice.controls.htmlt',
+	'modules/splice.controls/splice.controls.datatable.js',
+	'modules/splice.controls/splice.controls.scrollpanel.js'
+], 	
+         	
+definition:function(){
+	
 	
 	
 	var Button = _.Namespace('SpliceJS.Controls').Class(function Button(args){
@@ -93,7 +94,6 @@ definition:function(){
 		}
 	};
 
-
 	Button.prototype.setLabel = function(label){
 		this.elements.controlContainer.value = label;
 	};
@@ -101,11 +101,6 @@ definition:function(){
 	Button.prototype.onClick = function(){
 		_.debug.log('Event is not assigned');
 	};
-	
-	
-	
-	
-	
 	
 	Button.prototype.enable = function(){
 		this.elements.controlContainer.className = '-splicejs-button';
@@ -135,7 +130,7 @@ definition:function(){
 	}
 		
 	TextField.prototype.dataIn = function(dataItem){
-		UIControl.prototype.dataIn.call(this,dataItem);
+		SpliceJS.Controls.UIControl.prototype.dataIn.call(this,dataItem);
 		var value = this.dataItem[this.dataPath];
 		
 		if(value) this.elements.controlContainer.value = value;
@@ -207,7 +202,7 @@ definition:function(){
 	
 	
 	RadioButton.prototype.dataIn = function(dataItem){
-		UIControl.prototype.dataIn.call(this,dataItem);
+		SpliceJS.Controls.UIControl.prototype.dataIn.call(this,dataItem);
 
 		if(!this.dataPath) {
 			this.elements.controlContainer.checked = false;

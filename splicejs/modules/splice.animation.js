@@ -112,7 +112,7 @@ Animation.easeOut = function(origin, distance, time, duration){
 };
 
 
-Animation.qubicEaseInOut = function(origin, distance, time, duration){
+Animation.cubicEaseInOut = function(origin, distance, time, duration){
 
 	time = time / (duration/2);
 	if (time < 1) return [distance/2*time*time*time + origin,time];
@@ -155,7 +155,7 @@ _.Animate = function(obj){
 	
 		width:function(from, to, duration,oncomplete){
 		new _.StoryBoard([
-		new _.Animation(from,  to, duration ? duration: 300, _.Animation.qubicEaseInOut, 
+		new _.Animation(from,  to, duration ? duration: 300, _.Animation.cubicEaseInOut, 
 			    function(value){
 			    	objStyle.width = value+'px';
 			    },

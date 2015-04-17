@@ -223,7 +223,7 @@ definition:function(){
 		var actuate = function(from, to){
 			
 			new _.StoryBoard([
-			new _.Animation(from,  to, 800, _.Animation.qubicEaseInOut, 
+			new _.Animation(from,  to, 800, _.Animation.cubicEaseInOut, 
 			    function(value){
 			    	objStyle.width = value+'px';
 			    	objDataStyle.left = value + 'px';

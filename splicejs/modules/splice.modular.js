@@ -438,7 +438,6 @@ _.Module = (function(document){
 				var required 	= moduleDefinition.required;
 				var moduleName 	= moduleDefinition.name;
 				var definition  = moduleDefinition.definition;
-				var follows 	= moduleDefinition.follows; 
 			
 				var node = _.currentlyLoading;
 								
@@ -491,14 +490,6 @@ _.Module = (function(document){
 					 * 
 					 * */
 					compileTemplates(scope);
-					
-					/*
-					 * Invoke callback when definition is
-					 * complete
-					 * */
-					if(follows && follows.length > 0) {
-						_.include(follows);
-					}
 					
 				},collectTemplates);
 			},

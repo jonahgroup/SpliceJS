@@ -401,10 +401,15 @@ var _ = (function(window, document){
 		var obj = loader.iterator.next();
 		if(!obj) return;
 		
-		var filename = obj; 
-				
+		var filename = obj;
+		var runnable = null;
+		
+		/*
+		 * this is inline file 
+		 */		
 		if(typeof filename == 'object') {
-			filename =  filename.src;
+			filename =  obj.name;
+			runnable =  obj.source;
 		}
 		
 		/*
@@ -426,6 +431,19 @@ var _ = (function(window, document){
 		
 		var head = document.getElementsByTagName('head')[0];
 		
+	    /*
+		 * Run the inline pseudo file
+		 */
+		if(runnable){
+
+			runnable();
+			_url_cache[filename] = true;
+			loader.onitemloaded();
+			loader.progress--; loader.loadNext(watcher);
+			return;
+		
+		} 	
+
 		/*
 		 * Load CSS Files
 		 * */
@@ -454,6 +472,7 @@ var _ = (function(window, document){
 				}
 			};
 			head.appendChild(linkref);
+			return;
 		}
 
 		/*
@@ -476,6 +495,7 @@ var _ = (function(window, document){
 				}
 			};
 			head.appendChild(script); 
+			return;
 		}
 		
 		/*
@@ -492,6 +512,7 @@ var _ = (function(window, document){
 					loader.progress--; loader.loadNext(watcher);
 				}
 			});
+			return;
 		}
 		
 	};
