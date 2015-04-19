@@ -2,6 +2,7 @@ _.Module({
 
 
 required:[
+	'modules/splice.controls/splice.controls.scrollpanel.css',
 	'modules/splice.controls/splice.controls.scrollpanel.htmlt'
 ],
 
@@ -34,7 +35,7 @@ definition:function(){
 			}
 		);
 		
-		if(scrollBar.vertical) this.elements.scrollClient.className = 'client -sc-scrolling-vertical'; 
+		if(scrollBar.vertical) this.elements.scrollClient.className = 'client -splicejs-scrolling-vertical'; 
 		else this.elements.scrollClient.className = 'client';  
 	};
 	
