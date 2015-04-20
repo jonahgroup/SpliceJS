@@ -98,6 +98,8 @@
 .cool-blue-table table.-splicejs-datatable td:first-child {
 	text-align: center;
 	padding:0px;
-	
+}
 
+.cool-blue-table .-splicejs-scrollpanel {
+	background-color:rgb(28,50,73);
 }
