@@ -33,6 +33,7 @@ definition:function(){
 	 * Clock class
 	 * */
 	var Clock = _.Namespace('UserControls').Class(function Clock(){
+		if(this.autoStart === true) this.start();
 	});
 	
 	Clock.prototype.start = function(){

@@ -338,7 +338,7 @@ _.Module = (function(document){
 			
 			if(typeof instance[key] === 'function')
 				result.instance[binding.prop] = function(){
-					instance[key].apply(instance,arguments);
+					return instance[key].apply(instance,arguments);
 				}
 			else
 				result.instance[binding.prop] = instance[key];
@@ -347,7 +347,7 @@ _.Module = (function(document){
 		case _.Binding.Direction.FROM:
 			if(typeof result.instance[binding.prop] === 'function')
 				instance[key] = function(){
-					result.instance[binding.prop].apply(result.instance,arguments);
+					return result.instance[binding.prop].apply(result.instance,arguments);
 				}
 			else
 				instance[key] = result.instance[binding.prop]; 

@@ -35,8 +35,15 @@ definition:function(){
 			}
 		);
 		
-		if(scrollBar.vertical) this.elements.scrollClient.className = 'client -splicejs-scrolling-vertical'; 
-		else this.elements.scrollClient.className = 'client';  
+		if(scrollBar.vertical) { 
+			this.elements.scrollClient.className = 'client -splicejs-scrolling-vertical'; 
+			this.elements.staticContainer.className = 'static -splicejs-scrolling-vertical';
+		}
+
+		else { 
+			this.elements.scrollClient.className = 'client';  
+			this.elements.staticContainer.className = 'static';
+		}
 	};
 	
 	ScrollPanel.prototype.attachScrollBars = function(parent,args){
@@ -151,11 +158,11 @@ definition:function(){
 			e.cancelBubble = true;
 			if (e.stopPropagation) e.stopPropagation();
 			
-			CSDialogs.DragAndDrop.startDrag(this,e);
+			SpliceJS.Ui.DragAndDrop.startDrag(this,e);
 			var top = this.offsetTop - parent.scrollTop ;
 			
 		
-			CSDialogs.DragAndDrop.ondrag = function(position,offset){
+			SpliceJS.Ui.DragAndDrop.ondrag = function(position,offset){
 				
 				var t = (top + position.y-offset.y);
 				if(t <=10) t = 10;
@@ -176,12 +183,12 @@ definition:function(){
 			e.cancelBubble = true;
 			if (e.stopPropagation) e.stopPropagation();
 			
-			CSDialogs.DragAndDrop.startDrag(this,e);
+			SpliceJS.Ui.DragAndDrop.startDrag(this,e);
 			var left = this.offsetLeft - parent.scrollLeft ;
 			var scale = thumbSizes.horizontal.scale;
 		
 		
-			CSDialogs.DragAndDrop.ondrag = function(position,offset){
+			SpliceJS.Ui.DragAndDrop.ondrag = function(position,offset){
 				
 				var t = (left + position.x-offset.x);
 				if(t <=10) t = 10;

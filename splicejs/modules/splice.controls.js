@@ -66,8 +66,12 @@ definition:function(){
 
 		var self = this;
 		this.elements.controlContainer.onchange = function(){
-			self.dataItem[self.dataPath] = this.value;
-			
+			if(self.dataPath) {
+				self.dataItem[self.dataPath] = this.value;
+			}
+			else {
+				self.dataItem = {value:this.value};
+			}
 			self.dataOut(self.dataItem);
 		}
 	});

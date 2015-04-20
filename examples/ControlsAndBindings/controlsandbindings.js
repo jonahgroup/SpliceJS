@@ -15,7 +15,9 @@ definition:function(){
 			onok:function(data){
 				eval('var sampleData = ' + data.text);
 			
-				self.orderData = sampleData.data;
+				self.sourceData = sampleData.data; 
+				self.orderData = self.sourceData;
+				
 				self.dataColumns = sampleData.cols;
 				
 				self.updateOrders();
@@ -27,6 +29,32 @@ definition:function(){
 	});
 	
 	
+
+	ControlsAndBindings.prototype.onSearchValue = function(dataItem){
+		_.debug.log('Searching for: ' + dataItem.value);
+		
+		this.orderData = [];
+		this.currentSearchValue = dataItem.value;
+
+		for(var i=0; i<this.sourceData.length; i++){
+			for(var j=0; j< this.sourceData[i].length; j++){
+				var v = this.sourceData[i][j]; 	
+				if(v.indexOf(dataItem.value) > -1) { 
+					this.orderData.push(this.sourceData[i]);
+					break;
+				}
+			}
+		}
+
+		this.updateOrders();
+	};
+
+	ControlsAndBindings.prototype.getHighlightValue = function(){
+		return this.currentSearchValue;
+	};
+
+
+
 	ControlsAndBindings.prototype.onAddRecord = function(){
 		_.info.log('Creating new record');
 		

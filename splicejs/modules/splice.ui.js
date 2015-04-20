@@ -149,7 +149,7 @@ definition:function(){
 	    	
 	    	this.ondragfired = false;
 	    	
-	    	this.disableSelection($document().body, event);
+	    	this.disableSelection(document.body, event);
 			//get original position of the trigger node
 			//p = JSPositioning.absPosition(elementnode);
 			var p = SpliceJS.Ui.Positioning.mousePosition(event);
@@ -158,8 +158,8 @@ definition:function(){
 					
 			
 			
-			document.body.onmousemove = function(event) {CSDialogs.DragAndDrop.drag(event);	};	
-			document.body.onmouseup   = function(event) {CSDialogs.DragAndDrop.stopdrag(event);	}; 	
+			document.body.onmousemove = function(event) {SpliceJS.Ui.DragAndDrop.drag(event);	};	
+			document.body.onmouseup   = function(event) {SpliceJS.Ui.DragAndDrop.stopdrag(event);	}; 	
 
 			
 			
@@ -180,8 +180,8 @@ definition:function(){
 		},
 		
 		drag:function(e) {
-			mousePos = JSPositioning.mousePosition(e);
-			this.ondrag(mousePos,CSDialogs.DragAndDrop.offset);
+			mousePos = SpliceJS.Ui.Positioning.mousePosition(e);
+			this.ondrag(mousePos,SpliceJS.Ui.DragAndDrop.offset);
 			if(this.ondragfired === false) {
 				this.onbegin();
 			}

@@ -16,11 +16,6 @@ definition:function(){
 		SpliceJS.Controls.UIControl.apply(this,arguments);
 		
 		var self = this;
-		
-
-		window.onresize = function(){
-			self.reflow();
-		}
 
 		this.dom = this.ref.scrollPanel.ref.tableBody.elements.dataTable;
 		this.elements.dataTable = this.ref.scrollPanel.ref.tableBody.elements.dataTable;
@@ -209,44 +204,30 @@ definition:function(){
 
 	DataTable.prototype.reflow = function(){
 		/* user offsetWidth it included border sizes */
-		this.elements.columnHeaderTable.style.width = this.elements.dataTable.offsetWidth  + 'px';
+		/* 
+			try controling table width using cell widths
+			instead of setting total table width explicitly
+		*/
+		//this.elements.columnHeaderTable.style.width = this.elements.dataTable.offsetWidth  + 'px';
 		/* measure column sizes */
 		var body = this.elements.dataTable.tHead;
 		var head = this.elements.columnHeaderTable.tHead;
 		
 		if(!body || !head) return;
 		
+		this.ref.scrollPanel.reflow();
+
 		var cells = body.rows[0].cells;
 		for(var i=0; i< cells.length; i++){
 			
 			var cellWidth = cells[i].clientWidth;
 			var style = _.Doc.style(cells[i]);
 
-			head.rows[0].cells[i].width = (cellWidth 
+			head.rows[0].cells[i].style.minWidth = (cellWidth 
 				 - style.padding.left.value 
 				 - style.padding.right.value) + 'px';
 		}
 		
-		this.ref.scrollPanel.reflow();
-
-		/* careful its a prototype call */
-		/*
-		var scrollBar = ScrollPanel.prototype.attachScrollBars(
-				
-				this.ref.scrollContainer,{
-					scrollClient:this.ref.scrollClient
-				}
-		);
-		
-		if(scrollBar.vertical) { 
-			this.ref.scrollClient.className = 'client -sc-scrolling-vertical';
-			this.ref.columnHeaderContainer.className = 'static-column-header -sc-scrolling-vertical';
-		} 
-		else { 
-			this.ref.scrollClient.className = 'client';
-			this.ref.columnHeaderContainer.className = 'static-column-header';
-		}
-		*/	
 	};
 
 
@@ -283,21 +264,39 @@ definition:function(){
 	DataTableRow.prototype.onDeleteClick = function(){
 		this.onDelete(this.data);
 	};
+
+	DataTableRow.prototype.onHighlightValue = function(){};
 	
 	DataTableRow.prototype.dataIn = function(data){
 		
 		var textNodes = _.Doc.selectTextNodes(this.concrete.dom);
 		this.data = data;
 		
+
+		var highlightValue = null;
+		if(this.onHighlightValue) {
+			var highlightValue = this.onHighlightValue();
+		}
+
+
+
 		for(var key in this.contentMap){
 			
 			var node = this.contentMap[key];
 			var value = data[key];
-			node.nodeValue = value;
+			
+			if(highlightValue) {
+				var i = value.indexOf(highlightValue);
+				if(i >= 0){
+					value.substring(i,highlightValue);
+				}
+				else node.nodeValue = value;	
+			} else {
+				node.nodeValue = value;
+			}
 		}
 		
 		this.dataOut(this.data);
-	
 	};
 	
 	DataTableRow.prototype.dataOut = new _.Multicaster();

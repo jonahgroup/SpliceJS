@@ -4,5 +4,5 @@
 	<div class="client" data-sp-ref="scrollClient"><div>@scrollContent</div></div>
 	<div class="vertical-bar" data-sp-ref="verticalBar"></div>
 	<div class="horizontal-bar" data-sp-ref="horizontalBar"></div>
-	<div class="static">@staticContent</div>
+	<div class="static" data-sp-ref="staticContainer">@staticContent</div>
 </div>

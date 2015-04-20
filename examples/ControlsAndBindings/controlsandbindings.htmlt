@@ -43,8 +43,6 @@
 		<!-- @include:{
 		type:'SpliceJS.Controls.TextField',
 		style: 'edit-field',
-		dataPath:'value',
-		dataIn: _.Binding.To('dataOut').Parent,
 		dataOut:_.Binding.From('onSearchValue').Type('UserApplications.ControlsAndBindings')
 		} -->
 	
@@ -80,7 +78,10 @@
 			type:'HeaderRowTemplate',
 			activate:_.Binding.To('activateHeader').Type('UserApplications.ControlsAndBindings')
 		}),
-		itemTemplate: 	_.Obj({type:'OrderRowTemplate'})
+		itemTemplate: 	_.Obj({
+			type:'OrderRowTemplate',
+			onHighlightValue:_.Binding.From('getHighlightValue').Type('UserApplications.ControlsAndBindings')
+		})
 	
 	} -->
 
