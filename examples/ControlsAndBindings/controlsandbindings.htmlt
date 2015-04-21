@@ -41,9 +41,17 @@
 
 	<div class="search">
 		<!-- @include:{
-		type:'SpliceJS.Controls.TextField',
-		style: 'edit-field',
-		dataOut:_.Binding.From('onSearchValue').Type('UserApplications.ControlsAndBindings')
+			type:'SpliceJS.Controls.Button', 
+			content:{label:'Clear'},
+			ref:'searchClearButton',
+			animate:true,
+			onClick:_.Binding.From('clearSearch').Parent,
+		}-->
+		<!-- @include:{
+			type:'SpliceJS.Controls.TextField',
+			style: 'edit-field',
+			ref:'searchTextField',
+			dataOut:_.Binding.From('onSearchValue').Type('UserApplications.ControlsAndBindings')
 		} -->
 	
 	</div>

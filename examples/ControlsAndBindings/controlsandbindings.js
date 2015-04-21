@@ -33,20 +33,16 @@ definition:function(){
 	ControlsAndBindings.prototype.onSearchValue = function(dataItem){
 		_.debug.log('Searching for: ' + dataItem.value);
 		
-		this.orderData = [];
 		this.currentSearchValue = dataItem.value;
-
-		for(var i=0; i<this.sourceData.length; i++){
-			for(var j=0; j< this.sourceData[i].length; j++){
-				var v = this.sourceData[i][j]; 	
-				if(v.indexOf(dataItem.value) > -1) { 
-					this.orderData.push(this.sourceData[i]);
-					break;
-				}
-			}
-		}
-
 		this.updateOrders();
+		this.ref.searchClearButton.show();
+	};
+
+	ControlsAndBindings.prototype.clearSearch = function(){
+		this.currentSearchValue = null;
+		this.ref.searchTextField.clear();
+		this.updateOrders();
+		this.ref.searchClearButton.hide();
 	};
 
 	ControlsAndBindings.prototype.getHighlightValue = function(){
@@ -124,7 +120,7 @@ definition:function(){
 			r.push(this.newRecord[i].value);
 		}
 		
-		this.orderSource.splice(0,0,r);
+		this.sourceData.splice(0,0,r);
 		
 		this.updateOrders();
 	};
@@ -195,6 +191,24 @@ definition:function(){
 	};
 	
 	ControlsAndBindings.prototype.updateOrders = function(){
+		/*
+			Apply search filters
+		*/
+		if(this.currentSearchValue){
+			this.orderData = [];
+			for(var i=0; i<this.sourceData.length; i++){
+				for(var j=0; j< this.sourceData[i].length; j++){
+					var v = this.sourceData[i][j]; 	
+					if(v.indexOf(this.currentSearchValue) > -1) { 
+						this.orderData.push(this.sourceData[i]);
+						break;
+					}
+				}
+			}
+		} else {
+			this.orderData = this.sourceData;
+		}
+
 		this.onOrderData({data:this.orderData, headers:this.dataColumns});
 	}
 	

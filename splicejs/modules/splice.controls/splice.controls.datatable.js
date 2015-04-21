@@ -302,8 +302,8 @@ definition:function(){
 	DataTableRow.prototype.dataOut = new _.Multicaster();
 
 	function splitHighlightValue(value,hv){
-		
-		return value.replace(hv,'<span class="-search-result-highlight">'+hv+'</span>');
+		if(value == null || value == undefined) return value;
+		return value.replace(new RegExp(hv,'gi'),'<span class="-search-result-highlight">'+hv+'</span>');
 	}
 
 // end module definition

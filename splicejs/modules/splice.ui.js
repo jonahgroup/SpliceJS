@@ -16,6 +16,8 @@ definition:function(){
 	
 	UIControl.prototype.hide = function(){
 		var self = this;
+		this.prevDisplayState = this.elements.controlContainer.style.display; 
+		
 		if(this.animate){
 			_.Animate(this.elements.controlContainer).opacity(100, 0, 300,function(){
 				self.elements.controlContainer.style.display = 'none';
@@ -30,7 +32,7 @@ definition:function(){
 		if(this.animate) {
 			this.elements.controlContainer.style.opacity = 0;
 		}
-		this.elements.controlContainer.style.display = 'block';
+		this.elements.controlContainer.style.display = this.prevDisplayState;
 		
 		if(this.animate) {
 			_.Animate(this.elements.controlContainer).opacity(0, 100, 300);
