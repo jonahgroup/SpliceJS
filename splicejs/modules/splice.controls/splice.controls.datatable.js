@@ -250,7 +250,9 @@ definition:function(){
 		
 			var key = value.substring(1,value.length);
 			
-			this.contentMap[key] = textNodes[i];
+			var span = document.createElement('span');
+			textNodes[i].parentNode.replaceChild(span,textNodes[i]);
+			this.contentMap[key] = span;
 		}
 		
 		
@@ -281,18 +283,16 @@ definition:function(){
 
 
 		for(var key in this.contentMap){
-			
 			var node = this.contentMap[key];
-			var value = data[key];
+			if(!this.contentMap.hasOwnProperty(key)) continue;
 			
-			if(highlightValue) {
-				var i = value.indexOf(highlightValue);
-				if(i >= 0){
-					value.substring(i,highlightValue);
+			var value = data[key];
+			if(node){
+				if(highlightValue) {
+					node.innerHTML = splitHighlightValue(value,highlightValue);		
+				} else {
+					node.innerHTML = value;
 				}
-				else node.nodeValue = value;	
-			} else {
-				node.nodeValue = value;
 			}
 		}
 		
@@ -301,6 +301,10 @@ definition:function(){
 	
 	DataTableRow.prototype.dataOut = new _.Multicaster();
 
+	function splitHighlightValue(value,hv){
+		
+		return value.replace(hv,'<span class="-search-result-highlight">'+hv+'</span>');
+	}
 
 // end module definition
 }});

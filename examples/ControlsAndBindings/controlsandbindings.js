@@ -124,7 +124,7 @@ definition:function(){
 			r.push(this.newRecord[i].value);
 		}
 		
-		this.orderData.splice(0,0,r);
+		this.orderSource.splice(0,0,r);
 		
 		this.updateOrders();
 	};
