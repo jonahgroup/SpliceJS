@@ -60,6 +60,7 @@
 	background-color:#D8D8D8;
 	opacity:0.15;
 	cursor:default;
+	z-index:10;
 }
 
 .-scroll-bar-thumb-vertical:hover {

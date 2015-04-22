@@ -169,5 +169,72 @@ definition:function(){
 	};
 
 
+
+
+	/**
+	 * Drop down list
+	 * */
+	var DropDownList = _.Namespace('SpliceJS.Controls').Class(function DropDownList(args){
+		this.dom = this.concrete.dom;
+	}).extend(SpliceJS.Controls.UIControl); 
+
+
+	var ListItem = _.Namespace('SpliceJS.Controls').Class(function ListItem(args){
+
+	});
+
+
+	DropDownList.prototype.show = function(args){
+		if(!args || !args.parent) return;
+		
+		var parent_size 	= _.Doc.elementSize(args.parent);
+		var parent_position = _.Doc.elementPosition(args.parent);
+		var documentHeight 	= _.Doc.getHeight();
+		
+		this.dom.style.maxHeight = (documentHeight - parent_position.y - parent_size.height - 5) + 'px';
+		
+		
+		document.body.appendChild(this.dom);
+		
+		if(typeof(args.content) ==  'string') {
+			this.dom.innerHTML = args.content;
+		} else if( typeof(args.content) == 'object'){
+			this.dom.innerHTML = '';
+			this.dom.appendChild(args.content);
+		}
+		
+		
+		var style = this.dom.style;
+		style.left = parent_position.x + 'px';
+		style.top  = parent_position.y + parent_size.height + 'px';
+		
+		this.dom.className = '-sc-drop-down-list -sc-show';
+		
+		
+		/* remove list on defocus*/
+		
+		document.body.onmousedown = (function(){
+			this.hide();
+			document.body.onmousedown = '';
+		}).bind(this); 
+		
+	};
+	
+
+	DropDownList.prototype.dataIn = function(data){
+
+
+
+	};
+	
+	DropDownList.prototype.hide = function() {
+		this.dom.className = '-sc-drop-down-list -sc-hide';
+	};
+
+
+
+
+
+
 // end module definition		
 }});

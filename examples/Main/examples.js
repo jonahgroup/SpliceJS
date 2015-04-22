@@ -8,6 +8,13 @@ function BasicApplication(){
 }
 
 
+function ControlsApplication(){
+	_.load(['../examples/Controls/controlsdemoapplication.js'],function(){
+		_.Doc.display(new UserApplications.ControlsDemoApplication());
+	});
+}
+
+
 
 function ControlsAndBindings(){
 	_.load(['../examples/ControlsAndBindings/controlsandbindings.js'],function(){

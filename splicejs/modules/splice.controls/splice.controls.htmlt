@@ -10,3 +10,6 @@
 <!-- @template:{type: 'SpliceJS.Controls.RadioButton'} -->
 <input type="radio" data-sp-ref="controlContainer">
 
+
+<!-- @template:{type: 'SpliceJS.Controls.DropDownList'} -->
+<div class="-splicejs-drop-down-list" data-sp-ref="controlContainer">@selectedValue</div>

@@ -12,7 +12,8 @@ var CONTENT_TYPE_MAP = {
 
 	'js'	:'text/javascript',
 	'css'	:'text/css',
-	'html'	:'text/html'
+	'html'	:'text/html',
+	'ttf'	:'application/octet-stream'
 };
 
 

@@ -23,7 +23,9 @@ definition:function(){
 
 
 
-
+	/*
+	* Image loader class 
+	*/
 	var ImageLoader = this.ImageLoader = _.Class(function ImageLoader(){
 		var self = this;
 		this.elements.sourceImage.onload = function(){

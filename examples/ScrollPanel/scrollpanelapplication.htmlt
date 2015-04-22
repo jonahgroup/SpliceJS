@@ -8,10 +8,8 @@
 				type:'PanelContent',
 				onImageLoaded:_.Binding.From('onDisplay').Type('UserApplications.ScrollPanelApplication')
 			}),
-			staticContent:_.Obj({
-				type:'UserControls.Clock',
-				autoStart:true
-			})
+			
+			staticContent:''
 		}
 	} -->
 </div>

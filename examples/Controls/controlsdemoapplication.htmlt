@@ -1,0 +1,59 @@
+<!-- @template:{type:'UserApplications.ControlsDemoApplication'} -->
+<div>
+
+	<!-- @include: {
+		type:'SpliceJS.Controls.Button',
+		content:{value:'Button'}
+	} -->
+
+	<br>
+
+	<!-- @include: {
+		type:'SpliceJS.Controls.CheckBox',
+		content:{value:'Button'}
+	} -->
+
+
+	<br>
+
+	<!-- @include: {
+		type:'SpliceJS.Controls.RadioButton',
+		content:{value:'Button'}
+	} -->
+
+	<br>
+
+	<!-- @include: {
+		type:'SpliceJS.Controls.DropDownList',
+		content:{selectedValue:'test'}
+	} -->
+
+	</br>
+	
+	<div style="position:relative; width:200px; height:200px;">
+	<!-- @include: {
+		type:	'SpliceJS.Controls.ScrollPanel',
+		content:{
+			scrollContent: _.Obj({type:'SampleContent'}),
+			staticContent: ''
+		} 
+	} -->
+	</div>
+</div>
+
+
+<!-- @template:{type:'SampleContent'} -->
+<div style="position:relative; width:1000px; height:1000px;"> 
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, erat a finibus lobortis, nisl dui interdum sem, ut bibendum sem ligula vel risus. Vestibulum sagittis justo ac eros blandit, at blandit nunc scelerisque. Quisque non ipsum finibus nisl finibus facilisis. Fusce elementum commodo sodales. Praesent vitae odio at ante mattis tincidunt. Duis ac enim tempor, tempus diam nec, ornare leo. Suspendisse commodo lacus lorem, placerat scelerisque nulla feugiat vel.
+</p>
+<p>
+Fusce non lacus sed est auctor aliquam. Vivamus blandit imperdiet accumsan. Mauris nibh nunc, semper et tempor sed, ultrices sed leo. Quisque cursus lacinia eros. Etiam iaculis nulla vel nibh rutrum, in molestie ipsum gravida. Quisque tincidunt lacus in sem consequat, sit amet suscipit massa fermentum. Vivamus tristique eros sed elit luctus suscipit. Fusce vel fringilla nunc, vel facilisis est. Donec at odio velit. Vestibulum a dui semper, cursus tortor ac, euismod massa. In nisi turpis, porta a euismod nec, imperdiet in diam. Fusce dolor justo, vehicula vel lectus vitae, consequat tristique sapien. Donec vestibulum condimentum pulvinar. Sed pretium metus eu ex lobortis, rutrum imperdiet ex sodales. Nunc neque lorem, semper ac tortor at, vestibulum viverra mauris.
+</p>
+<p>
+Maecenas odio urna, pellentesque vel velit eu, auctor pretium orci. Donec fermentum enim bibendum ultrices eleifend. In est diam, luctus id lectus vel, blandit tincidunt enim. Nullam varius mi a urna interdum, quis dignissim odio eleifend. Nullam accumsan euismod odio, eget pellentesque ex. Aliquam dictum ligula ac iaculis accumsan. Vestibulum vitae enim nec enim fermentum mollis sed at enim. Sed gravida tempus lectus, a mattis lacus vestibulum quis. Nam accumsan ante nisi, iaculis rutrum orci ullamcorper in. Cras aliquet lobortis ipsum eget consequat. Nam eros justo, tincidunt ut est nec, sodales suscipit sem. Ut facilisis tincidunt neque, eget suscipit quam interdum a. Aliquam sagittis, lorem sit amet porttitor tempus, leo orci eleifend massa, laoreet varius ex tellus id orci. Proin sagittis diam ex, et cursus lectus semper et.
+</p>
+<p>
+Etiam aliquet mi in velit porttitor, quis sagittis erat gravida. Etiam vitae scelerisque mauris, vel condimentum risus. Nunc tincidunt, sapien vitae dapibus iaculis, sapien diam egestas libero, non suscipit dolor erat sed libero. Nam finibus libero auctor, eleifend nibh nec, eleifend libero. Suspendisse vitae convallis arcu. Praesent a nunc elementum, placerat eros vel, lacinia risus. Suspendisse lorem ligula, suscipit id mi eget, iaculis tempor est. Nulla eu justo turpis. Vivamus commodo at purus at vulputate. Sed lacinia elit dolor, eu porta dolor vulputate et. Pellentesque id felis sagittis, laoreet nisi nec, pharetra tellus. Mauris fermentum at nisl eget egestas. Mauris vel lacinia nibh. Nunc porttitor ipsum eros, vel ornare lorem hendrerit vel. Vestibulum a metus feugiat, viverra purus eu, congue arcu. Curabitur eget venenatis mauris.
+</p>
+</div>

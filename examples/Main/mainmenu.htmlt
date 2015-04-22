@@ -1,6 +1,7 @@
 <!-- @template:{type:'UserApplications.MainMenu'} -->
 <div>
 	<div><a onclick="BasicApplication();">Basic Application</a></div>
+	<div><a onclick="ControlsApplication();">Controls Demo</a></div>
 	<div><a onclick="ScrollPanelSample();">Scroll Panel</a></div>
 	<div><a onclick="ControlsAndBindings();">Controls and Binding</a></div>
 

@@ -119,6 +119,7 @@
 
 <!-- @template:{type:'HeaderRowTemplate', tie:'FancyHeaderRow'} -->
 	<div data-sp-ref="controlColumn"></div>
+	<div>Picture</div>
 	<div>@0</div>
 	<div>@1</div>
 	<div>@2</div>
@@ -150,6 +151,9 @@
 		dataIn:		_.Binding.To('dataOut').Parent,
 		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
 	} -->
+	</div>
+	<div>
+		<!-- @include:{type:'UserApplications.ScrollPanelApplication'} -->
 	</div>
 	<div>@0</div>
 	<div>@1</div>

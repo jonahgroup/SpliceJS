@@ -40,7 +40,7 @@ definition:function(){
 			this.elements.scrollClient.className = 'client -splicejs-scrolling-vertical'; 
 			this.elements.staticContainer.className = 'static -splicejs-scrolling-vertical';
 			*/
-			this.elements.clippingArea.className = 'clipping -splicejs-scrolling-vertical'; 
+			//this.elements.clippingArea.className = 'clipping -splicejs-scrolling-vertical'; 
 		}
 
 		else { 
