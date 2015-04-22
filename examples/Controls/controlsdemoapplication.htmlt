@@ -33,6 +33,7 @@
 	<div style="position:relative; width:200px; height:200px;">
 	<!-- @include: {
 		type:	'SpliceJS.Controls.ScrollPanel',
+		ref:	'scrollPanel',
 		content:{
 			scrollContent: _.Obj({type:'SampleContent'}),
 			staticContent: ''

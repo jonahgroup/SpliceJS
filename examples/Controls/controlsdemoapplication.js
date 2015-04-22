@@ -12,5 +12,11 @@ definition:function(){
 
 	});
 
+	ControlsDemoApplication.prototype.onDisplay = function(){
+
+		this.ref.scrollPanel.reflow();
+
+	};
+
 
 }});
