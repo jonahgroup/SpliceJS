@@ -187,7 +187,7 @@ _.Module = (function(document){
 		
 		if(parameters.content) 
 		contentNodes = _.Doc.selectTextNodes(deepClone, function(node){
-			if(node.nodeValue.startsWith('@')) 
+			if(node.nodeValue.indexOf('@') === 0) //starts with 
 				return node;
 			return null;
 		});	

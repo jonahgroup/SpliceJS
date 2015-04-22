@@ -22,7 +22,7 @@ definition:function(){
 		this.elements.columnHeaderTable = this.ref.scrollPanel.ref.tableHeader.elements.columnHeaderTable;
 
 		this.dataRows = [];
-		this.haderRow = null;
+		this.headerRow = null;
 
 
 
@@ -213,9 +213,10 @@ definition:function(){
 		var body = this.elements.dataTable.tHead;
 		var head = this.elements.columnHeaderTable.tHead;
 		
+		this.ref.scrollPanel.reflow();
 		if(!body || !head) return;
 		
-		this.ref.scrollPanel.reflow();
+		
 
 		var cells = body.rows[0].cells;
 		for(var i=0; i< cells.length; i++){
@@ -246,7 +247,7 @@ definition:function(){
 		for(var i=0; i<textNodes.length; i++){
 			var value = textNodes[i].nodeValue;
 			if(!value) continue;
-			if(!value.startsWith('@')) continue;
+			if(value.indexOf('@') !== 0) continue;
 		
 			var key = value.substring(1,value.length);
 			

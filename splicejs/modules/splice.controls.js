@@ -77,8 +77,8 @@ definition:function(){
 	});
 	
 	TextField.prototype.dataOut = function(){
-		throw 'Data out interface is not assigned';
-	}
+		
+	};
 		
 	TextField.prototype.dataIn = function(dataItem){
 		SpliceJS.Controls.UIControl.prototype.dataIn.call(this,dataItem);

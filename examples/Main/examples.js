@@ -15,3 +15,9 @@ function ControlsAndBindings(){
 	});
 }
 
+
+function ScrollPanelSample(){
+	_.load(['../examples/ScrollPanel/scrollpanelapplication.js'],function(){
+		_.Doc.display(new UserApplications.ScrollPanelApplication());
+	});
+}

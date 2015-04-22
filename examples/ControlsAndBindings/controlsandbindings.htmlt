@@ -63,7 +63,7 @@
 <div class="editpanel" data-sp-ref="editPanel">
 	<div class="editlabel"><span data-sp-ref="editSectionLabel">Create New Record</span></div>
 	<div class="instructionsLabel" data-sp-ref="editInstructionsLabel">Select record on the right hand side to enable edit dialog</div>
-	<div style="position:relative; height:300px; top:60px;">
+	<div style="position:absolute; top:125px; left:25px; bottom:0px; right:0px;">
 	<!-- @include: {
 		type:'SpliceJS.Controls.DataTable',
 
@@ -151,7 +151,6 @@
 		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
 	} -->
 	</div>
-	
 	<div>@0</div>
 	<div>@1</div>
 	<div>@2</div>

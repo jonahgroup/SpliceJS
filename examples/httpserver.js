@@ -18,6 +18,7 @@ var CONTENT_TYPE_MAP = {
 
 var regex = /\.([A-Za-z_0-9]+)$/;
 function getContent(path){
+	if(!path) return;
 	var m = regex.exec(path);
 	if(m) return CONTENT_TYPE_MAP[m[1].toLowerCase()];
 }
@@ -25,8 +26,7 @@ function getContent(path){
 
 require('http').createServer(function (request,response){
 
-	console.log('URL: ' + request.url);
-	filePath = docRoot + request.url;
+	var filePath = docRoot + request.url;
 	if(filePath === '../') filePath += 'examples/example.html';
 
 
@@ -41,6 +41,9 @@ require('http').createServer(function (request,response){
 		
 		var content = getContent(filePath);
 		if(!content) content = 'text/html';
+
+		
+		console.log('URL: ' + filePath + ' Content-Type:' + content);
 
 		response.writeHead(200, {'Content-Type': content});
 		response.write(fd);

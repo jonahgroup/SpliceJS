@@ -31,7 +31,7 @@
 	background-color:rgb(31, 44, 56);
 	
 	padding-top:30px;
-	padding-left:25px;
+	
 }
 
 .editlabel {
@@ -39,6 +39,7 @@
 	/*color:#ECFF44;*/
 	color:#E143EC;
 	font-size:1.5em;
+	padding-left:25px;
 }
 
 .instructionsLabel {
@@ -111,7 +112,7 @@
 	height:100%;
 }
 .cool-blue-table table.-splicejs-datatable {
-	width:100%;
+	/*width:100%;*/
 	border-collapse: collapse;
 }
 
@@ -143,6 +144,15 @@
 
 .cool-blue-table .-search-result-highlight {
 	color:#96CD52;
+}
+
+.cool-blue-table .-splicejs-scrollpanel .static { height:50px; }
+
+
+.-picture-frame {
+	position:relative;
+	width:160px;
+	height:90px;
 }
 /*
 .-clock-label {

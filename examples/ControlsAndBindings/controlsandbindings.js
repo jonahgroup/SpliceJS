@@ -2,6 +2,7 @@ _.Module({
 
 required:['modules/splice.controls.js',
 		  '../examples/BasicApplication/basicapplication.js',
+		  '../examples/ScrollPanel/scrollpanelapplication.js',
 		  '../examples/ControlsAndBindings/controlsandbindings.css',
           '../examples/ControlsAndBindings/controlsandbindings.htmlt'],	
 	
@@ -66,17 +67,22 @@ definition:function(){
 		this.ref.addButton.onClick = this.onSaveNewRecord.bind(this);
 		
 		
-		this.actuateEditPanel().open();
-		this.isAddMode = true;
+
+
+		this.actuateEditPanel().open((function(){
+			this.isAddMode = true;
 		
-		this.newRecord = [];
-		for(var i=0; i < this.dataColumns.length; i++){
-			this.newRecord.push({field:this.dataColumns[i], value:''});
-		}
+			this.newRecord = [];
+			for(var i=0; i < this.dataColumns.length; i++){
+				this.newRecord.push({field:this.dataColumns[i], value:''});
+			}
+			this.onEditRecordData({data:this.newRecord});
+		
+		}).bind(this));
+		
 		
 		this.elements.editSectionLabel.innerHTML = 'Create New Record';
 
-		this.onEditRecordData({data:this.newRecord});
 	};
 	
 	
@@ -274,7 +280,7 @@ definition:function(){
 
 		var self = this;
 		
-		var actuate = function(from, to, buttons){
+		var actuate = function(from, to, oncomplete){
 			
 			new _.StoryBoard([
 			new _.Animation(from,  to, 800, _.Animation.cubicEaseInOut, 
@@ -293,17 +299,12 @@ definition:function(){
 						isExpanded:false,
 						oncomplete:function(){self.onToggleEdit({isHidden:true})}
 					});
-					
-					
-					
 				}
+				if(typeof oncomplete === 'function') oncomplete(); 
 			}),
 			new _.Animation(to+25,from+25,600, _.Animation.easeOut, function(value){
 				self.elements.editInstructionsLabel.style.left = (value + 'px');
 				self.elements.editSectionLabel.style.left = (value + 'px');
-			}),
-			new _.Animation(0,25,600, _.Animation.easeOut, function(value){
-				self.ref.editButton.elements.controlContainer.style.top = (value + 'px');
 			})
 
 			]).animate();
@@ -311,8 +312,8 @@ definition:function(){
 		}
 		
 		return {
-			open:function(){ actuate(0,300);},
-			close:function(){ actuate(300,0);}
+			open:function(oncomplete){ actuate(0,300, oncomplete);},
+			close:function(oncomplete){ actuate(300,0, oncomplete);}
 		}
 		
 	};

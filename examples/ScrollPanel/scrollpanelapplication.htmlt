@@ -1,0 +1,21 @@
+<!-- @template:{type:'UserApplications.ScrollPanelApplication'} -->
+<div class="-picture-frame" data-sp-ref="controlContainer">
+	<!-- @include:{
+		type:'SpliceJS.Controls.ScrollPanel',
+		ref:'scrollPanel',
+		content:{
+			scrollContent:_.Obj({
+				type:'PanelContent',
+				onImageLoaded:_.Binding.From('onDisplay').Type('UserApplications.ScrollPanelApplication')
+			}),
+			staticContent:_.Obj({
+				type:'UserControls.Clock',
+				autoStart:true
+			})
+		}
+	} -->
+</div>
+
+
+<!-- @template:{type:'PanelContent', tie:'ImageLoader'} -->
+<img src="ScrollPanel/sampleimage.jpg" data-sp-ref="sourceImage">
