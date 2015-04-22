@@ -34,8 +34,23 @@ definition:function(){
 	 * */
 	var Clock = _.Namespace('UserControls').Class(function Clock(){
 		if(this.autoStart === true) this.start();
+		if(this.staticDate === true) this.setDateTime(new Date());
 	});
 	
+
+	Clock.prototype.setDateTime = function(dateTime){
+		if(!dateTime) return;
+
+		var d = dateTime;
+		var l = (100 + d.getHours()+'').substr(1,2) + ':' + 
+				(100 + d.getMinutes()+'').substr(1,2) + ':' + 
+				(100 + d.getSeconds()+'').substr(1,2);
+		
+		this.elements.clockLabel.innerHTML = l;
+	};
+
+
+
 	Clock.prototype.start = function(){
 		
 		var labelElement = 	this.elements.clockLabel; 

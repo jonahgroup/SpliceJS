@@ -3,7 +3,10 @@ _.Module({
 definition:function(){
 
 	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(args){
-		if(this.isHidden) this.elements.controlContainer.style.display = 'none';
+		if(this.isHidden) {
+			this.prevDisplayState = this.elements.controlContainer.style.display; 
+			this.elements.controlContainer.style.display = 'none';
+		}
 
 		/* attach style to the controlContainer */
 		if(args.style)
@@ -16,6 +19,9 @@ definition:function(){
 	
 	UIControl.prototype.hide = function(){
 		var self = this;
+		
+		if(this.isHidden) return;
+
 		this.prevDisplayState = this.elements.controlContainer.style.display; 
 		
 		if(this.animate){
@@ -26,18 +32,23 @@ definition:function(){
 		else {
 			this.elements.controlContainer.style.display = 'none';
 		}
-	}
+		this.isHidden = true;
+	};
 	
 	UIControl.prototype.show = function(){
 		if(this.animate) {
 			this.elements.controlContainer.style.opacity = 0;
 		}
+		
+		if(!this.prevDisplayState) this.prevDisplayState = 'inline';
+		
 		this.elements.controlContainer.style.display = this.prevDisplayState;
 		
 		if(this.animate) {
 			_.Animate(this.elements.controlContainer).opacity(0, 100, 300);
 		}
-	}
+		this.isHidden = false;
+	};
 	
 	UIControl.prototype.changeState = function(args){
 		_.debug.log('Changing button\'s state');

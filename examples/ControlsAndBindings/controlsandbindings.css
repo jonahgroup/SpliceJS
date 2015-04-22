@@ -28,8 +28,32 @@
 	
 	overflow:hidden;
 
-	background-color:rgb(28,50,73);
+	background-color:rgb(31, 44, 56);
+	
+	padding-top:30px;
+	padding-left:25px;
 }
+
+.editlabel {
+	white-space: nowrap;
+	/*color:#ECFF44;*/
+	color:#E143EC;
+	font-size:1.5em;
+}
+
+.instructionsLabel {
+	position:absolute;
+	font-size:0.9em;
+	color:#cecece;
+	
+	padding-right:3em;
+	padding-top:1em;
+
+	width:250px;
+	color:#96CD52;
+
+}
+
 
 .datapanel {
 	position:absolute;
@@ -39,15 +63,26 @@
 	bottom:0px;
 	
 	overflow:hidden;
+
+	-webkit-box-shadow: -8px 0px 30px -5px rgba(0,0,0,0.23);
+	-moz-box-shadow: -8px 0px 30px -5px rgba(0,0,0,0.23);
+	box-shadow: -8px 0px 30px -5px rgba(0,0,0,0.23);
 }
 
 .search {
 	float:right;
 }
 
-/*
-.button { font-size:11px;}
-*/
+
+.-splicejs-button {position:relative; font-size:12px;}
+.-splicejs-button-disabled {position:relative;font-size:12px; }
+
+
+
+.button { 
+	position:relative;
+}
+
 
 
 .edit-field {
@@ -109,7 +144,7 @@
 .cool-blue-table .-search-result-highlight {
 	color:#96CD52;
 }
-
+/*
 .-clock-label {
 	font-size:2em;
-}
+}*/

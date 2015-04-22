@@ -11,7 +11,9 @@
 
 .-splicejs-scrollpanel .static {
 	position:absolute;
-	top:0px; left:0px;
+	top:0px; left:0px; right:0px;
+	overflow: hidden;
+	height:50px;
 }
 
 
@@ -23,6 +25,13 @@
 	top:0px; bottom:0px; left:0px; right:0px;
 	overflow:hidden;
 }
+
+.-splicejs-scrollpanel .clipping {
+	position:absolute;
+	top:0px; bottom:0px; left:0px; right:0px;
+	overflow:hidden;
+}
+
 
 .-splicejs-scrollpanel .vertical-bar {
 	position:absolute;

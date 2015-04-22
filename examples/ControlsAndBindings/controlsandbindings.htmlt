@@ -33,17 +33,20 @@
 		type:'SpliceJS.Controls.Button', 
 
 		ref:'cancelButton',
+		isHidden:true,
+		animate:true,
 		style: 'button',
 		isDisabled:true,
 		onClick:_.Binding.From('onCancel').Parent,
 		content:{label:'Cancel'}
 	} -->
-
+	
 	<div class="search">
 		<!-- @include:{
 			type:'SpliceJS.Controls.Button', 
 			content:{label:'Clear'},
 			ref:'searchClearButton',
+			isHidden:true,
 			animate:true,
 			onClick:_.Binding.From('clearSearch').Parent,
 		}-->
@@ -53,13 +56,14 @@
 			ref:'searchTextField',
 			dataOut:_.Binding.From('onSearchValue').Type('UserApplications.ControlsAndBindings')
 		} -->
-	
 	</div>
 
 </div>
 <div class="bodypanel">
 <div class="editpanel" data-sp-ref="editPanel">
-
+	<div class="editlabel"><span data-sp-ref="editSectionLabel">Create New Record</span></div>
+	<div class="instructionsLabel" data-sp-ref="editInstructionsLabel">Select record on the right hand side to enable edit dialog</div>
+	<div style="position:relative; height:300px; top:60px;">
 	<!-- @include: {
 		type:'SpliceJS.Controls.DataTable',
 
@@ -71,8 +75,7 @@
 		})
 		
 	} -->
-	
-
+	</div>
 </div>
 <div class="datapanel" data-sp-ref="dataPanel">
 	
@@ -117,10 +120,7 @@
 <!-- @template:{type:'HeaderRowTemplate', tie:'FancyHeaderRow'} -->
 	<div data-sp-ref="controlColumn"></div>
 	<div>@0</div>
-	<div>
-		<div style="display:inline;">@1</div> 
-		<div style="display:inline; float:right;">X</div>
-	</div>
+	<div>@1</div>
 	<div>@2</div>
 	<div>@3</div>
 	<div>@4</div>
@@ -151,6 +151,7 @@
 		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
 	} -->
 	</div>
+	
 	<div>@0</div>
 	<div>@1</div>
 	<div>@2</div>

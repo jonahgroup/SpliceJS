@@ -36,14 +36,21 @@ definition:function(){
 		);
 		
 		if(scrollBar.vertical) { 
+			/*
 			this.elements.scrollClient.className = 'client -splicejs-scrolling-vertical'; 
 			this.elements.staticContainer.className = 'static -splicejs-scrolling-vertical';
+			*/
+			this.elements.clippingArea.className = 'clipping -splicejs-scrolling-vertical'; 
 		}
 
 		else { 
+			this.elements.clippingArea.className = 'clipping'; 	
+			/*
 			this.elements.scrollClient.className = 'client';  
 			this.elements.staticContainer.className = 'static';
+			*/
 		}
+
 	};
 	
 	ScrollPanel.prototype.attachScrollBars = function(parent,args){
@@ -53,6 +60,7 @@ definition:function(){
 		parent.style.overflow = 'hidden';
 		
 		var client = this.elements.scrollClient;
+		var staticContainer = this.elements.staticContainer;
 		
 		var content = _.Doc.firstNonText(client);
 
@@ -195,6 +203,7 @@ definition:function(){
 				if((thumbSizes.horizontal.size+t) > size.width - 20) t = size.width - thumbSizes.horizontal.size - 10;
 				
 				client.scrollLeft = (t-10)*scale;
+				staticContainer.scrollLeft = (t-10)*scale;
 				
 				// keep scrolling thumbs in their positions
 				thumb.horizontal.style.left =  (parent.scrollLeft + t) + 'px';

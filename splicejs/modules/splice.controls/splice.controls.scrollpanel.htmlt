@@ -1,8 +1,10 @@
 
 <!-- @template:{type:'SpliceJS.Controls.ScrollPanel'} -->
 <div class="-splicejs-scrollpanel">
-	<div class="client" data-sp-ref="scrollClient"><div>@scrollContent</div></div>
+	<div class="clipping" data-sp-ref="clippingArea">
+		<div class="client" data-sp-ref="scrollClient"><div>@scrollContent</div></div>
+		<div class="static" data-sp-ref="staticContainer"><div>@staticContent</div></div>
+	</div>
 	<div class="vertical-bar" data-sp-ref="verticalBar"></div>
 	<div class="horizontal-bar" data-sp-ref="horizontalBar"></div>
-	<div class="static" data-sp-ref="staticContainer">@staticContent</div>
 </div>

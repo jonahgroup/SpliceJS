@@ -1,3 +1,4 @@
+
 /*
 
 SpliceJS
@@ -328,7 +329,11 @@ var _ = (function(window, document){
 			/* retain inheritance chain */
 			this.base = this.prototype.constructor;			
 			this.prototype.constructor = this;
-			
+			/*
+			this.prototype.super = function(){
+				base.apply(this,arguments);
+			}
+			*/
 			return this;
 			
 		};

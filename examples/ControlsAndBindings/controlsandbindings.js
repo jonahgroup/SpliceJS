@@ -1,7 +1,8 @@
 _.Module({
 
 required:['modules/splice.controls.js',
-          '../examples/ControlsAndBindings/controlsandbindings.css',
+		  '../examples/BasicApplication/basicapplication.js',
+		  '../examples/ControlsAndBindings/controlsandbindings.css',
           '../examples/ControlsAndBindings/controlsandbindings.htmlt'],	
 	
 definition:function(){
@@ -24,8 +25,8 @@ definition:function(){
 			}
 		});
 		
-		
 		_.Doc.display(this);
+		
 	});
 	
 	
@@ -57,7 +58,10 @@ definition:function(){
 		/* reconfigure buttons */
 		this.ref.deleteButton.disable();
 		this.ref.editButton.disable();
+		
+		this.ref.cancelButton.show();
 		this.ref.cancelButton.enable();
+
 		this.ref.addButton.setLabel('Save');
 		this.ref.addButton.onClick = this.onSaveNewRecord.bind(this);
 		
@@ -70,6 +74,8 @@ definition:function(){
 			this.newRecord.push({field:this.dataColumns[i], value:''});
 		}
 		
+		this.elements.editSectionLabel.innerHTML = 'Create New Record';
+
 		this.onEditRecordData({data:this.newRecord});
 	};
 	
@@ -83,7 +89,9 @@ definition:function(){
 	
 	
 	ControlsAndBindings.prototype.onDelete = function(args){
+		
 		this.ref.cancelButton.enable();
+		this.ref.cancelButton.show();
 		
 		this.ref.addButton.disable();
 		this.ref.editButton.disable();
@@ -145,6 +153,8 @@ definition:function(){
 		this.ref.deleteButton.enable();
 		this.ref.addButton.enable();
 		this.ref.editButton.enable();
+
+		this.ref.cancelButton.hide();
 		
 		// Cancel edit mode
 		if(this.isEditMode) {
@@ -184,8 +194,9 @@ definition:function(){
 			this.ref.addButton.onClick = this.onAddRecord.bind(this);
 			
 			this.resetEditForm();
-		
+			return;
 		}
+		
 		
 		
 	};
@@ -241,6 +252,7 @@ definition:function(){
 		
 		this.isEditMode = true;
 		
+		this.ref.cancelButton.show();
 		this.ref.cancelButton.enable();
 		
 		this.ref.deleteButton.disable();
@@ -249,7 +261,7 @@ definition:function(){
 		this.ref.editButton.setLabel('Save');
 		this.ref.editButton.onClick = this.onSaveEditRecord.bind(this);
 
-		
+		this.elements.editSectionLabel.innerHTML = 'Edit Record';
 		
 		this.actuateEditPanel({isEdit:true}).open();
 	};
@@ -262,7 +274,7 @@ definition:function(){
 
 		var self = this;
 		
-		var actuate = function(from, to){
+		var actuate = function(from, to, buttons){
 			
 			new _.StoryBoard([
 			new _.Animation(from,  to, 800, _.Animation.cubicEaseInOut, 
@@ -285,14 +297,22 @@ definition:function(){
 					
 					
 				}
-			}	
-			)]).animate();
+			}),
+			new _.Animation(to+25,from+25,600, _.Animation.easeOut, function(value){
+				self.elements.editInstructionsLabel.style.left = (value + 'px');
+				self.elements.editSectionLabel.style.left = (value + 'px');
+			}),
+			new _.Animation(0,25,600, _.Animation.easeOut, function(value){
+				self.ref.editButton.elements.controlContainer.style.top = (value + 'px');
+			})
+
+			]).animate();
 			
 		}
 		
 		return {
-			open:function(){ actuate(0,250);},
-			close:function(){ actuate(250,0);}
+			open:function(){ actuate(0,300);},
+			close:function(){ actuate(300,0);}
 		}
 		
 	};
