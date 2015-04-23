@@ -9,9 +9,14 @@ definition:function(){
 var Dial = _.Namespace('SpliceJS.Controls').Class(
 function Dial(){
 	
-    this.canvas = this.elements.controlContainer;
+    this.dom = this.canvas = this.elements.controlContainer;
 	var canvas = this.canvas;
+    
     var scale = this.scale ? this.scale : 1;
+
+    this.label  = this.label ? this.label : '%';
+    this.size = {width:this.dom.clientWidth, height:this.dom.clientHeight};
+
 
 	this.ctx = canvas.getContext('2d');
 	this.scale = scale;
@@ -70,7 +75,16 @@ function Dial(){
 });
 
 Dial.prototype.dataIn = function(dataItem){
-    
+    if(!this.dataPath) return;
+
+    this.value = dataItem[this.dataPath];
+
+
+    this.value = this.value?this.value : 80;
+    this.alpha = this.arcRange * this.value / 100 + this.arcStart; 
+    this._alpha = this.alpha;
+
+    this.draw();
 };
 
 
@@ -180,7 +194,7 @@ Dial.prototype.draw = function(config){
     ctx.font="20px Arial";
     ctx.translate(100,80);
     
-    var txt = '%';
+    var txt = this.label;
     var metrics = ctx.measureText(txt);
     
     ctx.fillText(txt,0-metrics.width/2,0);

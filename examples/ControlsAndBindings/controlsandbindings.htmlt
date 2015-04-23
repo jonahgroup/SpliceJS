@@ -128,7 +128,7 @@
 	<div>@6</div>
 	<div>@7</div>
 	<div>@8</div>
-	<div>Temperature</div>
+	
 
 <!-- @template:{type:'OrderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
 	<div>
@@ -160,7 +160,7 @@
 	<div>@6</div>
 	<div>@7</div>
 	<div>@8</div>
-	<div>@9</div>
+	
 
 <!-- @template:{type: 'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
 <input style="background-color:#ff0000; border:1px solid #ff0000; font-size:10px; padding:4px; display:none;" data-sp-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>

@@ -20,9 +20,12 @@ definition:function(){
 				self.sourceData = sampleData.data; 
 				self.dataColumns = sampleData.cols;
 
+				
 				self.sourceData.forEach(function(item){
 					item.push(Math.random()*100);
-				});	
+				});
+				self.dataColumns.push('Temperature');
+
 				
 				self.orderData = self.sourceData;
 				
@@ -219,8 +222,9 @@ definition:function(){
 			this.orderData = [];
 			for(var i=0; i<this.sourceData.length; i++){
 				for(var j=0; j< this.sourceData[i].length; j++){
-					var v = this.sourceData[i][j]; 	
-					if(v.indexOf(this.currentSearchValue) > -1) { 
+					var v = this.sourceData[i][j]; 
+					if(!v) continue;	
+					if((v+'').indexOf(this.currentSearchValue) > -1) { 
 						this.orderData.push(this.sourceData[i]);
 						break;
 					}

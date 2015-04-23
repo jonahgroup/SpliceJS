@@ -8,6 +8,11 @@
 		type:'SpliceJS.Controls.Button',
 		content:{value:'Button'}
 	} -->
+
+	<!-- @include: {
+		type:'LocalButton',
+		content:{value:'Test Button'}
+	} -->
 	</td>
 </tr>
 
@@ -42,6 +47,7 @@
 	<td>
 	<!-- @include: {
 		type:	'SpliceJS.Controls.Dial',
+		scale: 0.7,
 		value:	34
 	} -->	
 
@@ -91,6 +97,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, er
 <p>
 Fusce non lacus sed est auctor aliquam. Vivamus blandit imperdiet accumsan. Mauris nibh nunc, semper et tempor sed, ultrices sed leo. Quisque cursus lacinia eros. Etiam iaculis nulla vel nibh rutrum, in molestie ipsum gravida. Quisque tincidunt lacus in sem consequat, sit amet suscipit massa fermentum. Vivamus tristique eros sed elit luctus suscipit. Fusce vel fringilla nunc, vel facilisis est. Donec at odio velit. Vestibulum a dui semper, cursus tortor ac, euismod massa. In nisi turpis, porta a euismod nec, imperdiet in diam. Fusce dolor justo, vehicula vel lectus vitae, consequat tristique sapien. Donec vestibulum condimentum pulvinar. Sed pretium metus eu ex lobortis, rutrum imperdiet ex sodales. Nunc neque lorem, semper ac tortor at, vestibulum viverra mauris.
 </p>
+	<!-- @include: {
+		type:	'SpliceJS.Controls.Dial',
+		scale: 0.7,
+		value:	50
+	} -->
 <p>
 Maecenas odio urna, pellentesque vel velit eu, auctor pretium orci. Donec fermentum enim bibendum ultrices eleifend. In est diam, luctus id lectus vel, blandit tincidunt enim. Nullam varius mi a urna interdum, quis dignissim odio eleifend. Nullam accumsan euismod odio, eget pellentesque ex. Aliquam dictum ligula ac iaculis accumsan. Vestibulum vitae enim nec enim fermentum mollis sed at enim. Sed gravida tempus lectus, a mattis lacus vestibulum quis. Nam accumsan ante nisi, iaculis rutrum orci ullamcorper in. Cras aliquet lobortis ipsum eget consequat. Nam eros justo, tincidunt ut est nec, sodales suscipit sem. Ut facilisis tincidunt neque, eget suscipit quam interdum a. Aliquam sagittis, lorem sit amet porttitor tempus, leo orci eleifend massa, laoreet varius ex tellus id orci. Proin sagittis diam ex, et cursus lectus semper et.
 </p>

@@ -23,30 +23,6 @@
 				
 				_.Doc.display(new UserApplications.MainMenu());
 				
-				
-
-				var A = _.Class(function A(){
-					this.message = (this.message?this.message:'') +  " I am A";
-				});
-
-				var B = _.Class(function B(){
-					this.super();
-					this.message = (this.message?this.message:'') +  " I am B";
-				}).extend(A);
-
-				var C = _.Class(function C(){
-					this.super();
-					this.message = (this.message?this.message:'') +  " I am C";
-				}).extend(B);
-
-				var a = new A();
-				//var b = new B();
-				//var c = new C();
-/*
-				_.debug.log(a.message);
-				_.debug.log(b.message);
-				_.debug.log(c.message);
-*/
 
 			});	
 			
