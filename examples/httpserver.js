@@ -27,11 +27,8 @@ function getContent(path){
 
 require('http').createServer(function (request,response){
 
-	var filePath = docRoot + request.url;
-	if(filePath === '../') filePath += 'examples/example.html';
-
-
-
+	var filePath = __dirname +'/' + docRoot + request.url;
+	
 	var fs = require('fs');
 
 	fs.readFile(filePath, function(err,fd){
@@ -54,3 +51,4 @@ require('http').createServer(function (request,response){
 
 }).listen(8081);
 
+console.log("Current directory " + __dirname);
