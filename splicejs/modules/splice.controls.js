@@ -6,7 +6,8 @@ required:[
 	'modules/splice.controls/splice.controls.css',
   	'modules/splice.controls/splice.controls.htmlt',
 	'modules/splice.controls/splice.controls.datatable.js',
-	'modules/splice.controls/splice.controls.scrollpanel.js'
+	'modules/splice.controls/splice.controls.scrollpanel.js',
+	'modules/splice.controls/splice.controls.chart.js'
 ], 	
          	
 definition:function(){

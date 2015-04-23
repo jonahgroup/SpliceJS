@@ -1,0 +1,2 @@
+<!-- @template:{type:'SpliceJS.Controls.Dial'} -->
+<canvas data-sp-ref="controlContainer"></canvas>

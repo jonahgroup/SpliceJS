@@ -18,9 +18,13 @@ definition:function(){
 				eval('var sampleData = ' + data.text);
 			
 				self.sourceData = sampleData.data; 
-				self.orderData = self.sourceData;
-				
 				self.dataColumns = sampleData.cols;
+
+				self.sourceData.forEach(function(item){
+					item.push(Math.random()*100);
+				});	
+				
+				self.orderData = self.sourceData;
 				
 				self.updateOrders();
 			}

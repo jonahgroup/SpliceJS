@@ -1,36 +1,57 @@
 <!-- @template:{type:'UserApplications.ControlsDemoApplication'} -->
 <div>
+<table>
 
+<tr><td>Button</td>
+	<td>
 	<!-- @include: {
 		type:'SpliceJS.Controls.Button',
 		content:{value:'Button'}
 	} -->
+	</td>
+</tr>
 
-	<br>
+<tr><td>Checkbox</td>
+	<td>
+		<!-- @include: {
+			type:'SpliceJS.Controls.CheckBox',
+			content:{value:'Button'}
+		} -->
+	</td>
+</tr>
 
-	<!-- @include: {
-		type:'SpliceJS.Controls.CheckBox',
-		content:{value:'Button'}
-	} -->
-
-
-	<br>
-
-	<!-- @include: {
-		type:'SpliceJS.Controls.RadioButton',
-		content:{value:'Button'}
-	} -->
-
-	<br>
-
+<tr><td>Radio button</td>
+	<td>
+		<!-- @include: {
+			type:'SpliceJS.Controls.RadioButton',
+			content:{value:'Button'}
+		} -->
+	</td>
+</tr>
+	
+<tr><td>Drop down list</td>
+<td>
 	<!-- @include: {
 		type:'SpliceJS.Controls.DropDownList',
 		content:{selectedValue:'test'}
 	} -->
+</td>
+</tr>
 
-	</br>
+<tr><td>Dial</td>
+	<td>
+	<!-- @include: {
+		type:	'SpliceJS.Controls.Dial',
+		value:	34
+	} -->	
+
+	</td>
+</tr>
+
 	
-	<div style="position:relative; width:200px; height:200px;">
+<tr><td>Scroll panel</td>
+	<td>	
+	<div style="position:relative; width:400px; height:200px;">
 	<!-- @include: {
 		type:	'SpliceJS.Controls.ScrollPanel',
 		ref:	'scrollPanel',
@@ -40,11 +61,30 @@
 		} 
 	} -->
 	</div>
+</td>
+</tr>
+
+
+<tr><td>Data table</td>
+	<td>
+	<div style="position:relative; width:400px; height:200px;">
+	<!-- @include: {
+		type: 	'SpliceJS.Controls.DataTable',
+		dataIn:	_.Binding.To('sampleData').Parent
+	} -->
+	</div>
+</td></tr>
+</table>
 </div>
 
 
+
+<!-- @template:{type:'LocalButton', tie:'SpliceJS.Controls.Button'} -->
+<div style="border:1px solid; padding:5px; display:inline;" data-sp-ref="controlContainer">@value</div>
+
+
 <!-- @template:{type:'SampleContent'} -->
-<div style="position:relative; width:1000px; height:1000px;"> 
+<div style="position:relative; width:400px; height:1000px;"> 
 <p>
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, erat a finibus lobortis, nisl dui interdum sem, ut bibendum sem ligula vel risus. Vestibulum sagittis justo ac eros blandit, at blandit nunc scelerisque. Quisque non ipsum finibus nisl finibus facilisis. Fusce elementum commodo sodales. Praesent vitae odio at ante mattis tincidunt. Duis ac enim tempor, tempus diam nec, ornare leo. Suspendisse commodo lacus lorem, placerat scelerisque nulla feugiat vel.
 </p>
