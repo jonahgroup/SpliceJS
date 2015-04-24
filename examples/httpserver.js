@@ -27,7 +27,7 @@ function getContent(path){
 
 require('http').createServer(function (request,response){
 
-	var filePath = __dirname +'/' + docRoot + request.url;
+	var filePath = docRoot + request.url;
 	
 	var fs = require('fs');
 

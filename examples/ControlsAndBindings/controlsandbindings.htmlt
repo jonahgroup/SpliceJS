@@ -4,16 +4,14 @@
 	
 	<!-- @include:{
 		type:'SpliceJS.Controls.Button', 
-
 		ref:'addButton',
 		style: 'button',
 		onClick:_.Binding.From('onAddRecord').Parent,
 		content:{label:'Add'}
 	} -->
 
-	<!-- @include:{
+	<!-- @include:{ 
 		type:'SpliceJS.Controls.Button', 
-
 		ref:'editButton',
 		style: 'button',
 		onClick:_.Binding.From('onEdit').Parent,
@@ -22,7 +20,6 @@
 	
 	<!-- @include:{
 		type:'SpliceJS.Controls.Button', 
-
 		ref:'deleteButton',
 		style: 'button',
 		onClick:_.Binding.From('onDelete').Parent,
