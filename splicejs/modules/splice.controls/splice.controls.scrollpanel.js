@@ -6,7 +6,11 @@ required:[
 	'modules/splice.controls/splice.controls.scrollpanel.htmlt'
 ],
 
-definition:function(){	
+definition:function(){
+
+	var isTouch = _.configuration.platform.IS_TOUCH_ENABLED;
+
+
 	var ScrollPanel = _.Namespace('SpliceJS.Controls').Class(function ScrollPanel(args){
 		if(!args) return;
 		
@@ -14,9 +18,36 @@ definition:function(){
 		
 		this.horizontalDisable = this.isDisableHorizontal;
 		this.domRoot = this.concrete.dom;
-		
+
+		this.clippingArea = this.elements.clippingArea;
+
+		var self = this;
+
+		/* setup touch events on touch enabled platforms */
+		if(isTouch){
+
+		this.clippingArea.addEventListener( 'touchstart', function(e){self.onTouchStart(e);},	false );
+		this.clippingArea.addEventListener( 'touchend',   function(e){self.onTouchEnd(e);}, 	false );
+		this.clippingArea.addEventListener( 'touchmove',  function(e){self.onTouchMove(e);}, 	false );
+
+		}
+	
 	}).extend(SpliceJS.Controls.UIControl);
 	
+
+
+	ScrollPanel.prototype.onTouchStart = function(e){
+		_.debug.log(e);
+	};
+
+	ScrollPanel.prototype.onTouchEnd = function(e){
+		_.debug.log(e);
+	};
+
+	ScrollPanel.prototype.onTouchMove = function(e){
+		_.debug.log(e);
+	};
+
 
 	
 	

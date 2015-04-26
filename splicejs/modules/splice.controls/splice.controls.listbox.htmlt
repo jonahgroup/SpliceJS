@@ -1,8 +1,26 @@
-<!-- @template:{type:'SpliceJS.Controls.ListBox'} -->
+<!-- @template:{type:'StretchListBox'} -->
+<div class="-splicejs-list-box" data-sjs-ref="controlContainer">
+
+</div>
+
+
+<!-- @template:{type:'ScrollableListBox'} -->
 <div class="-splicejs-list-box" data-sjs-ref="controlContainer">
 	<!-- @include:{
 		type:'SpliceJS.Controls.ScrollPanel',
-		ref:'scrollPanel'
-
+		ref:'scrollPanel',
+		content:{
+			scrollContent:_.Obj({
+				type:'ContentClient',
+				ref:'contentClient'
+			}),
+			staticContent:''
+		}
 	} -->
 </div>
+
+
+<!-- @template:{type:'ContentClient'} -->
+<div data-sjs-ref="controlContainer"></div>
+
+

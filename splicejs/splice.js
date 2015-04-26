@@ -31,10 +31,18 @@ SOFTWARE.
 var _ = (function(window, document){
 	"use strict";
 
-	
+	var configuration = {
+		PUBLIC_ROOT:         	window.SPLICE_PUBLIC_ROOT,
+		platform: {	
+			IS_MOBILE: 			window.SPLICE_PLATFORM_IS_MOBILE,
+			IS_TOUCH_ENABLED: 	window.SPLICE_PLATFORM_IS_TOUCH_ENABLED
+		}
+	};
+
+
 	/* Cache loading indicator 
 	 * */
-	new Image().src = ( window.SPLICE_PUBLIC_ROOT || '') + '/resources/images/bootloading.gif';
+	new Image().src = ( configuration.PUBLIC_ROOT || '') + '/resources/images/bootloading.gif';
 
 	
 	if(!window.console) { 
@@ -119,6 +127,9 @@ var _ = (function(window, document){
 	 * Core Object
 	 * */
 	function Splice(){
+		
+		this.configuration = configuration;
+
 		/*
 		 * loader initializers
 		 * */

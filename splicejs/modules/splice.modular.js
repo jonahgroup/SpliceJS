@@ -54,7 +54,49 @@ _.Module = (function(document){
 		this.dom = dom;
 	});
 	
-	
+	Concrete.prototype.applyContent = function(content){
+		
+		var deepClone = this.dom;
+		var tieInstance = this.tieInstance;
+
+		var contentNodes = _.Doc.selectTextNodes(deepClone, function(node){
+			if(node.nodeValue.indexOf('@') === 0) //starts with 
+				return node;
+			return null;
+		});	
+		
+
+		if(contentNodes) {
+			for(var i=0; i < contentNodes.length; i++){
+				var value = contentNodes[i].nodeValue; 
+				value = value.substring(1,value.length);
+
+				var obj = content[value];
+				var newNode = null;
+
+				if(typeof obj === 'function') {
+					var contentInstance = new obj({parent:tieInstance});
+					if(contentInstance.concrete) 
+						newNode = contentInstance.concrete.dom; 
+					
+				}
+
+				if(typeof obj === 'string'){
+					newNode = document.createTextNode(obj);		
+				}
+
+				if(typeof obj === 'number'){
+					newNode = document.createTextNode(obj);			
+				}
+
+				if(newNode) contentNodes[i].parentNode.replaceChild(
+						newNode, 
+						contentNodes[i]
+				);	
+			}
+		}
+
+	};
 
 	
 	var Template = _.Namespace('SpliceJS.Modular').Class(function Template(dom){
@@ -133,7 +175,7 @@ _.Module = (function(document){
 		deepClone.normalize();
 		 
 		var instance = new Concrete(deepClone);
-		
+		instance.tieInstance = tieInstance;
 		
 		deepClone._concrete = instance; // DOM get a reference to the concrete instance
 		
@@ -182,46 +224,9 @@ _.Module = (function(document){
 	   /*
 		* Handle content declaration
 		* Getcontent nodes
-		*/
-		var contentNodes = null;
-		
+		*/	
 		if(parameters.content) 
-		contentNodes = _.Doc.selectTextNodes(deepClone, function(node){
-			if(node.nodeValue.indexOf('@') === 0) //starts with 
-				return node;
-			return null;
-		});	
-		
-
-		if(contentNodes) {
-			for(var i=0; i < contentNodes.length; i++){
-				var value = contentNodes[i].nodeValue; 
-				value = value.substring(1,value.length);
-
-				var obj = parameters.content[value];
-				var newNode = null;
-
-				if(typeof obj === 'function') {
-					var contentInstance = new obj({parent:tieInstance});
-					if(contentInstance.concrete) 
-						newNode = contentInstance.concrete.dom; 
-					
-				}
-
-				if(typeof obj === 'string'){
-					newNode = document.createTextNode(obj);		
-				}
-
-				if(typeof obj === 'number'){
-					newNode = document.createTextNode(obj);			
-				}
-
-				if(newNode) contentNodes[i].parentNode.replaceChild(
-						newNode, 
-						contentNodes[i]
-				);	
-			}
-		}
+		instance.applyContent(parameters.content);
 
 
 		if(typeof tieInstance.handleContent === 'function'){
@@ -388,11 +393,15 @@ _.Module = (function(document){
 					obj.elements = {};
 					
 					/* 
-					 * assign reference to a parent
+					 * assign reference to a parent and 
+					 * append to children array
 					 * */
 					if(obj.parent) { 
-						obj.parent.ref = obj.parent.ref || [];
+						obj.parent.ref 		= obj.parent.ref || [];
+						obj.parent.children = obj.parent.children || [];
+
 						if(args.ref) obj.parent.ref[args.ref] = obj;
+						obj.parent.children.push(obj);						
 					}
 					
 					obj.concrete = template.getInstance(obj, args, scope);
@@ -482,6 +491,7 @@ _.Module = (function(document){
 					 * for template compilation
 					 * */
 					var scope = {}; 
+					
 					definition.call(scope);
 					scope.templates = templateDefinitions;
 					
