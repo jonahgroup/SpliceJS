@@ -524,7 +524,7 @@ _.Module = (function(document){
 	
 	function extractTemplates(fileSource){
 		
-		var regex = /<!--\s+@template:{.*}\s+-->/igm; 	//script start RE
+		var regex = /<!--\s+@(template|selector):{.*}\s+-->/igm; 	//script start RE
 		var match = null;
 		
 		var lastMatch = null;
@@ -819,12 +819,14 @@ _.Module = (function(document){
 		/* 
 		 * this is a local scope template declaration 
 		 * local templates may only couple with explicitly defined ties
-		 * same-name linkage is not possible
+		 * same-name linkage is not possible,
+		 !!! unless implicit tie is also within the local scope
 		 * */
 		if(!split_name.namespace || split_name.namespace === '') { 	
 			template.isLocal = true;
 			
-			var tie = tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : Concrete;
+			var tie = tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : 
+					  scope[template_name] ? scope[template_name] : Concrete;
 			
 			if(tie && tie.isComponent) tie = tie.tie;
 			
