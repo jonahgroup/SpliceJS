@@ -1,5 +1,5 @@
 <!-- @template:{type:'UserApplications.ScrollPanelApplication'} -->
-<div class="-picture-frame" data-sp-ref="controlContainer">
+<div class="-picture-frame" data-sjs-ref="controlContainer">
 	<!-- @include:{
 		type:'SpliceJS.Controls.ScrollPanel',
 		ref:'scrollPanel',
@@ -16,4 +16,4 @@
 
 
 <!-- @template:{type:'PanelContent', tie:'ImageLoader'} -->
-<img src="ScrollPanel/sampleimage.jpg" data-sp-ref="sourceImage">
+<img src="ScrollPanel/sampleimage.jpg" data-sjs-ref="sourceImage">

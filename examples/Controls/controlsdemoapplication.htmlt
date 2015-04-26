@@ -43,6 +43,18 @@
 </td>
 </tr>
 
+<tr><td>List Box</td>
+<td>
+	<div style="position:relative; width:300px; height:400px;">
+	<!-- @include: {
+		type:'SpliceJS.Controls.ListBox',
+		dataIn: _.Binding.To('listData').Parent
+	} -->
+	</div>
+</td>
+</tr>
+
+
 <tr><td>Dial</td>
 	<td>
 	<!-- @include: {
@@ -86,7 +98,7 @@
 
 
 <!-- @template:{type:'LocalButton', tie:'SpliceJS.Controls.Button'} -->
-<div style="border:1px solid; padding:5px; display:inline;" data-sp-ref="controlContainer">@value</div>
+<div style="border:1px solid; padding:5px; display:inline;" data-sjs-ref="controlContainer">@value</div>
 
 
 <!-- @template:{type:'SampleContent'} -->

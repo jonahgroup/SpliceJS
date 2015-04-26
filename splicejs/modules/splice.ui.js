@@ -10,7 +10,7 @@ definition:function(){
 
 		/* attach style to the controlContainer */
 		if(args.style)
-		this.elements.controlContainer.className += ' ' + args.style; 
+			this.elements.controlContainer.className += ' ' + args.style; 
 
 
 		this.dataItem = null;

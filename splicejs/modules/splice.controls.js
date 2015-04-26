@@ -7,7 +7,8 @@ required:[
   	'modules/splice.controls/splice.controls.htmlt',
 	'modules/splice.controls/splice.controls.datatable.js',
 	'modules/splice.controls/splice.controls.scrollpanel.js',
-	'modules/splice.controls/splice.controls.chart.js'
+	'modules/splice.controls/splice.controls.chart.js',
+	'modules/splice.controls/splice.controls.listbox.js'
 ], 	
          	
 definition:function(){
@@ -180,9 +181,7 @@ definition:function(){
 	}).extend(SpliceJS.Controls.UIControl); 
 
 
-	var ListItem = _.Namespace('SpliceJS.Controls').Class(function ListItem(args){
 
-	});
 
 
 	DropDownList.prototype.show = function(args){

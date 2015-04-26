@@ -1,0 +1,8 @@
+<!-- @template:{type:'SpliceJS.Controls.ListBox'} -->
+<div class="-splicejs-list-box" data-sjs-ref="controlContainer">
+	<!-- @include:{
+		type:'SpliceJS.Controls.ScrollPanel',
+		ref:'scrollPanel'
+
+	} -->
+</div>

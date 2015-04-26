@@ -57,9 +57,9 @@
 
 </div>
 <div class="bodypanel">
-<div class="editpanel" data-sp-ref="editPanel">
-	<div class="editlabel"><span data-sp-ref="editSectionLabel">Create New Record</span></div>
-	<div class="instructionsLabel" data-sp-ref="editInstructionsLabel">Select record on the right hand side to enable edit dialog</div>
+<div class="editpanel" data-sjs-ref="editPanel">
+	<div class="editlabel"><span data-sjs-ref="editSectionLabel">Create New Record</span></div>
+	<div class="instructionsLabel" data-sjs-ref="editInstructionsLabel">Select record on the right hand side to enable edit dialog</div>
 	<div style="position:absolute; top:125px; left:25px; bottom:0px; right:0px;">
 	<!-- @include: {
 		type:'SpliceJS.Controls.DataTable',
@@ -74,7 +74,7 @@
 	} -->
 	</div>
 </div>
-<div class="datapanel" data-sp-ref="dataPanel">
+<div class="datapanel" data-sjs-ref="dataPanel">
 	
 	<!-- @include: {
 		type:'SpliceJS.Controls.DataTable',
@@ -115,7 +115,7 @@
 </div>
 
 <!-- @template:{type:'HeaderRowTemplate', tie:'FancyHeaderRow'} -->
-	<div data-sp-ref="controlColumn"></div>
+	<div data-sjs-ref="controlColumn"></div>
 	<div>@0</div>
 	<div>@1</div>
 	<div>@2</div>
@@ -160,5 +160,5 @@
 	
 
 <!-- @template:{type: 'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
-<input style="background-color:#ff0000; border:1px solid #ff0000; font-size:10px; padding:4px; display:none;" data-sp-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
+<input style="background-color:#ff0000; border:1px solid #ff0000; font-size:10px; padding:4px; display:none;" data-sjs-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
 

@@ -1,5 +1,5 @@
 <!-- @template:{type:'SpliceJS.Controls.DataTable'} -->
-<div style="position:relative;" data-sp-ref="controlContainer">
+<div style="position:relative;" data-sjs-ref="controlContainer">
 	<!-- @include: {
 		type:'SpliceJS.Controls.ScrollPanel',
 		ref:'scrollPanel',
@@ -19,10 +19,10 @@
 
 <!-- @template:{type:'DataTableHeader'} -->
 <div class="-splicejs-datatable-headercontainer" style="position:absolute; z-index:10;">
-	<table class="-splicejs-datatable" data-sp-ref="columnHeaderTable"></table>
+	<table class="-splicejs-datatable" data-sjs-ref="columnHeaderTable"></table>
 </div>
 
 <!-- @template:{type:'DataTableBody'} -->
 <div style="position:relative;">
-	<table class="-splicejs-datatable" data-sp-ref="dataTable"></table>
+	<table class="-splicejs-datatable" data-sjs-ref="dataTable"></table>
 </div>

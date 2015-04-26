@@ -126,7 +126,7 @@ _.Module = (function(document){
 		//Clone node retaining _config property
 		var deepClone = _.Doc.cloneNodeAndProperties(
 				 build,{
-					 selectors:['[data-sgi-module],[data-sgi-api]'], 
+					 selectors:['[data-sjs-module],[data-sjs-api]'], 
 					 properties:['_config','_template'],
 					 isDeep:true
 				 });
@@ -138,7 +138,7 @@ _.Module = (function(document){
 		deepClone._concrete = instance; // DOM get a reference to the concrete instance
 		
 		/* process dom references */
-		var elements = deepClone.querySelectorAll('[data-sp-ref]');
+		var elements = deepClone.querySelectorAll('[data-sjs-ref]');
 		var element = deepClone;
 		
 		if(tieInstance)
@@ -146,7 +146,7 @@ _.Module = (function(document){
 			
 			if(i > -1) element = elements[i];
 			
-			var ref = element.getAttribute('data-sp-ref'); 
+			var ref = element.getAttribute('data-sjs-ref'); 
 			if(ref) tieInstance.elements[ref] = element; 	
 		}
 		
@@ -230,15 +230,15 @@ _.Module = (function(document){
 		
 
 		/* 
-		 * Anchor elements with data-splice-tmp-anchor attibute
+		 * Anchor elements with data-sjs-tmp-anchor attibute
 		 * are placeholders for included templates
 		 * Process clone and attach templates 
 		 * */
-		var anchors = deepClone.querySelectorAll('[data-splice-tmp-anchor]');
+		var anchors = deepClone.querySelectorAll('[data-sjs-tmp-anchor]');
 		
 		for(var i=0; i < anchors.length; i++){
 			
-			var childId = anchors[i].getAttribute('data-splice-child-id');
+			var childId = anchors[i].getAttribute('data-sjs-child-id');
 			var proxy 	= this.children[childId];
 			
 			
@@ -747,8 +747,8 @@ _.Module = (function(document){
 			var childId = template.addChild(result);
 				
 			var a = document.createElement('a');
-			a.setAttribute('data-splice-tmp-anchor',result.type);
-			a.setAttribute('data-splice-child-id',	childId);
+			a.setAttribute('data-sjs-tmp-anchor',result.type);
+			a.setAttribute('data-sjs-child-id',	childId);
 				
 			parent.replaceChild(a,notation);
 			
