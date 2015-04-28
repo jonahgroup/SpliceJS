@@ -32,6 +32,7 @@ var _ = (function(window, document){
 	"use strict";
 
 	var configuration = {
+		APPLICATION_HOME: 		getPath(window.location.href).path, 
 		PUBLIC_ROOT:         	window.SPLICE_PUBLIC_ROOT,
 		platform: {	
 			IS_MOBILE: 			window.SPLICE_PLATFORM_IS_MOBILE,
@@ -123,6 +124,41 @@ var _ = (function(window, document){
 		document.body.innerHTML = tempBodyContent;
 	}
 	
+
+
+	function collapsePath(path){
+		var stack = [];
+		
+		/* 
+			create origin stack
+		*/
+		var parts = path.split('/');
+		for(var i=0; i<parts.length; i++){
+			if(!parts[i] && parts[i] == '') continue;
+			if(parts[i] === '..' && stack.length >  0) { 
+				stack.pop(); 
+				continue;
+			}
+			stack.push(parts[i]);
+		}
+
+		var cpath = '';
+		var separator = '';
+		for(var i=0; i<stack.length; i++){
+
+			cpath = cpath + separator + stack[i];
+			if(i == 0) { separator = '//'; continue; }
+			separator = '/';
+		}
+		return cpath;
+	}
+
+
+	function absPath(path){
+		return collapsePath(configuration.APPLICATION_HOME+'/'+path);
+	}
+
+
 	/*
 	 * Core Object
 	 * */
@@ -179,8 +215,7 @@ var _ = (function(window, document){
 	};
 
 
-
-	Splice.prototype.getPath = function(path){
+	function getPath(path){
 		var index = path.lastIndexOf('/');
 
 		if(index < 0) return {name:path};
@@ -189,6 +224,9 @@ var _ = (function(window, document){
 			name:path.substring(index+1)
 		}
 	};
+	
+	Splice.prototype.absPath = absPath;
+	Splice.prototype.getPath = getPath;
 	
 	if(window.performance && window.performance.now)
 	Splice.prototype.performance = {
@@ -466,6 +504,9 @@ var _ = (function(window, document){
 		 * qualify filename
 		 * */
 		//filename = window.SPLICE_PUBLIC_ROOT +'/'+filename;
+		var relativeFileName = filename; 
+		filename = _.absPath(filename);
+
 		/*
 		 * */
 		if(	filename._endswith(".css") || 
@@ -501,7 +542,7 @@ var _ = (function(window, document){
 			var linkref = document.createElement('link');
 			
 			//tell Splice what is loading
-			watcher.notifyCurrentlyLoading({name:filename,obj:linkref});
+			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:linkref});
 			
 			linkref.setAttribute("rel", "stylesheet");
 			linkref.setAttribute("type", "text/css");
@@ -532,7 +573,7 @@ var _ = (function(window, document){
 			var script = document.createElement('script');
 			
 			//tell Splice what is loading
-			watcher.notifyCurrentlyLoading({name:filename,obj:script});
+			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:script});
 			
 			script.setAttribute("type", "text/javascript");
 			script.setAttribute("src", filename);
@@ -553,7 +594,7 @@ var _ = (function(window, document){
 		 * */
 		if(filename._endswith('.htmlt')){
 			//tell Splice what is loading
-			watcher.notifyCurrentlyLoading({name:filename,obj:null});
+			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
 			_.HttpRequest.post({
 				url: filename,
 				onok:function(response){
@@ -574,6 +615,16 @@ var _ = (function(window, document){
 		return null;
 	};
 	
+	Splice.prototype.dumpUrlCache = function (){ 
+		var cache = [];
+		for(var key in _url_cache){
+			if( _url_cache.hasOwnProperty(key)) {
+				_.info.log(key);
+				cache.push(key);
+			}
+		}
+		return cache;
+	};
 	
 	Splice.prototype.include = function(resources, oncomplete, onitemloaded){
 		

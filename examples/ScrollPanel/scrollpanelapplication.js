@@ -1,10 +1,10 @@
 _.Module({
 	
 required:[
-	'modules/splice.controls.js',
-	'../examples/BasicApplication/basicapplication.js',
-	'../examples/ScrollPanel/scrollpanelapplications.css',
-	'../examples/ScrollPanel/scrollpanelapplication.htmlt'
+	_.home('modules/splice.controls.js'),
+	'../BasicApplication/basicapplication.js',
+	'scrollpanelapplications.css',
+	'scrollpanelapplication.htmlt'
 ],
 
 definition:function(){
