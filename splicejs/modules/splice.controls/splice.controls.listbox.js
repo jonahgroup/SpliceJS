@@ -1,9 +1,9 @@
 _.Module({
 
 required:[ 
-	'modules/splice.ui.js',
-	'modules/splice.controls/splice.controls.listbox.css',
-	'modules/splice.controls/splice.controls.listbox.htmlt'
+	_.home('modules/splice.ui.js'),
+	'splice.controls.listbox.css',
+	'splice.controls.listbox.htmlt'
 ],
 
 definition:function(){

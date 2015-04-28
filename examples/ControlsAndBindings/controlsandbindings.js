@@ -1,10 +1,10 @@
 _.Module({
 
-required:['modules/splice.controls.js',
-		  '../examples/BasicApplication/basicapplication.js',
-		  '../examples/ScrollPanel/scrollpanelapplication.js',
-		  '../examples/ControlsAndBindings/controlsandbindings.css',
-          '../examples/ControlsAndBindings/controlsandbindings.htmlt'],	
+required:[_.home('modules/splice.controls.js'),
+		  '../BasicApplication/basicapplication.js',
+		  '../ScrollPanel/scrollpanelapplication.js',
+		  'controlsandbindings.css',
+          'controlsandbindings.htmlt'],	
 	
 definition:function(){
 	var LocalScope = this;
@@ -26,7 +26,6 @@ definition:function(){
 				});
 				self.dataColumns.push('Temperature');
 
-				
 				self.orderData = self.sourceData;
 				
 				self.updateOrders();

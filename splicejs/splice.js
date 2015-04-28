@@ -155,6 +155,40 @@ var _ = (function(window, document){
 		Splice.prototype.debug = console;
 	};
 	
+
+
+	Splice.prototype.home = function(obj,path){
+
+
+		if(!path) var path = window.SPLICE_PUBLIC_ROOT;
+
+		if(!obj) return path;
+
+		if(typeof obj === 'string'){
+			if(obj.indexOf(window.SPLICE_PUBLIC_ROOT) === 0) return obj;
+			return path + '/' + obj;
+		}
+
+		if(obj instanceof Array){
+			for(var i=0; i < obj.length; i++){
+				obj[i] = Splice.prototype.home(obj[i],path);
+			}
+			return obj;
+		}
+
+	};
+
+
+
+	Splice.prototype.getPath = function(path){
+		var index = path.lastIndexOf('/');
+
+		if(index < 0) return {name:path};
+		return {
+			path:path.substring(0,index),
+			name:path.substring(index+1)
+		}
+	};
 	
 	if(window.performance && window.performance.now)
 	Splice.prototype.performance = {
@@ -431,7 +465,7 @@ var _ = (function(window, document){
 		/*
 		 * qualify filename
 		 * */
-		filename = window.SPLICE_PUBLIC_ROOT +'/'+filename;
+		//filename = window.SPLICE_PUBLIC_ROOT +'/'+filename;
 		/*
 		 * */
 		if(	filename._endswith(".css") || 

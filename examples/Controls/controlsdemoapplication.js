@@ -1,8 +1,8 @@
 _.Module({
 	
 required:[
-	'modules/splice.controls.js',
-	'../examples/Controls/controlsdemoapplication.htmlt'
+	_.home('modules/splice.controls.js'),
+		   'controlsdemoapplication.htmlt'
 ],
 
 definition:function(){

@@ -2,13 +2,13 @@ _.Module({
 
 required:[	
 			
-	'modules/splice.ui.js',
-	'modules/splice.controls/splice.controls.css',
-  	'modules/splice.controls/splice.controls.htmlt',
-	'modules/splice.controls/splice.controls.datatable.js',
-	'modules/splice.controls/splice.controls.scrollpanel.js',
-	'modules/splice.controls/splice.controls.chart.js',
-	'modules/splice.controls/splice.controls.listbox.js'
+	_.home('modules/splice.ui.js'),
+	'splice.controls/splice.controls.css',
+  	'splice.controls/splice.controls.htmlt',
+	'splice.controls/splice.controls.datatable.js',
+	'splice.controls/splice.controls.scrollpanel.js',
+	'splice.controls/splice.controls.chart.js',
+	'splice.controls/splice.controls.listbox.js'
 ], 	
          	
 definition:function(){

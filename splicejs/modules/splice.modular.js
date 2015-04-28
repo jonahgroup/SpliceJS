@@ -284,7 +284,6 @@ _.Module = (function(document){
 			}
 			
 			compileTemplates({templates:templates});
-			_.info.log(arg.filename);
 		}
 		originalInclude.call(_,resources, oncomplete,handler);
 	}
@@ -429,80 +428,90 @@ _.Module = (function(document){
 	 * */
 	var _modules = new Array(); //module cache	
 	
+
+	/**
+	 * Builds module and compiles template(s) from module definition. 
+	 * The templates will be compiled recursively, 
+	 * where inner templates are compiled first and then outer. 
+	 * Any scripts embedded into template will be evaluated and 
+	 * their result be injected into DOM, by replacing underlying script tag.
+	 * @param moduleDefinition
+	 */
+	function define(moduleDefinition){
+		
+		var path = _.getPath(_.currentlyLoading.name).path;
+
+		var required 	= _.home(moduleDefinition.required,path);
+		var moduleName 	= moduleDefinition.name;
+		var definition  = moduleDefinition.definition;
+	
+		/* required collection is always an Array */
+		required = required instanceof Array ? required : null;
+			
+		_.debug.log(path);
+
+		var templateDefinitions = new Array();
+		
+		/*
+		 * Handler to receive template file sources
+		 * each file may container any number of templates
+		 * template are then extracted into templateDefinitions
+		 * and assigned to module instance
+		 * 
+		 * Template compiler is called on module instance 
+		 * */
+		var collectTemplates = function(template){
+			/* template is a template file as loaded
+			 * extract template information
+			 * */
+			if(!template) return;
+			var t = extractTemplates(template.data);
+			
+			for(var i=0; i< t.length; i++){
+				templateDefinitions[t[i].spec.type] = t[i];
+			}
+		};
+						
+		/*
+		 * Module has no required includes
+		 * */
+		if(!required || required.length < 1) {
+			definition(); 
+			return;
+		}
+		
+		/* 
+		 * Load dependencies
+		 * */
+		 originalInclude.call(_,required, function(){	
+			
+			/*
+			 * Define a module
+			 * and create template scope 
+			 * for template compilation
+			 * */
+			var scope = {}; 
+			
+			definition.call(scope);
+			scope.templates = templateDefinitions;
+			
+			/* 
+			 * Templates are compiled after module has been defined
+			 * 
+			 * */
+			compileTemplates(scope);
+			
+		},collectTemplates);
+	};
+
+
+
+
 	function ModularApi(){};
 	ModularApi.prototype = {
 	
 			constructor:ModularApi,
 	
-			/**
-			 * Builds module and compiles template(s) from module definition. 
-			 * The templates will be compiled recursively, 
-			 * where inner templates are compiled first and then outer. 
-			 * Any scripts embedded into template will be evaluated and 
-			 * their result be injected into DOM, by replacing underlying script tag.
-			 * @param moduleDefinition
-			 */
-			define : function(moduleDefinition){
-				
-				var required 	= moduleDefinition.required;
-				var moduleName 	= moduleDefinition.name;
-				var definition  = moduleDefinition.definition;
-			
-				var node = _.currentlyLoading;
-								
-				var templateDefinitions = new Array();
-				
-				/*
-				 * Handler to receive template file sources
-				 * each file may container any number of templates
-				 * template are then extracted into templateDefinitions
-				 * and assigned to module instance
-				 * 
-				 * Template compiler is called on module instance 
-				 * */
-				var collectTemplates = function(template){
-					/* template is a template file as loaded
-					 * extract template information
-					 * */
-					if(!template) return;
-					var t = extractTemplates(template.data);
-					
-					for(var i=0; i< t.length; i++){
-						templateDefinitions[t[i].spec.type] = t[i];
-					}
-				};
-								
-				/*
-				 * Module has no required includes
-				 * */
-				if(!required || required.length < 1) {
-					definition(); 
-					return;
-				}
-				
-				/* 
-				 * Load dependencies
-				 * */
-				 originalInclude.call(_,required, function(){	
-					
-					/*
-					 * Define a module
-					 * and create template scope 
-					 * for template compilation
-					 * */
-					var scope = {}; 
-					
-					definition.call(scope);
-					scope.templates = templateDefinitions;
-					
-					/* 
-					 * Templates are compiled after module has been defined
-					 * 
-					 * */
-					compileTemplates(scope);
-					
-				},collectTemplates);
-			},
 			
 			isLoaded : function(moduleName){
 				if(_modules[moduleName]) return true;
@@ -998,5 +1007,5 @@ _.Module = (function(document){
 		this.domText = domText;
 	};
 	
-	return (new ModularApi()).define;
+	return define;
 })(document);

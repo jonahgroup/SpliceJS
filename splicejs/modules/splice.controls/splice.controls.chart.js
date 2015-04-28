@@ -1,7 +1,7 @@
 _.Module({
 
 required:[
-    'modules/splice.controls/splice.controls.chart.htmlt'
+    'splice.controls.chart.htmlt'
 ],
 
 definition:function(){

@@ -2,8 +2,8 @@ _.Module({
 
 
 required:[
-	'modules/splice.controls/splice.controls.scrollpanel.css',
-	'modules/splice.controls/splice.controls.scrollpanel.htmlt'
+	'splice.controls.scrollpanel.css',
+	'splice.controls.scrollpanel.htmlt'
 ],
 
 definition:function(){
@@ -23,7 +23,13 @@ definition:function(){
 
 		var self = this;
 
-		/* setup touch events on touch enabled platforms */
+		/* Scrollable content client */
+		this.client = this.elements.scrollClient;
+
+		/* Current scroll offset */
+		this.currentScrollTop = 0;
+
+		/* Setup touch events on touch enabled platforms */
 		if(isTouch){
 
 		this.clippingArea.addEventListener( 'touchstart', function(e){self.onTouchStart(e);},	false );
@@ -37,15 +43,45 @@ definition:function(){
 
 
 	ScrollPanel.prototype.onTouchStart = function(e){
-		_.debug.log(e);
+		this.touchStart = {x:e.touches[0].pageX, y:e.touches[0].pageY};
+		e.preventDefault();
+	
+		this.pVector = null;
 	};
 
 	ScrollPanel.prototype.onTouchEnd = function(e){
-		_.debug.log(e);
+		this.currentScrollTop = this.client.scrollTop; 
+
+		var self = this;
+		new _.StoryBoard([
+		new _.Animation(this.currentScrollTop,  this.currentScrollTop+6*-1*this.endMagnitude, 300, _.Animation.easeOut, 
+		    function(value){
+		    	self.client.scrollTop = value;
+			},
+			function(){
+				self.currentScrollTop = self.client.scrollTop; 	
+				self.endMagnitude = 0;			
+			})
+		]).animate();
+
 	};
 
+
 	ScrollPanel.prototype.onTouchMove = function(e){
-		_.debug.log(e);
+		this.touchEnd = {x:e.touches[0].pageX, y:e.touches[0].pageY};
+		e.preventDefault();
+
+		var vector = [
+			this.touchEnd.x - this.touchStart.x,
+			this.touchEnd.y - this.touchStart.y
+		];
+		this.client.scrollTop = this.currentScrollTop + (-1*vector[1]);
+
+		if(this.pVector){
+			this.endMagnitude = vector[1] - this.pVector[1];
+		}
+
+		this.pVector = vector;
 	};
 
 

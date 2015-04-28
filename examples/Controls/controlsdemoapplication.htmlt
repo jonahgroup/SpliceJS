@@ -8,11 +8,6 @@
 		type:'SpliceJS.Controls.Button',
 		content:{value:'Button'}
 	} -->
-
-	<!-- @include: {
-		type:'LocalButton',
-		content:{value:'Test Button'}
-	} -->
 	</td>
 </tr>
 
@@ -103,12 +98,9 @@
 <!-- @template:{type:'SampleListItem', tie:'SpliceJS.Controls.ListItem'} -->
 <div style="border-bottom:1px solid #cecece; padding:0.5em;">
 	<div>@name</div>
-	<div style="font-size:0.5em; color: #52A2E5;">@number</div>
+	<div style="font-size:11px; color: #52A2E5; font-family:Arial;">@number</div>
 </div>
 
-
-<!-- @template:{type:'LocalButton', tie:'SpliceJS.Controls.Button'} -->
-<div style="border:1px solid; padding:5px; display:inline;" data-sjs-ref="controlContainer">@value</div>
 
 
 <!-- @template:{type:'SampleContent'} -->

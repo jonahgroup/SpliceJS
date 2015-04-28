@@ -8,18 +8,18 @@
 <script>
 	_.debugEnable();
 	_.run = function(){
-		_.include(['modules/splice.typextension.js',
-		           'modules/splice.animation.js',
-		           'modules/splice.document.js',
-		           'modules/splice.network.js',
-		           'modules/splice.modular.js',
-		           'modules/splice.controls.js'
-		           ], function(){
+		_.include(_.home(['modules/splice.typextension.js',
+		           		  'modules/splice.animation.js',
+		           		  'modules/splice.document.js',
+		           		  'modules/splice.network.js',
+		           		  'modules/splice.modular.js',
+		           		  'modules/splice.controls.js'
+		           ]), function(){
 			
-			_.include(['../examples/resources/fontfaces.css',
-			           '../examples/Main/examples.css',
-			           '../examples/Main/examples.js',
-			           '../examples/Main/mainmenu.htmlt'], function(){
+			_.include(['resources/fontfaces.css',
+			           'Main/examples.css',
+			           'Main/examples.js',
+			           'Main/mainmenu.htmlt'], function(){
 				
 				_.Doc.display(new UserApplications.MainMenu());
 				

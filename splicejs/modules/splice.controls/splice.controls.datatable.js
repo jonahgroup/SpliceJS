@@ -1,10 +1,11 @@
 _.Module({
 	
 required:[
-	'modules/splice.controls/splice.controls.css',
-	'modules/splice.controls/splice.controls.scrollpanel.js',
-	'modules/splice.controls/splice.controls.datatable.css',
-	'modules/splice.controls/splice.controls.datatable.htmlt'],
+	'splice.controls.css',
+	'splice.controls.scrollpanel.js',
+	'splice.controls.datatable.css',
+	'splice.controls.datatable.htmlt'
+],
 
 definition:function(){
 	

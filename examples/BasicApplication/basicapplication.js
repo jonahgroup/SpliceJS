@@ -1,8 +1,8 @@
 _.Module({
 
-required:['../examples/resources/fontfaces.css',
-          '../examples/BasicApplication/basicapplication.css',
-          '../examples/BasicApplication/basicapplication.htmlt'],
+required:['../resources/fontfaces.css',
+          'basicapplication.css',
+          'basicapplication.htmlt'],
 
 definition:function(){
 
