@@ -147,7 +147,8 @@ var _ = (function(window, document){
 		for(var i=0; i<stack.length; i++){
 
 			cpath = cpath + separator + stack[i];
-			if(i == 0) { separator = '//'; continue; }
+			if(stack[i] == 'http:') { separator = '//';  continue; }
+			if(stack[i] == 'file:') { separator = '///'; continue; }
 			separator = '/';
 		}
 		return cpath;
