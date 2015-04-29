@@ -1,7 +1,7 @@
 _.Module({
 
 required:[ 
-	'../splice.ui.js',
+	_.home('modules/splice.ui.js'),
 	'splice.controls.listbox.css',
 	'splice.controls.listbox.htmlt'
 ],
@@ -47,7 +47,7 @@ definition:function(){
 		
 		for(var i=0; i<dataItem.length; i++) {
 			if(this.itemTemplate) {
-				item = new this.itemTemplate();
+				item = new this.itemTemplate({parent:this});
 				item.dataIn(this.dataItem[i]);
 				
 				if(this.contentClient){
@@ -78,13 +78,24 @@ definition:function(){
 
 	var ListItem = _.Namespace('SpliceJS.Controls').Class(function ListItem(args){
 		SpliceJS.Controls.UIControl.call(this,args);
+	
+		var self = this;
+		this.concrete.dom.onclick = function(){
+			if(typeof self.onClick === 'function' )
+				self.onClick(self.dataItem);
+		};
+
 	}).extend(SpliceJS.Controls.UIControl);
 
 
 	ListItem.prototype.dataIn = function(dataItem){
+		this.dataItem = dataItem;
 		this.concrete.applyContent(dataItem);
 		this.dataOut(dataItem);
 	};
+
+
+
 
 
 

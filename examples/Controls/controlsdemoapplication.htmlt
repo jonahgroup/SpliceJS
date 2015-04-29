@@ -58,6 +58,18 @@
 		dataIn:	_.Binding.To('sampleData').Parent,
 	} -->
 	</div>
+
+	<div style="position:relative; width:400px; height:200px;">
+	<!-- @include: {
+		type: 	'SpliceJS.Controls.DrawerPanel',
+		content: {
+			body:	_.Obj({type:'SampleContent'}),
+			drawer: _.Obj({type:'LocalList'})
+		},
+		dataIn:	_.Binding.To('sampleData').Parent,
+	} -->
+	</div>
+
 </td>
 
 
@@ -72,6 +84,15 @@
 		value:	34
 	} -->	
 
+	</td>
+
+	<td>Map</td>
+	<td> <div style="position:relative; width:400px; height:400px;">
+	<!-- @include: {
+		ref:'map',
+		type: 'SpliceJS.Controls.Map'
+	}-->
+	</div>
 	</td>
 </tr>
 
@@ -117,7 +138,8 @@
 			type:'SpliceJS.Controls.ListBox',
 			isScrollable:true,
 			itemTemplate:_.Obj({
-				type:'SampleListItem'
+				type:'SampleListItem',
+				onClick:_.Binding.From('listItemSelected').Type('UserApplications.ControlsDemoApplication')
 			}),
 			dataIn: _.Binding.To('listData').Type('UserApplications.ControlsDemoApplication')
 } -->

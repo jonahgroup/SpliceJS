@@ -10,6 +10,7 @@ required:[
 	'splice.controls/splice.controls.chart.js',
 	'splice.controls/splice.controls.listbox.js',
 	'splice.controls/splice.controls.drawerpanel.js',
+	'splice.controls/splice.controls.map.js'
 ], 	
          	
 definition:function(){

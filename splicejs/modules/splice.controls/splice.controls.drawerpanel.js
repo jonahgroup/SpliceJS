@@ -24,7 +24,7 @@ definition:function(){
 			}
 
 		}
-	);
+	).extend(SpliceJS.Controls.UIControl);
 
 
 	DrawerPanel.prototype.openDrawer = function(){
@@ -68,7 +68,7 @@ definition:function(){
 			
 		}, true);
 
-		this.elements.body.style.transform = 'scale('+scale+')';
+		//this.elements.body.style.transform = 'scale('+scale+')';
 		this.elements.body.style.color = color;
 
 		this.elements.drawer.style.width = to + 'px';

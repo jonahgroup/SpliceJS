@@ -17,13 +17,18 @@ definition:function(){
 			for(var i=0; i<20; i++){
 				this.sampleListData.push({name:'test ' + i, number:'234-12312-1234'});
 			}
+
+
+			this.mainMenuData = [{name:'Locations'},{name:'Map'}];
+
 		}
-	);
+	).extend(SpliceJS.Controls.UIControl);
 
 
 
 	MyApplication.prototype.onDisplay = function(){
-		this.listData(this.sampleListData);
+		SpliceJS.Controls.UIControl.prototype.onDisplay.call(this);
+		this.listData(this.mainMenuData);
 	};
 
 }

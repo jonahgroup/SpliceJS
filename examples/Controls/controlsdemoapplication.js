@@ -18,16 +18,25 @@ definition:function(){
 			this.sampleListData.push({name:'test ' + i, number:'234-12312-1234'});
 		}
 
-	});
+	}).extend(SpliceJS.Controls.UIControl);
 
 	ControlsDemoApplication.prototype.listData = new _.Multicaster();
 
 	ControlsDemoApplication.prototype.onDisplay = function(){
 
+		SpliceJS.Controls.UIControl.prototype.onDisplay.call(this);
+
 		this.ref.scrollPanel.reflow();
+
 		this.listData(this.sampleListData);
+		//this.ref.map.onDisplay();
 	};
 
+
+
+	ControlsDemoApplication.prototype.listItemSelected = function(item){
+		_.debug.log(item);
+	};
 
 
 }});

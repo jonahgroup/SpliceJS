@@ -22,10 +22,10 @@ Drawer Panel
 
 .-splicejs-drawer-panel .body { 
 	position:absolute;
-	top:20px; left:0px; right:0px; bottom:0px;
+	top:0px; left:0px; right:0px; bottom:0px;
 	overflow: hidden;
 	transition-duration: 0.8s;
-	transition-delay:0.2;
+	transition-delay:0.2s;
 }
 
 .-splicejs-drawer-panel .drawer { 

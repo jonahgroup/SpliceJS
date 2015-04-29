@@ -68,6 +68,16 @@ definition:function(){
 	UIControl.prototype.dataOut = function(){};
 
 
+	UIControl.prototype.onDisplay = function(){
+		_.debug.log('UIControl.onDisplay');
+		if(!this.children) return;
+		for(var i=0; i< this.children.length; i++){
+			var child = this.children[i];
+			if(typeof child.onDisplay === 'function') 
+				child.onDisplay();
+		}
+	};
+
 	/*
 		Element positioning utilies
 	*/

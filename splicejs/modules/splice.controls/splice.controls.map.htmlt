@@ -1,0 +1,4 @@
+<!-- @template:{type:'SpliceJS.Controls.Map'} -->
+<div class="-splicejs-map" data-sjs-ref="controlContainer">
+
+</div>

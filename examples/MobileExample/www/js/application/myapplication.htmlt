@@ -3,10 +3,11 @@
 	
 	<!-- @include:{
 		type:'SpliceJS.Controls.DrawerPanel',
+		ref:'drawer',
 		content: {
 			body: _.Obj({
 				type:'SpliceJS.Controls.ScrollPanel',
-				content:{scrollContent:_.Obj({type:'SampleContent'}),
+				content:{scrollContent:_.Obj({type:'SpliceJS.Controls.Map', ref:'map'}),
 						 staticContent:''}
 			}),
 			drawer: _.Obj({type:'LocalList'})
@@ -23,12 +24,18 @@
 			type:'SpliceJS.Controls.ListBox',
 			isScrollable:true,
 			itemTemplate:_.Obj({
-				type:'SampleListItem'
+				type:'MenuItem'
 			}),
 			dataIn: _.Binding.To('listData').Type('UserApplications.MyApplication')
 } -->
 </div>
 
+
+
+<!-- @template:{type:'MenuItem', tie:'SpliceJS.Controls.ListItem'} -->
+<div class="-my-menu-item">
+	<div>@name</div>
+</div>
 
 
 <!-- @template:{type:'SampleListItem', tie:'SpliceJS.Controls.ListItem'} -->
