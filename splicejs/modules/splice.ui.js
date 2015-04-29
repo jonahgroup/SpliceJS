@@ -2,6 +2,9 @@ _.Module({
 
 definition:function(){
 
+	//enable strict mode
+	"use strict"; 
+	
 	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(args){
 		if(this.isHidden) {
 			this.prevDisplayState = this.elements.controlContainer.style.display; 
@@ -193,7 +196,7 @@ definition:function(){
 		},
 		
 		drag:function(e) {
-			mousePos = SpliceJS.Ui.Positioning.mousePosition(e);
+			var mousePos = SpliceJS.Ui.Positioning.mousePosition(e);
 			this.ondrag(mousePos,SpliceJS.Ui.DragAndDrop.offset);
 			if(this.ondragfired === false) {
 				this.onbegin();

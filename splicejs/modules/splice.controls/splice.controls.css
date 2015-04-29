@@ -76,3 +76,60 @@
 	white-space: nowrap;
 	opacity:1; 
 }
+
+
+/*
+Drawer Panel
+----------------------------	
+*/
+.-splicejs-drawer-panel {
+	position:absolute;
+	top:0px; left:0px; right:0px; bottom:0px;	
+}
+
+.-splicejs-drawer-panel .actuator { 
+	position:absolute;
+	top:0px; left:0px; 
+	width: 20px;
+  	height: 20px;
+  	top:10px;
+  	z-index:3;
+
+  	cursor: pointer;
+  	transition: left 0.5s ease-in-out;
+}
+
+.-splicejs-drawer-panel .body { 
+	position:absolute;
+	top:20px; left:0px; right:0px; bottom:0px;
+	overflow: hidden;
+}
+
+.-splicejs-drawer-panel .drawer { 
+	
+	position:absolute;
+	top:0px; left:0px; bottom:0px; width:0px;
+	overflow: hidden;
+
+	background-color:#fff;
+
+	z-index:2;
+
+	transition: width 0.5s ease-in-out;
+}
+
+.-splicejs-drawer-panel .drawer-active { 
+	
+	position:absolute;
+	top:0px; left:0px; bottom:0px;
+	width:10px;
+	border-right:1px solid #cecece;
+	overflow: hidden;
+	background-color:#fff;
+
+	z-index:2;
+
+	/*box-shadow: 3px 0px 8px -4px rgba(0,0,0,0.78);*/
+}
+
+

@@ -19,10 +19,11 @@
 			_.include(['resources/fontfaces.css',
 			           'Main/examples.css',
 			           'Main/examples.js',
-			           'Main/mainmenu.htmlt'], function(){
+			           'Main/mainmenu.htmlt',
+			           'Controls/controlsdemoapplication.js'], function(){
 				
-				_.Doc.display(new UserApplications.MainMenu());
-				
+				//_.Doc.display(new UserApplications.MainMenu());
+				_.Doc.display(new UserApplications.ControlsDemoApplication());
 
 			});	
 			

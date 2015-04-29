@@ -268,6 +268,10 @@ _.Module = (function(document){
 	_.include = function(resources, oncomplete, onitemloaded){
 		
 		var handler = function(){
+
+			var path = _.getPath(_.currentlyLoading.name).path;
+			var scope = {path:path};
+
 			if(typeof onitemloaded === 'function')
 			onitemloaded.apply(this,arguments);
 			
@@ -275,7 +279,7 @@ _.Module = (function(document){
 			if(!arg) return;
 			if(arg.ext !== 'htmlt') return;
 			
-			var t = extractTemplates(arg.data);
+			var t = extractTemplates.call(scope,arg.data);
 			if(!t) return;
 			
 			var templates = {};
@@ -447,6 +451,8 @@ _.Module = (function(document){
 	
 		/* required collection is always an Array */
 		required = required instanceof Array ? required : null;
+
+		var scope = {path:path}; 
 			
 		_.debug.log(path);
 
@@ -465,7 +471,7 @@ _.Module = (function(document){
 			 * extract template information
 			 * */
 			if(!template) return;
-			var t = extractTemplates(template.data);
+			var t = extractTemplates.call(scope,template.data);
 			
 			for(var i=0; i< t.length; i++){
 				templateDefinitions[t[i].spec.type] = t[i];
@@ -490,7 +496,7 @@ _.Module = (function(document){
 			 * and create template scope 
 			 * for template compilation
 			 * */
-			var scope = {}; 
+			
 			
 			definition.call(scope);
 			scope.templates = templateDefinitions;
@@ -541,8 +547,37 @@ _.Module = (function(document){
 				descriptor.length - 3);
 	};
 	
+	function applyPath(src){
+		var path = this.path;
+		var regex = /<img\s+src="(\S+)"\s+/igm;
+	
+		var match = null;
+		var asrc = '';
+		
+		var lastMatch = 0;
+
+		while(  match = regex.exec( src ) ){
+			var apath = _.absPath(_.home(match[1],path));
+			
+			var left = src.substring(lastMatch, match.index);
+						
+
+			asrc = asrc + left + '<img src="' + apath + '" ';
+			lastMatch += match.index + match[0].length;
+
+			_.debug.log(apath);
+		}
+
+		asrc = asrc + src.substring(lastMatch, src.length);
+		return asrc;
+	}
+
+
+
 	function extractTemplates(fileSource){
 		
+		var scope = this;
+
 		var regex = /<!--\s+@(template|selector):{.*}\s+-->/igm; 	//script start RE
 		var match = null;
 		
@@ -568,7 +603,7 @@ _.Module = (function(document){
 				//eval('result = ' + desc);
 				
 				templates.push({
-					src:templateSource,
+					src:applyPath.call(scope,templateSource),
 					spec:attributes 
 					/* 
 					 * attributes are parameters specified in the @template declaration
@@ -594,7 +629,7 @@ _.Module = (function(document){
 			eval('result='+desc);
 			*/
 			templates.push({
-				src:templateSource,
+				src:applyPath.call(scope,templateSource),
 				spec:result
 			});
 		}
@@ -794,10 +829,9 @@ _.Module = (function(document){
 		var html = declaration.src;
 		var wrapper = document.createElement('span');
 		wrapper.innerHTML = html;
-		
+
+
 		var template = new Template(wrapper);
-		
-		
 		
 		/*
 		 * Run notations and scripts to form a 
@@ -889,14 +923,14 @@ _.Module = (function(document){
 	 * Compiles template within a given loading scope
 	 * 
 	 * */
-	function compileTemplates(module){
-		var templateSource = module.templates;
+	function compileTemplates(scope){
+		var templateSource = scope.templates;
 		var keys = Object.keys(templateSource);
 		
 		for(var i=0; i< keys.length; i++) {
 			var key = keys[i];
 			if(!templateSource[key]) continue;
-			compileTemplate.call(module,templateSource[key]);
+			compileTemplate.call(scope,templateSource[key]);
 		}
 	}
 	

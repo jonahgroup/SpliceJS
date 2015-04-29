@@ -1,133 +1,40 @@
-<!-- @template:{type:'UserApplications.ControlsDemoApplication'} -->
-<div>
-<table>
-
-<tr><td>Button</td>
-	<td>
-	<!-- @include: {
-		type:'SpliceJS.Controls.Button',
-		content:{value:'Button'}
-	} -->
-	</td>
-</tr>
-
-<tr><td>Checkbox</td>
-	<td>
-		<!-- @include: {
-			type:'SpliceJS.Controls.CheckBox',
-			content:{value:'Button'}
-		} -->
-	</td>
-</tr>
-
-<tr><td>Radio button</td>
-	<td>
-		<!-- @include: {
-			type:'SpliceJS.Controls.RadioButton',
-			content:{value:'Button'}
-		} -->
-	</td>
-</tr>
+<!-- @template:{type:'UserApplications.MyApplication'} -->
+<div class="-fill-screen">
 	
-<tr><td>Drop down list</td>
-<td>
-	<!-- @include: {
-		type:'SpliceJS.Controls.DropDownList',
-		content:{selectedValue:'test'}
-	} -->
-</td>
-</tr>
-
-<tr><td>List Box</td>
-<td>
-	
-	<!-- @include:{type:'LocalList'} -->
-	
-</td>
-
-
-<td>Drawer panel</td>
-	<td>
-	<div style="position:relative; width:400px; height:200px;">
-	<!-- @include: {
-		type: 	'SpliceJS.Controls.DrawerPanel',
+	<!-- @include:{
+		type:'SpliceJS.Controls.DrawerPanel',
 		content: {
 			body:	_.Obj({type:'SampleContent'}),
 			drawer: _.Obj({type:'LocalList'})
-		},
-		dataIn:	_.Binding.To('sampleData').Parent,
+		}
 	} -->
-	</div>
-</td>
 
 
-</tr>
-
-
-<tr><td>Dial</td>
-	<td>
-	<!-- @include: {
-		type:	'SpliceJS.Controls.Dial',
-		scale: 0.7,
-		value:	34
-	} -->	
-
-	</td>
-</tr>
-
-	
-<tr><td>Scroll panel</td>
-	<td>	
-	<div style="position:relative; width:400px; height:200px;">
-	<!-- @include: {
-		type:	'SpliceJS.Controls.ScrollPanel',
-		ref:	'scrollPanel',
-		content:{
-			scrollContent: _.Obj({type:'SampleContent'}),
-			staticContent: ''
-		} 
-	} -->
-	</div>
-</td>
-</tr>
-
-
-<tr><td>Data table</td>
-	<td>
-	<div style="position:relative; width:400px; height:200px;">
-	<!-- @include: {
-		type: 	'SpliceJS.Controls.DataTable',
-		dataIn:	_.Binding.To('sampleData').Parent
-	} -->
-	</div>
-</td></tr>
-
-
-
-
-
-</table>
 </div>
 
 
 
+
 <!-- @template:{type:'LocalList'} -->
-<div style="position:relative; width:300px; height:200px;">
+<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:hidden;">
 <!-- @include: {
 			type:'SpliceJS.Controls.ListBox',
 			isScrollable:true,
 			itemTemplate:_.Obj({
 				type:'SampleListItem'
 			}),
-			dataIn: _.Binding.To('listData').Type('UserApplications.ControlsDemoApplication')
+			dataIn: _.Binding.To('listData').Type('UserApplications.MyApplication')
 } -->
 </div>
 
+
+
 <!-- @template:{type:'SampleListItem', tie:'SpliceJS.Controls.ListItem'} -->
-<div style="border-bottom:1px solid #cecece; padding:0.5em;">
+<div style="border-bottom:1px solid #cecece; padding:1em; font-size:1em;">
 	<div>@name</div>
-	<div style="font-size:11px; color: #52A2E5; font-family:Arial;">@number</div>
+	<div style="font-size:1em; color: #52A2E5; font-family:Arial;">@number</div>
 </div>
+
 
 
 

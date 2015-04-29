@@ -54,7 +54,7 @@ definition:function(){
 
 		var self = this;
 		new _.StoryBoard([
-		new _.Animation(this.currentScrollTop,  this.currentScrollTop+6*-1*this.endMagnitude, 300, _.Animation.easeOut, 
+		new _.Animation(this.currentScrollTop,  this.currentScrollTop+20*-1*this.endMagnitude, 1000, _.Animation.easeOut, 
 		    function(value){
 		    	self.client.scrollTop = value;
 			},

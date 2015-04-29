@@ -2,7 +2,7 @@ _.Module({
 
 required:[	
 			
-	_.home('modules/splice.ui.js'),
+	'splice.ui.js',
 	'splice.controls/splice.controls.css',
   	'splice.controls/splice.controls.htmlt',
 	'splice.controls/splice.controls.datatable.js',
@@ -234,6 +234,60 @@ definition:function(){
 
 
 
+
+	/* DrawerPanel*/
+
+	var DrawerPanel = _.Namespace('SpliceJS.Controls').Class(
+		function DrawerPanel(){
+			
+			this.isOpen = false;
+
+			var self = this;
+			this.elements.actuator.onclick = function(){
+				self.openDrawer();		
+			}
+
+		}
+	);
+
+
+	DrawerPanel.prototype.openDrawer = function(){
+			
+		var self = this;	
+
+		
+	
+		var width = this.elements.controlContainer.clientWidth;
+
+		var actuatorIconSize = {
+			width: 	this.elements.actuatorIcon.clientWidth,
+			height: this.elements.actuatorIcon.clientHeight
+		};
+
+		var s = this.elements.drawer.style;
+		var s_actuator = this.elements.actuator.style;
+
+
+		var from = to = 0;
+
+		if(!this.isOpen) {
+			from = 0;
+			to = width / 2;
+		} else {
+			from = width / 2;
+			to = 0;
+		}
+
+
+		this.elements.actuator.addEventListener("transitionend", function(e){
+			self.isOpen = !self.isOpen;
+		}, true);
+
+		this.elements.drawer.style.width = to + 'px';
+		this.elements.actuator.style.left = (to - actuatorIconSize.width - 10) + 'px';
+
+
+	};
 
 
 // end module definition		

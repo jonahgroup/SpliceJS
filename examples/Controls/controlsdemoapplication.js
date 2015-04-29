@@ -20,6 +20,8 @@ definition:function(){
 
 	});
 
+	ControlsDemoApplication.prototype.listData = new _.Multicaster();
+
 	ControlsDemoApplication.prototype.onDisplay = function(){
 
 		this.ref.scrollPanel.reflow();
