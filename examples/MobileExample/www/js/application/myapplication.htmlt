@@ -4,12 +4,14 @@
 	<!-- @include:{
 		type:'SpliceJS.Controls.DrawerPanel',
 		content: {
-			body:	_.Obj({type:'SampleContent'}),
+			body: _.Obj({
+				type:'SpliceJS.Controls.ScrollPanel',
+				content:{scrollContent:_.Obj({type:'SampleContent'}),
+						 staticContent:''}
+			}),
 			drawer: _.Obj({type:'LocalList'})
 		}
 	} -->
-
-
 </div>
 
 
@@ -30,16 +32,16 @@
 
 
 <!-- @template:{type:'SampleListItem', tie:'SpliceJS.Controls.ListItem'} -->
-<div style="border-bottom:1px solid #cecece; padding:1em; font-size:1em;">
+<div class="-my-list-item">
 	<div>@name</div>
-	<div style="font-size:1em; color: #52A2E5; font-family:Arial;">@number</div>
+	<div class="-phone-no">@number</div>
 </div>
 
 
 
 
 <!-- @template:{type:'SampleContent'} -->
-<div style="position:relative; width:400px; height:1000px;"> 
+<div style="position:relative; height:1000px; width:300px; padding:1em;"> 
 <p>
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, erat a finibus lobortis, nisl dui interdum sem, ut bibendum sem ligula vel risus. Vestibulum sagittis justo ac eros blandit, at blandit nunc scelerisque. Quisque non ipsum finibus nisl finibus facilisis. Fusce elementum commodo sodales. Praesent vitae odio at ante mattis tincidunt. Duis ac enim tempor, tempus diam nec, ornare leo. Suspendisse commodo lacus lorem, placerat scelerisque nulla feugiat vel.
 </p>

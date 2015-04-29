@@ -124,7 +124,7 @@
 </div>
 
 <!-- @template:{type:'SampleListItem', tie:'SpliceJS.Controls.ListItem'} -->
-<div style="border-bottom:1px solid #cecece; padding:0.5em;">
+<div style="border-bottom:1px solid #cecece; padding:0.5em; white-space:nowrap;">
 	<div>@name</div>
 	<div style="font-size:11px; color: #52A2E5; font-family:Arial;">@number</div>
 </div>

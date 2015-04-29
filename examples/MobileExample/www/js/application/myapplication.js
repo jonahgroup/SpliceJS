@@ -14,7 +14,7 @@ definition:function(){
 				{name:'Susan Sample', number:'555-2324-1234'}
 			];
 
-			for(var i=0; i<100; i++){
+			for(var i=0; i<20; i++){
 				this.sampleListData.push({name:'test ' + i, number:'234-12312-1234'});
 			}
 		}

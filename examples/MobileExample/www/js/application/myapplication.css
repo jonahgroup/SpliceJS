@@ -3,3 +3,21 @@
 	
 
 }
+.-my-list-item  {
+	border-bottom:1px solid #cecece; 
+	padding:1.2em; 
+	font-size:1.2em; 
+	white-space:nowrap;
+	
+}
+
+.-phone-no {
+
+	font-size:1em;
+	color: #52A2E5; 
+
+}
+
+.-splicejs-drawer-panel .drawer {
+	border-right:1px solid #cecece;
+}

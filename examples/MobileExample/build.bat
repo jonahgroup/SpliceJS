@@ -1,2 +1,2 @@
-echo A | xcopy ..\..\splicejs www\js\splicejs /e
+xcopy ..\..\splicejs www\js\splicejs\ /e /y
 cordova build

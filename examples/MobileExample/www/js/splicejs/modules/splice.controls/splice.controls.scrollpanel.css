@@ -1,0 +1,80 @@
+
+/*
+	Scroll Panel
+--------------------	
+*/
+
+.-splicejs-scrollpanel {
+	position:absolute;
+	top:0px; bottom:0px; left:0px; right:0px;
+}
+
+.-splicejs-scrollpanel .static {
+	position:absolute;
+	top:0px; left:0px; right:0px;
+	overflow: hidden;
+	
+}
+
+
+/* 	default client size does not allocate scroll bar margins 
+	margins are set at runtime by the API
+*/
+.-splicejs-scrollpanel .client {
+	position:absolute;
+	top:0px; bottom:0px; left:0px; right:0px;
+	overflow:hidden;
+}
+
+.-splicejs-scrollpanel .clipping {
+	position:absolute;
+	top:0px; bottom:0px; left:0px; right:0px;
+	overflow:hidden;
+}
+
+
+.-splicejs-scrollpanel .vertical-bar {
+	position:absolute;
+	display:none;
+	width:9px;
+	right:3px; /* margin from the right edge*/
+}
+
+.-splicejs-scrollpanel .horizontal-bar {
+	position:absolute;
+	display:none;
+	height:9px;
+	botttom:3px; /* margin from the bottom edge */
+}
+
+.-splicejs-scrolling-vertical {
+	right:20px !important;
+}
+
+.-splicejs-scrolling-horizontal {
+	bottom:20px !important;
+}
+	
+.-scroll-bar-thumb-vertical {
+	position:absolute; width:9px; right:5px; top:10px; 
+	background-color:#D8D8D8;
+	opacity:0.15;
+	cursor:default;
+	z-index:10;
+}
+
+.-scroll-bar-thumb-vertical:hover {
+	opacity:0.7;
+}
+
+
+.-scroll-bar-thumb-horizontal {
+	position:absolute; height:9px; left:10px; bottom:8px; 
+	background-color:#D8D8D8;
+	opacity:0.15;
+	cursor:default;
+}
+
+.-scroll-bar-thumb-horizontal:hover {
+	opacity:0.7;
+}
