@@ -1,0 +1,46 @@
+.-fill-screen {
+
+	
+
+}
+.-my-list-item  {
+	border-bottom:1px solid #cecece; 
+	padding:1.2em; 
+	font-size:1.2em; 
+	white-space:nowrap;
+}
+
+
+.-my-menu-item  {
+	
+	color:#fff;
+	padding:1em; 
+	font-size:1.5em; 
+	white-space:nowrap;
+}
+
+.-my-menu-item div {display:inline;}
+.-my-menu-item div.label {position:relative; top:-0.9em; left:0.5em;}
+
+.-my-menu-item:hover{
+	
+	background-color:#21C7DD;
+}
+
+.-phone-no {
+
+	font-size:1em;
+	color: #52A2E5; 
+
+}
+
+
+
+.-splicejs-drawer-panel .drawer {
+	background-color:#20B9CD;
+}
+
+.-splicejs-drawer-panel .actuator {
+
+	top:50%;
+}

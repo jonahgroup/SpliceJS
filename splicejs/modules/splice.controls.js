@@ -234,8 +234,25 @@ definition:function(){
 	};
 
 
+	/*
+	 *	Image Selector
+     *
+	 * */
+	var ImageSelector = _.Namespace('SpliceJS.Controls').Class(function ImageSelector(){
+		
+		var container = this.elements.controlContainer;
 
+		if(this.width) 	container.width = this.width;
+		if(this.height) container.height = this.height;
 
+	});
+
+	ImageSelector.prototype.dataIn = function(dataItem) {
+		if(!this.dataPath) return;
+
+		this.elements.controlContainer.src = dataItem[this.dataPath];
+
+	};
 
 // end module definition		
 }});

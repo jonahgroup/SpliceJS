@@ -3,6 +3,7 @@ _.Module({
 required:[ 
 	_.home('modules/splice.ui.js'),
 	_.home('modules/splice.controls/splice.controls.scrollpanel.js'),
+	'splice.controls.transitions.css',
 	'splice.controls.drawerpanel.css',
 	'splice.controls.drawerpanel.htmlt'
 ],
@@ -20,18 +21,31 @@ definition:function(){
 
 			var self = this;
 			this.elements.actuator.onclick = function(){
-				self.openDrawer();		
+				self.activateDrawer();		
 			}
-
 		}
 	).extend(SpliceJS.Controls.UIControl);
 
 
-	DrawerPanel.prototype.openDrawer = function(){
+	DrawerPanel.prototype.onDisplay = function(){
+		SpliceJS.Controls.UIControl.prototype.onDisplay.call(this);
+
+		var openWidth = this.openWidth = this.elements.controlContainer.clientWidth * this.openTo;
+		
+		this.elements.drawer.style.left = (-1 * openWidth) + 'px';
+		
+
+		this.elements.drawer.className += ' -splicejs-left-transition';
+
+	};
+
+
+
+	DrawerPanel.prototype.activateDrawer = function(){
 			
 		var self = this;	
 
-		
+		this.elements.drawer.style.width = this.openWidth + 'px';
 	
 		var width = this.elements.controlContainer.clientWidth;
 
@@ -68,10 +82,22 @@ definition:function(){
 			
 		}, true);
 
-		//this.elements.body.style.transform = 'scale('+scale+')';
+		
 		this.elements.body.style.color = color;
 
-		this.elements.drawer.style.width = to + 'px';
+		
+		if(self.isOpen) {
+			this.elements.drawer.style.transitionDelay = '0s';
+			this.elements.body.style.transitionDelay = '0.1s';
+			this.elements.drawer.style.left = '0px';
+		} else {
+			this.elements.drawer.style.transitionDelay = '0.1s';
+			this.elements.body.style.transitionDelay = '0s';
+			this.elements.drawer.style.left = (-1*this.openWidth) + 'px';
+		}
+
+
+		
 		this.elements.body.style.left = to + 'px';
 
 		var actuator_to = (to - actuatorIconSize.width - 10);

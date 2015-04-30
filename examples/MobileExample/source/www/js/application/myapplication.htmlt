@@ -24,7 +24,8 @@
 			type:'SpliceJS.Controls.ListBox',
 			isScrollable:true,
 			itemTemplate:_.Obj({
-				type:'MenuItem'
+				type:'MenuItem',
+				onClick: _.Binding.From('menuItemSelected').Type('UserApplications.MyApplication')
 			}),
 			dataIn: _.Binding.To('listData').Type('UserApplications.MyApplication')
 } -->
@@ -34,7 +35,14 @@
 
 <!-- @template:{type:'MenuItem', tie:'SpliceJS.Controls.ListItem'} -->
 <div class="-my-menu-item">
-	<div>@name</div>
+	<div><!-- @include:{
+			type:'SpliceJS.Controls.ImageSelector',
+			width:60, height:60,
+			dataPath: 'icon',
+			dataIn: _.Binding.To('dataOut').Parent
+		} -->
+	</div>
+	<div class="label">@name</div>
 </div>
 
 
