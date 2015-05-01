@@ -597,7 +597,7 @@ var _ = sjs = (function(window, document){
 		if(filename._endswith('.htmlt')){
 			//tell Splice what is loading
 			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
-			_.HttpRequest.post({
+			_.HttpRequest.get({
 				url: filename,
 				onok:function(response){
 					_url_cache[filename] = true;

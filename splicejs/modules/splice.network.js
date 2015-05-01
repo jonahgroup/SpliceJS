@@ -10,11 +10,10 @@
         else if (window.XMLHttpRequest)   this.transport =  new XMLHttpRequest();
 	};
 
-	HttpRequest.prototype.post = function(config){
+	HttpRequest.prototype.get = function(config){
 		
-		this.transport.open('POST',config.url,true);
+		this.transport.open('GET',config.url,true);
 		this.transport.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded charset=utf-8');
-        this.transport.setRequestHeader('x-benefiteditor-ajax', 'ajax-request');
 
 	 	var params = '';
         var separator = '';
@@ -40,7 +39,7 @@
 		return this;
 	};
 
-	HttpRequest.prototype.get = function(config){
+	HttpRequest.prototype.post = function(config){
 		return this;
 	};
 
