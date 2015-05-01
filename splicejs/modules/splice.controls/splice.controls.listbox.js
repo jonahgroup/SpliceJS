@@ -76,6 +76,8 @@ definition:function(){
 
 
 
+
+
 	var ListItem = _.Namespace('SpliceJS.Controls').Class(function ListItem(args){
 		SpliceJS.Controls.UIControl.call(this,args);
 	
@@ -97,6 +99,36 @@ definition:function(){
 
 
 
+	var GroupedListItem = _.Namespace('SpliceJS.Controls').Class(function GroupedListItem(args){
+		this.groupInstance = null;
+		this.itemInstances = [];
+	});
+
+
+
+	GroupedListItem.prototype.dataIn = function(dataItem){
+
+		if(!this.groupInstance) { 
+			if(this.groupTemplate) { 
+				this.groupInstance = new this.groupTemplate({parent:this}); 
+				_.Doc.$(this.elements.controlContainer).embed(this.groupInstance);
+			}
+		}
+
+		if(this.groupInstance) this.groupInstance.dataIn(dataItem);
+
+
+		if(this.itemInstances.length < 1) {
+			if(dataItem.children) {
+			for(var i=0; i<dataItem.children.length; i++){
+				var item = new this.groupItemTemplate({parent:this});
+				item.dataIn(dataItem.children[i]);
+				this.itemInstances.push(item);
+				this.elements.controlContainer.appendChild(item.concrete.dom);	
+			}}
+		}
+
+	};
 
 
 }

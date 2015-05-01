@@ -24,3 +24,5 @@
 <div data-sjs-ref="controlContainer"></div>
 
 
+<!-- @template:{type:'SpliceJS.Controls.GroupedListItem'} -->
+<div data-sjs-ref="controlContainer"></div>
