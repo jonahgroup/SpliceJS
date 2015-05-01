@@ -18,6 +18,8 @@ definition:function(){
 			this.sampleListData.push({name:'test ' + i, number:'234-12312-1234'});
 		}
 
+		this.currentView = 0;
+
 	}).extend(SpliceJS.Controls.UIControl);
 
 	ControlsDemoApplication.prototype.listData = new _.Multicaster();
@@ -32,6 +34,13 @@ definition:function(){
 		//this.ref.map.onDisplay();
 	};
 
+
+	ControlsDemoApplication.prototype.switchView = function(){
+		
+		this.currentView++;
+		
+		this.ref.viewPanel.switchView(this.currentView % 2);
+	};
 
 
 	ControlsDemoApplication.prototype.listItemSelected = function(item){

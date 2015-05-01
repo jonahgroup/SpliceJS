@@ -6,9 +6,12 @@
 		ref:'drawer',
 		content: {
 			body: _.Obj({
-				type:'SpliceJS.Controls.ScrollPanel',
-				content:{scrollContent:_.Obj({type:'SpliceJS.Controls.Map', ref:'map'}),
-						 staticContent:''}
+				type:'SpliceJS.Controls.ViewPanel',
+				ref:'viewPanel',
+				views:[
+					{key:'Map', 		view:_.Obj({type:'SpliceJS.Controls.Map'})},
+					{key:'Locations', 	view:_.Obj({type:'SampleContent'})}
+				]
 			}),
 			drawer: _.Obj({type:'LocalList'})
 		}

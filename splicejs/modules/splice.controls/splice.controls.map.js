@@ -17,6 +17,8 @@ definition:function(){
 
 
 	Map.prototype.onDisplay = function(){
+		if(this.isInitialized) return;
+
 		var mapID = 'drogozhkin.kgb6lfoc';
 		var mapContainerId = 'map'+Math.round(1000*Math.random());
 		
@@ -30,6 +32,8 @@ definition:function(){
 		    //attribution: 'Imagery © <a href="http://mapbox.com">Mapbox</a>',
 		    maxZoom: 18
 		}).addTo(map);
+
+		this.isInitialized = true;
 
 	};
 

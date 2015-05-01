@@ -17,3 +17,8 @@
 <img data-sjs-ref="controlContainer"/>
 
 
+<!-- @template:{type:'SpliceJS.Controls.ViewPanel'} -->
+<div class="-splicejs-view-panel" data-sjs-ref="controlContainer">
+	<div class="panel" data-sjs-ref="panel1"></div>
+	<div class="panel" data-sjs-ref="panel2"></div>
+</div>

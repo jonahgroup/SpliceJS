@@ -28,12 +28,13 @@ SOFTWARE.
 */
 
 
-var _ = (function(window, document){
+var _ = sjs = (function(window, document){
 	"use strict";
 
 	var configuration = {
-		APPLICATION_HOME: 		getPath(window.location.href).path, 
-		PUBLIC_ROOT:         	window.SPLICE_PUBLIC_ROOT,
+		APPLICATION_HOME: 				getPath(window.location.href).path, 
+		PUBLIC_ROOT:         			window.SPLICE_PUBLIC_ROOT,
+		ONLOAD_DISP_SHORT_FILENAME: 	window.SPLICE_ONLOAD_DISP_SHORT_FILENAME, 
 		platform: {	
 			IS_MOBILE: 			window.SPLICE_PLATFORM_IS_MOBILE,
 			IS_TOUCH_ENABLED: 	window.SPLICE_PLATFORM_IS_TOUCH_ENABLED
@@ -111,7 +112,7 @@ var _ = (function(window, document){
 		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:0.7em; color:#101010;">'+
 		'<div style="position:relative; top:-20px">'+
 			'<div style="display:inline;"><img style="vertical-align:middle;" src="'+window.SPLICE_PUBLIC_ROOT+'/resources/images/bootloading.gif"/></div>'+
-			'<div style="display:inline; padding-left:0.5em;"><span></span></div>'+
+			'<div style="display:inline; padding-left:1em;"><span></span></div>'+
 		'</div>'+
 		'</div>';
 
@@ -670,9 +671,14 @@ var _ = (function(window, document){
 	
 	Splice.prototype.notifyCurrentlyLoading = function(current){
 		this.currentlyLoading = current;
-		if(progressLabel)
-		progressLabel.innerHTML = current.name;
+		if(!progressLabel) return;
+
+		var label = current.name;
 		
+		if(configuration.ONLOAD_DISP_SHORT_FILENAME)
+			label = getPath(current.name).name;
+
+		progressLabel.innerHTML = label;
 	};
 	
 	

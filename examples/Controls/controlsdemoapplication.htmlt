@@ -58,18 +58,6 @@
 		dataIn:	_.Binding.To('sampleData').Parent,
 	} -->
 	</div>
-
-	<div style="position:relative; width:400px; height:200px;">
-	<!-- @include: {
-		type: 	'SpliceJS.Controls.DrawerPanel',
-		content: {
-			body:	_.Obj({type:'SampleContent'}),
-			drawer: _.Obj({type:'LocalList'})
-		},
-		dataIn:	_.Binding.To('sampleData').Parent,
-	} -->
-	</div>
-
 </td>
 
 
@@ -93,7 +81,7 @@
 		type: 'SpliceJS.Controls.Map'
 	}-->
 	</div>
-	</td>
+</td>
 </tr>
 
 	
@@ -109,7 +97,30 @@
 		} 
 	} -->
 	</div>
-</td>
+	</td>
+	
+
+	<td>View Panel</td>
+	<td>
+		<div>
+			<!-- @include:{
+				type:'SpliceJS.Controls.Button',
+				onClick: _.Binding.From('switchView').Type('UserApplications.ControlsDemoApplication')
+			}-->
+		</div>
+		<div style="position:relative; width:400px; height:200px;">
+			<!-- @include:{
+				type:'SpliceJS.Controls.ViewPanel',
+				ref:'viewPanel',
+				views:[	
+					{key:'map',view:_.Obj({type:'SpliceJS.Controls.Map'})},
+					{key:'list',view:_.Obj({type:'LocalList'})}
+				]
+			} -->
+		</div>	
+	</td>
+
+
 </tr>
 
 
@@ -133,7 +144,7 @@
 
 
 <!-- @template:{type:'LocalList'} -->
-<div style="position:relative; width:300px; height:200px;">
+<div style="position:relative; width:400px; height:200px;">
 <!-- @include: {
 			type:'SpliceJS.Controls.ListBox',
 			isScrollable:true,

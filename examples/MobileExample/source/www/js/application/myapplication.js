@@ -31,6 +31,11 @@ definition:function(){
 				{name:'Settings',	icon:_.home('img/white/settings64.png',scope.path)}
 			];
 
+			/* build view map */
+			this.viewMap = [];
+			for(var i=0; i<this.ref.drawer.ref.viewPanel.views.length; i++){
+				this.viewMap[this.ref.drawer.ref.viewPanel.views[i].key] = i;
+			}
 		}
 	).extend(SpliceJS.Controls.UIControl);
 
@@ -42,8 +47,12 @@ definition:function(){
 	};
 
 
-	MyApplication.prototype.menuItemSelected = function(){
+	MyApplication.prototype.menuItemSelected = function(item){
 		this.ref.drawer.activateDrawer();
+
+		var i = this.viewMap[item.name];
+		if(i >=0 ) this.ref.drawer.ref.viewPanel.switchView(i);
+
 	};
 
 }

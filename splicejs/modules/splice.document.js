@@ -212,7 +212,67 @@ Doc.prototype.display = function(control,ondisplay){
 		if(typeof ondisplay === 'function') ondisplay(control);
 		return;
 	}
-}
+};
+
+
+Doc.prototype.$ = function(target){
+
+
+	return {
+
+		embed:function(control){
+			if(!control) return;
+	
+			target.innerHTML = '';
+			
+			if(control.concrete && control.concrete.dom) {
+				target.appendChild(control.concrete.dom);
+				if(typeof ondisplay === 'function') ondisplay(control);
+				if(typeof control.onDisplay === 'function') control.onDisplay();
+				return;
+			}
+			
+			if(control.dom) {
+				target.appendChild(control.dom);
+				if(typeof ondisplay === 'function') ondisplay(control);
+				return;
+			}
+		},
+		
+		/**
+		 * size:{width:Number,height:Number};
+		 */
+		size:function(size) {
+			var style = target.style;
+			if(size) {
+				style.width  = size.width  + 'px';
+				style.height = size.height + 'px';
+			}
+
+			return {
+				width: 		target.clientWidth,
+				height: 	target.clientHeight	
+			}
+		},
+
+	   /**
+		* position:{left:Number, top:Number, bottom:Number, right:Number}
+		*/
+		position:function(pos){
+			var style = target.style;
+			if(pos) {
+				if(pos.left) style.left = pos.left + 'px';
+				if(pos.top)  style.top = pos.top + 'px';
+			}
+
+			return {
+				left: 	target.offsetLeft,
+				top: 	target.offsetTop
+			}	
+		}
+
+	}
+};
 
 
 
