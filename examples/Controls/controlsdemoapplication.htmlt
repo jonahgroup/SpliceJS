@@ -28,6 +28,21 @@
 		} -->
 	</td>
 </tr>
+
+
+<tr><td>Layout</td>
+<td>
+
+	<div class="-button-panel">
+	<!-- @include: {
+		type:'PlainButton',
+		content:{label:'Button1'}
+	} -->
+	
+	</div>
+</td>
+</tr>
+
 	
 <tr><td>Drop down list</td>
 <td>
@@ -134,13 +149,15 @@
 	</div>
 </td></tr>
 
-
-
-
-
 </table>
 </div>
 
+
+<!-- @template:{type:'PlainButton', tie:'SpliceJS.Controls.Button'} -->
+<div data-sjs-ref="controlContainer">
+	<div>@icon</div>
+	<div>@label</div>
+</div>
 
 
 <!-- @template:{type:'LocalList'} -->
@@ -155,6 +172,7 @@
 			dataIn: _.Binding.To('listData').Type('UserApplications.ControlsDemoApplication')
 } -->
 </div>
+
 
 <!-- @template:{type:'SampleListItem', tie:'SpliceJS.Controls.ListItem'} -->
 <div style="border-bottom:1px solid #cecece; padding:0.5em; white-space:nowrap;">

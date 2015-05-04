@@ -245,6 +245,9 @@ definition:function(){
 		if(this.width) 	container.width = this.width;
 		if(this.height) container.height = this.height;
 
+		if(this.src) this.elements.controlContainer.src = this.src;
+
+
 	});
 
 	ImageSelector.prototype.dataIn = function(dataItem) {

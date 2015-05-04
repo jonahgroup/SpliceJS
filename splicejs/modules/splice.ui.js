@@ -13,7 +13,7 @@ definition:function(){
 		}
 
 		/* attach style to the controlContainer */
-		if(args.style)
+		if(args && args.style)
 			this.elements.controlContainer.className += ' ' + args.style; 
 
 

@@ -418,6 +418,17 @@ _.Module = (function(document){
 		
 		if(tie) Component.base = tie.base;
 		
+		/* fill for extending classes */
+		Component.call = function(_this){
+			var args = [];
+			if(arguments.length > 1) {
+				for(var i=1; i<arguments.length; i++){
+					args[i] = arguments[i];
+				}
+			}
+			tie.apply(_this,args);
+		};
+
 		Component.isComponent = true;
 		Component.template = template;
 		Component.tie = tie;
@@ -549,7 +560,7 @@ _.Module = (function(document){
 	
 	function applyPath(src){
 		var path = this.path;
-		var regex = /<img\s+src="(\S+)"\s+/igm;
+		var regex = /<img\s+src="(\S+)"\s*/igm;
 	
 		var match = null;
 		var asrc = '';
@@ -810,6 +821,36 @@ _.Module = (function(document){
 	}
 
 		
+		/*
+	 * Compiles template within a given loading scope
+	 * 
+	 * */
+	function compileTemplates(scope){
+		var templateSource = scope.templates;
+		var keys = Object.keys(templateSource);
+		
+		for(var i=0; i< keys.length; i++) {
+			var key = keys[i];
+			if(!templateSource[key]) continue;
+
+
+			var declaration = templateSource[key];
+
+
+			var html = declaration.src;
+			var wrapper = document.createElement('span');
+			wrapper.innerHTML = html;
+
+			var template = new Template(wrapper);
+
+			/* copy template declaration attributes */		
+			template.declaration = declaration.spec;
+
+			compileTemplate.call(scope,template);
+		}
+	}
+	
+
 	
 	/**
 	 * Creates a build version of the template (dom element but not linked to main document yet).
@@ -820,19 +861,12 @@ _.Module = (function(document){
 	 * @param moduleName - a module where template can be located
 	 * @returns {HTMLElement|*} a DOM of the template (aka build version).
 	 */
-	function compileTemplate(declaration){
-		
-		if(declaration.build) return declaration.build;
+	function compileTemplate(template){
+
 		
 		var scope = this;
-		
-		var html = declaration.src;
-		var wrapper = document.createElement('span');
-		wrapper.innerHTML = html;
 
 
-		var template = new Template(wrapper);
-		
 		/*
 		 * Run notations and scripts to form a 
 		 * final template DOM
@@ -840,13 +874,12 @@ _.Module = (function(document){
 		_.debug.log('Processing template notations for module: ');		
 		AnnotationRunner.call(scope.templates,template);
 		
-		_.debug.log('Processing template scripts for module: ' );
-		new ScriptDomRunner(wrapper).run({module:''});
+		//_.debug.log('Processing template scripts for module: ' );
+		//new ScriptDomRunner(template.dom).run({module:''});
 		
 		template.normalize();
 
-		/* copy template declaration attributes */		
-		template.declaration = declaration.spec;
+		
 
 		
 		var template_name 	= template.declaration.type;
@@ -883,7 +916,7 @@ _.Module = (function(document){
 			
 			if(tie && tie.isComponent) tie = tie.tie;
 			
-			return scope.templates[declaration.spec.type] = createComponent(tie,template, scope);
+			return scope.templates[template.declaration.type] = createComponent(tie,template, scope);
 		
 		}
 
@@ -914,26 +947,10 @@ _.Module = (function(document){
 		var ns = _.Namespace(split_name.namespace);
 		ns.add(split_name.name,component);
 		
-		return scope.templates[declaration.spec.type] = component;
+		return scope.templates[template.declaration.type] = component;
 	}
 		
 
-	
-	/*
-	 * Compiles template within a given loading scope
-	 * 
-	 * */
-	function compileTemplates(scope){
-		var templateSource = scope.templates;
-		var keys = Object.keys(templateSource);
-		
-		for(var i=0; i< keys.length; i++) {
-			var key = keys[i];
-			if(!templateSource[key]) continue;
-			compileTemplate.call(scope,templateSource[key]);
-		}
-	}
-	
 	
 	
 	/* 

@@ -1,0 +1,15 @@
+.-button-panel {
+  width: 100%;
+
+  display: table;
+}
+
+.-button-panel div {
+  position: relative;
+  
+  /* display: inline; */
+  display: table-cell;
+  text-align: center;
+  background-color: #cecece;
+  padding: 1em;
+}

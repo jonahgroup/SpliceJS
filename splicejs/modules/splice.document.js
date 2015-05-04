@@ -220,6 +220,25 @@ Doc.prototype.$ = function(target){
 
 	return {
 
+		add:function(control){
+			if(!control) return;
+			
+			if(control.concrete && control.concrete.dom) {
+				target.appendChild(control.concrete.dom);
+				if(typeof ondisplay === 'function') ondisplay(control);
+				if(typeof control.onDisplay === 'function') control.onDisplay();
+				return;
+			}
+			
+			if(control.dom) {
+				target.appendChild(control.dom);
+				if(typeof ondisplay === 'function') ondisplay(control);
+				return;
+			}
+		},
+
+
+
 		embed:function(control){
 			if(!control) return;
 	
