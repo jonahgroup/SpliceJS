@@ -12,7 +12,7 @@ definition:function(){
 	var ControlsAndBindings = _.Namespace('UserApplications').Class(function ControlsAndBindings(){
 
 		var self = this;
-		_.HttpRequest.post({
+		_.HttpRequest.get({
 			url:SPLICE_PUBLIC_ROOT + '/../examples/ControlsAndBindings/data/dataApr-2-2015.json',
 			onok:function(data){
 				eval('var sampleData = ' + data.text);
@@ -32,6 +32,9 @@ definition:function(){
 			}
 		});
 		
+
+		this.columnPaths = [0,1,2,3,4,5,6,7,8];
+
 		_.Doc.display(this);
 		
 	});
@@ -344,5 +347,21 @@ definition:function(){
 	};
 	
 
+
+	var DataRowBuilder = _.Class(function DataRowBuilder(){
+		
+		this.concrete = new SpliceJS.Modular.Concrete(document.createElement('span'));
+ 		this.concrete.export = function(){ 
+ 			return this.dom.childNodes;
+ 		}
+		
+		for(var i=0; i<this.columnPath.length; i++) {
+			var div = document.createElement('div');
+			div.innerHTML = '@'+this.columnPath[i];
+			this.concrete.dom.appendChild(div);
+		}
+	});
+
+	LocalScope.DataRowBuilder = this.createComponent(DataRowBuilder,null);
 	
 }});

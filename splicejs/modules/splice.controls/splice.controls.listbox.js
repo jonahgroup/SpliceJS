@@ -21,7 +21,7 @@ definition:function(){
 
 		if(this.ref) args['ref'] = this.ref;
 		
-		var obj = _.Obj.call(localScope.templates,args);
+		var obj = _.Obj.call(localScope,args);
 	
 		return new obj();  
 

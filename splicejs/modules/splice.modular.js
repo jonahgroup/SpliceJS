@@ -20,7 +20,7 @@ _.Module = (function(document){
 			/* create instance of the proxy object
 			 * local scope lookup takes priority
 			 */
-			var obj = scope[args.type] || _.Namespace.lookup(args.type);
+			var obj = scope.templates[args.type] || scope[args.type] || _.Namespace.lookup(args.type);
 			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
 			
@@ -34,9 +34,7 @@ _.Module = (function(document){
 			}
 			if(proxyArgs && proxyArgs.parent) parameters['parent'] = proxyArgs.parent; 
 			
-			var instance = new obj(parameters);
-			
-			return instance;
+			return new obj(parameters);	
 		}
 		
 		Proxy.type 			= args.type;
@@ -54,6 +52,11 @@ _.Module = (function(document){
 		this.dom = dom;
 	});
 	
+
+	Concrete.prototype.export = function(){
+		return this.dom;
+	};
+
 	Concrete.prototype.applyContent = function(content){
 		
 		var deepClone = this.dom;
@@ -95,7 +98,6 @@ _.Module = (function(document){
 				);	
 			}
 		}
-
 	};
 
 	
@@ -193,34 +195,7 @@ _.Module = (function(document){
 		}
 		
 		
-		/*
-		 * Bind declarative parameters
-		 *
-		 */
-		if(parameters) {
-			var keys = Object.keys(parameters);
-			for(var k=0; k< keys.length; k++) {
-			
-				var key = keys[k];
-
-				if(key === 'ref') 		continue;
-				if(key === 'content') 	continue; //content is processed separately
-
-				_.debug.log("Processing include property: " + key);
-			
-				/* remaining parameters are for the child instance */
-				if(parameters[key] instanceof _.Binding) {
-					var binding = parameters[key]; 
-					resolveBinding(binding, tieInstance, key, scope.templates);
-					continue;
-				}
-			
-				/* default property assignment */
-				tieInstance[key] = parameters[key];
-			}
-		}
-
-		
+	
 	   /*
 		* Handle content declaration
 		* Getcontent nodes
@@ -249,8 +224,24 @@ _.Module = (function(document){
 			
 			var c_instance = new proxy({parent:tieInstance});
 			
-			anchors[i].parentNode.replaceChild((c_instance.concrete.dom || c_instance.dom), anchors[i]);
+			var exportDom = c_instance.concrete.export();
 			
+			/*multiple child nodes*/
+			if(_.getFunctionName(exportDom.constructor) === 'NodeList') {
+				var parentNode = anchors[i].parentNode;
+				var child = exportDom[0]; 
+				
+				parentNode.replaceChild(child, anchors[i]);
+
+				while(exportDom.length > 0){
+					var sibling = child.nextSibling;
+					var child = exportDom[0]
+					parentNode.insertBefore(child,sibling);
+				}	
+			}
+			else {	
+				anchors[i].parentNode.replaceChild((c_instance.concrete.dom || c_instance.dom), anchors[i]);
+			}
 		}
 		
 		return instance;
@@ -384,36 +375,68 @@ _.Module = (function(document){
 		 * function that created the object
 		 * */
 		var Component = function Component(args){
-			if(this instanceof Component) {
-				if(typeof tie === 'function'){
-					var args = args || {};
-					
-					var obj = Object.create(tie.prototype);
-					obj.constructor = tie;
-					
-					obj.parent = args.parent;
-					obj.ref = {};
-					obj.elements = {};
-					
-					/* 
-					 * assign reference to a parent and 
-					 * append to children array
-					 * */
-					if(obj.parent) { 
-						obj.parent.ref 		= obj.parent.ref || [];
-						obj.parent.children = obj.parent.children || [];
+			
+			if(!(this instanceof Component)) throw 'Component function must be invoked with [new] keyword';
 
-						if(args.ref) obj.parent.ref[args.ref] = obj;
-						obj.parent.children.push(obj);						
-					}
-					
-					obj.concrete = template.getInstance(obj, args, scope);
-					tie.apply(obj, [args]);
-					return obj; 
-				}
-				return template.getInstance(undefined,undefined,scope);
+			
+			
+			var args = args || {};
+			
+			var obj = Object.create(tie.prototype);
+			obj.constructor = tie;
+			
+			obj.parent = args.parent;
+			obj.ref = {};
+			obj.elements = {};
+			
+			/* 
+			 * assign reference to a parent and 
+			 * append to children array
+			 * */
+			if(obj.parent) { 
+				obj.parent.ref 		= obj.parent.ref || [];
+				obj.parent.children = obj.parent.children || [];
+
+				if(args.ref) obj.parent.ref[args.ref] = obj;
+				obj.parent.children.push(obj);						
 			}
-			throw 'Component function must be invoked with [new] keyword';
+			
+
+			/*
+			 * Bind declarative parameters
+			 *
+			 */
+			var tieInstance = obj; 
+			var parameters = args;
+			if(parameters) {
+				var keys = Object.keys(parameters);
+				for(var k=0; k< keys.length; k++) {
+				
+					var key = keys[k];
+
+					if(key === 'ref') 		continue;
+					if(key === 'content') 	continue; //content is processed separately
+
+				
+					/* remaining parameters are for the child instance */
+					if(parameters[key] instanceof _.Binding) {
+						var binding = parameters[key]; 
+						resolveBinding(binding, tieInstance, key, scope);
+						continue;
+					}
+				
+					/* default property assignment */
+					tieInstance[key] = parameters[key];
+				}
+			}
+
+			if(template)
+			obj.concrete = template.getInstance(obj, args, scope);
+			
+
+			tie.apply(obj, [args]);
+			return obj; 
+			
 		};
 		
 		if(tie) Component.base = tie.base;
@@ -464,6 +487,7 @@ _.Module = (function(document){
 		required = required instanceof Array ? required : null;
 
 		var scope = {path:path}; 
+		scope.createComponent = function(tie,template){return createComponent(tie,template,this);};
 			
 		_.debug.log(path);
 
@@ -872,7 +896,7 @@ _.Module = (function(document){
 		 * final template DOM
 		 * */
 		_.debug.log('Processing template notations for module: ');		
-		AnnotationRunner.call(scope.templates,template);
+		AnnotationRunner.call(scope,template);
 		
 		//_.debug.log('Processing template scripts for module: ' );
 		//new ScriptDomRunner(template.dom).run({module:''});

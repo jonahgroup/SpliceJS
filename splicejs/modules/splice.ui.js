@@ -79,6 +79,11 @@ definition:function(){
 		}
 	};
 
+
+	UIControl.prototype.onAttach = function(){
+		
+	};
+
 	/*
 		Element positioning utilies
 	*/

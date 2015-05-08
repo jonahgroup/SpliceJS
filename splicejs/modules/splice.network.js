@@ -24,6 +24,14 @@
         }
         //in ie8 onreadystatechange is attached to a quasy window object
         var self = this;
+        
+        this.transport.onload = function(){
+        	var response = {text:self.transport.responseText, xml:self.transport.responseXML};
+        	if(config.onok)	config.onok(response);
+        }
+
+
+/*
         this.transport.onreadystatechange = function(){
 
         	if(self.transport.readyState == 4){
@@ -34,7 +42,7 @@
 				break;
        		}}
         };
-
+*/
 		this.transport.send(params); 
 		return this;
 	};
