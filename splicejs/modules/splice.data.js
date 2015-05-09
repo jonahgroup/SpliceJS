@@ -25,22 +25,32 @@ _.data = (function(){
 	}
 
 
-	function groupBy(grouping){
-		var groupings = [];
+	function groupBy(grouping, groupingFunction){
+		var groupings = {};
 		
 		//array interator
 		if(this instanceof Array){
 			for(var i=0; i<this.length; i++){
 				
-				var groupkey = grouping(this[i]);
-				if(!groupkey) continue;			
+				var groupkey = typeof grouping === 'function' ? grouping(this[i],groupings) : null;
+				if(!groupkey) groupkey = 'default';			
 
-				var group = groupings[groupkey];
-				if(!group) {
-					group = {key:groupkey, value:[]};
-					groupings.push(group);
+				var value = groupings[groupkey];
+				if(!value) {
+					if(typeof groupingFunction === 'function' && groupkey !== 'default') 
+						groupings[groupkey] = null;
+					else 
+						groupings[groupkey] = [];
 				}
-				group.value.push(this[i]);
+
+				if(typeof groupingFunction === 'function' && groupkey !== 'default') {
+
+					groupings[groupkey] = groupingFunction(this[i], groupings[groupkey]);
+
+				} else {
+					
+					groupings[groupkey].push(this[i]);
+				}
 			}	
 		}
 		return data(groupings);
@@ -76,7 +86,7 @@ _.data = (function(){
 		return {
 			forEach	:function(callback){return forEach.call(dataObj,callback);},
 			filter	:function(callback){return filter.call(dataObj,callback);},
-			groupBy	:function(callback){return groupBy.call(dataObj,callback);},
+			groupBy	:function(callback,gfn){return groupBy.call(dataObj,callback,gfn);},
 			first	:function(callback){return first.call(dataObj)}, 	 
 			result  :dataObj
 		}

@@ -533,7 +533,7 @@ _.Module = (function(document){
 			 * */
 			
 			
-			definition.call(scope);
+			definition.call(scope,scope);
 			scope.templates = templateDefinitions;
 			
 			/* 
