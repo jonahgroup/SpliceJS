@@ -227,7 +227,7 @@ _.Module = (function(document){
 			var exportDom = c_instance.concrete.export();
 			
 			/*multiple child nodes*/
-			if(_.getFunctionName(exportDom.constructor) === 'NodeList') {
+			if(exportDom instanceof Array) {
 				var parentNode = anchors[i].parentNode;
 				var child = exportDom[0]; 
 				
