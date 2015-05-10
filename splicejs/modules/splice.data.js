@@ -28,7 +28,7 @@ _.data = (function(){
 	function groupBy(grouping, groupingFunction){
 		var groupings = {};
 		
-		//array interator
+		//array iterator
 		if(this instanceof Array){
 			for(var i=0; i<this.length; i++){
 				
@@ -52,8 +52,22 @@ _.data = (function(){
 					groupings[groupkey].push(this[i]);
 				}
 			}	
+		
+			return data(groupings);
 		}
-		return data(groupings);
+
+
+		//map iterator
+		if(this instanceof Object){
+
+
+
+			return data(groupings);
+		}	
+
+
+		return data(this);
+		
 	}
 
 
@@ -64,12 +78,49 @@ _.data = (function(){
 			var result = [];
 			if(typeof condition !== 'function') return data(this);
 			for(var i=0; i<this.length; i++){
-				if(condition(this[i]) === true) {
+				if(condition({key:i,value:this[i]}) === true) {
 					result.push(this[i]);
 				}
 			}
 			return data(result);
 		}
+
+		// map iterator
+		if(this instanceof Object){
+			result = {};
+			var keys = Object.keys(this);
+
+			if(!keys) 			return data(result);
+			if(keys.length < 1) return data(result);
+
+			for(var i=0; i<keys.length; i++){
+				if(this.hasOwnProperty(keys[i]))
+				if(condition({key:keys[i],value:this[keys[i]]}) === true)
+					result[keys[i]] = this[keys[i]];
+			}
+
+
+			return data(result);
+		}
+
+
+	}
+
+
+	function toArray(){
+
+		var result = [];
+
+		var keys = Object.keys(this);
+		if(!keys) return result;
+		if(keys.length < 1) return result;
+		
+		for(var i=0; i<keys.length; i++){
+			if(this.hasOwnProperty(keys[i]))
+				result.push(this[keys[i]]);
+		}
+
+		return result;
 	}
 
 
@@ -87,7 +138,8 @@ _.data = (function(){
 			forEach	:function(callback){return forEach.call(dataObj,callback);},
 			filter	:function(callback){return filter.call(dataObj,callback);},
 			groupBy	:function(callback,gfn){return groupBy.call(dataObj,callback,gfn);},
-			first	:function(callback){return first.call(dataObj)}, 	 
+			first	:function(callback){return first.call(dataObj)},
+			toArray :function(){return toArray.call(dataObj);}, 	 
 			result  :dataObj
 		}
 	};

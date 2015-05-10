@@ -233,9 +233,9 @@ _.Module = (function(document){
 				
 				parentNode.replaceChild(child, anchors[i]);
 
-				while(exportDom.length > 0){
+				for( var i = 1; i < exportDom.length; i++){
 					var sibling = child.nextSibling;
-					var child = exportDom[0]
+					var child = exportDom[i];
 					parentNode.insertBefore(child,sibling);
 				}	
 			}

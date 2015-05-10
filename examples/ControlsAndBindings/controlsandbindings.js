@@ -352,7 +352,8 @@ definition:function(){
 		
 		this.concrete = new SpliceJS.Modular.Concrete(document.createElement('span'));
  		this.concrete.export = function(){ 
- 			return this.dom.childNodes;
+ 			var children = this.dom.childNodes;
+ 			return _.data(children).filter(function(item){return item.key !== 'length'}).toArray();
  		}
 		
 		for(var i=0; i<this.columnPath.length; i++) {
