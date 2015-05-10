@@ -98,16 +98,12 @@ _.data = (function(){
 				if(condition({key:keys[i],value:this[keys[i]]}) === true)
 					result[keys[i]] = this[keys[i]];
 			}
-
-
 			return data(result);
 		}
-
-
 	}
 
 
-	function toArray(){
+	function toArray(onitem){
 
 		var result = [];
 
@@ -116,10 +112,15 @@ _.data = (function(){
 		if(keys.length < 1) return result;
 		
 		for(var i=0; i<keys.length; i++){
-			if(this.hasOwnProperty(keys[i]))
-				result.push(this[keys[i]]);
+			if(this.hasOwnProperty(keys[i])){
+				var value = this[keys[i]];	
+				if(typeof onitem === 'function')
+					value = onitem({key:keys[i], value:value});
+				
+				if(!value) continue;
+				result.push(value);
+			}
 		}
-
 		return result;
 	}
 
@@ -139,7 +140,7 @@ _.data = (function(){
 			filter	:function(callback){return filter.call(dataObj,callback);},
 			groupBy	:function(callback,gfn){return groupBy.call(dataObj,callback,gfn);},
 			first	:function(callback){return first.call(dataObj)},
-			toArray :function(){return toArray.call(dataObj);}, 	 
+			toArray :function(callback){return toArray.call(dataObj,callback);}, 	 
 			result  :dataObj
 		}
 	};

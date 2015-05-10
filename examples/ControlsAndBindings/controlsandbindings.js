@@ -353,7 +353,11 @@ definition:function(){
 		this.concrete = new SpliceJS.Modular.Concrete(document.createElement('span'));
  		this.concrete.export = function(){ 
  			var children = this.dom.childNodes;
- 			return _.data(children).filter(function(item){return item.key !== 'length'}).toArray();
+ 			//return _.data(children).filter(function(item){return item.key !== 'length'}).toArray();
+ 			return _.data(children).toArray(
+ 				function(item){if(item.key == 'length') return null; 
+ 					return item.value;
+ 			});
  		}
 		
 		for(var i=0; i<this.columnPath.length; i++) {

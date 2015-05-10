@@ -10,10 +10,7 @@
         else if (window.XMLHttpRequest)   this.transport =  new XMLHttpRequest();
 	};
 
-	HttpRequest.prototype.get = function(config){
-		
-		this.transport.open('GET',config.url,true);
-		this.transport.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded charset=utf-8');
+	HttpRequest.prototype.request = function(type,config){
 
 	 	var params = '';
         var separator = '';
@@ -22,6 +19,16 @@
         	params += separator + config.data[d].name + '=' + encodeURIComponent(config.data[d].value);
            	separator = '&';
         }
+
+        var requestURL = config.url;
+
+        if(params.length > 0 && type === 'GET'){
+        	requestURL = requestURL + "?" + params;
+        }
+
+		this.transport.open(type,requestURL,true);
+		this.transport.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded charset=utf-8');
+
         //in ie8 onreadystatechange is attached to a quasy window object
         var self = this;
         
@@ -30,19 +37,6 @@
         	if(config.onok)	config.onok(response);
         }
 
-
-/*
-        this.transport.onreadystatechange = function(){
-
-        	if(self.transport.readyState == 4){
-        	var response = {text:self.transport.responseText, xml:self.transport.responseXML};
-        	switch(self.transport.status) {
-				case 200:	
-					if(config.onok)	config.onok(response);
-				break;
-       		}}
-        };
-*/
 		this.transport.send(params); 
 		return this;
 	};
@@ -56,11 +50,11 @@
 	//HttpRequest object proxy
 	_.HttpRequest = {};
 	_.HttpRequest.post = function(config){
-		return new HttpRequest().post(config);
+		return new HttpRequest().request('POST',config);
 	};
 
 	_.HttpRequest.get = function(config){
-		return new HttpRequest().get(config);
+		return new HttpRequest().request('GET',config);
 	};
 	
 	
