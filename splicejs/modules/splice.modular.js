@@ -21,19 +21,35 @@ _.Module = (function(document){
 			 * local scope lookup takes priority
 			 */
 			var obj = scope.templates[args.type] || scope[args.type] || _.Namespace.lookup(args.type);
+			var tieOverride = null;
+
 			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
 			
+
+			/* locate tie, if override was specified */
+			if(args.tie) {
+				tieOverride = scope[args.tie] || _.Namespace.lookup(args.tie);
+				if(!tieOverride) throw 'Tie type cannot be found';
+			}
+
 			/* copy args*/
 			var parameters = {};
 			var keys = Object.keys(args);
 			for(var i = 0; i < keys.length; i++ ){
 				var key = keys[i];
-				if(key == 'type') continue; /* skip type */
+				if(key == 'type' || key == 'tie') continue; /* skip type */
 				parameters[key] = args[key];
 			}
 			if(proxyArgs && proxyArgs.parent) parameters['parent'] = proxyArgs.parent; 
 			
+			
+			/* create new component*/
+			if(typeof tieOverride === 'function') {
+				obj = createComponent(tieOverride, obj.template, scope);
+			}
+
+
 			return new obj(parameters);	
 		}
 		

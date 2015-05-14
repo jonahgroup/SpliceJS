@@ -25,4 +25,4 @@
 
 
 <!-- @template:{type:'SpliceJS.Controls.GroupedListItem'} -->
-<div data-sjs-ref="controlContainer"></div>
+<div class="-splicejs-list-grouped-listitem" data-sjs-ref="controlContainer"></div>
