@@ -1039,6 +1039,21 @@ _.Module = (function(document){
 		}
 	};
 	
+	Binding.findValue=function(obj, path){
+		var nPath = path.split('.'),
+			result = obj;
+
+		if (!obj) return null;
+
+		for (var i = 0; i< nPath.length; i++){
+			
+			result = result[nPath[i]];
+
+			if (!result) return null;	
+		}
+
+		return result;
+	}
 	
 	var Multicaster = function Multicaster(){
 		
