@@ -52,7 +52,8 @@ definition:function(){
 				
 				if(this.contentClient){
 					this.contentClient.concrete.dom.appendChild(item.concrete.dom);
-					item.onAttached();
+					if(typeof item.onAttached == 'function') 
+						item.onAttached();
 				}
 			}
 		}

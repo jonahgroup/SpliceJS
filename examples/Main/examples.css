@@ -3,5 +3,16 @@ html {
 	font-family:SaniTrixieSans;
 }
 
-a {cursor:pointer;}
-a:hover {color:#4CA3FA;}
+
+div.-link-container {
+	cursor:pointer;
+	padding-left:5px;
+	background-color: #fefefe;
+	transition:background-color 0.5s;
+}
+
+div.-link-container:hover {
+	color:#fefefe;
+	background-color:#C800FF;
+	transition:background-color 0.5s;
+}

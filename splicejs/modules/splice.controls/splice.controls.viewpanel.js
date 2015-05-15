@@ -76,7 +76,7 @@ definition:function(){
 
 		var handler = function(e){
 									
-			activePanel.className = 'panel';
+			activePanel.className = _.text(activePanel.className).remword('-splicejs-left-transition');
 			activePanel.style.left = '100%';	
 
 			self.activePanelIndex = 1 - self.activePanelIndex;

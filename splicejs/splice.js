@@ -245,6 +245,88 @@ var _ = sjs = (function(window, document){
 			}
 	};
 	
+
+	/**
+	 * Text manupulation wrapper function	
+	 * @text parameter primitive type object String, Number	
+	 * @return object supporting text manipulation API
+	 */
+
+	var Text = function Text(text){
+		this.text = text;
+	}
+
+	Text.prototype = {
+	/**
+ 	 * Removes string or a collection of string from the a text blob
+	 * @arguments: String, Array
+	 */
+		remword: function(){
+
+			if(arguments.length < 1) return this.text;
+			
+			var parts = this.text.split(/\s/);	
+
+			// process all supplied arguments			
+			for(var i=0; i<arguments.length; i++){
+				var arg = arguments[i];		
+
+				if(typeof arg === 'number' )
+					arg = arg.toString();
+
+				if(typeof arg === 'string' ) {
+					for(var pi=parts.length-1; pi>=0; pi-- ){
+						if(parts[pi] === arg) parts.splice(pi,1);
+					}
+				}
+			}
+			return this.join.call({text:parts});
+		},
+
+	/**
+	 *	Builds string by concatinating element of the array and separated
+	 *  by the delimiter. If delimiter is not provided, default delimiter is "space"
+	 */	
+		join: function(delimiter){
+			if(!delimiter) delimiter = ' ';
+		
+			var runningDelimiter = '';
+			var result = '';
+			for(var i=0; i< this.text.length; i++){
+				result = result + runningDelimiter + this.text[i];
+				runningDelimiter = delimiter;
+			}
+
+			return result;
+		},
+
+	/**
+	 *	Counts number of words in the string
+	 */	
+		wordcount:function(){
+			var parts = this.text.split(/\s/);
+			if(!parts) return 0;
+
+			return parts.length;
+		},
+
+
+	/**
+	 *	Counts number of words in the string
+	 */	
+		format:function(){
+
+		}	
+
+	};
+	
+
+	Splice.prototype.text = function(text){
+		return new Text(text);
+	};
+
+
+
 	
 	Splice.prototype.splitQualifiedName = function(name){
 		

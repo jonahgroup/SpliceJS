@@ -312,7 +312,7 @@ _.Module = (function(document){
 		case _.Binding.PARENT:
 			if(!instance.parent) throw 'Cannot resolve parent binding, instance parent is not null';
 			result = { instance: instance.parent,
-					   prop:instance.parent[binding.prop]};
+					   prop: Binding.findValue(instance.parent, binding.prop)};
 			break;
 			
 		case _.Binding.FIRST_PARENT:
@@ -332,7 +332,7 @@ _.Module = (function(document){
 				if(parent instanceof vartype) {
 					_.debug.log('Found instance of type: ' + binding.vartype);
 					result = {instance:parent,
-							  prop:parent[binding.prop]};
+							  prop: Binding.findValue(parent, binding.prop)};
 				}
 				parent = parent.parent;
 			}
