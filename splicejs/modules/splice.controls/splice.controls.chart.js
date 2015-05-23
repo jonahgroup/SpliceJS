@@ -1,7 +1,8 @@
 _.Module({
 
 required:[
-    'splice.controls.chart.htmlt'
+    'splice.controls.chart.htmlt',
+    _.home('lib/Chart.js-1.0.2/Chart.js')
 ],
 
 definition:function(){
@@ -273,5 +274,69 @@ Dial.prototype.draw = function(config){
 
 };
 Dial.prototype.onchange = function(){};
+
+
+/**
+  --  Chart control ---
+*/
+
+function createChart(chartType, data){
+
+    if(chartType == 'Line')  return new Chart(this).Line(data);
+    if(chartType == 'Bar')   return new Chart(this).Bar(data);
+    if(chartType == 'Pie')   return new Chart(this).Pie(data);
+}
+
+
+
+var SChart = _.Namespace('SpliceJS.Controls').Class(function Chart(args){
+    
+    SpliceJS.Controls.UIControl.apply(this,arguments);
+    
+    var type = this.chartType;
+
+    this.canvas = this.elements.controlCanvas;
+    this.ctx = this.canvas.getContext("2d");
+
+    if(this.width)  this.canvas.width   = this.width;
+    if(this.height) this.canvas.height = this.height;
+
+    //this.chart = createChart();
+
+    this.isDirty = false;
+
+    if(!this.chart) {
+        this.chart = 'Line';
+    }
+
+}).extend(SpliceJS.Controls.UIControl);
+
+
+SChart.prototype.dataIn = function(dataItem){
+    SpliceJS.Controls.UIControl.prototype.dataIn.call(this, dataItem);
+    this.isDirty = true;
+    this.onDisplay();
+};
+
+SChart.prototype.onDisplay = function() {
+    /* adjust canvas size */
+    var containerWidth = this.elements.controlContainer.clientWidth;
+    var containerHeight = this.elements.controlContainer.clientHeight;
+    
+
+    this.canvas.width = containerWidth;
+    this.canvas.height = containerHeight;
+
+
+    if(this.isDirty) {
+        this.chart =  createChart.call(this.ctx, this.chart, this.dataItem);
+    }
+    this.isDirty = false;
+}
+
+SChart.listTypes = function(){
+    _.info.log('------ Supported chart types ------- ');
+};
+
 
 }});

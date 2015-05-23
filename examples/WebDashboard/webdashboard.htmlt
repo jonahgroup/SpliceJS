@@ -1,0 +1,72 @@
+<!-- @template:{type:'UserApplications.WebDashboard'} -->
+<div class="-web-dashboard" data-sjs-ref="controlContainer">
+
+	
+	<div class="right-pane">
+		
+		<!-- @include:{type:'Report',
+			content:{
+				reportname:'Daily Unique Visitors Report',
+				reportdate: (new Date()).toString(),
+				body:_.Obj({
+					type:'SpliceJS.Controls.DataTable',
+					style:'-data-table',
+					dataIn:_.Binding.To('uniqueVisitors').Type('UserApplications.WebDashboard')
+				})
+			}
+		} -->
+		
+	</div>
+
+
+	<div class="left-pane">
+
+		<div class="top-half">
+			<!-- @include:{type:'Report',
+				content:{
+				reportname:'Daily Unique Visitors Report',
+				reportdate: (new Date()).toString(),
+				body:_.Obj({
+					type:'SpliceJS.Controls.Chart',
+					style:'-report-chart',
+					chart:'Line',
+					dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')
+				})
+				}	
+			} -->
+		</div>
+		<div class="bottom-half">
+			<!-- @include:{type:'Report',
+				content:{
+					reportname:'Referring Domains Report',
+					reportdate: (new Date()).toString(),
+					body:_.Obj({
+						type:'SpliceJS.Controls.DataTable'
+				})
+				}
+			} -->
+		</div>
+
+	</div>
+
+</div>
+
+
+
+<!-- @template:{type:'Report'} -->
+<div class="-report">
+	<div class="-report-head"><div style="padding:0.5em">
+		<div class="report-name"><b>@reportname</b></div>
+		<div class="report-date">@reportdate</div>
+		</div>
+	</div>
+	
+	<div class="-report-body">@body</div>
+</div>
+
+
+
+
+
+
+

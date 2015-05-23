@@ -57,7 +57,6 @@ definition:function(){
 		var contSize = _.Doc.$(this.elements.controlContainer).size(),
 
 			activePanel = this.panels[this.activePanelIndex],
-
 			offscrPanel = this.panels[1-this.activePanelIndex],
 
 			view = this.viewInstances[viewIndex],

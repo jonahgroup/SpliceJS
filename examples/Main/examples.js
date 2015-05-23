@@ -28,3 +28,9 @@ function ScrollPanelSample(){
 		_.Doc.display(new UserApplications.ScrollPanelApplication());
 	});
 }
+
+function WebDashboard(){
+	_.load(['WebDashboard/webdashboard.js'],function(){
+		_.Doc.display(new UserApplications.WebDashboard());
+	});
+}

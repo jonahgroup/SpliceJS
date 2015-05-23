@@ -60,7 +60,10 @@ definition:function(){
 				}
 				/* standard table header row */
 				else {
-					this.addHeaderRow(headers);
+					
+					
+					this.addDefaultHeader(headers);
+					
 				}
 			}
 		}
@@ -102,7 +105,9 @@ definition:function(){
 				this.addDomRow(dataRow.concrete.dom);
 				continue;
 			}
-			this.addRow(r);
+			
+
+			this.addBodyRow(createDefaultRow(r));
 		}
 		
 		
@@ -111,6 +116,18 @@ definition:function(){
 	};
 	
 	
+	function createDefaultRow(r){
+		var row = [];
+		for(var i=0; i< r.length; i++ ){
+			row.push(document.createTextNode(r[i]));
+		}
+
+
+		return row;	
+	}
+
+
+
 	DataTable.prototype.removeRowByIndex = function(rowIndex){
 		this.dom.deleteRow(rowIndex);
 	};
@@ -174,20 +191,26 @@ definition:function(){
 		this.addBodyRow(row);
 	};
 
+	DataTable.prototype.addDefaultHeader = function(headers){
+		var row = [], cloned = [];
 
+		for(var i=0; i<headers.length; i++){
+			row.push(document.createTextNode(headers[i]));
+			cloned.push(document.createTextNode(headers[i]));
+		}
+
+		this.addHeaderRow(this.elements.columnHeaderTable, row);
+		this.addHeaderRow(this.elements.dataTable, cloned);
+	};
 
 	DataTable.prototype.addDomHeader = function(dom){
 		var row = [];	
 		for(var i=0; i< dom.childNodes.length; i++){
 			var node = dom.childNodes[i];
-			/* element nodes only */
+			/* element or text nodes only */
 			if(node.nodeType === 1) row.push(node);
 		}
 
-		if(!this.elements.columnHeaderTable) {
-			this.addHeaderRow(this.elements.dataTable, row);
-			return;
-		}
 
 		/*
 			Data table gets cloned row
@@ -196,10 +219,8 @@ definition:function(){
 		for(var i=0; i<row.length; i++){
 			cloned[i] = row[i].cloneNode(true);
 		}
-
 		this.addHeaderRow(this.elements.columnHeaderTable, row);
 		this.addHeaderRow(this.elements.dataTable, cloned);
-
 	};
 
 

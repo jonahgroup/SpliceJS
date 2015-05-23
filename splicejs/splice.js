@@ -343,6 +343,24 @@ var _ = sjs = (function(window, document){
 		return {namespace:ns, name:parts[parts.length-1]};
 	}
 	
+	/*
+
+		Event
+
+	*/
+	var Event = function Event(){
+
+
+
+
+	};
+
+	Splice.prototype.Event = Event;
+
+
+
+
+
 	/** Namespace object
 	 * 
 	 * */

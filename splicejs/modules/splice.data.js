@@ -2,6 +2,59 @@ _.data = (function(){
 
 
 
+	/*
+
+		Iterator 
+
+	*/
+
+
+
+
+	/*
+
+		Paginator
+
+	*/
+
+	var Paginator = function Paginator(data, pageSize){
+
+		this.data = data;
+	
+		this.pageSize = pageSize;
+		this.currentPage = 0;
+
+	};
+
+
+
+	Paginator.prototype = {
+
+		hasNext : function(){
+			/* compare next page idex to last element's index */
+			if( (this.currentPage + 1) * this.pageSize > (this.data.length-1) ) return false;
+
+			return true;
+		}
+		,
+		next 	: function(){
+			var subset = [];
+
+			for(var i=0; i<this.pageSize; i++){
+
+				var idx = this.currentPage * this.pageSize + i;
+				if(idx > this.data.length-1) break;
+
+				subset.push(this.data[idx]);
+			}
+
+			this.currentPage++;
+
+			return subset;
+		}  	 
+	};
+
+
 	function forEach(callback){
 		
 		// array iterator
@@ -22,7 +75,7 @@ _.data = (function(){
 			}	
 		}
 		return data(this);
-	}
+	};
 
 
 	function groupBy(grouping, groupingFunction){
@@ -68,7 +121,7 @@ _.data = (function(){
 
 		return data(this);
 		
-	}
+	};
 
 
 	function filter(condition){
@@ -121,28 +174,42 @@ _.data = (function(){
 				result.push(value);
 			}
 		}
-		return result;
-	}
+		return data(result);
+	};
+
+
+
+
+	function paginator(pageSize){
+		return 
+	};
+
+	function windownator(windowSize, shiftSize){
+
+	};
 
 
 	function sort(){
 
-	}
+	};
 
 	function first(){
 		if(! (this instanceof Array) ) return null;
 		return this[0];
-	}
+	};
 
 	function data(dataObj){
 		return {
-			forEach	:function(callback){return forEach.call(dataObj,callback);},
-			filter	:function(callback){return filter.call(dataObj,callback);},
-			groupBy	:function(callback,gfn){return groupBy.call(dataObj,callback,gfn);},
-			first	:function(callback){return first.call(dataObj)},
-			toArray :function(callback){return toArray.call(dataObj,callback);}, 	 
+			forEach		:function(callback){return forEach.call(dataObj,callback);},
+			filter		:function(callback){return filter.call(dataObj,callback);},
+			groupBy		:function(callback,gfn){return groupBy.call(dataObj,callback,gfn);},
+			first		:function(callback){return first.call(dataObj)},
+			toArray 	:function(callback){return toArray.call(dataObj,callback);},
+			paginator 	:function(pageSize){return new Paginator(dataObj,pageSize);}, 	 
 			result  :dataObj
 		}
 	};
 	return data;
 })();
+
+

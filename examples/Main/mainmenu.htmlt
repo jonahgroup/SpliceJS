@@ -4,5 +4,5 @@
 	<div class="-link-container" onclick="ControlsApplication();">Controls Demo</div>
 	<div class="-link-container" onclick="ScrollPanelSample();">Scroll Panel</div>
 	<div class="-link-container" onclick="ControlsAndBindings();">Controls and Binding</div>
-
+	<div class="-link-container" onclick="WebDashboard();">Web Dashboard</div>
 </div>

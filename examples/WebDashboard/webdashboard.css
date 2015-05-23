@@ -1,0 +1,101 @@
+.-web-dashboard {
+	position:absolute;
+	top:0px; bottom:0px;
+	left:0px; right:0px;
+
+	background-color: #777777;
+}
+
+
+.-web-dashboard .right-pane {
+	position:absolute;
+	right:0px; top:0px; bottom:0px;
+	left:75%;
+	padding:0.5em;
+}
+
+.-web-dashboard .left-pane {
+	position:absolute;
+	top:0px; bottom:0px; 
+	right:25%; left:0px;
+
+}
+
+.-web-dashboard .top-half {
+	position:absolute;
+	top:0px; bottom:50%; 
+	right:0px; left:0px;
+	padding-left:0.5em;
+	padding-top:0.5em;
+	padding-bottom: 0.25em
+}
+
+.-web-dashboard .bottom-half {
+	position:absolute;
+	top:50%; bottom:0px; 
+	right:0px; left:0px;
+	padding-left:0.5em;
+	padding-bottom:0.5em;
+	padding-top:0.25em;
+}
+
+
+.-report {
+	position:relative;
+	/*top:0px; bottom:0px;
+	left:0px; right:0px;*/
+	width:100%;
+	height:100%;
+	background-color: #fefefe
+}
+
+.-report .-report-body {
+	position:absolute;
+	top:3em;
+	bottom:0.5em;
+	right:0.5em;
+	left:0.5em;
+}
+
+.-report .-report-head {
+	position:absolute;
+	top:0em;
+	height:3em;
+	right:0em;
+	left:0em;
+
+	background-color: rgb(244, 244, 244);
+}
+
+
+.-report .report-date {
+	font-size: 0.7em;
+  	padding-top: 0.2em;
+}
+
+
+
+
+
+
+.-data-table {
+	position:relative;
+	width:100%;
+	height:100%;
+}
+
+.-data-table table.-splicejs-datatable {
+	width:100%;
+	border-collapse: collapse;
+}
+
+.-data-table .-splicejs-scrollpanel .static { 
+	height:50px; 
+}
+
+.-report-chart {
+
+	position:absolute;
+	left:0.5em; top:0.5em; bottom:0.5em; right:0.5em;
+
+}

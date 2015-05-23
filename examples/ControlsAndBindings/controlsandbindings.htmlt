@@ -148,6 +148,7 @@
 		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
 	} -->
 	</div>
+
 	<!-- @include: {
 		type: 'DataRowBuilder',
 		columnPath:_.Binding.From('columnPaths').Type('UserApplications.ControlsAndBindings'),

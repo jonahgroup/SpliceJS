@@ -144,9 +144,59 @@
 	<div style="position:relative; width:400px; height:200px;">
 	<!-- @include: {
 		type: 	'SpliceJS.Controls.DataTable',
+		style: '-sample-data-table',
 		dataIn:	_.Binding.To('sampleData').Parent
 	} -->
 	</div>
+</td></tr>
+
+<tr><td>Chart Line</td>
+	<td>
+	<div style="position:relative; width:400px; height:200px;">
+	<!-- @include: {
+		type: 	'SpliceJS.Controls.Chart',
+		chart:	'Line',		
+		width:400, height:200,
+		dataIn:	_.Binding.To('chartData').Parent
+	} -->
+	</div>
+</td></tr>
+
+<tr><td>Chart Bar</td>
+	<td>
+	<div style="position:relative; width:400px; height:200px;">
+	<!-- @include: {
+		type: 	'SpliceJS.Controls.Chart',
+		chart:	'Bar',		
+		width:400, height:200,
+		dataIn:	_.Binding.To('chartData').Parent
+	} -->
+	</div>
+		<div style="position:relative; width:400px; height:200px;">
+	<!-- @include: {
+		type: 	'SpliceJS.Controls.Chart',
+		chart:	'Pie',		
+		width:400, height:200,
+		dataIn:	_.Binding.To('chartData').Parent
+	} -->
+	</div>
+		<div style="position:relative; width:400px; height:200px;">
+	<!-- @include: {
+		type: 	'SpliceJS.Controls.Chart',
+		chart:	'Line',		
+		width:400, height:200,
+		dataIn:	_.Binding.To('chartData').Parent
+	} -->
+	</div>
+		<div style="position:relative; width:400px; height:200px;">
+	<!-- @include: {
+		type: 	'SpliceJS.Controls.Chart',
+		chart:	'Bar',		
+		width:400, height:200,
+		dataIn:	_.Binding.To('chartData').Parent
+	} -->
+	</div>
+
 </td></tr>
 
 </table>
