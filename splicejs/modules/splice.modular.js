@@ -675,7 +675,7 @@ _.Module = (function(document){
 		
 		var scope = this;
 
-		var regex = /<!--\s+@(template|selector):{.*}\s+-->/igm; 	//script start RE
+		var regex = /<!--\s+@(template|selector)\s*:\s*({.*})\s+-->/igm; 	//script start RE
 		var match = null;
 		
 		var lastMatch = null;
@@ -688,43 +688,36 @@ _.Module = (function(document){
 			if(lastMatch != null) {
 				var templateSource = fileSource.substring(lastMatch.index + lastMatch.descriptor.length, match.index);
 				
-				var desc = lastMatch.descriptor;
-				desc = desc.substring(	desc.indexOf('@template:')+'@template:'.length,	desc.length - 3);
-				
+				var desc = lastMatch.declaration;
+								
 				/* 
 				 * source execution through Function constructor 
 				 * avoid strict mode variable declarion restrictions
 				 * */
 				var attributes = (new Function('return  '+desc+' ;'))();
-				//var result = null;
-				//eval('result = ' + desc);
-				
+								
 				templates.push({
 					src:applyPath.call(scope,templateSource),
 					spec:attributes 
 					/* 
 					 * attributes are parameters specified in the @template declaration
 					 * in the form or JSON literal, it is evaluated as is
-					 * hence must be of correct syntax
+					 * hence must be of the correct JSON syntax
 					 *  */
 				});
 			}
 			
-			lastMatch = {descriptor:match[0],index:match.index };
+			lastMatch = {descriptor:match[0], declaration:match[2], index:match.index };
 		}
 		
 		/* last of the only template*/
 		if(lastMatch != null) {
 			var templateSource = fileSource.substring(lastMatch.index + lastMatch.descriptor.length, fileSource.length);
 			
-			var desc = lastMatch.descriptor;
-			desc = desc.substring(	desc.indexOf('@template:')+'@template:'.length,	desc.length - 3);
+			var desc = lastMatch.declaration;
 						
 			var result = (new Function('return  '+desc+' ;'))();
-			/*
-			var result = null;
-			eval('result='+desc);
-			*/
+			
 			templates.push({
 				src:applyPath.call(scope,templateSource),
 				spec:result
