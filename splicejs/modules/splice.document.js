@@ -391,29 +391,4 @@ DomWrapper.prototype.replaceContent = function(newContent){
 	this.dom.appendChild(newContent);
 };
 
-
-
-
-var events = {};
-_.Event = events;
-
-
-events.onenter = function(e,callback){
-	if(!e) var e = window.event; 
-	if(!e) return;
-	
-	if(e.keyCode == 13){
-		return { action: _.action.bind(e.srcElement)};
-	}
-	
-	return {action:function(){}};
-};
-
-events.onevent = function(e,arguments){
-	if(!e) var e = window.event; 
-	if(!e) return;
-	
-	return { action: _.action.bind(e.srcElement)};
-};
-
 })(document);

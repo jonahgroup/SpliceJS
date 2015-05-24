@@ -344,21 +344,60 @@ var _ = sjs = (function(window, document){
 	}
 	
 	/*
+	
+		SpliceJS Event Model
 
-		Event
 
 	*/
-	var Event = function Event(){
+	
+	var Event = function Event(){};
 
 
+	Event.create = function(object, property){
 
 
-	};
+		var callbacks = [], instances = [];
+
+		var MulticastEvent = function MulticastEvent(){
+
+			for(var i=0; i < callbacks.length; i++) {
+				callbacks[i].apply(instances[i],arguments);
+			}
+
+		}
+
+		MulticastEvent.SPLICE_JS_EVENT = true; 
+
+
+		/* 
+			"This" keyword migrates between assigments
+			important to preserve the original instance
+		*/
+		MulticastEvent.subscribe = function(callback, instance){
+			if(!callback) return;
+			if(typeof callback !== 'function') throw 'Event subscriber must be a function';
+
+			if(!instance) instance = this;
+
+			callbacks.push(callback);
+			instances.push(instance);
+			
+		}
+
+		if(object && property ){
+			var val = object[property];
+			
+			if(typeof val ===  'function') {
+				MulticastEvent.subscribe(val, object);		
+			}
+			
+			object[property] = MulticastEvent;
+		}
+		
+		return MulticastEvent;
+	}
 
 	Splice.prototype.Event = Event;
-
-
-
 
 
 	/** Namespace object

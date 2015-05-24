@@ -50,9 +50,7 @@ definition:function(){
 		this.elements.controlContainer.value = label;
 	};
 	
-	Button.prototype.onClick = function(){
-		_.debug.log('Event is not assigned');
-	};
+	Button.prototype.onClick = _.Event;
 	
 	Button.prototype.enable = function(){
 		this.elements.controlContainer.className = '-splicejs-button';

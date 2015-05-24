@@ -6,7 +6,8 @@
 	<td>
 	<!-- @include: {
 		type:'SpliceJS.Controls.Button',
-		content:{value:'Button'}
+		content:{value:'Button'},
+		onClick: _.Binding('buttonClicked').Parent
 	} -->
 	</td>
 </tr>
@@ -70,7 +71,7 @@
 			body:	_.Obj({type:'SampleContent'}),
 			drawer: _.Obj({type:'LocalList'})
 		},
-		dataIn:	_.Binding.To('sampleData').Parent,
+		dataIn:	_.Binding('onSampleData').Parent,
 	} -->
 	</div>
 </td>
@@ -145,7 +146,7 @@
 	<!-- @include: {
 		type: 	'SpliceJS.Controls.DataTable',
 		style: '-sample-data-table',
-		dataIn:	_.Binding.To('sampleData').Parent
+		dataIn:	_.Binding('onSampleData').Parent
 	} -->
 	</div>
 </td></tr>
@@ -157,7 +158,7 @@
 		type: 	'SpliceJS.Controls.Chart',
 		chart:	'Line',		
 		width:400, height:200,
-		dataIn:	_.Binding.To('chartData').Parent
+		dataIn:	_.Binding('onChartData').Parent
 	} -->
 	</div>
 </td></tr>
@@ -169,15 +170,7 @@
 		type: 	'SpliceJS.Controls.Chart',
 		chart:	'Bar',		
 		width:400, height:200,
-		dataIn:	_.Binding.To('chartData').Parent
-	} -->
-	</div>
-		<div style="position:relative; width:400px; height:200px;">
-	<!-- @include: {
-		type: 	'SpliceJS.Controls.Chart',
-		chart:	'Pie',		
-		width:400, height:200,
-		dataIn:	_.Binding.To('chartData').Parent
+		dataIn:	_.Binding('onChartData').Parent
 	} -->
 	</div>
 		<div style="position:relative; width:400px; height:200px;">
@@ -185,7 +178,15 @@
 		type: 	'SpliceJS.Controls.Chart',
 		chart:	'Line',		
 		width:400, height:200,
-		dataIn:	_.Binding.To('chartData').Parent
+		dataIn:	_.Binding('onChartData').Parent
+	} -->
+	</div>
+		<div style="position:relative; width:400px; height:200px;">
+	<!-- @include: {
+		type: 	'SpliceJS.Controls.Chart',
+		chart:	'Line',		
+		width:400, height:200,
+		dataIn:	_.Binding('onChartData').Parent
 	} -->
 	</div>
 		<div style="position:relative; width:400px; height:200px;">
@@ -193,7 +194,7 @@
 		type: 	'SpliceJS.Controls.Chart',
 		chart:	'Bar',		
 		width:400, height:200,
-		dataIn:	_.Binding.To('chartData').Parent
+		dataIn:	_.Binding('onChartData').Parent
 	} -->
 	</div>
 
@@ -217,9 +218,9 @@
 			isScrollable:true,
 			itemTemplate:_.Obj({
 				type:'SampleListItem',
-				onClick:_.Binding.From('listItemSelected').Type('UserApplications.ControlsDemoApplication')
+				onClick:_.Binding('listItemSelected').Type('UserApplications.ControlsDemoApplication')
 			}),
-			dataIn: _.Binding.To('listData').Type('UserApplications.ControlsDemoApplication')
+			dataIn: _.Binding('onListData').Type('UserApplications.ControlsDemoApplication')
 } -->
 </div>
 

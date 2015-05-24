@@ -301,9 +301,9 @@ _.Module = (function(document){
 	
 	
 	function resolveBinding(binding, instance, key, scope){
-		if( !(binding instanceof _.Binding) ) throw 'May to resolve binding, source property is not a binding object';
+		if( !(binding instanceof _.Binding) ) throw 'Cannot resolve binding, source property is not a binding object';
 		
-		var result = null;
+		var source = null;
 		
 		switch(binding.type){
 		case _.Binding.SELF:
@@ -311,8 +311,14 @@ _.Module = (function(document){
 		
 		case _.Binding.PARENT:
 			if(!instance.parent) throw 'Cannot resolve parent binding, instance parent is not null';
-			result = { instance: instance.parent,
-					   prop: Binding.findValue(instance.parent, binding.prop)};
+			
+			var v = Binding.Value(instance.parent);
+
+			source = { 
+						instance: 	v.instance(binding.prop),
+						path: 	  	v.path(binding.prop),
+						value: 		function(){return this.instance[this.path];}
+					};
 			break;
 			
 		case _.Binding.FIRST_PARENT:
@@ -331,43 +337,68 @@ _.Module = (function(document){
 			while(parent) {
 				if(parent instanceof vartype) {
 					_.debug.log('Found instance of type: ' + binding.vartype);
-					result = {instance:parent,
-							  prop: Binding.findValue(parent, binding.prop)};
+					
+					var v = Binding.Value(parent);
+
+					source = {
+								instance: 	v.instance(binding.prop),
+							  	path: 		v.path(binding.prop),
+							  	value: 		function(){return this.instance[this.path];}
+							};
 				}
 				parent = parent.parent;
 			}
 		}
 		
-		/* Assignment direction */
-		switch(binding.direction){
-		case _.Binding.Direction.TO:
-			if(result.instance[binding.prop] && result.instance[binding.prop].addHandler ){
-				if(!result.instance[binding.prop].isInitialized) {
-					result.instance[binding.prop] = new _.Multicaster();
-					result.instance[binding.prop].isInitialized = true;
+		if(!source) throw 'Cannot resolve binding source';
+
+		var v = Binding.Value(instance);
+		var dest = {
+				instance:  	v.instance(key),
+				path: 		v.path(key),
+				value: 		function(){return this.instance[this.path];}
+		}
+
+
+		/* Initialize events where applicable */
+		if(dest.value() === _.Event )  { dest.instance[dest.path] 	  = _.Event.create(); }
+		if(source.value() === _.Event) { source.instance[source.path] = _.Event.create(); }
+
+
+		/* Default binding mode is FROM */
+
+
+		/* If course is an event then switch to TO mode */
+		if(source.value() && source.value().SPLICE_JS_EVENT) {
+			var _s = source;
+			source = dest;
+			dest = _s;
+			_s = null;
+		}
+			
+		
+
+		/* Perform binding here */
+
+		/*  this is event binding only allow functions to be bound to events */
+		if(dest.value() && dest.value().SPLICE_JS_EVENT) {
+			if(typeof source.value() !== 'function') 
+				throw 'Origin property '+ key +' is not a functions. Events may only bind to functions';
+
+			dest.instance[dest.path].subscribe(source.value(), source.instance);
+
+			return;
+		}
+
+		if(typeof source.value() === 'function')
+			dest.instance[dest.path] = 	function(){
+					return source.instance[source.path].apply(source.instance,arguments);
 				}
 				
-				result.instance[binding.prop].addHandler(instance, instance[key]);
-				break;
-			}
-			
-			if(typeof instance[key] === 'function')
-				result.instance[binding.prop] = function(){
-					return instance[key].apply(instance,arguments);
-				}
-			else
-				result.instance[binding.prop] = instance[key];
-			break;
-			
-		case _.Binding.Direction.FROM:
-			if(typeof result.instance[binding.prop] === 'function')
-				instance[key] = function(){
-					return result.instance[binding.prop].apply(result.instance,arguments);
-				}
-			else
-				instance[key] = result.instance[binding.prop]; 
-			break;
-		}	
+		else
+			dest.instance[dest.path] = source.instance[source.path];
+		
+
 	}
 	
 	
@@ -419,6 +450,23 @@ _.Module = (function(document){
 			
 
 			/*
+				Auto-creating event casters
+				
+			*/
+			var keys = Object.keys(obj);
+			for(var i=0; i<keys.length; i++){
+				
+				//if(!obj.hasOwnProperty(keys[i])) continue;
+				if(obj[keys[i]] == _.Event){
+					_.debug.log('Found event object');
+					obj[keys[i]] = _.Event.create();
+				}	
+
+			}	
+
+
+
+			/*
 			 * Bind declarative parameters
 			 *
 			 */
@@ -432,9 +480,7 @@ _.Module = (function(document){
 
 					if(key === 'ref') 		continue;
 					if(key === 'content') 	continue; //content is processed separately
-
-				
-					/* remaining parameters are for the child instance */
+					
 					if(parameters[key] instanceof _.Binding) {
 						var binding = parameters[key]; 
 						resolveBinding(binding, tieInstance, key, scope);
@@ -997,7 +1043,17 @@ _.Module = (function(document){
 	 * !!! Bidirectional bindings are not allowed 
 	 * */
 	var Binding = function Binding(propName,type,dir){
-		if(!(this instanceof Binding)) return new Binding(propName, type, dir);
+		if(!(this instanceof Binding)) return {
+			Self:   		new Binding(propName,	Binding.SELF,   		Binding.Direction.AUTO),
+			Parent: 		new Binding(propName,	Binding.PARENT, 		Binding.Direction.AUTO),
+			FirstParent: 	new Binding(propName,	Binding.FIRST_PARENT, 	Binding.Direction.AUTO),
+			Root:			new Binding(propName,	Binding.ROOT, 			Binding.Direction.AUTO),
+			Type:			function(type){
+							var b = 
+							new Binding(propName, 	Binding.TYPE, 			Binding.Direction.AUTO); 
+							b.vartype = type;
+							return b;}
+		}
 		
 		this.prop = propName;
 		this.type = type;
@@ -1039,7 +1095,7 @@ _.Module = (function(document){
 		}
 	};
 	
-	Binding.findValue=function(obj, path){
+	Binding.findValue = function(obj, path){
 		var nPath = path.split('.'),
 			result = obj;
 
@@ -1054,6 +1110,70 @@ _.Module = (function(document){
 
 		return result;
 	}
+
+
+	Binding.Value = function(obj){
+
+		
+
+		return {
+			set : function(value, path){
+
+				var nPath = path.split('.');
+					
+				for(var i=0; i< nPath.length-1; i++){
+					obj = obj[nPath[i]];
+				}
+
+				if(obj) {
+					obj[nPath[nPath.length-1]] = value;
+				}
+
+			},
+
+			get : function(path){
+
+				var nPath = path.split('.'),
+					result = obj;
+
+				if(nPath.length < 1) return null; 	
+
+				for (var i = 0; i< nPath.length; i++){
+			
+					result = result[nPath[i]];
+
+					if (!result) return null;	
+				}
+
+				return result;
+			},
+
+			instance:function(path){
+
+				var nPath = path.split('.'),
+					result = obj;
+
+				for (var i = 0; i< nPath.length-1; i++){
+			
+					result = result[nPath[i]];
+
+					if (!result) return null;	
+				}
+
+				return result;
+
+			},
+
+			path:function(path){
+				var nPath = path.split('.');
+				return nPath[nPath.length-1];
+			}
+		}
+
+	};
+
+
+
 	
 	var Multicaster = function Multicaster(){
 		
@@ -1086,8 +1206,13 @@ _.Module = (function(document){
 	
 	Binding.Direction = {
 			FROM : 1,
-	/* Left assignment */
-			TO: 2
+		/* Left assignment */
+			TO: 2,
+		/* 
+			determine binding based on the type of objects 
+			use right assignment by default
+		*/	
+			AUTO: 3
 	};
 	/* Right assignment */
 	

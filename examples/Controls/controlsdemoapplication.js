@@ -59,8 +59,14 @@ definition:function(){
 	}).extend(SpliceJS.Controls.UIControl);
 
 
-	ControlsDemoApplication.prototype.listData 	= new _.Multicaster();
-	ControlsDemoApplication.prototype.chartData = new _.Multicaster();
+	ControlsDemoApplication.prototype.onListData   = _.Event;
+	ControlsDemoApplication.prototype.onSampleData = _.Event;
+	ControlsDemoApplication.prototype.onChartData  = _.Event;
+	
+
+	ControlsDemoApplication.prototype.buttonClicked = function(){
+		_.debug.log('Button clicked');
+	}
 
 
 	ControlsDemoApplication.prototype.onDisplay = function(){
@@ -69,11 +75,11 @@ definition:function(){
 
 		this.ref.scrollPanel.reflow();
 
-		this.listData(this.sampleListData);
+		this.onListData(this.sampleListData);
 		
-		this.chartData(sampleChartData);
+		this.onChartData(sampleChartData);
 
-		this.sampleData(sampleTableData);
+		this.onSampleData(sampleTableData);
 	};
 
 
@@ -88,6 +94,15 @@ definition:function(){
 	ControlsDemoApplication.prototype.listItemSelected = function(item){
 		_.debug.log(item);
 	};
+
+
+	ControlsDemoApplication.prototype.onBinding = function(item){
+		_.debug.log('pre binding call');
+	};
+
+
+
+	
 
 
 }});
