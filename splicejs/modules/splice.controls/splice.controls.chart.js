@@ -7,6 +7,8 @@ required:[
 
 definition:function(){
 
+Chart.defaults.global.responsive = true;
+
 var Dial = _.Namespace('SpliceJS.Controls').Class(
 function Dial(){
 	
@@ -332,7 +334,33 @@ SChart.prototype.onDisplay = function() {
         this.chart =  createChart.call(this.ctx, this.chart, this.dataItem);
     }
     this.isDirty = false;
-}
+};
+
+SChart.prototype.reflow = function(position, size, bubbleup){
+    
+    SpliceJS.Controls.UIControl.prototype.reflow.call(this,position,size,bubbleup);
+
+
+
+
+    this.canvas.width  = this.elements.controlContainer.clientWidth;
+    this.canvas.height = this.elements.controlContainer.clientHeight;
+
+    var style = this.canvas.style;
+    style.width = this.canvas.width + 'px';
+    style.height = this.canvas.height + 'px';
+
+    if(this.dataItem) {
+        this.chart =  createChart.call(this.canvas.getContext("2d"), this.chart, this.dataItem);
+    }
+/*
+    if(typeof this.chart.update === 'function') {
+        this.chart.update();
+    }
+*/
+};
+
+
 
 SChart.listTypes = function(){
     _.info.log('------ Supported chart types ------- ');

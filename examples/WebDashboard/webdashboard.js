@@ -8,8 +8,11 @@ required:[
 
 definition:function(){
 
+	var scope = this;
 
 	var WebDashboard = _.Namespace('UserApplications').Class( function WebDashboard(){
+
+		SpliceJS.Controls.UIControl.call(this);
 
 		this.data = {};
 
@@ -55,14 +58,31 @@ definition:function(){
 			}
 		});
 
-	});
+	}).extend(SpliceJS.Controls.UIControl);
 
-	WebDashboard.prototype.uniqueVisitors = new _.Multicaster();
-	WebDashboard.prototype.uniqueVisitorsChart	= new _.Multicaster();
 
-	WebDashboard.prototype.onDisplay = function(){
+	WebDashboard.prototype.uniqueVisitors = _.Event;
+	WebDashboard.prototype.uniqueVisitorsChart	= _.Event;
+
+
+
+	var Report = scope.Report = _.Class(function Report(){
+
+		SpliceJS.Controls.UIControl.call(this);
+
+	}).extend(SpliceJS.Controls.UIControl);
+
+
+	Report.prototype.reflowChildren = function(position, size, bubbleup){
 		
-	};
+		var size = {
+			width: 	this.elements.reportBody.clientWidth,
+			height: this.elements.reportBody.clientHeight
+		};
+
+		SpliceJS.Controls.UIControl.prototype.reflowChildren.call(
+				this, {left:0, top:0}, size, bubbleup );		
+	};	
 
 
 

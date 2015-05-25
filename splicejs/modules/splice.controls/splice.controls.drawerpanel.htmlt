@@ -1,8 +1,8 @@
 <!-- @template:{type: 'SpliceJS.Controls.DrawerPanel'} -->
-<div class="-splicejs-drawer-panel" data-sjs-ref="controlContainer">
-	<div class="body" data-sjs-ref="body">@body</div>
-	<div class="drawer" data-sjs-ref="drawer">@drawer</div>
-	<div class="actuator" data-sjs-ref="actuator">
-		<img src="menu48.png" data-sjs-ref="actuatorIcon">
+<div class="-splicejs-drawer-panel" data-sjs-element="controlContainer">
+	<div class="body" data-sjs-element="body">@body</div>
+	<div class="drawer" data-sjs-element="drawer">@drawer</div>
+	<div class="actuator" data-sjs-element="actuator">
+		<img src="menu48.png" data-sjs-element="actuatorIcon">
 	</div>
 </div>

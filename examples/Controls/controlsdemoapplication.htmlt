@@ -205,7 +205,7 @@
 
 
 <!-- @template:{type:'PlainButton', tie:'SpliceJS.Controls.Button'} -->
-<div data-sjs-ref="controlContainer">
+<div data-sjs-element="controlContainer">
 	<div>@icon</div>
 	<div>@label</div>
 </div>

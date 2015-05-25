@@ -66,7 +66,7 @@ definition:function(){
 		this.dataItem = data;
 	};
 	
-	UIControl.prototype.dataOut = function(){};
+	UIControl.prototype.dataOut = _.Event;
 
 
 	UIControl.prototype.onDisplay = function(){
@@ -81,8 +81,55 @@ definition:function(){
 
 
 	UIControl.prototype.onAttach = function(){
-		
+
+		for(var i=0; i<this.children.length; i++){
+			if(typeof this.children[i].onAttach === 'function')
+				this.children[i].onAttach();
+		}
+
 	};
+
+	/**
+	 * Called by the layout manager or a parent view when container dimensions changed and
+	 * layout update is required
+	 * @param {position: {left:{number}, top:{Number}}} - top left corner position
+	 * @param {size: {width:{Number}, height:{Number}}} - parent container' dimensions
+	 * */
+	UIControl.prototype.onReflow = _.Event;
+	UIControl.prototype.reflow = function(position,size,bubbleup){
+
+			
+		// Get style object once and apply settings
+		var style = this.concrete.dom.style;
+		
+		style.left 		= position.left +'px';
+		style.top  		= position.top + 'px';
+		
+		style.width  	= size.width + 'px';
+		style.height 	= size.height + 'px';
+		
+		this.reflowChildren(position,size,bubbleup);
+
+		/* fire on reflow event */
+		this.onReflow(position,size);
+
+	};
+
+
+	UIControl.prototype.reflowChildren = function(position, size,bubbleup){
+		/*reflow all the children*/
+		for(var i=0; i<this.children.length; i++){
+			if(typeof this.children[i].reflow !== 'function') continue;
+
+			this.children[i].reflow(position,size,bubbleup);
+		}
+	}
+
+
+
+
+
+
 
 	/*
 		Element positioning utilies

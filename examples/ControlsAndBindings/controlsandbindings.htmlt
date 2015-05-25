@@ -6,7 +6,7 @@
 		type:'SpliceJS.Controls.Button', 
 		ref:'addButton',
 		style: 'button',
-		onClick:_.Binding.From('onAddRecord').Parent,
+		onClick:_.Binding('onAddRecord').Parent,
 		content:{label:'Add'}
 	} -->
 
@@ -14,7 +14,7 @@
 		type:'SpliceJS.Controls.Button', 
 		ref:'editButton',
 		style: 'button',
-		onClick:_.Binding.From('onEdit').Parent,
+		onClick:_.Binding('onEdit').Parent,
 		content:{label:'Edit'}
 	} -->
 	
@@ -22,7 +22,7 @@
 		type:'SpliceJS.Controls.Button', 
 		ref:'deleteButton',
 		style: 'button',
-		onClick:_.Binding.From('onDelete').Parent,
+		onClick:_.Binding('onDelete').Parent,
 		content:{label:'Delete'}
 	} -->
 
@@ -34,7 +34,7 @@
 		animate:true,
 		style: 'button',
 		isDisabled:true,
-		onClick:_.Binding.From('onCancel').Parent,
+		onClick:_.Binding('onCancel').Parent,
 		content:{label:'Cancel'}
 	} -->
 	
@@ -45,7 +45,7 @@
 			ref:'searchClearButton',
 			isHidden:true,
 			animate:true,
-			onClick:_.Binding.From('clearSearch').Parent,
+			onClick:_.Binding('clearSearch').Parent,
 		}-->
 		<!-- @include:{
 			type:'SpliceJS.Controls.TextField',
@@ -57,16 +57,16 @@
 
 </div>
 <div class="bodypanel">
-<div class="editpanel" data-sjs-ref="editPanel">
-	<div class="editlabel"><span data-sjs-ref="editSectionLabel">Create New Record</span></div>
-	<div class="instructionsLabel" data-sjs-ref="editInstructionsLabel">Select record on the right hand side to enable edit dialog</div>
+<div class="editpanel" data-sjs-element="editPanel">
+	<div class="editlabel"><span data-sjs-element="editSectionLabel">Create New Record</span></div>
+	<div class="instructionsLabel" data-sjs-element="editInstructionsLabel">Select record on the right hand side to enable edit dialog</div>
 	<div style="position:absolute; top:125px; left:25px; bottom:0px; right:0px;">
 	<!-- @include: {
 		type:'SpliceJS.Controls.DataTable',
 
 		ref:'editTable',
 		style:'edit-fields-table',
-		dataIn: _.Binding.To('onEditRecordData').Parent,		
+		dataIn: _.Binding('onEditRecordData').Parent,		
 		itemTemplate: 	_.Obj({
 			type:'EditRecordRow'
 		})
@@ -74,21 +74,21 @@
 	} -->
 	</div>
 </div>
-<div class="datapanel" data-sjs-ref="dataPanel">
+<div class="datapanel" data-sjs-element="dataPanel">
 	
 	<!-- @include: {
 		type:'SpliceJS.Controls.DataTable',
 
 		ref:'ordersTable',
 		style: 'cool-blue-table',
-		dataIn:			_.Binding.To('onOrderData').Parent,
+		dataIn:			_.Binding('onOrderData').Parent,
 		headerTemplate: _.Obj({
 			type:'HeaderRowTemplate',
-			activate:_.Binding.To('activateHeader').Type('UserApplications.ControlsAndBindings')
+			activate:_.Binding('onActivateHeader').Type('UserApplications.ControlsAndBindings')
 		}),
 		itemTemplate: 	_.Obj({
 			type:'OrderRowTemplate',
-			onHighlightValue:_.Binding.From('getHighlightValue').Type('UserApplications.ControlsAndBindings')
+			onHighlightValue:_.Binding('getHighlightValue').Type('UserApplications.ControlsAndBindings')
 		})
 	
 	} -->
@@ -115,7 +115,7 @@
 </div>
 
 <!-- @template:{type:'HeaderRowTemplate', tie:'FancyHeaderRow'} -->
-	<div data-sjs-ref="controlColumn"></div>
+	<div data-sjs-element="controlColumn"></div>
 	<div>@0</div>
 	<div>@1</div>
 	<div>@2</div>
@@ -148,15 +148,13 @@
 		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
 	} -->
 	</div>
-
 	<!-- @include: {
 		type: 'DataRowBuilder',
-		columnPath:_.Binding.From('columnPaths').Type('UserApplications.ControlsAndBindings'),
-		dataIn: _.Binding.To('dataOut').Parent
+		columnPath:_.Binding('columnPaths').Type('UserApplications.ControlsAndBindings'),
 	} -->
 	
 
 
 <!-- @template:{type: 'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
-<input style="background-color:#ff0000; border:1px solid #ff0000; font-size:10px; padding:4px; display:none;" data-sjs-ref="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
+<input style="background-color:#ff0000; border:1px solid #ff0000; font-size:10px; padding:4px; display:none;" data-sjs-element="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
 

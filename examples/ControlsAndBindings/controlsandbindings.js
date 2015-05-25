@@ -95,12 +95,13 @@ definition:function(){
 	};
 	
 	
-	ControlsAndBindings.prototype.onToggleDelete 	= new _.Multicaster();
-	ControlsAndBindings.prototype.onClearDelete 	= new _.Multicaster();
-	ControlsAndBindings.prototype.onToggleEdit 		= new _.Multicaster();
-	ControlsAndBindings.prototype.resetEditForm 	= new _.Multicaster();
-	ControlsAndBindings.prototype.onOrderData 		= new _.Multicaster();
-	
+	ControlsAndBindings.prototype.onToggleDelete 	= _.Event;
+	ControlsAndBindings.prototype.onClearDelete 	= _.Event;
+	ControlsAndBindings.prototype.onToggleEdit 		= _.Event;
+	ControlsAndBindings.prototype.resetEditForm 	= _.Event;
+	ControlsAndBindings.prototype.onOrderData 		= _.Event;
+	ControlsAndBindings.prototype.onEditRecordData 	= _.Event;
+	ControlsAndBindings.prototype.onActivateHeader 	= _.Event;
 	
 	
 	ControlsAndBindings.prototype.onDelete = function(args){
@@ -117,7 +118,7 @@ definition:function(){
 		
 		var self = this;
 		
-		this.activateHeader({isExpanded:true, oncomplete:function(){
+		this.onActivateHeader({isExpanded:true, oncomplete:function(){
 			self.onToggleDelete({isHidden:false});
 		}});
 		
@@ -196,7 +197,7 @@ definition:function(){
 			this.onToggleDelete({isHidden:!this.isDeleteMode});
 			
 			this.ref.deleteButton.onClick = this.onDelete.bind(this);
-			this.activateHeader({isExpanded:false});
+			this.onActivateHeader({isExpanded:false});
 			return;
 		}
 		
@@ -301,11 +302,11 @@ definition:function(){
 			},
 			function(){
 				if(args && args.isEdit){
-					if(from < to) self.activateHeader({
+					if(from < to) self.onActivateHeader({
 						isExpanded:true,
 						oncomplete:function(){self.onToggleEdit({isHidden:false})}
 					});
-					if(from > to) self.activateHeader({
+					if(from > to) self.onActivateHeader({
 						isExpanded:false,
 						oncomplete:function(){self.onToggleEdit({isHidden:true})}
 					});

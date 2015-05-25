@@ -1,56 +1,78 @@
 <!-- @template:{type:'UserApplications.WebDashboard'} -->
-<div class="-web-dashboard" data-sjs-ref="controlContainer">
+<div class="-web-dashboard" data-sjs-element="controlContainer">
 
-	
-	<div class="right-pane">
-		
-		<!-- @include:{type:'Report',
-			content:{
-				reportname:'Daily Unique Visitors Report',
-				reportdate: (new Date()).toString(),
-				body:_.Obj({
-					type:'SpliceJS.Controls.DataTable',
-					style:'-data-table',
-					dataIn:_.Binding.To('uniqueVisitors').Type('UserApplications.WebDashboard')
+	<!-- @include:{
+		type:'SpliceJS.Controls.GridLayout',
+		grid:{rows:4, columns:3},
+		cells:[
+			
+			{	
+				//top half report
+				col:0, row:0, colspan:2, rowspan:2, 
+			 	content: _.Obj({
+			 		type:'Report',
+					content:{
+						reportname:'Daily Unique Visitors Report',
+						reportdate: (new Date()).toString(),
+						body:_.Obj({
+							type:'SpliceJS.Controls.Chart',
+							style:'-report-chart',
+							chart:'Line',
+							dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')
+						})
+					}	
+				})	
+			
+			}
+
+			,
+
+			{
+				//bottom half report
+				col:0, row:2, colspan:2, rowspan:1, 
+				content: _.Obj({type:'Report',
+					content:{
+						reportname:'Referring Domains Report',
+						reportdate: (new Date()).toString(),
+						body:_.Obj({
+							type:'SpliceJS.Controls.DataTable'
+						})
+					}
 				})
 			}
-		} -->
-		
-	</div>
 
 
-	<div class="left-pane">
+			,
 
-		<div class="top-half">
-			<!-- @include:{type:'Report',
-				content:{
-				reportname:'Daily Unique Visitors Report',
-				reportdate: (new Date()).toString(),
-				body:_.Obj({
-					type:'SpliceJS.Controls.Chart',
-					style:'-report-chart',
-					chart:'Line',
-					dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')
+			{
+				col:0, row:3, colspan:1, rowspan:1, 
+				content: _.Obj({
+					type:'SpliceJS.Controls.Button',
+					content:{label:'Test Button'}
+					
 				})
-				}	
-			} -->
-		</div>
-		<div class="bottom-half">
-			<!-- @include:{type:'Report',
-				content:{
-					reportname:'Referring Domains Report',
-					reportdate: (new Date()).toString(),
-					body:_.Obj({
-						type:'SpliceJS.Controls.DataTable'
+			}
+			,
+
+			{
+				//right most report
+				col:2, row:0, colspan:1, rowspan:4,
+				content: _.Obj({type:'Report',
+					content:{
+						reportname:'Daily Unique Visitors Report',
+						reportdate: (new Date()).toString(),
+						body:_.Obj({
+							type:'SpliceJS.Controls.DataTable',
+							style:'-data-table',
+							dataIn:_.Binding.To('uniqueVisitors').Type('UserApplications.WebDashboard')
+						})
+					}
 				})
-				}
-			} -->
-		</div>
+			}
 
-	</div>
-
+		]
+	} -->	
 </div>
-
 
 
 <!-- @template:{type:'Report'} -->
@@ -61,7 +83,7 @@
 		</div>
 	</div>
 	
-	<div class="-report-body">@body</div>
+	<div class="-report-body" data-sjs-element="reportBody">@body</div>
 </div>
 
 

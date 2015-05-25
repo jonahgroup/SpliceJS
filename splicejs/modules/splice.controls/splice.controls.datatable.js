@@ -323,7 +323,7 @@ definition:function(){
 		this.dataOut(this.data);
 	};
 	
-	DataTableRow.prototype.dataOut = new _.Multicaster();
+	DataTableRow.prototype.dataOut = _.Event;
 
 	function splitHighlightValue(value,hv){
 		if(value == null || value == undefined) return value;

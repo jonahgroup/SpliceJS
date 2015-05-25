@@ -1,18 +1,18 @@
 <!-- @template:{type:'SpliceJS.Controls.Button'} -->
-<input class="-splicejs-button" data-sjs-ref="controlContainer"  type = "button" value="@label"/>
+<input class="-splicejs-button" data-sjs-element="controlContainer"  type = "button" value="@label"/>
 
 <!-- @template:{type:'SpliceJS.Controls.TextField'} -->
-<input class="-splicejs-textfield" type="text" data-sjs-ref="controlContainer"/>
+<input class="-splicejs-textfield" type="text" data-sjs-element="controlContainer"/>
 
 <!-- @template:{type: 'SpliceJS.Controls.CheckBox'} -->
-<input type="checkbox" data-sjs-ref="controlContainer">
+<input type="checkbox" data-sjs-element="controlContainer">
 
 <!-- @template:{type: 'SpliceJS.Controls.RadioButton'} -->
-<input type="radio" data-sjs-ref="controlContainer">
+<input type="radio" data-sjs-element="controlContainer">
 
 <!-- @template:{type: 'SpliceJS.Controls.DropDownList'} -->
-<div class="-splicejs-drop-down-list" data-sjs-ref="controlContainer">@selectedValue</div>
+<div class="-splicejs-drop-down-list" data-sjs-element="controlContainer">@selectedValue</div>
 
 <!-- @template:{type: 'SpliceJS.Controls.ImageSelector'} -->
-<img data-sjs-ref="controlContainer"/>
+<img data-sjs-element="controlContainer"/>
 

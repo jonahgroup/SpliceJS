@@ -203,7 +203,7 @@ Doc.prototype.display = function(control,ondisplay){
 	if(control.concrete && control.concrete.dom) {
 		document.body.appendChild(control.concrete.dom);
 		if(typeof ondisplay === 'function') ondisplay(control);
-		if(typeof control.onDisplay === 'function') control.onDisplay();
+		if(typeof control.onAttach === 'function') control.onAttach();
 		return;
 	}
 	

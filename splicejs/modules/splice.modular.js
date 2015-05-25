@@ -198,7 +198,7 @@ _.Module = (function(document){
 		deepClone._concrete = instance; // DOM get a reference to the concrete instance
 		
 		/* process dom references */
-		var elements = deepClone.querySelectorAll('[data-sjs-ref]');
+		var elements = deepClone.querySelectorAll('[data-sjs-element]');
 		var element = deepClone;
 		
 		if(tieInstance)
@@ -206,7 +206,7 @@ _.Module = (function(document){
 			
 			if(i > -1) element = elements[i];
 			
-			var ref = element.getAttribute('data-sjs-ref'); 
+			var ref = element.getAttribute('data-sjs-element'); 
 			if(ref) tieInstance.elements[ref] = element; 	
 		}
 		
@@ -435,6 +435,7 @@ _.Module = (function(document){
 			obj.parent = args.parent;
 			obj.ref = {};
 			obj.elements = {};
+			obj.children = [];
 			
 			/* 
 			 * assign reference to a parent and 
@@ -453,15 +454,11 @@ _.Module = (function(document){
 				Auto-creating event casters
 				
 			*/
-			var keys = Object.keys(obj);
-			for(var i=0; i<keys.length; i++){
-				
-				//if(!obj.hasOwnProperty(keys[i])) continue;
-				if(obj[keys[i]] == _.Event){
+			for(var key in  obj){
+				if(obj[key] == _.Event){
 					_.debug.log('Found event object');
-					obj[keys[i]] = _.Event.create();
+					obj[key] = _.Event.create();
 				}	
-
 			}	
 
 
