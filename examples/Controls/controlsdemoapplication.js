@@ -55,14 +55,15 @@ definition:function(){
 		}
 
 		this.currentView = 0;
-
+		this.currentView2 = 0;
+	
 	}).extend(SpliceJS.Controls.UIControl);
 
 
 	ControlsDemoApplication.prototype.onListData   = _.Event;
 	ControlsDemoApplication.prototype.onSampleData = _.Event;
 	ControlsDemoApplication.prototype.onChartData  = _.Event;
-	
+	ControlsDemoApplication.prototype.onFlipViews  = _.Event; 	
 
 	ControlsDemoApplication.prototype.buttonClicked = function(){
 		_.debug.log('Button clicked');
@@ -83,11 +84,18 @@ definition:function(){
 	};
 
 
+	ControlsDemoApplication.prototype.flipView = function(){
+		this.currentView2++;
+		this.onFlipViews(this.currentView2 % 2);
+	}
+
+
 	ControlsDemoApplication.prototype.switchView = function(){
 		
 		this.currentView++;
 		
 		this.ref.viewPanel.switchView(this.currentView % 2);
+		
 	};
 
 

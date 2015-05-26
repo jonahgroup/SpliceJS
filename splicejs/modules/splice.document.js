@@ -55,15 +55,17 @@ _.className = function(node, className){
 	return result;
 };
 
-_.unit = function(value){
-	if(!value) return;
+function getValueUnit(value){
+	if(!value) return null;
 
 	value = value.toLowerCase();
 
 	var index = value.indexOf('px');
 	if(index >= 0) {
-		return {value:1*value.substring(0,index), 
-				unit:value.substring(index,value.length)};
+		return {
+			value: 	1*value.substring(0,index), 
+			unit: 	value.substring(index,value.length)
+		};
 	}
 };
 
@@ -76,7 +78,7 @@ Doc.prototype.style = function(element){
 	var css = window.getComputedStyle(element,null);
 
 	var getValue = function(valueName){
-		return _.unit(css.getPropertyValue(valueName));
+		return getValueUnit(css.getPropertyValue(valueName));
 	}
 
 	return {
@@ -204,6 +206,7 @@ Doc.prototype.display = function(control,ondisplay){
 		document.body.appendChild(control.concrete.dom);
 		if(typeof ondisplay === 'function') ondisplay(control);
 		if(typeof control.onAttach === 'function') control.onAttach();
+		if(typeof control.onDisplay === 'function') control.onDisplay();
 		return;
 	}
 	

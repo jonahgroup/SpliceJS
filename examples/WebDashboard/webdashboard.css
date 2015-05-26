@@ -3,7 +3,7 @@
 	top:0px; bottom:0px;
 	left:0px; right:0px;
 
-	background-color: #777777;
+	background-color: #505861;
 }
 
 
@@ -87,6 +87,22 @@
 
 .-data-table .-splicejs-scrollpanel .static { 
 	height:50px; 
+}
+
+
+.-data-table table.-splicejs-datatable thead td {
+	background-color: rgb(97, 106, 116);
+ 	color: #ffffff;
+}
+
+.-data-table .-scroll-bar-thumb-vertical {
+	background-color: rgb(0,0,0);
+	opacity:0.6;
+}
+
+.-data-table .-scroll-bar-thumb-vertical:hover {
+	background-color: rgb(0,0,0);
+	opacity:0.9;
 }
 
 .-report-chart {

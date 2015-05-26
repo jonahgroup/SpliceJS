@@ -31,13 +31,74 @@
 </tr>
 
 
-<tr><td>Layout</td>
+<tr><td> Grid Layout</td>
 <td>
 
-	<div class="-button-panel">
+	<div class="-layout-boundary">
 	<!-- @include: {
-		type:'PlainButton',
-		content:{label:'Button1'}
+		
+		type:'SpliceJS.Controls.GridLayout',
+		grid: {rows:4, columns:4},
+		cells:[
+
+			{	col:0, row:0, colspan:1, rowspan:1,
+				content: _.Obj({
+					type:'SpliceJS.Controls.Button',
+					content:{label:'Hello'}
+				})
+			},
+
+			{	col:1, row:0, colspan:1, rowspan:3,
+				content: _.Obj({
+					type:'SpliceJS.Controls.Button',
+					content:{label:'Big button'}
+				})
+			},			
+
+			{	col:0, row:1, colspan:1, rowspan:3,
+				content: _.Obj({
+					type:'SpliceJS.Controls.Button',
+					content:{label:'Click Me'},
+					onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
+				})
+			},
+
+
+			{	col:2, row:0, colspan:2, rowspan:4,
+				content: _.Obj({
+				type:'SpliceJS.Controls.ViewPanel',
+				switchView:_.Binding('onFlipViews').Type('UserApplications.ControlsDemoApplication'),
+				views:[	
+					{	key:'list',
+						view:_.Obj({
+							type:'SpliceJS.Controls.Button',
+							content:{label:'Click Me too'},
+							onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')		
+					})},
+
+					{	key:'map',
+						view:_.Obj({
+							type:'SpliceJS.Controls.Button',
+							style:'-red-button',
+							content:{label:'Meh..'},
+							onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
+						
+						})
+
+					}
+				]
+			})
+			},
+
+			{	col:1, row:3, colspan:1, rowspan:1,
+				content: _.Obj({
+					type:'SpliceJS.Controls.Button',
+					content:{label:'Click Me'},
+					onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
+				})
+			},
+
+		]
 	} -->
 	
 	</div>
@@ -121,6 +182,7 @@
 		<div>
 			<!-- @include:{
 				type:'SpliceJS.Controls.Button',
+				content:{label:'Switch View'},
 				onClick: _.Binding.From('switchView').Type('UserApplications.ControlsDemoApplication')
 			}-->
 		</div>
@@ -151,52 +213,29 @@
 	</div>
 </td></tr>
 
-<tr><td>Chart Line</td>
+<tr><td>Line Chart</td>
 	<td>
 	<div style="position:relative; width:400px; height:200px;">
 	<!-- @include: {
 		type: 	'SpliceJS.Controls.Chart',
-		chart:	'Line',		
+		chartType:	'Line',		
 		width:400, height:200,
 		dataIn:	_.Binding('onChartData').Parent
 	} -->
 	</div>
 </td></tr>
 
-<tr><td>Chart Bar</td>
+<tr><td>Bar Chart</td>
 	<td>
 	<div style="position:relative; width:400px; height:200px;">
 	<!-- @include: {
 		type: 	'SpliceJS.Controls.Chart',
-		chart:	'Bar',		
+		chartType:	'Bar',		
 		width:400, height:200,
 		dataIn:	_.Binding('onChartData').Parent
 	} -->
 	</div>
-		<div style="position:relative; width:400px; height:200px;">
-	<!-- @include: {
-		type: 	'SpliceJS.Controls.Chart',
-		chart:	'Line',		
-		width:400, height:200,
-		dataIn:	_.Binding('onChartData').Parent
-	} -->
-	</div>
-		<div style="position:relative; width:400px; height:200px;">
-	<!-- @include: {
-		type: 	'SpliceJS.Controls.Chart',
-		chart:	'Line',		
-		width:400, height:200,
-		dataIn:	_.Binding('onChartData').Parent
-	} -->
-	</div>
-		<div style="position:relative; width:400px; height:200px;">
-	<!-- @include: {
-		type: 	'SpliceJS.Controls.Chart',
-		chart:	'Bar',		
-		width:400, height:200,
-		dataIn:	_.Binding('onChartData').Parent
-	} -->
-	</div>
+	
 
 </td></tr>
 

@@ -310,6 +310,8 @@ var SChart = _.Namespace('SpliceJS.Controls').Class(function Chart(args){
     if(!this.chart) {
         this.chart = 'Line';
     }
+    
+    if(!this.chartType) this.cartType = 'Line';
 
 }).extend(SpliceJS.Controls.UIControl);
 
@@ -331,7 +333,7 @@ SChart.prototype.onDisplay = function() {
 
 
     if(this.isDirty) {
-        this.chart =  createChart.call(this.ctx, this.chart, this.dataItem);
+        this.chart =  createChart.call(this.ctx, this.chartType, this.dataItem);
     }
     this.isDirty = false;
 };
@@ -351,7 +353,7 @@ SChart.prototype.reflow = function(position, size, bubbleup){
     style.height = this.canvas.height + 'px';
 
     if(this.dataItem) {
-        this.chart =  createChart.call(this.canvas.getContext("2d"), this.chart, this.dataItem);
+        this.chart =  createChart.call(this.canvas.getContext("2d"), this.chartType, this.dataItem);
     }
 /*
     if(typeof this.chart.update === 'function') {

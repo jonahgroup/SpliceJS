@@ -17,7 +17,7 @@
 						body:_.Obj({
 							type:'SpliceJS.Controls.Chart',
 							style:'-report-chart',
-							chart:'Line',
+							chartType:'Line',
 							dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')
 						})
 					}	
@@ -29,29 +29,44 @@
 
 			{
 				//bottom half report
-				col:0, row:2, colspan:2, rowspan:1, 
+				col:0, row:2, colspan:1, rowspan:2, 
 				content: _.Obj({type:'Report',
 					content:{
 						reportname:'Referring Domains Report',
 						reportdate: (new Date()).toString(),
 						body:_.Obj({
-							type:'SpliceJS.Controls.DataTable'
+							type:'SpliceJS.Controls.Chart',
+							style:'-report-chart',
+							chartType:'Bar',
+							dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')						
 						})
 					}
 				})
 			}
 
 
+
 			,
 
 			{
-				col:0, row:3, colspan:1, rowspan:1, 
-				content: _.Obj({
-					type:'SpliceJS.Controls.Button',
-					content:{label:'Test Button'}
-					
+				//bottom half report
+				col:1, row:2, colspan:1, rowspan:2, 
+				content: _.Obj({type:'Report',
+					content:{
+						reportname:'Some Other Report',
+						reportdate: (new Date()).toString(),
+						body:_.Obj({
+							type:'SpliceJS.Controls.Chart',
+							style:'-report-chart',
+							chartType:'Line',
+							dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')						
+								
+						})
+					}
 				})
 			}
+
+
 			,
 
 			{
@@ -87,6 +102,15 @@
 </div>
 
 
+<!-- @template:{type:'BarGraph', tie:'SpliceJS.Controls.UIControl'} -->
+<span>
+	<!-- @include:{
+			type:'SpliceJS.Controls.Chart',
+			style:'-report-chart',
+			chartType:'Bar',
+			dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')
+	} -->
+</span>
 
 
 

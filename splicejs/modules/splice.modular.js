@@ -61,13 +61,28 @@ _.Module = (function(document){
 		
 	}
 	
+	/* Proxy Object */
 	_.Obj = Obj;
 
 	
 	var Concrete = _.Namespace('SpliceJS.Modular').Class(function Concrete(dom){
+		
+		/* function call */
+		if(!(this instanceof Concrete)) {
+
+			return {
+				compose: Concrete.prototype.compose.bind(dom)
+			}
+		}
+
+
 		this.dom = dom;
 	});
 	
+
+	Concrete.prototype.compose = function(){
+
+	};
 
 	Concrete.prototype.export = function(){
 		return this.dom;
@@ -368,8 +383,12 @@ _.Module = (function(document){
 		/* Default binding mode is FROM */
 
 
-		/* If course is an event then switch to TO mode */
-		if(source.value() && source.value().SPLICE_JS_EVENT) {
+		/* 
+			If course is an event then switch to TO mode 
+			unless destination is an event too
+		*/
+		if(source.value() && source.value().SPLICE_JS_EVENT && 
+		  (!dest.value() || !dest.value().SPLICE_JS_EVENT)) {
 			var _s = source;
 			source = dest;
 			dest = _s;

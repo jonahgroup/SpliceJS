@@ -18,7 +18,7 @@ function ControlsApplication(){
 
 function ControlsAndBindings(){
 	_.load(['ControlsAndBindings/controlsandbindings.js'],function(){
-		new UserApplications.ControlsAndBindings();
+		_.Doc.display(new UserApplications.ControlsAndBindings());
 	});
 }
 

@@ -35,7 +35,6 @@ definition:function(){
 
 		this.columnPaths = [0,1,2,3,4,5,6,7,8];
 
-		_.Doc.display(this);
 		
 	});
 	
@@ -358,7 +357,7 @@ definition:function(){
  			return _.data(children).toArray(
  				function(item){if(item.key == 'length') return null; 
  					return item.value;
- 			});
+ 			}).result;
  		}
 		
 		for(var i=0; i<this.columnPath.length; i++) {
