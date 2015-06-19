@@ -299,42 +299,107 @@ Doc.prototype.$ = function(target){
 
 
 
+function isUnknownElement(node) {
+	if(node instanceof window['HTMLUnknownElement']) return true;
+	return false;
+} 
+
+
 
 /*
  * use this where treewalker is not supported
  * IE8 for example.
  * */
-function dfs(dom, target, nodeType, filterFn){
+function dfs(dom, target, filterFn, nodesFn){
 	if(!dom) return;
-	if(dom.nodeType == nodeType) {
-		if(typeof filterFn === 'function') {
-			dom = filterFn(dom);  
-			if(dom)	target.push(dom);
-		} else {
-			target.push(dom);
-		} 
-		return;
-	}
 	
-	for(var i=0; i < dom.childNodes.length; i++){
+	
+	if(typeof filterFn === 'function') {
+		var node = filterFn(dom);  
+		if(node) target.push(node);
+	} else {
+		target.push(dom);
+	} 
+	
+	
+	var children = [];
+	if(typeof nodesFn === 'function'){
+		children = nodesFn(dom);
+	}
+	else {
+		children = dom.childNodes;
+	}
+
+	for(var i=0; i < children.length; i++){
 		var n = dom.childNodes[i];
-		dfs(n,target,nodeType,filterFn);
+		dfs(n,target,filterFn, nodesFn);
 	}
 }; 
+
+Doc.prototype.selectNodes = function selectNodes(dom,filterFn, nodesFn){
+	var nodes = new Array();
+	dfs(dom,nodes,filterFn, nodesFn);
+	if(nodes.length < 1) nodes = null;
+	return nodes;
+};
 
 Doc.prototype.selectComments = function selectComments(dom){
 	var nodes = new Array();
 	//nodeType 8 is comment node
-	dfs(dom,nodes,8);
+	dfs(dom,nodes,function(node){ 
+		if(node.nodeType === 8) return node; return null; 
+	});
 	if(nodes.length < 1) nodes = null;
 	return nodes;
 };
 
 
+Doc.prototype.selectUnknownElements = function selectUnknownNodes(dom){
+	var nodes = new Array();
+	
+	dfs(dom,nodes,
+		function(node){
+			if(isUnknownElement(node)) return node;
+			return null;
+		},
+		function(node){
+			if(isUnknownElement(node)) return [];
+			else return node.childNodes;
+		}
+	);
+
+	if(nodes.length < 1) nodes = null;
+	return nodes;
+};
+
+
+Doc.prototype.selectElementNodes = function selectNonTextNodes(dom, filterFn){
+	var nodes = new Array();
+	//nodeType 3 is a text node
+	dfs({childNodes:dom.childNodes},nodes,
+		function(node){ 
+			if(node.nodeType === 1) return node;
+			return null; 
+		},
+		function(node){
+			if(node.nodeType === 1) return [];
+			return node.childNodes;
+		}
+	);
+	if(nodes.length < 1) nodes = null;
+	return nodes;
+};
+
 Doc.prototype.selectTextNodes = function selectTextNodes(dom,filterFn){
 	var nodes = new Array();
 	//nodeType 3 is a text node
-	dfs(dom,nodes,3,filterFn);
+	dfs(dom,nodes,function(node){ 
+		if(node.nodeType === 3) {
+			if(typeof filterFn === 'function')	return filterFn(node);
+			return node;
+		}
+		return null; 
+	});
 	if(nodes.length < 1) nodes = null;
 	return nodes;
 };

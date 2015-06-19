@@ -161,6 +161,19 @@ var _ = sjs = (function(window, document){
 	}
 
 
+	function getPath(path){
+		var index = path.lastIndexOf('/');
+
+		if(index < 0) return {name:path};
+		return {
+			path:path.substring(0,index),
+			name:path.substring(index+1)
+		}
+	}
+	
+
+
+
 	/*
 	 * Core Object
 	 * */
@@ -217,16 +230,7 @@ var _ = sjs = (function(window, document){
 	};
 
 
-	function getPath(path){
-		var index = path.lastIndexOf('/');
 
-		if(index < 0) return {name:path};
-		return {
-			path:path.substring(0,index),
-			name:path.substring(index+1)
-		}
-	};
-	
 	Splice.prototype.absPath = absPath;
 	Splice.prototype.getPath = getPath;
 	
@@ -400,18 +404,27 @@ var _ = sjs = (function(window, document){
 	Splice.prototype.Event = Event;
 
 
+	var NAMESPACE_INDEX = [];
+
 	/** Namespace object
 	 * 
 	 * */
-	var Namespace = function Namespace(){};
+	var Namespace = function Namespace(path){
+		this._path = path;
+	};
+
 	Namespace.prototype = {
 			
 			Class: function(constructor){
-				return Splice.prototype.Class.call({namespace:this},constructor);
+				var idx = (this._path + '.' + getFunctionName(constructor)).toUpperCase(); 
+				return Splice.prototype.Class.call({namespace:this,idx:idx},constructor);
 			},
 			
 			add:function(name, object){
-				this[name] = object;
+
+				var idx = (this._path + '.' + name).toUpperCase(); 
+				NAMESPACE_INDEX[idx] = this[name] = object;
+
 			},
 			
 			list: function(){
@@ -459,6 +472,8 @@ var _ = sjs = (function(window, document){
 			}
 	};
 	
+
+
 	/**
 	 * Public Namespace interface
 	 * returns Namespace or a namespace proxy object
@@ -475,12 +490,20 @@ var _ = sjs = (function(window, document){
 		if(ns == null){
 			return {
 				Class:function(constructor){
+					
+					var idx = (namespace + '.' + getFunctionName(constructor)).toUpperCase(); 
 					var newNamespace = getNamespace(namespace,true);
-					return Splice.prototype.Class.call({namespace:newNamespace},constructor);
+					return Splice.prototype.Class.call({namespace:newNamespace, idx:idx}, constructor);
+
 				},
+
 				add:function(name, object){
+					
+					var idx = (namespace + '.' + name).toUpperCase(); 
+
 					var newNamespace = getNamespace(namespace,true);
-					newNamespace[name] = object;
+					NAMESPACE_INDEX[idx] = newNamespace[name] = object;
+
 				}
 			}
 		}
@@ -503,11 +526,24 @@ var _ = sjs = (function(window, document){
 				Namespace.prototype.list.call(a);
 			}
 		}
-	}
+	};
 	
+	Splice.prototype.Namespace.listIndex = function(){
+		for(var key in NAMESPACE_INDEX){
+			if(NAMESPACE_INDEX.hasOwnProperty(key))
+				Splice.prototype.debug.log(key);
+		}
+	};
+
 	Splice.prototype.Namespace.lookup = function(qualifiedName){
 		Splice.prototype.debug.log('searching ' + qualifiedName);
 		return getNamespace(qualifiedName,false, true);
+	};
+
+	Splice.prototype.Namespace.lookupIndex = function(qualifiedName){
+		var idx = qualifiedName.toUpperCase();
+
+		return NAMESPACE_INDEX[idx];
 	}
 		
 	/**
@@ -531,6 +567,7 @@ var _ = sjs = (function(window, document){
 			if(this.namespace[constructorName]) throw constructorName + ' is already defined, please check namespace and definition name';
 			
 			this.namespace[constructorName] = constructor;
+			NAMESPACE_INDEX[this.idx] = constructor;
 		}
 		
 		/*
@@ -825,7 +862,7 @@ var _ = sjs = (function(window, document){
 		this.include(moduleUrls, oncomplete);
 	};
 	
-	var _names = new Namespace(); //namespace container
+	
 	
 	
 	/*
@@ -864,12 +901,16 @@ var _ = sjs = (function(window, document){
 		
 		var ns = window;
 		var last = null;
-		//userapplications.basicapplication.clock
+		
+
+		var separator = '', path = '';
+		
 		for(var i=0; i<parts.length; i++){
 			
-			
+			path = path + separator + parts[i]; 
+
 			if(!ns[parts[i]]) { 
-				if(isCreate === true) ns[parts[i]] = new Namespace();
+				if(isCreate === true) ns[parts[i]] = new Namespace(path);
 				else return null;
 			}
 			
@@ -884,7 +925,10 @@ var _ = sjs = (function(window, document){
 			if(ns instanceof Namespace){
 				last = ns;
 			}
-		}
+		
+			separator = '.';
+
+		} // end for
 		
 		if(isLookup === true){ 
 			if(i+1 == parts.length) return ns;

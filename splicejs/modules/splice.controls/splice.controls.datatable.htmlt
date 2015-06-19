@@ -1,28 +1,30 @@
-<!-- @template:{type:'SpliceJS.Controls.DataTable'} -->
-<div style="position:relative;" data-sjs-element="controlContainer">
-	<!-- @include: {
-		type:'SpliceJS.Controls.ScrollPanel',
-		ref:'scrollPanel',
-		content:{
-			scrollContent:_.Obj({
-				type:'DataTableBody',
-				ref:'tableBody'
-			}),
-			staticContent:_.Obj({
-				type:'DataTableHeader',
-				ref:'tableHeader'
-			})
-		}
-	} -->
-</div>
+<sjstemplate type="SpliceJS.Controls.DataTable">
+	<div style="position:relative;" data-sjs-element="controlContainer">
+		<sjsinclude>{
+			type:'SpliceJS.Controls.ScrollPanel',
+			ref:'scrollPanel',
+			content:{
+				scrollContent:<sjsinclude>{
+					type:'DataTableBody',
+					ref:'tableBody'
+				}</sjsinclude>,
+				staticContent:<sjsinclude>{
+					type:'DataTableHeader',
+					ref:'tableHeader'
+				}</sjsinclude>
+			}
+		}</sjsinclude>
+	</div>
+</sjstemplate>
 
+<sjstemplate type="DataTableHeader">
+	<div class="-splicejs-datatable-headercontainer" style="position:absolute; z-index:10;">
+		<table class="-splicejs-datatable" data-sjs-element="columnHeaderTable"></table>
+	</div>
+</sjstemplate>
 
-<!-- @template:{type:'DataTableHeader'} -->
-<div class="-splicejs-datatable-headercontainer" style="position:absolute; z-index:10;">
-	<table class="-splicejs-datatable" data-sjs-element="columnHeaderTable"></table>
-</div>
-
-<!-- @template:{type:'DataTableBody'} -->
-<div style="position:relative;">
-	<table class="-splicejs-datatable" data-sjs-element="dataTable"></table>
-</div>
+<sjstemplate type="DataTableBody">
+	<div style="position:relative;">
+		<table class="-splicejs-datatable" data-sjs-element="dataTable"></table>
+	</div>
+</sjstemplate>

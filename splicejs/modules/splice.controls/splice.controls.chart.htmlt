@@ -1,8 +1,10 @@
 
-<!-- @template:{type:'SpliceJS.Controls.Chart'} -->
-<div class="-splicejs-controls-chart" data-sjs-element="controlContainer" >
-	<canvas data-sjs-element="controlCanvas"></canvas>
-</div>
+<sjstemplate type="SpliceJS.Controls.Chart">
+	<div class="-splicejs-controls-chart" data-sjs-element="controlContainer" >
+		<canvas data-sjs-element="controlCanvas"></canvas>
+	</div>
+</sjstemplate>
 
-<!-- @template:{type:'SpliceJS.Controls.Dial'} -->
-<canvas width="150" height="150" data-sjs-element="controlContainer"></canvas>
+<sjstemplate type="SpliceJS.Controls.Dial">
+	<canvas width="150" height="150" data-sjs-element="controlContainer"></canvas>
+<sjstemplate>	

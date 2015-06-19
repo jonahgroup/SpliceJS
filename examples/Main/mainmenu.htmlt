@@ -1,7 +1,14 @@
-<!-- @template:{type:'UserApplications.MainMenu'} -->
-<div>
-	<div class="-link-container" onclick="BasicApplication();">Basic Application</div>
-	<div class="-link-container" onclick="ControlsApplication();">Controls Demo</div>
-	<div class="-link-container" onclick="ControlsAndBindings();">Controls and Binding</div>
-	<div class="-link-container" onclick="WebDashboard();">Web Dashboard</div>
-</div>
+<sjstemplate type="UserApplications.MainMenu">
+	<div>
+		<div class="-link-container" onclick="BasicApplication();">Basic Application</div>
+		<div class="-link-container" onclick="ControlsApplication();">Controls Demo</div>
+		<div class="-link-container" onclick="ControlsAndBindings();">Controls and Binding</div>
+		<div class="-link-container" onclick="WebDashboard();">Web Dashboard</div>
+	</div>
+
+	<sjsinclude>{
+		type:'SpliceJS.Controls.Button',
+		content:{label:'test'}
+	}</sjsinclude>
+
+</sjstemplate>

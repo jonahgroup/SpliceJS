@@ -1,18 +1,23 @@
-<!-- @template:{type:'SpliceJS.Controls.Button'} -->
-<input class="-splicejs-button" data-sjs-element="controlContainer"  type = "button" value="@label"/>
+<sjstemplate type="SpliceJS.Controls.Button">
+	<input class="-splicejs-button" data-sjs-element="controlContainer"  type = "button" value="@label"/>
+</sjstemplate>
 
-<!-- @template:{type:'SpliceJS.Controls.TextField'} -->
-<input class="-splicejs-textfield" type="text" data-sjs-element="controlContainer"/>
+<sjstemplate type="SpliceJS.Controls.TextField">
+	<input class="-splicejs-textfield" type="text" data-sjs-element="controlContainer"/>
+</sjstemplate>
 
-<!-- @template:{type: 'SpliceJS.Controls.CheckBox'} -->
-<input type="checkbox" data-sjs-element="controlContainer">
+<sjstemplate type="SpliceJS.Controls.CheckBox" >
+	<input type="checkbox" data-sjs-element="controlContainer">
+</sjstemplate>
 
-<!-- @template:{type: 'SpliceJS.Controls.RadioButton'} -->
-<input type="radio" data-sjs-element="controlContainer">
+<sjstemplate type="SpliceJS.Controls.RadioButton">
+	<input type="radio" data-sjs-element="controlContainer">
+</sjstemplate>
 
-<!-- @template:{type: 'SpliceJS.Controls.DropDownList'} -->
-<div class="-splicejs-drop-down-list" data-sjs-element="controlContainer">@selectedValue</div>
+<sjstemplate type="SpliceJS.Controls.DropDownList">
+	<div class="-splicejs-drop-down-list" data-sjs-element="controlContainer">@selectedValue</div>
+</sjstemplate>
 
-<!-- @template:{type: 'SpliceJS.Controls.ImageSelector'} -->
-<img data-sjs-element="controlContainer"/>
-
+<sjstemplate type="SpliceJS.Controls.ImageSelector">
+	<img data-sjs-element="controlContainer"/>
+</sjstemplate>

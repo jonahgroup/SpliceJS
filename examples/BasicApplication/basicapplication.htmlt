@@ -1,15 +1,16 @@
-<!-- @template:{type:'UserApplications.BasicApplication'} -->
-<div>	
-	<div><a data-sjs-element="mainMenuButton">Main Menu</a></div>
-	<!-- @include:{type:'UserControls.Clock', ref:'clock'} -->
-</div>
+<sjstemplate type="UserApplications.BasicApplication">
+	<div>	
+		<div><a data-sjs-element="mainMenuButton">Main Menu</a></div>
+		<UserControls.Clock ref="clock"></UserControls.Clock>
+	</div>
+</sjstemplate>
 
 
-
-<!-- @template:{type:'UserControls.Clock'} -->
+<sjstemplate type="UserControls.Clock">
 	<div class="-center" data-sjs-element="mainContainer">
 		<span class="-clock-label" data-sjs-element="clockLabel"></span>
 		<span style="font-family:Arial;"> UTC -5</span>
 	</div>
+</sjstemplate>
 
 

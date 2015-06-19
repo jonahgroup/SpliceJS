@@ -1,3 +1,31 @@
+
+/*
+
+SpliceJS
+  
+The MIT License (MIT)
+
+Copyright (c) 2015 jonahgroup
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
 _.Module = (function(document){	
 
 	//enable strict mode
@@ -190,6 +218,44 @@ _.Module = (function(document){
 		}
 	}
 	
+	
+	function buildComponents(dom,tieInstance,scope){
+
+		/* 	process nested elements 
+			element tag name are not not case sensetive
+		*/
+		var nested = _.Doc.selectUnknownElements(dom);
+
+		for(var i=0; nested!=null && i < nested.length; i++){
+
+			var node = nested[i];
+			var parent = node.parentNode;
+
+			var idx = node.tagName;
+			
+			var obj = _.Namespace.lookupIndex(idx);
+			if(!obj) continue;
+
+			var parameters = {type:idx};
+			for(var j=0; j < node.attributes.length; j++){
+				var attr = node.attributes[j];
+				parameters[attr.name] = attr.value;
+			}
+
+
+			/* process content */
+			var proxy = _.Obj.call(scope,parameters);
+
+
+			var c_instance = new proxy({parent:tieInstance});
+
+			parent.replaceChild((c_instance.concrete.dom || c_instance.dom), node);
+
+			_.debug.log(node.tagName);
+		}
+	}
+
+
 	/**
 	 * @tieInstance - instance of a tie class that is associated with the template
 	 * */
@@ -238,7 +304,10 @@ _.Module = (function(document){
 		if(typeof tieInstance.handleContent === 'function'){
 			tieInstance.handleContent(parameters.content);
 		}
+
+
 		
+
 
 		/* 
 		 * Anchor elements with data-sjs-tmp-anchor attibute
@@ -247,6 +316,7 @@ _.Module = (function(document){
 		 * */
 		var anchors = deepClone.querySelectorAll('[data-sjs-tmp-anchor]');
 		
+
 		for(var i=0; i < anchors.length; i++){
 			
 			var childId = anchors[i].getAttribute('data-sjs-child-id');
@@ -613,7 +683,8 @@ _.Module = (function(document){
 			
 			definition.call(scope,scope);
 			scope.templates = templateDefinitions;
-			
+			scope.compindex = [];
+
 			/* 
 			 * Templates are compiled after module has been defined
 			 * 
@@ -691,54 +762,49 @@ _.Module = (function(document){
 		
 		var scope = this;
 
-		var regex = /<!--\s+@(template|selector)\s*:\s*({.*})\s+-->/igm; 	//script start RE
+		//var regex = /<!--\s+@(template|selector)\s*:\s*({.*})\s+-->/igm; 	//script start RE
+		var regex = 	/<sjstemplate(\s*.*\s*)>([\s\S]+?)<\/sjstemplate>/igm;
+		var attrRegex = /(\S+)="(\S+?)"/igm;
+
 		var match = null;
 		
 		var lastMatch = null;
 		var templates = new Array();
+
+		//match a single template at a time
 		while( match = regex.exec( fileSource ) ){
 			
-			/* multiple templates in the file
-			 * next one is found
-			 * */
-			if(lastMatch != null) {
-				var templateSource = fileSource.substring(lastMatch.index + lastMatch.descriptor.length, match.index);
-				
-				var desc = lastMatch.declaration;
+			
+			var attr = match[1];
+			var body = match[2];
+			
+
+			//convert attributes to object respresentation
+			var attrMatch = null;	
+			var attributes = {};
+
+			while(attrMatch = attrRegex.exec(attr)){
+
+				var prop 	= attrMatch[1];
+				var value 	= attrMatch[2];
+
+				attributes[prop] = value;
+			}
 								
-				/* 
-				 * source execution through Function constructor 
-				 * avoid strict mode variable declarion restrictions
-				 * */
-				var attributes = (new Function('return  '+desc+' ;'))();
-								
-				templates.push({
-					src:applyPath.call(scope,templateSource),
-					spec:attributes 
+			templates.push({
+				src:applyPath.call(scope,body),
+				spec:attributes 
 					/* 
 					 * attributes are parameters specified in the @template declaration
 					 * in the form or JSON literal, it is evaluated as is
 					 * hence must be of the correct JSON syntax
 					 *  */
-				});
-			}
+			});
 			
-			lastMatch = {descriptor:match[0], declaration:match[2], index:match.index };
+			
+			
 		}
 		
-		/* last of the only template*/
-		if(lastMatch != null) {
-			var templateSource = fileSource.substring(lastMatch.index + lastMatch.descriptor.length, fileSource.length);
-			
-			var desc = lastMatch.declaration;
-						
-			var result = (new Function('return  '+desc+' ;'))();
-			
-			templates.push({
-				src:applyPath.call(scope,templateSource),
-				spec:result
-			});
-		}
 		
 		return templates;
 	};
@@ -866,6 +932,83 @@ _.Module = (function(document){
 	
 	};
 	
+
+	function ConvertToProxyJson(dom){
+		
+		var scope = this;
+
+		var elements = 	_.Doc.selectNodes({childNodes:dom.childNodes},
+				function(node){
+					if(node.tagName == 'SJSINCLUDE') return node;
+				},
+				function(node){
+					if(node.tagName == 'SJSINCLUDE') return [];
+					return node.childNodes;	
+				}
+			);
+
+		if(!elements) return dom.innerHTML;
+		
+		for(var i=0; i<elements.length; i++){
+			var element = elements[i];
+			if(element.tagName === 'SJSINCLUDE'){
+				//create new template and repeat parsing
+				var text = '_.Obj.call(scope,'+element.innerHTML+')';
+				element.parentNode.replaceChild(document.createTextNode(text),element);
+			}
+		}
+		return dom.innerHTML;
+	};
+
+	function ResolveCustomElements(template){
+
+		var scope = this;
+
+		/* select top level includes */
+		var inclusions = [];
+
+		var nodes = _.Doc.selectNodes({childNodes:template.dom.childNodes},
+				function(node){
+					if(node.tagName == 'SJSINCLUDE') return node;
+				},
+				function(node){
+					if(node.tagName == 'SJSINCLUDE') return [];
+					return node.childNodes;	
+				}
+			);
+
+		if(!nodes || nodes.length < 1) return;
+
+		for(var i=0; i<nodes.length; i++){
+			
+			var node = nodes[i];
+			var parent = node.parentNode;
+
+			
+				var json = ConvertToProxyJson.call(scope,node);
+			
+
+				var result = null; 
+				eval('result = ' + json);
+
+				if(typeof result !==  'function'){				
+					result = _.Obj.call(scope,result);
+				}
+
+				var childId = template.addChild(result);
+
+				var a = document.createElement('a');
+				a.setAttribute('data-sjs-tmp-anchor',result.type);
+				a.setAttribute('data-sjs-child-id',	childId);
+				
+				parent.replaceChild(a,node);
+			
+		}
+
+	}
+
+
+
 	function AnnotationRunner(template){
 		
 		var scope = this;
@@ -967,8 +1110,9 @@ _.Module = (function(document){
 		 * final template DOM
 		 * */
 		_.debug.log('Processing template notations for module: ');		
-		AnnotationRunner.call(scope,template);
-		
+		//AnnotationRunner.call(scope,template);
+		ResolveCustomElements.call(scope,template);
+
 		//_.debug.log('Processing template scripts for module: ' );
 		//new ScriptDomRunner(template.dom).run({module:''});
 		
@@ -977,8 +1121,9 @@ _.Module = (function(document){
 		
 
 		
-		var template_name 	= template.declaration.type;
-		var tie_name  		= template.declaration.tie; 
+		var template_name 			 = template.declaration.type;
+		var template_component_index = template.declaration.type.toUpperCase();
+		var tie_name  				 = template.declaration.tie; 
 		
 		var split_name 	= _.splitQualifiedName(template_name);
 		var split_tie 	= _.splitQualifiedName(tie_name);
@@ -996,7 +1141,6 @@ _.Module = (function(document){
 		 * */
 		
 		
-		
 		/* 
 		 * this is a local scope template declaration 
 		 * local templates may only couple with explicitly defined ties
@@ -1011,7 +1155,11 @@ _.Module = (function(document){
 			
 			if(tie && tie.isComponent) tie = tie.tie;
 			
-			return scope.templates[template.declaration.type] = createComponent(tie,template, scope);
+
+
+			return scope.templates[template.declaration.type] = 
+				   scope.compindex[template_component_index] =
+				   createComponent(tie,template, scope);
 		
 		}
 

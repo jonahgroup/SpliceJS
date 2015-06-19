@@ -1,120 +1,124 @@
-<!-- @template:{type:'UserApplications.ControlsAndBindings'} -->
-<div class="applicationpanel">
-<div class="menubar">
-	
-	<!-- @include:{
-		type:'SpliceJS.Controls.Button', 
-		ref:'addButton',
-		style: 'button',
-		onClick:_.Binding('onAddRecord').Parent,
-		content:{label:'Add'}
-	} -->
+<sjstemplate type="UserApplications.ControlsAndBindings">
+	<div class="applicationpanel">
+	<div class="menubar">
+		
 
-	<!-- @include:{ 
-		type:'SpliceJS.Controls.Button', 
-		ref:'editButton',
-		style: 'button',
-		onClick:_.Binding('onEdit').Parent,
-		content:{label:'Edit'}
-	} -->
-	
-	<!-- @include:{
-		type:'SpliceJS.Controls.Button', 
-		ref:'deleteButton',
-		style: 'button',
-		onClick:_.Binding('onDelete').Parent,
-		content:{label:'Delete'}
-	} -->
 
-	<!-- @include:{
-		type:'SpliceJS.Controls.Button', 
+	    <sjsinclude>{
+	        type:'SpliceJS.Controls.Button', 
+	        ref:'addButton',
+	        style: 'button',
+	        onClick:_.Binding('onAddRecord').Parent,
+	        content:{label:'Add'}
+    	}
+    	</sjsinclude>
 
-		ref:'cancelButton',
-		isHidden:true,
-		animate:true,
-		style: 'button',
-		isDisabled:true,
-		onClick:_.Binding('onCancel').Parent,
-		content:{label:'Cancel'}
-	} -->
-	
-	<div class="search">
-		<!-- @include:{
+
+		<sjsinclude>{ 
 			type:'SpliceJS.Controls.Button', 
-			content:{label:'Clear'},
-			ref:'searchClearButton',
+			ref:'editButton',
+			style: 'button',
+			onClick:_.Binding('onEdit').Parent,
+			content:{label:'Edit'}
+		}</sjsinclude>
+		
+		<sjsinclude>{
+			type:'SpliceJS.Controls.Button', 
+			ref:'deleteButton',
+			style: 'button',
+			onClick:_.Binding('onDelete').Parent,
+			content:{label:'Delete'}
+		}</sjsinclude>
+
+		<sjsinclude>{
+			type:'SpliceJS.Controls.Button', 
+			ref:'cancelButton',
 			isHidden:true,
 			animate:true,
-			onClick:_.Binding('clearSearch').Parent,
-		}-->
-		<!-- @include:{
+			style: 'button',
+			isDisabled:true,
+			onClick:_.Binding('onCancel').Parent,
+			content:{label:'Cancel'}
+		}</sjsinclude>
+		
+		<div class="search">
+			
+			<sjsinclude>{
+				type:'SpliceJS.Controls.Button', 
+				content:{label:'Clear'},
+				ref:'searchClearButton',
+				isHidden:true,
+				animate:true,
+				onClick:_.Binding('clearSearch').Parent,
+			}</sjsinclude>
+			
+			<sjsinclude>{
+				type:'SpliceJS.Controls.TextField',
+				style: 'edit-field',
+				ref:'searchTextField',
+				dataOut:_.Binding.From('onSearchValue').Type('UserApplications.ControlsAndBindings')
+			}</sjsinclude>
+
+		</div>
+
+	</div>
+	<div class="bodypanel">
+	<div class="editpanel" data-sjs-element="editPanel">
+		<div class="editlabel"><span data-sjs-element="editSectionLabel">Create New Record</span></div>
+		<div class="instructionsLabel" data-sjs-element="editInstructionsLabel">Select record on the right hand side to enable edit dialog</div>
+		<div style="position:absolute; top:125px; left:25px; bottom:0px; right:0px;">
+		<sjsinclude>{
+			type:'SpliceJS.Controls.DataTable',
+
+			ref:'editTable',
+			style:'edit-fields-table',
+			dataIn: _.Binding('onEditRecordData').Parent,		
+			itemTemplate: 	<sjsinclude>{type:'EditRecordRow'}</sjsinclude>
+			
+		}</sjsinclude>
+		</div>
+	</div>
+	<div class="datapanel" data-sjs-element="dataPanel">
+		
+		<sjsinclude>{
+			type:'SpliceJS.Controls.DataTable',
+
+			ref:'ordersTable',
+			style: 'cool-blue-table',
+			dataIn:			_.Binding('onOrderData').Parent,
+			headerTemplate: <sjsinclude>{
+				type:'HeaderRowTemplate',
+				activate:_.Binding('onActivateHeader').Type('UserApplications.ControlsAndBindings')
+			}</sjsinclude>,
+			itemTemplate: <sjsinclude>{
+				type:'OrderRowTemplate',
+				onHighlightValue:_.Binding('getHighlightValue').Type('UserApplications.ControlsAndBindings')
+			}</sjsinclude>
+		
+		}</sjsinclude>
+
+
+	</div>
+	</div>
+
+	</div>
+</sjstemplate>
+
+
+<sjstemplate type="EditRecordRow" tie="SpliceJS.Controls.DataTableRow">
+	<div>
+		<div style="font-size:12px;">@field</div>
+		<div><sjsinclude>{
 			type:'SpliceJS.Controls.TextField',
-			style: 'edit-field',
-			ref:'searchTextField',
-			dataOut:_.Binding.From('onSearchValue').Type('UserApplications.ControlsAndBindings')
-		} -->
+			style:'edit-field',
+			dataPath:'value',
+			dataIn: _.Binding.To('dataOut').Parent,
+			clear:	_.Binding.To('resetEditForm').Type('UserApplications.ControlsAndBindings')
+		}</sjsinclue></div>
 	</div>
+</sjstemplate>
 
-</div>
-<div class="bodypanel">
-<div class="editpanel" data-sjs-element="editPanel">
-	<div class="editlabel"><span data-sjs-element="editSectionLabel">Create New Record</span></div>
-	<div class="instructionsLabel" data-sjs-element="editInstructionsLabel">Select record on the right hand side to enable edit dialog</div>
-	<div style="position:absolute; top:125px; left:25px; bottom:0px; right:0px;">
-	<!-- @include: {
-		type:'SpliceJS.Controls.DataTable',
-
-		ref:'editTable',
-		style:'edit-fields-table',
-		dataIn: _.Binding('onEditRecordData').Parent,		
-		itemTemplate: 	_.Obj({
-			type:'EditRecordRow'
-		})
-		
-	} -->
-	</div>
-</div>
-<div class="datapanel" data-sjs-element="dataPanel">
-	
-	<!-- @include: {
-		type:'SpliceJS.Controls.DataTable',
-
-		ref:'ordersTable',
-		style: 'cool-blue-table',
-		dataIn:			_.Binding('onOrderData').Parent,
-		headerTemplate: _.Obj({
-			type:'HeaderRowTemplate',
-			activate:_.Binding('onActivateHeader').Type('UserApplications.ControlsAndBindings')
-		}),
-		itemTemplate: 	_.Obj({
-			type:'OrderRowTemplate',
-			onHighlightValue:_.Binding('getHighlightValue').Type('UserApplications.ControlsAndBindings')
-		})
-	
-	} -->
-
-
-</div>
-</div>
-
-</div>
-
-
-
-<!-- @template:{type:'EditRecordRow', tie:'SpliceJS.Controls.DataTableRow'} -->
-<div>
-	<div style="font-size:12px;">@field</div>
-	<div><!-- @include:{
-		type:'SpliceJS.Controls.TextField',
-		style:'edit-field',
-		dataPath:'value',
-		dataIn: _.Binding.To('dataOut').Parent,
-		clear:	_.Binding.To('resetEditForm').Type('UserApplications.ControlsAndBindings')
-		
-	} --></div>
-</div>
-
-<!-- @template:{type:'HeaderRowTemplate', tie:'FancyHeaderRow'} -->
+<sjstemplate type="HeaderRowTemplate" tie="FancyHeaderRow">
 	<div data-sjs-element="controlColumn"></div>
 	<div>@0</div>
 	<div>@1</div>
@@ -125,11 +129,11 @@
 	<div>@6</div>
 	<div>@7</div>
 	<div>@8</div>
-	
+</sjstemplate>	
 
-<!-- @template:{type:'OrderRowTemplate', tie:'SpliceJS.Controls.DataTableRow'} -->
+<sjstemplate type="OrderRowTemplate" tie="SpliceJS.Controls.DataTableRow">
 	<div>
-	<!-- @include: {
+	<sjsinclude>{
 		type: 'SpliceJS.Controls.CheckBox',
 		isHidden:	true,
 		animate:	true,
@@ -137,8 +141,8 @@
 		changeState: _.Binding.To('onToggleDelete').Type('UserApplications.ControlsAndBindings'),
 		dataPath: 	'_del_flag',
 		dataIn: 	_.Binding.To('dataOut').Parent
-	} -->
-	<!-- @include: {
+	}</sjsinclude>
+	<sjsinclude>{
 		type: 'SpliceJS.Controls.RadioButton',
 		isHidden:	true,
 		animate:	true,
@@ -146,15 +150,15 @@
 		dataPath:	'_edit_flag',
 		dataIn:		_.Binding.To('dataOut').Parent,
 		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
-	} -->
+	}</sjsinclude>
 	</div>
-	<!-- @include: {
+	<sjsinclude>{
 		type: 'DataRowBuilder',
 		columnPath:_.Binding('columnPaths').Type('UserApplications.ControlsAndBindings'),
-	} -->
-	
+	}</sjsinclude>
+</sjstemplate>	
 
 
-<!-- @template:{type: 'DeleteButton', tie:'SpliceJS.Controls.Button'} -->
-<input style="background-color:#ff0000; border:1px solid #ff0000; font-size:10px; padding:4px; display:none;" data-sjs-element="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
-
+<sjstemplate type="DeleteButton" tie="SpliceJS.Controls.Button">
+	<input style="background-color:#ff0000; border:1px solid #ff0000; font-size:10px; padding:4px; display:none;" data-sjs-element="buttonContainer" class="-splicejs-button" type = "button" value="@label"/>
+</sjstemplate>
