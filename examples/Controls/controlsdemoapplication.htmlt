@@ -24,13 +24,13 @@
 <tr><td>Radio button</td>
 	<td>
 	
-		<sjsinclude>
+		<sjs-include>
 			type:'SpliceJS.Controls.RadioButton',
 			content:{
 				value:'Button',
 				default:<table><tr><td></td></tr></table>
 			}
-		</sjsinclude>
+		</sjs-include>
 	
 	</td>
 </tr>
@@ -40,24 +40,24 @@
 <td>
 
 	<div class="-layout-boundary">
-	<sjsinclude>{
+	<sjs-include>{
 		
 		type:'SpliceJS.Controls.GridLayout',
 		grid: {rows:4, columns:4},
 		cells:[
 
 			{	col:0, row:0, colspan:1, rowspan:1,
-				content: <sjsinclude>{
+				content: <sjs-include>{
 					type:'SpliceJS.Controls.Button',
 					content:{label:'Hello'}
-				}</sjsinclude>
+				}</sjs-include>
 			},
 
 			{	col:1, row:0, colspan:1, rowspan:3,
-				content: <sjsinclude>{
+				content: <sjs-include>{
 					type:'SpliceJS.Controls.Button',
 					content:{label:'Big button'}
-				}</sjsinclude>
+				}</sjs-include>
 			},			
 
 			{	col:0, row:1, colspan:1, rowspan:3,
@@ -104,7 +104,7 @@
 			},
 
 		]
-	}</sjsinclude>
+	}</sjs-include>
 	
 	</div>
 </td>
@@ -131,14 +131,14 @@
 <td>Drawer panel</td>
 	<td>
 	<div style="position:relative; width:400px; height:200px;">
-	<sjsinclude> {
+	<sjs-include> {
 		type: 	'SpliceJS.Controls.DrawerPanel',
 		content: {
-			body:	<sjsinclude>{type:'SampleContent'}</sjsinclude>,
-			drawer: <sjsinclude>{type:'LocalList'}</sjsinclude>
+			body:	<sjs-include>{type:'SampleContent'}</sjs-include>,
+			drawer: <sjs-include>{type:'LocalList'}</sjs-include>
 		},
 		dataIn:	_.Binding('onSampleData').Parent,
-	</sjsinclude>
+	</sjs-include>
 	</div>
 </td>
 

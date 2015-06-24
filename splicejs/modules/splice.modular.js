@@ -763,7 +763,7 @@ _.Module = (function(document){
 		var scope = this;
 
 		//var regex = /<!--\s+@(template|selector)\s*:\s*({.*})\s+-->/igm; 	//script start RE
-		var regex = 	/<sjstemplate(\s*.*\s*)>([\s\S]+?)<\/sjstemplate>/igm;
+		var regex = 	/<sjs-template(\s*.*\s*)>([\s\S]+?)<\/sjs-template>/igm;
 		var attrRegex = /(\S+)="(\S+?)"/igm;
 
 		var match = null;
@@ -939,10 +939,10 @@ _.Module = (function(document){
 
 		var elements = 	_.Doc.selectNodes({childNodes:dom.childNodes},
 				function(node){
-					if(node.tagName == 'SJSINCLUDE') return node;
+					if(node.tagName == 'SJS-INCLUDE') return node;
 				},
 				function(node){
-					if(node.tagName == 'SJSINCLUDE') return [];
+					if(node.tagName == 'SJS-INCLUDE') return [];
 					return node.childNodes;	
 				}
 			);
@@ -951,7 +951,7 @@ _.Module = (function(document){
 		
 		for(var i=0; i<elements.length; i++){
 			var element = elements[i];
-			if(element.tagName === 'SJSINCLUDE'){
+			if(element.tagName === 'SJS-INCLUDE'){
 				//create new template and repeat parsing
 				var text = '_.Obj.call(scope,'+element.innerHTML+')';
 				element.parentNode.replaceChild(document.createTextNode(text),element);
@@ -969,10 +969,10 @@ _.Module = (function(document){
 
 		var nodes = _.Doc.selectNodes({childNodes:template.dom.childNodes},
 				function(node){
-					if(node.tagName == 'SJSINCLUDE') return node;
+					if(node.tagName == 'SJS-INCLUDE') return node;
 				},
 				function(node){
-					if(node.tagName == 'SJSINCLUDE') return [];
+					if(node.tagName == 'SJS-INCLUDE') return [];
 					return node.childNodes;	
 				}
 			);
