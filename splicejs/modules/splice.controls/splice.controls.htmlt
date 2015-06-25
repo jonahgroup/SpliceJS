@@ -1,5 +1,6 @@
 <sjs-template type="SpliceJS.Controls.Button">
 	<input class="-splicejs-button" data-sjs-element="controlContainer"  type = "button" value="@label"/>
+	<div>@default</div>
 </sjs-template>
 
 <sjs-template type="SpliceJS.Controls.TextField">

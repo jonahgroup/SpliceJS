@@ -937,6 +937,28 @@ _.Module = (function(document){
 		
 		var scope = this;
 
+
+		var tags = _.Doc.selectNodes({childNodes:dom.childNodes},
+				function(node){
+					if(node.nodeType == 1 && node.tagName != 'SJS-INCLUDE') return node;
+				},
+				function(node){
+					if(node.nodeType == 1 && node.tagName != 'SJS-INCLUDE') return [];
+					return node.childNodes;
+				});
+
+		//process tags as new implicit templates
+		if(tags != null){
+			for(var i=0; i<tags.length; i++){
+				var tag = tags[i];
+
+				var placeholder = document.createElement('sjs-include');
+				placeholder.appendChild(document.createTextNode('{type:\'_domTemplate\'}'));
+				tag.parentNode.replaceChild(placeholder, tag);
+			}
+		}
+
+		//process include elements
 		var elements = 	_.Doc.selectNodes({childNodes:dom.childNodes},
 				function(node){
 					if(node.tagName == 'SJS-INCLUDE') return node;

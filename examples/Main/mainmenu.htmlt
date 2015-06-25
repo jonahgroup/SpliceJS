@@ -8,7 +8,10 @@
 
 	<sjs-include>{
 		type:'SpliceJS.Controls.Button',
-		content:{label:'test'}
+		content:{
+			label:'test',
+			default:<table><tr><td>something</td></tr></table>
+		}
 	}</sjs-include>
 
 </sjs-template>
