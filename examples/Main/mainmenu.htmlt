@@ -5,13 +5,4 @@
 		<div class="-link-container" onclick="ControlsAndBindings();">Controls and Binding</div>
 		<div class="-link-container" onclick="WebDashboard();">Web Dashboard</div>
 	</div>
-
-	<sjs-include>{
-		type:'SpliceJS.Controls.Button',
-		content:{
-			label:'test',
-			default:<table><tr><td>something</td></tr></table>
-		}
-	}</sjs-include>
-
 </sjs-template>

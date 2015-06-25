@@ -1,4 +1,3 @@
-
 <sjs-template type="SpliceJS.Controls.ScrollPanel">
 	<div class="-splicejs-scrollpanel">
 		<div class="clipping" data-sjs-element="clippingArea">

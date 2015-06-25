@@ -31,6 +31,17 @@ _.Module = (function(document){
 	//enable strict mode
 	"use strict"; 
 	
+	
+	var Scope = function Scope(path){
+		this.path = path;
+		this.compindex = [];
+		this.itc = 0;
+	};
+
+	Scope.prototype.getNextTemplateName = function(){
+		return '__impTemplate' + (this.itc++);
+	};
+
 	/**
 	 * Object descriptor
 	 * @type: data type of the object to be created
@@ -198,6 +209,7 @@ _.Module = (function(document){
 	};
 	
 	Template.prototype.normalize  = function(){
+
 		/*
 		 * reassign the wrapper if template has a root element
 		 * */
@@ -362,7 +374,7 @@ _.Module = (function(document){
 		var handler = function(){
 
 			var path = _.getPath(_.currentlyLoading.name).path;
-			var scope = {path:path};
+			var scope = new Scope(path);
 
 			if(typeof onitemloaded === 'function')
 			onitemloaded.apply(this,arguments);
@@ -378,8 +390,8 @@ _.Module = (function(document){
 			for(var i=0; i< t.length; i++){
 				templates[t[i].spec.type] = t[i];
 			}
-			
-			compileTemplates({templates:templates});
+			scope.templates = templates;
+			compileTemplates(scope);
 		}
 		originalInclude.call(_,resources, oncomplete,handler);
 	}
@@ -634,7 +646,8 @@ _.Module = (function(document){
 		/* required collection is always an Array */
 		required = required instanceof Array ? required : null;
 
-		var scope = {path:path}; 
+		var scope = new Scope(path);
+
 		scope.createComponent = function(tie,template){return createComponent(tie,template,this);};
 			
 		_.debug.log(path);
@@ -683,7 +696,7 @@ _.Module = (function(document){
 			
 			definition.call(scope,scope);
 			scope.templates = templateDefinitions;
-			scope.compindex = [];
+			
 
 			/* 
 			 * Templates are compiled after module has been defined
@@ -952,9 +965,26 @@ _.Module = (function(document){
 			for(var i=0; i<tags.length; i++){
 				var tag = tags[i];
 
+				/* generate template name */
+				var inlineTemplateName = scope.getNextTemplateName();
+
+
 				var placeholder = document.createElement('sjs-include');
-				placeholder.appendChild(document.createTextNode('{type:\'_domTemplate\'}'));
+				placeholder.appendChild(document.createTextNode('{type:\'' + inlineTemplateName +'\'}'));
 				tag.parentNode.replaceChild(placeholder, tag);
+
+				/* 
+					build new template and store within scope 
+					run template compiler
+				*/
+				var wrapper = document.createElement('span');
+				wrapper.appendChild(tag);
+
+				var template = new Template(wrapper);
+				/* copy template declaration attributes */		
+				template.declaration = {type:inlineTemplateName};
+
+				compileTemplate.call(scope,template);
 			}
 		}
 
@@ -975,7 +1005,7 @@ _.Module = (function(document){
 			var element = elements[i];
 			if(element.tagName === 'SJS-INCLUDE'){
 				//create new template and repeat parsing
-				var text = '_.Obj.call(scope,'+element.innerHTML+')';
+				var text = '_.Obj.call(scope,'+ConvertToProxyJson(element)+')';
 				element.parentNode.replaceChild(document.createTextNode(text),element);
 			}
 		}

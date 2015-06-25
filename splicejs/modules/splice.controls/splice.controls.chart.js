@@ -9,8 +9,7 @@ definition:function(){
 
 Chart.defaults.global.responsive = true;
 
-var Dial = _.Namespace('SpliceJS.Controls').Class(
-function Dial(){
+var Dial = _.Namespace('SpliceJS.Controls').Class(function Dial(){
 	
     this.dom = this.canvas = this.elements.controlContainer;
 	var canvas = this.canvas;

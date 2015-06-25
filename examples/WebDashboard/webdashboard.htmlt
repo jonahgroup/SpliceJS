@@ -1,7 +1,6 @@
-<!-- @template:{type:'UserApplications.WebDashboard'} -->
+<sjs-template type="UserApplications.WebDashboard">
 <div class="-web-dashboard" data-sjs-element="controlContainer">
-
-	<!-- @include:{
+	<sjs-include>{
 		type:'SpliceJS.Controls.GridLayout',
 		grid:{rows:4, columns:3},
 		cells:[
@@ -9,19 +8,19 @@
 			{	
 				//top half report
 				col:0, row:0, colspan:2, rowspan:2, 
-			 	content: _.Obj({
+			 	content: <sjs-include>{
 			 		type:'Report',
 					content:{
 						reportname:'Daily Unique Visitors Report',
 						reportdate: (new Date()).toString(),
-						body:_.Obj({
+						body:<sjs-include>{
 							type:'SpliceJS.Controls.Chart',
 							style:'-report-chart',
 							chartType:'Line',
 							dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')
-						})
+						}</sjs-include>
 					}	
-				})	
+				}</sjs-include>	
 			
 			}
 
@@ -30,40 +29,37 @@
 			{
 				//bottom half report
 				col:0, row:2, colspan:1, rowspan:2, 
-				content: _.Obj({type:'Report',
+				content: <sjs-include>{type:'Report',
 					content:{
 						reportname:'Referring Domains Report',
 						reportdate: (new Date()).toString(),
-						body:_.Obj({
+						body:<sjs-include>{
 							type:'SpliceJS.Controls.Chart',
 							style:'-report-chart',
 							chartType:'Bar',
-							dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')						
-						})
+							dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')			
+						}</sjs-include>
 					}
-				})
+				}</sjs-include>
 			}
-
-
 
 			,
 
 			{
 				//bottom half report
 				col:1, row:2, colspan:1, rowspan:2, 
-				content: _.Obj({type:'Report',
+				content: <sjs-include>{type:'Report',
 					content:{
 						reportname:'Some Other Report',
 						reportdate: (new Date()).toString(),
-						body:_.Obj({
+						body:<sjs-include>{
 							type:'SpliceJS.Controls.Chart',
 							style:'-report-chart',
 							chartType:'Line',
-							dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')						
-								
-						})
+							dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')
+						}</sjs-include>
 					}
-				})
+				}</sjs-include>
 			}
 
 
@@ -72,45 +68,46 @@
 			{
 				//right most report
 				col:2, row:0, colspan:1, rowspan:4,
-				content: _.Obj({type:'Report',
+				content: <sjs-include>{type:'Report',
 					content:{
 						reportname:'Daily Unique Visitors Report',
 						reportdate: (new Date()).toString(),
-						body:_.Obj({
+						body:<sjs-include>{
 							type:'SpliceJS.Controls.DataTable',
 							style:'-data-table',
 							dataIn:_.Binding.To('uniqueVisitors').Type('UserApplications.WebDashboard')
-						})
+						}</sjs-include>
 					}
-				})
+				}</sjs-include>
 			}
 
 		]
-	} -->	
+	}</sjs-include>	
 </div>
+</sjs-template>
 
-
-<!-- @template:{type:'Report'} -->
-<div class="-report">
-	<div class="-report-head"><div style="padding:0.5em">
-		<div class="report-name"><b>@reportname</b></div>
-		<div class="report-date">@reportdate</div>
+<sjs-template type="Report">
+	<div class="-report">
+		<div class="-report-head"><div style="padding:0.5em">
+			<div class="report-name"><b>@reportname</b></div>
+			<div class="report-date">@reportdate</div>
+			</div>
 		</div>
+		
+		<div class="-report-body" data-sjs-element="reportBody">@body</div>
 	</div>
-	
-	<div class="-report-body" data-sjs-element="reportBody">@body</div>
-</div>
+</sjs-template>
 
-
-<!-- @template:{type:'BarGraph', tie:'SpliceJS.Controls.UIControl'} -->
-<span>
-	<!-- @include:{
+<sjs-template type="BarGraph" tie="SpliceJS.Controls.UIControl">
+	<span>
+		<sjs-include>{
 			type:'SpliceJS.Controls.Chart',
 			style:'-report-chart',
 			chartType:'Bar',
 			dataIn:_.Binding.To('uniqueVisitorsChart').Type('UserApplications.WebDashboard')
-	} -->
-</span>
+		}</sjs-include>
+	</span>
+</sjs-template>
 
 
 
