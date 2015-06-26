@@ -235,7 +235,11 @@ definition:function(){
 		/* measure column sizes */
 		var body = this.elements.dataTable.tHead;
 		var head = this.elements.columnHeaderTable.tHead;
-		
+		var wrapper = this.ref.scrollPanel.ref.tableBody.elements.tableWrapper;
+
+		if(body.clientWidth < wrapper.clientWidth)
+			body.style.width = wrapper.clientWidth;
+
 		this.ref.scrollPanel.reflow();
 		if(!body || !head) return;
 		
