@@ -1,0 +1,3 @@
+<sjs-template type="SpliceJS.Controls.CodeEditor">
+	<div sjs-data-element="controlContainer"></div>
+</sjs-template>

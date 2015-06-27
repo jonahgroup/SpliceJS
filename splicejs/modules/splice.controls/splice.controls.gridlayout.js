@@ -56,7 +56,11 @@ definition:function(){
 	
 
 
-
+	/* 
+	*	
+	*	Cell container class 
+	*
+	*/
 	var CellContainer = scope.CellContainer = _.Class(function CellContainer(){
 		SpliceJS.Controls.UIControl.call(this);
 	}).extend(SpliceJS.Controls.UIControl);
@@ -68,14 +72,11 @@ definition:function(){
 
 
 
-
-
-
-
-
-
-
-
+	/* 
+	*	
+	*	Grid Layout implementation
+	*
+	*/
 	var GridLayout = _.Namespace('SpliceJS.Controls').Class(function GridLayout(){
 
 		SpliceJS.Controls.UIControl.call(this);

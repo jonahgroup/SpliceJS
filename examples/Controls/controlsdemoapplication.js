@@ -66,7 +66,7 @@ definition:function(){
 	ControlsDemoApplication.prototype.onFlipViews  = _.Event; 	
 
 	ControlsDemoApplication.prototype.buttonClicked = function(){
-		_.debug.log('Button clicked');
+		_.debug.log('Button clicked HAHA');
 	}
 
 

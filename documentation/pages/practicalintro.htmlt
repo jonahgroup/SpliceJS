@@ -1,0 +1,25 @@
+<sjs-template type="SpliceJS.Documentation.PracticalIntro">
+
+<h1>Practical Intro</h1>
+<p>
+Oh no, not another JS framework! <br>
+SpliceJS is a component oriented application development utility (aka. framework) driven by the phylosophy that every application build with SpliceJS is a component itself and can be reused within other components/applications. 
+This document describes motivation behind framework features and how they address shortfalls of the conventional front-end application programming model.
+</p>
+
+
+	index.htmlt
+	<sjs-include>{
+		type:SpliceJS.Control.CodeEditor,
+		file:'code/helloworld/index.html'
+	}</sjs-include>
+
+
+	helloworld.htmlt
+	<sjs-include>{
+		type:SpliceJS.Control.CodeEditor,
+		file:'code/helloworld/helloworld.htmlt'
+	}</sjs-include>
+
+
+</sjs-template>

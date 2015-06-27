@@ -26,8 +26,7 @@ definition:function(){
 		this.dataRows = [];
 		this.headerRow = null;
 
-
-
+		_.Event.create(window, 'onresize').subscribe(function(){self.reflow();});
 		
 	}).extend(SpliceJS.Controls.UIControl);
 	
@@ -237,8 +236,11 @@ definition:function(){
 		var head = this.elements.columnHeaderTable.tHead;
 		var wrapper = this.ref.scrollPanel.ref.tableBody.elements.tableWrapper;
 
+
+		if(!body) return; //empty table no records were added
+
 		if(body.clientWidth < wrapper.clientWidth)
-			body.style.width = wrapper.clientWidth;
+			this.elements.dataTable.style.width = wrapper.clientWidth + 'px';
 
 		this.ref.scrollPanel.reflow();
 		if(!body || !head) return;

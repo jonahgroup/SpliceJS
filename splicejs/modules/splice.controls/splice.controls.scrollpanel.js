@@ -41,6 +41,10 @@ definition:function(){
 	}).extend(SpliceJS.Controls.UIControl);
 	
 
+	ScrollPanel.prototype.onDisplay = function(){
+		this.reflow();
+	};
+
 
 	ScrollPanel.prototype.onTouchStart = function(e){
 		this.touchStart = {x:e.touches[0].pageX, y:e.touches[0].pageY};

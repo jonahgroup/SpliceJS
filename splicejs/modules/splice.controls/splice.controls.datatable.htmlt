@@ -28,3 +28,4 @@
 		<table class="-splicejs-datatable" data-sjs-element="dataTable"></table>
 	</div>
 </sjs-template>
+

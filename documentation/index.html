@@ -1,13 +1,30 @@
+<!DOCTYPE html>
+<html>
 
-<h1>API</h1>
+<head>
+<script src="splice.config.js"></script>
+<script src="../splicejs/splice.js"></script>
 
-<h1>Example Applications</h1>
+<script>
+
+_.run = function(){
+_.include(_.home(['modules/splice.typextension.js',
+		          'modules/splice.animation.js',
+		          'modules/splice.document.js',
+		          'modules/splice.network.js',
+		          'modules/splice.modular.js',
+		          'modules/splice.data.js',
+		          'modules/splice.controls.js'
+		           ]), function(){
+			
+			_.include(['pages/toc.htmlt'], function(){
+				_.Doc.display(new SpliceJS.Documentation.TableOfContent());
+			});	
+			
+		});};
 
 
-<h2>Loader</h2>
+</script>
 
-
-<h3>Methods</h3>
-<table>
-	<tr><td></td></tr>
-</table>
+</head>
+</html>

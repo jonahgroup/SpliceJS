@@ -12,7 +12,8 @@ required:[
 	'splice.controls/splice.controls.drawerpanel.js',
 	'splice.controls/splice.controls.viewpanel.js',
 	'splice.controls/splice.controls.map.js',
-	'splice.controls/splice.controls.gridlayout.js'
+	'splice.controls/splice.controls.gridlayout.js',
+	'splice.controls/splice.controls.codeeditor.js'
 ], 	
          	
 definition:function(){

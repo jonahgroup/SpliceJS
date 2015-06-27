@@ -367,11 +367,9 @@ var _ = sjs = (function(window, document){
 			for(var i=0; i < callbacks.length; i++) {
 				callbacks[i].apply(instances[i],arguments);
 			}
-
 		}
 
 		MulticastEvent.SPLICE_JS_EVENT = true; 
-
 
 		/* 
 			"This" keyword migrates between assigments
@@ -385,18 +383,20 @@ var _ = sjs = (function(window, document){
 
 			callbacks.push(callback);
 			instances.push(instance);
-			
 		}
 
-		if(object && property ){
-			var val = object[property];
-			
-			if(typeof val ===  'function') {
-				MulticastEvent.subscribe(val, object);		
-			}
-			
-			object[property] = MulticastEvent;
+		if(!object || !property) return MulticastEvent;
+
+		/* handle object and property arguments */
+		var val = object[property];
+
+		if(val && val.SPLICE_JS_EVENT) return val;
+
+		if(typeof val ===  'function') {
+			MulticastEvent.subscribe(val, object);		
 		}
+		object[property] = MulticastEvent;
+		
 		
 		return MulticastEvent;
 	}

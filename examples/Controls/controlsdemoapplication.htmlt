@@ -1,3 +1,9 @@
+
+<sjs-template type="MyButton" controller="SpliceJS.Controls.Button">
+	<button class="btn" data-sjs-element="controlContainer">@label</button>
+</sjs-template>
+
+
 <sjs-template type="UserApplications.ControlsDemoApplication">
 <div>
 <table>
@@ -6,10 +12,18 @@
 	<td>
 	<sjs-include>{
 		type:'SpliceJS.Controls.Button',
-		content:{value:'Button'},
+		content:{label:'Sample Button'},
 		onClick: _.Binding('buttonClicked').Parent
 	}
 	</sjs-include>
+
+
+	<sjs-include>{
+		type:'MyButton',
+		content:{label:'test'},
+		onClick: _.Binding('buttonClicked').Parent
+	}</sjs-include>
+
 	</td>
 </tr>
 
@@ -132,7 +146,13 @@
 	<sjs-include> {
 		type: 	'SpliceJS.Controls.DrawerPanel',
 		content: {
-			body:	<sjs-include>{type:'SampleContent'}</sjs-include>,
+			body: <sjs-include>{
+				type:'SpliceJS.Controls.ScrollPanel',
+				content:{
+					scrollContent:<sjs-include>{type:'SampleContent'}</sjs-include>,
+					staticContent:''
+				}
+			}</sjs-include>,
 			drawer: <sjs-include>{type:'LocalList'}</sjs-include>
 		},
 		dataIn:	_.Binding('onSampleData').Parent
@@ -298,4 +318,12 @@
 	Etiam aliquet mi in velit porttitor, quis sagittis erat gravida. Etiam vitae scelerisque mauris, vel condimentum risus. Nunc tincidunt, sapien vitae dapibus iaculis, sapien diam egestas libero, non suscipit dolor erat sed libero. Nam finibus libero auctor, eleifend nibh nec, eleifend libero. Suspendisse vitae convallis arcu. Praesent a nunc elementum, placerat eros vel, lacinia risus. Suspendisse lorem ligula, suscipit id mi eget, iaculis tempor est. Nulla eu justo turpis. Vivamus commodo at purus at vulputate. Sed lacinia elit dolor, eu porta dolor vulputate et. Pellentesque id felis sagittis, laoreet nisi nec, pharetra tellus. Mauris fermentum at nisl eget egestas. Mauris vel lacinia nibh. Nunc porttitor ipsum eros, vel ornare lorem hendrerit vel. Vestibulum a metus feugiat, viverra purus eu, congue arcu. Curabitur eget venenatis mauris.
 	</p>
 	</div>
+</sjs-template>
+
+
+<sjs-template type="UserApplications.CrazyApp" tie="SpliceJS.Controls.UIControl">
+	<table><tr>
+		<td><sjs-include>{type:'UserApplications.ControlsDemoApplication'}</sjs-include></td>
+		<td><sjs-include>{type:'UserApplications.ControlsDemoApplication'}</sjs-include></td>
+	</tr></table>
 </sjs-template>
