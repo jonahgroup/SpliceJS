@@ -6,7 +6,7 @@ required:[
 		   'controlsdemoapplication.htmlt'
 ],
 
-definition:function(){
+definition: function(){
 
 
 	var sampleChartData = {
@@ -31,7 +31,7 @@ definition:function(){
     styling: [
 
     ]
-};
+	};
 
 	var sampleTableData = {
 			headers: sampleChartData.labels,

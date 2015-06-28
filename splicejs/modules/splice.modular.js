@@ -80,7 +80,17 @@ _.Module = (function(document){
 				if(key == 'type' || key == 'tie') continue; /* skip type */
 				parameters[key] = args[key];
 			}
-			if(proxyArgs && proxyArgs.parent) parameters['parent'] = proxyArgs.parent; 
+
+			/* override proxy arguments */
+			if(proxyArgs){
+				var keys = Object.keys(proxyArgs);
+				for(var i=0; i<keys.length; i++){
+					var key = keys[i];
+					//parameters['parent'] = proxyArgs.parent; 
+					parameters[key] = proxyArgs[key]; 
+				}
+				
+			} 
 			
 			
 			/* create new component*/
@@ -106,22 +116,19 @@ _.Module = (function(document){
 	
 	var Concrete = _.Namespace('SpliceJS.Modular').Class(function Concrete(dom){
 		
-		/* function call */
-		if(!(this instanceof Concrete)) {
-
-			return {
-				compose: Concrete.prototype.compose.bind(dom)
-			}
-		}
-
-
 		this.dom = dom;
+
+
+		if(!this.concrete) return;
+		
+		var self = this;
+		this.concrete.dom.onclick = function(){
+			self.onClick(self);
+		}
 	});
 	
+	Concrete.prototype.onClick = _.Event;
 
-	Concrete.prototype.compose = function(){
-
-	};
 
 	Concrete.prototype.export = function(){
 		return this.dom;
@@ -946,7 +953,7 @@ _.Module = (function(document){
 	};
 	
 
-	function ConvertToProxyJson(dom){
+	function convertToProxyJson(dom, tagName){
 		
 		var scope = this;
 
@@ -1005,11 +1012,20 @@ _.Module = (function(document){
 			var element = elements[i];
 			if(element.tagName === 'SJS-INCLUDE'){
 				//create new template and repeat parsing
-				var text = '_.Obj.call(scope,'+ConvertToProxyJson(element)+')';
+				var text = '_.Obj.call(scope,'+convertToProxyJson(element)+')';
 				element.parentNode.replaceChild(document.createTextNode(text),element);
 			}
 		}
-		return dom.innerHTML;
+
+		var json = dom.innerHTML;
+
+		//append implied type for sjs-element
+		if(tagName == 'SJS-ELEMENT'){
+			var ind = json.indexOf('{');
+			json = '{ type:\'SpliceJS.Controls.UIElement\',' + json.substring(ind+1);
+		}
+
+		return json;
 	};
 
 	function ResolveCustomElements(template){
@@ -1021,10 +1037,10 @@ _.Module = (function(document){
 
 		var nodes = _.Doc.selectNodes({childNodes:template.dom.childNodes},
 				function(node){
-					if(node.tagName == 'SJS-INCLUDE') return node;
+					if(node.tagName == 'SJS-INCLUDE' || node.tagName == 'SJS-ELEMENT') return node;
 				},
 				function(node){
-					if(node.tagName == 'SJS-INCLUDE') return [];
+					if(node.tagName == 'SJS-INCLUDE' || node.tagName == 'SJS-ELEMENT') return [];
 					return node.childNodes;	
 				}
 			);
@@ -1037,7 +1053,7 @@ _.Module = (function(document){
 			var parent = node.parentNode;
 
 			
-				var json = ConvertToProxyJson.call(scope,node);
+				var json = convertToProxyJson.call(scope,node, node.tagName);
 			
 
 				var result = null; 

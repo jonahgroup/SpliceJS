@@ -6,6 +6,16 @@ definition:function(){
 	"use strict"; 
 	
 
+	var UIElement = _.Namespace('SpliceJS.Controls').Class(function UIElement(args){
+
+		var concrete = new args.html(args);
+
+		this.concrete = concrete.concrete;
+
+	});
+
+
+
 	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(args){
 		if(this.isHidden) {
 			this.prevDisplayState = this.elements.controlContainer.style.display; 

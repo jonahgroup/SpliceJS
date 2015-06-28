@@ -8,18 +8,22 @@ This document describes motivation behind framework features and how they addres
 </p>
 
 
-	index.htmlt
+index.htmlt
+	
 	<sjs-include>{
-		type:SpliceJS.Control.CodeEditor,
-		file:'code/helloworld/index.html'
+		type:'SpliceJS.Controls.CodeEditor',
+		file:'code/helloworld/index.html',
+		lineNumbers:true
 	}</sjs-include>
-
-
-	helloworld.htmlt
+	
+helloworld.htmlt
 	<sjs-include>{
-		type:SpliceJS.Control.CodeEditor,
+		type:'SpliceJS.Controls.CodeEditor',
 		file:'code/helloworld/helloworld.htmlt'
 	}</sjs-include>
+
+
+
 
 
 </sjs-template>

@@ -1,11 +1,19 @@
 <sjs-template type="SpliceJS.Documentation.TableOfContent">
 
-<sjs-element>{
-	html:<h1>Practical Intro</h1>,
-	onclick:_.Binding('onLinkClick').Parent
-}</sjs-element>
+<ul>
+<li>
+	<h1><sjs-element>{
+		html:<a>Practical Intro (aka. Getting Started)</a>,
+		linkname:'PracticalIntro',
+		onClick:_.Binding('onLinkClick').Parent
+	}</sjs-element></h1>
+	<ul><li>Required Downloads</li>
+		<li>Setting-up Project</li>
+	</ul>
+</li>
 
 
+</ul>
 
 <h1>Core Concepts</h1>
 

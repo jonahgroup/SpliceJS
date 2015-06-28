@@ -1,0 +1,21 @@
+.-sjs-code-editor {
+	font-family:Courier;
+	font-size:1em;
+	background-color: #222222;
+	color:#c3c3c3;
+	padding-top:1em;
+	padding-bottom:1em;
+}
+
+
+.-sjs-code-editor .line:hover {
+	background-color:#373737;
+}
+
+.-sjs-code-editor .linenumber {
+	display: inline;
+  	width:4em;
+  	padding-right:2em;
+  	padding-left: 1em;
+  	color:#B7BA4B;
+  }
