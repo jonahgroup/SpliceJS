@@ -6,12 +6,13 @@
 <script src="../splicejs/splice.js"></script>
 
 <script>
-
-_.run = function(){
-	_.include(['pages/splice.documentation.js'], function(){
-				_.Doc.display(new SpliceJS.Documentation.TableOfContent());
-			});	
+	_.boot([
+		'helloworld.htmlt'
+	]);
 </script>
 
 </head>
+<body>
+	<sjs-include>{type:'MyApplications.HelloWorld'}</sjs-include>
+<body>
 </html>

@@ -31,6 +31,7 @@ SOFTWARE.
 var _ = sjs = (function(window, document){
 	"use strict";
 
+
 	var configuration = {
 		APPLICATION_HOME: 				getPath(window.location.href).path, 
 		PUBLIC_ROOT:         			window.SPLICE_PUBLIC_ROOT,
@@ -42,14 +43,35 @@ var _ = sjs = (function(window, document){
 	};
 
 
-	/* Cache loading indicator 
-	 * */
+	/*
+	  	Bootloading files
+	*/
+	var BOOT_SOURCE = [];
+
+
+	/*
+		Core object released into global space
+	*/
+	var core = {};
+
+
+	/* 
+	 	Cache loading indicator 
+	*/
 	new Image().src = ( configuration.PUBLIC_ROOT || '') + '/resources/images/bootloading.gif';
 
 	
 	if(!window.console) { 
 		window.console = {log:function(){}}; 
 	}
+
+/*
+	
+	Utility Functions
+
+*/
+
+
 
 	/*
 	 * No support for bind
@@ -153,12 +175,12 @@ var _ = sjs = (function(window, document){
 			separator = '/';
 		}
 		return cpath;
-	}
+	};
 
 
 	function absPath(path){
 		return collapsePath(configuration.APPLICATION_HOME+'/'+path);
-	}
+	};
 
 
 	function getPath(path){
@@ -169,46 +191,115 @@ var _ = sjs = (function(window, document){
 			path:path.substring(0,index),
 			name:path.substring(index+1)
 		}
-	}
+	};
+	
+
+	/*
+	 * Returns function's name
+	 * First tries function.name property
+	 * Next name is parsed from the function.prototype.toString output
+	 * */
+	function getFunctionName(foo){
+		if(foo.name) return foo.name;
+		
+		if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
+		
+		var regex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
+		var functionString = foo.toString();
+		var match = regex.exec(functionString);
+		
+		if(!match)  throw 'Unable to obtain function name';
+		return match[1];
+	};
+
+
+
+/*
+
+	Templating Engine
+	Implementation
+
+*/
 	
 
 
 
-	/*
-	 * Core Object
-	 * */
-	function Splice(){
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+	SliceJS Core
+	Implementation
+
+*/
+
+
+
+
+
 		
-		this.configuration = configuration;
+		core.configuration = configuration;
 
 		/*
 		 * loader initializers
 		 * */
-		this.PUBLIC_ROOT = window.SPLICE_PUBLIC_ROOT || '';
+		core.PUBLIC_ROOT = window.SPLICE_PUBLIC_ROOT ? window.SPLICE_PUBLIC_ROOT : '';
 		
-		window.onload = (function(){
-			if(typeof(this.run) === 'function') this.run();
-		}).bind(this);
-	};
+		window.onload = function(){
+			
+			if(BOOT_SOURCE.length > 1) {
+				core.include(BOOT_SOURCE, function(){
+					if(typeof(core.run) === 'function') core.run();	
+				})
+			}
+			else {
+				if(typeof(core.run) === 'function') core.run();
+			}
+
+		};
+
 	
 	
 	/**
 	 * Debug and info log harness
 	 * */
-	Splice.prototype.debug  = {log:function(){}};
-	Splice.prototype.info = console;
+	core.debug  = {log:function(){}};
+	core.info = console;
 	
-	Splice.prototype.debugDisable = function(){
-		Splice.prototype.debug = {log:function(){}};
+	core.debugDisable = function(){
+		core.debug = {log:function(){}};
 	};	
 	
-	Splice.prototype.debugEnable = function(){
-		Splice.prototype.debug = console;
+	core.debugEnable = function(){
+		core.debug = console;
 	};
 	
 
 
-	Splice.prototype.home = function(obj,path){
+	core.boot = function(args){
+
+		if(!args) return null;
+		if(!(args instanceof Array) ) return null;
+		
+		for(var i=0; i< args.length; i++){
+			BOOT_SOURCE.push(args[i]);
+		}
+
+		return core.boot;
+	}
+
+
+
+	core.home = function(obj,path){
 
 
 		if(!path) var path = window.SPLICE_PUBLIC_ROOT;
@@ -222,7 +313,7 @@ var _ = sjs = (function(window, document){
 
 		if(obj instanceof Array){
 			for(var i=0; i < obj.length; i++){
-				obj[i] = Splice.prototype.home(obj[i],path);
+				obj[i] = core.home(obj[i],path);
 			}
 			return obj;
 		}
@@ -231,11 +322,11 @@ var _ = sjs = (function(window, document){
 
 
 
-	Splice.prototype.absPath = absPath;
-	Splice.prototype.getPath = getPath;
+	core.absPath = absPath;
+	core.getPath = getPath;
 	
 	if(window.performance && window.performance.now)
-	Splice.prototype.performance = {
+	core.performance = {
 			now:function(){
 				return window.performance.now();
 			}
@@ -243,7 +334,7 @@ var _ = sjs = (function(window, document){
 	
 	
 	if(!window.performance || !window.performance.now)
-		Splice.prototype.performance = {
+		core.performance = {
 			now:function(){
 				return (new Date()).getTime();
 			}
@@ -325,14 +416,14 @@ var _ = sjs = (function(window, document){
 	};
 	
 
-	Splice.prototype.text = function(text){
+	core.text = function(text){
 		return new Text(text);
 	};
 
 
 
 	
-	Splice.prototype.splitQualifiedName = function(name){
+	core.splitQualifiedName = function(name){
 		
 		if(!name) return null;
 		var parts = name.split('.');
@@ -401,7 +492,7 @@ var _ = sjs = (function(window, document){
 		return MulticastEvent;
 	}
 
-	Splice.prototype.Event = Event;
+	core.Event = Event;
 
 
 	var NAMESPACE_INDEX = [];
@@ -417,7 +508,7 @@ var _ = sjs = (function(window, document){
 			
 			Class: function(constructor){
 				var idx = (this._path + '.' + getFunctionName(constructor)).toUpperCase(); 
-				return Splice.prototype.Class.call({namespace:this,idx:idx},constructor);
+				return core.Class.call({namespace:this,idx:idx},constructor);
 			},
 			
 			add:function(name, object){
@@ -466,7 +557,7 @@ var _ = sjs = (function(window, document){
 				fn(this,namespaces, '','');
 				
 				for(var i=0; i< namespaces.length; i++){
-					Splice.prototype.info.log(namespaces[i]);
+					core.info.log(namespaces[i]);
 				}
 				
 			}
@@ -478,7 +569,7 @@ var _ = sjs = (function(window, document){
 	 * Public Namespace interface
 	 * returns Namespace or a namespace proxy object
 	 * */
-	Splice.prototype.Namespace = function(namespace) {
+	core.Namespace = function(namespace) {
 		var ns = getNamespace(namespace,false, false);
 		
 		if(ns && !(ns instanceof Namespace)) 
@@ -493,7 +584,7 @@ var _ = sjs = (function(window, document){
 					
 					var idx = (namespace + '.' + getFunctionName(constructor)).toUpperCase(); 
 					var newNamespace = getNamespace(namespace,true);
-					return Splice.prototype.Class.call({namespace:newNamespace, idx:idx}, constructor);
+					return core.Class.call({namespace:newNamespace, idx:idx}, constructor);
 
 				},
 
@@ -512,7 +603,7 @@ var _ = sjs = (function(window, document){
 		return ns;
 	};
 	
-	Splice.prototype.Namespace.list = function(){
+	core.Namespace.list = function(){
 		/* 
 		 * get owened properties on the global window object 
 		 * */
@@ -528,28 +619,28 @@ var _ = sjs = (function(window, document){
 		}
 	};
 	
-	Splice.prototype.Namespace.listIndex = function(){
+	core.Namespace.listIndex = function(){
 		for(var key in NAMESPACE_INDEX){
 			if(NAMESPACE_INDEX.hasOwnProperty(key))
-				Splice.prototype.debug.log(key);
+				core.debug.log(key);
 		}
 	};
 
-	Splice.prototype.Namespace.lookup = function(qualifiedName){
-		Splice.prototype.debug.log('searching ' + qualifiedName);
+	core.Namespace.lookup = function(qualifiedName){
+		core.debug.log('searching ' + qualifiedName);
 		return getNamespace(qualifiedName,false, true);
 	};
 
-	Splice.prototype.Namespace.lookupIndex = function(qualifiedName){
+	core.Namespace.lookupIndex = function(qualifiedName){
 		var idx = qualifiedName.toUpperCase();
 
 		return NAMESPACE_INDEX[idx];
-	}
+	};
 		
 	/**
 	 * pseudo class wrapper
 	 * */
-	Splice.prototype.Class = function Class(constructor){
+	core.Class = function Class(constructor){
 		
 		if(!constructor) throw 'constructor function may not be empty';
 		if(typeof(constructor) !== 'function' ) throw 'Constructor must be a function';
@@ -691,12 +782,12 @@ var _ = sjs = (function(window, document){
 			filename._endswith(".js")  || 
 			filename._endswith(".htmlt") )
 		if(_url_cache[filename] === true){
-			Splice.prototype.debug.log('File ' + filename + ' is already loaded, skipping...');
+			core.debug.log('File ' + filename + ' is already loaded, skipping...');
 			loader.progress--; loader.loadNext(watcher);
 			return;
 		}
 		
-		Splice.prototype.debug.log('Loading: ' + filename);
+		core.debug.log('Loading: ' + filename);
 		
 		var head = document.getElementsByTagName('head')[0];
 		
@@ -793,7 +884,7 @@ var _ = sjs = (function(window, document){
 		return null;
 	};
 	
-	Splice.prototype.dumpUrlCache = function (){ 
+	core.dumpUrlCache = function (){ 
 		var cache = [];
 		for(var key in _url_cache){
 			if( _url_cache.hasOwnProperty(key)) {
@@ -804,7 +895,7 @@ var _ = sjs = (function(window, document){
 		return cache;
 	};
 	
-	Splice.prototype.include = function(resources, oncomplete, onitemloaded){
+	core.include = function(resources, oncomplete, onitemloaded){
 		
 		/*
 		 * Initial bootstrap
@@ -824,7 +915,7 @@ var _ = sjs = (function(window, document){
 		/*
 		 * Always perform nested loading
 		 * */
-		Splice.prototype.debug.log('Nested loading...');
+		core.debug.log('Nested loading...');
 		var loader = new Loader(resources, (function(){
 			Loader.loaders.pop();
 			if(typeof(oncomplete)  === 'function') oncomplete();
@@ -845,7 +936,7 @@ var _ = sjs = (function(window, document){
 
 	
 	
-	Splice.prototype.notifyCurrentlyLoading = function(current){
+	core.notifyCurrentlyLoading = function(current){
 		this.currentlyLoading = current;
 		if(!progressLabel) return;
 
@@ -858,32 +949,13 @@ var _ = sjs = (function(window, document){
 	};
 	
 	
-	Splice.prototype.load = function(moduleUrls, oncomplete){
+	core.load = function(moduleUrls, oncomplete){
 		this.include(moduleUrls, oncomplete);
 	};
 	
+
 	
-	
-	
-	/*
-	 * Returns function's name
-	 * First tries function.name property
-	 * Next name is parsed from the function.prototype.toString output
-	 * */
-	function getFunctionName(foo){
-		if(foo.name) return foo.name;
-		
-		if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
-		
-		var regex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
-		var functionString = foo.toString();
-		var match = regex.exec(functionString);
-		
-		if(!match)  throw 'Unable to obtain function name';
-		return match[1];
-	}
-	
-	Splice.prototype.getFunctionName = getFunctionName;
+	core.getFunctionName = getFunctionName;
 	
 	/*	
 	 * 
@@ -938,7 +1010,7 @@ var _ = sjs = (function(window, document){
 		return ns;
 	};
 	
-	return new Splice();
+	return core;
 })(window,document);
 
 
