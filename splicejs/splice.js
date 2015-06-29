@@ -65,12 +65,15 @@ var _ = sjs = (function(window, document){
 		window.console = {log:function(){}}; 
 	}
 
+
+
 /*
 	
+----------------------------------------------------------
+
 	Utility Functions
 
 */
-
 
 
 	/*
@@ -213,22 +216,429 @@ var _ = sjs = (function(window, document){
 	};
 
 
+	/* make this more efficient */
+	function endsWith(text, pattern){
+		var matcher = new RegExp("^.+"+pattern.replace(/[.]/,"\\$&")+'$');
+		var result = matcher.test(text); 
+		return result;
+	}
+
+
 
 /*
+	
+----------------------------------------------------------
+	
+	SpliceJS Event Model
+
+*/
+	
+	var Event = function Event(){};
+
+
+	Event.create = function(object, property){
+
+
+		var callbacks = [], instances = [];
+
+		var MulticastEvent = function MulticastEvent(){
+
+			for(var i=0; i < callbacks.length; i++) {
+				callbacks[i].apply(instances[i],arguments);
+			}
+		}
+
+		MulticastEvent.SPLICE_JS_EVENT = true; 
+
+		/* 
+			"This" keyword migrates between assigments
+			important to preserve the original instance
+		*/
+		MulticastEvent.subscribe = function(callback, instance){
+			if(!callback) return;
+			if(typeof callback !== 'function') throw 'Event subscriber must be a function';
+
+			if(!instance) instance = this;
+
+			callbacks.push(callback);
+			instances.push(instance);
+		}
+
+		if(!object || !property) return MulticastEvent;
+
+		/* handle object and property arguments */
+		var val = object[property];
+
+		if(val && val.SPLICE_JS_EVENT) return val;
+
+		if(typeof val ===  'function') {
+			MulticastEvent.subscribe(val, object);		
+		}
+		object[property] = MulticastEvent;
+		
+		
+		return MulticastEvent;
+	}
+
+	core.Event = Event;
+
+
+
+/*
+
+----------------------------------------------------------
+	
+	Binding Model
+
+*/
+
+	
+	/* 
+	 * !!! Bidirectional bindings are not allowed 
+	 * */
+	var Binding = function Binding(propName,type,dir){
+		if(!(this instanceof Binding)) return {
+			Self:   		new Binding(propName,	Binding.SELF,   		Binding.Direction.AUTO),
+			Parent: 		new Binding(propName,	Binding.PARENT, 		Binding.Direction.AUTO),
+			FirstParent: 	new Binding(propName,	Binding.FIRST_PARENT, 	Binding.Direction.AUTO),
+			Root:			new Binding(propName,	Binding.ROOT, 			Binding.Direction.AUTO),
+			Type:			function(type){
+							var b = 
+							new Binding(propName, 	Binding.TYPE, 			Binding.Direction.AUTO); 
+							b.vartype = type;
+							return b;}
+		}
+		
+		this.prop = propName;
+		this.type = type;
+		this.direction = dir;
+		
+	};
+	
+	
+	Binding.Template = function(templateName){
+		return new Binding(templateName, Binding.TEMPLATE, Binding.Direction.FROM);
+	};
+	
+	Binding.From = function(propName){
+		return {
+			Self:   		new Binding(propName,	Binding.SELF,   Binding.Direction.FROM),
+			Parent: 		new Binding(propName,	Binding.PARENT, Binding.Direction.FROM),
+			FirstParent: 	new Binding(propName,	Binding.FIRST_PARENT, Binding.Direction.FROM),
+			Root:			new Binding(propName,	Binding.ROOT, Binding.Direction.FROM),
+			Type:			function(type){
+							var b = 
+							new Binding(propName, 	Binding.TYPE, Binding.Direction.FROM); 
+							b.vartype = type;
+							return b;}
+		}
+	};
+	
+	Binding.To = function(propName){
+		return {
+			Self:   		new Binding(propName, 	Binding.SELF,   Binding.Direction.TO),
+			Parent: 		new Binding(propName, 	Binding.PARENT, Binding.Direction.TO),
+			FirstParent: 	new Binding(propName, 	Binding.FIRST_PARENT, Binding.Direction.TO),
+			Root:			new Binding(propName, 	Binding.ROOT, 	Binding.Direction.TO),
+			Type:			function(type){
+							var b = 
+							new Binding(propName, 	Binding.TYPE, Binding.Direction.TO); 
+							b.vartype = type;
+							return b;}
+
+		}
+	};
+	
+	Binding.findValue = function(obj, path){
+		var nPath = path.split('.'),
+			result = obj;
+
+		if (!obj) return null;
+
+		for (var i = 0; i< nPath.length; i++){
+			
+			result = result[nPath[i]];
+
+			if (!result) return null;	
+		}
+
+		return result;
+	}
+
+
+	Binding.Value = function(obj){
+
+		
+
+		return {
+			set : function(value, path){
+
+				var nPath = path.split('.');
+					
+				for(var i=0; i< nPath.length-1; i++){
+					obj = obj[nPath[i]];
+				}
+
+				if(obj) {
+					obj[nPath[nPath.length-1]] = value;
+				}
+
+			},
+
+			get : function(path){
+
+				var nPath = path.split('.'),
+					result = obj;
+
+				if(nPath.length < 1) return null; 	
+
+				for (var i = 0; i< nPath.length; i++){
+			
+					result = result[nPath[i]];
+
+					if (!result) return null;	
+				}
+
+				return result;
+			},
+
+			instance:function(path){
+
+				var nPath = path.split('.'),
+					result = obj;
+
+				for (var i = 0; i< nPath.length-1; i++){
+			
+					result = result[nPath[i]];
+
+					if (!result) return null;	
+				}
+
+				return result;
+
+			},
+
+			path:function(path){
+				var nPath = path.split('.');
+				return nPath[nPath.length-1];
+			}
+		}
+
+	};
+
+
+
+
+
+/*
+
+----------------------------------------------------------
 
 	Templating Engine
 	Implementation
 
 */
 	
+	var Scope = function Scope(path){
+		this.path = path;
+		this.compindex = [];
+		this.itc = 0;
+	};
+
+	Scope.prototype.getNextTemplateName = function(){
+		return '__impTemplate' + (this.itc++);
+	};
+
+
+		/** 
+	 * 
+	 * @tie
+	 * 
+	 * @template
+	 * 
+	 * @module is a scope object where modules have been declared
+	 * used for resolving references to local-scoped templates
+	 * when invoked by parent, module points to the parent's context
+	 * 
+	 * */
+	function createComponent(tie, template, scope){
+		/*
+		 * Component function is assigned to the variable of the same name
+		 * "Component" because otherwise in IE8 instanceof operation on "this"
+		 * implicit object does not return true on this instanceof Component
+		 * IE8 seems to evaluare the operator against the name of the
+		 * function that created the object
+		 * */
+		var Component = function Component(args){
+			
+			if(!(this instanceof Component)) throw 'Component function must be invoked with [new] keyword';
+
+			
+			
+			var args = args || {};
+			
+			var obj = Object.create(tie.prototype);
+			obj.constructor = tie;
+			
+			obj.parent = args.parent;
+			obj.ref = {};
+			obj.elements = {};
+			obj.children = [];
+			
+			/* 
+			 * assign reference to a parent and 
+			 * append to children array
+			 * */
+			if(obj.parent) { 
+				obj.parent.ref 		= obj.parent.ref || [];
+				obj.parent.children = obj.parent.children || [];
+
+				if(args.ref) obj.parent.ref[args.ref] = obj;
+				obj.parent.children.push(obj);						
+			}
+			
+
+			/*
+				Auto-creating event casters
+				
+			*/
+			for(var key in  obj){
+				if(obj[key] == _.Event){
+					core.debug.log('Found event object');
+					obj[key] = core.Event.create();
+				}	
+			}	
 
 
 
+			/*
+			 * Bind declarative parameters
+			 *
+			 */
+			var tieInstance = obj; 
+			var parameters = args;
+			if(parameters) {
+				var keys = Object.keys(parameters);
+				for(var k=0; k< keys.length; k++) {
+				
+					var key = keys[k];
+
+					if(key === 'ref') 		continue;
+					if(key === 'content') 	continue; //content is processed separately
+					
+					if(parameters[key] instanceof _.Binding) {
+						var binding = parameters[key]; 
+						resolveBinding(binding, tieInstance, key, scope);
+						continue;
+					}
+				
+					/* default property assignment */
+					tieInstance[key] = parameters[key];
+				}
+			}
+
+			if(template)
+			obj.concrete = template.getInstance(obj, args, scope);
+			
+
+			tie.apply(obj, [args]);
+			return obj; 
+			
+		};
+		
+		if(tie) Component.base = tie.base;
+		
+		/* fill for extending classes */
+		Component.call = function(_this){
+			var args = [];
+			if(arguments.length > 1) {
+				for(var i=1; i<arguments.length; i++){
+					args[i] = arguments[i];
+				}
+			}
+			tie.apply(_this,args);
+		};
+
+		Component.isComponent = true;
+		Component.template = template;
+		Component.tie = tie;
+		Component.prototype = tie.prototype;
+		Component.constructor = tie;
+		return Component;
+	}; 
 
 
 
+	/**
+	 * Proxy Object factory
+	 * @type: data type of the object to be created
+	 * @parameters:	parameters to be passed to the object behind proxy
+	 * */
+	var Obj = function Obj(args){
+		/*
+		 * Scope object
+		 * */
+		var scope = this;
+		
+		var Proxy = function Proxy(proxyArgs){
+			if(!(this instanceof Proxy) ) throw 'Proxy object must be invoked with [new] keyword';
+		
+			/* create instance of the proxy object
+			 * local scope lookup takes priority
+			 */
+			var obj = scope.templates[args.type] || scope[args.type] || _.Namespace.lookup(args.type);
+			var tieOverride = null;
+
+			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
+			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
+			
+
+			/* locate tie, if override was specified */
+			if(args.tie) {
+				tieOverride = scope[args.tie] || _.Namespace.lookup(args.tie);
+				if(!tieOverride) throw 'Tie type cannot be found';
+			}
+
+			/* copy args*/
+			var parameters = {};
+			var keys = Object.keys(args);
+			for(var i = 0; i < keys.length; i++ ){
+				var key = keys[i];
+				if(key == 'type' || key == 'tie') continue; /* skip type */
+				parameters[key] = args[key];
+			}
+
+			/* override proxy arguments */
+			if(proxyArgs){
+				var keys = Object.keys(proxyArgs);
+				for(var i=0; i<keys.length; i++){
+					var key = keys[i];
+					//parameters['parent'] = proxyArgs.parent; 
+					parameters[key] = proxyArgs[key]; 
+				}
+				
+			} 
+			
+			
+			/* create new component*/
+			if(typeof tieOverride === 'function') {
+				obj = createComponent(tieOverride, obj.template, scope);
+			}
 
 
+			return new obj(parameters);	
+		}
+		
+		Proxy.type 			= args.type;
+		Proxy.ref 			= args.ref;
+		Proxy.parameters 	= args;
+		
+		return Proxy;
+		
+	};
+
+
+	core.Obj = Obj;
 
 
 
@@ -236,6 +646,8 @@ var _ = sjs = (function(window, document){
 
 
 /*
+
+----------------------------------------------------------
 
 	SliceJS Core
 	Implementation
@@ -243,29 +655,25 @@ var _ = sjs = (function(window, document){
 */
 
 
+	core.configuration = configuration;
 
-
-
+	/*
+	 * loader initializers
+	 * */
+	core.PUBLIC_ROOT = window.SPLICE_PUBLIC_ROOT ? window.SPLICE_PUBLIC_ROOT : '';
+	
+	window.onload = function(){
 		
-		core.configuration = configuration;
+		if(BOOT_SOURCE.length > 1) {
+			core.include(BOOT_SOURCE, function(){
+				if(typeof(core.run) === 'function') core.run();	
+			})
+		}
+		else {
+			if(typeof(core.run) === 'function') core.run();
+		}
 
-		/*
-		 * loader initializers
-		 * */
-		core.PUBLIC_ROOT = window.SPLICE_PUBLIC_ROOT ? window.SPLICE_PUBLIC_ROOT : '';
-		
-		window.onload = function(){
-			
-			if(BOOT_SOURCE.length > 1) {
-				core.include(BOOT_SOURCE, function(){
-					if(typeof(core.run) === 'function') core.run();	
-				})
-			}
-			else {
-				if(typeof(core.run) === 'function') core.run();
-			}
-
-		};
+	};
 
 	
 	
@@ -340,89 +748,6 @@ var _ = sjs = (function(window, document){
 			}
 	};
 	
-
-	/**
-	 * Text manupulation wrapper function	
-	 * @text parameter primitive type object String, Number	
-	 * @return object supporting text manipulation API
-	 */
-
-	var Text = function Text(text){
-		this.text = text;
-	}
-
-	Text.prototype = {
-	/**
- 	 * Removes string or a collection of string from the a text blob
-	 * @arguments: String, Array
-	 */
-		remword: function(){
-
-			if(arguments.length < 1) return this.text;
-			
-			var parts = this.text.split(/\s/);	
-
-			// process all supplied arguments			
-			for(var i=0; i<arguments.length; i++){
-				var arg = arguments[i];		
-
-				if(typeof arg === 'number' )
-					arg = arg.toString();
-
-				if(typeof arg === 'string' ) {
-					for(var pi=parts.length-1; pi>=0; pi-- ){
-						if(parts[pi] === arg) parts.splice(pi,1);
-					}
-				}
-			}
-			return this.join.call({text:parts});
-		},
-
-	/**
-	 *	Builds string by concatinating element of the array and separated
-	 *  by the delimiter. If delimiter is not provided, default delimiter is "space"
-	 */	
-		join: function(delimiter){
-			if(!delimiter) delimiter = ' ';
-		
-			var runningDelimiter = '';
-			var result = '';
-			for(var i=0; i< this.text.length; i++){
-				result = result + runningDelimiter + this.text[i];
-				runningDelimiter = delimiter;
-			}
-
-			return result;
-		},
-
-	/**
-	 *	Counts number of words in the string
-	 */	
-		wordcount:function(){
-			var parts = this.text.split(/\s/);
-			if(!parts) return 0;
-
-			return parts.length;
-		},
-
-
-	/**
-	 *	Counts number of words in the string
-	 */	
-		format:function(){
-
-		}	
-
-	};
-	
-
-	core.text = function(text){
-		return new Text(text);
-	};
-
-
-
-	
 	core.splitQualifiedName = function(name){
 		
 		if(!name) return null;
@@ -438,61 +763,7 @@ var _ = sjs = (function(window, document){
 		return {namespace:ns, name:parts[parts.length-1]};
 	}
 	
-	/*
-	
-		SpliceJS Event Model
 
-
-	*/
-	
-	var Event = function Event(){};
-
-
-	Event.create = function(object, property){
-
-
-		var callbacks = [], instances = [];
-
-		var MulticastEvent = function MulticastEvent(){
-
-			for(var i=0; i < callbacks.length; i++) {
-				callbacks[i].apply(instances[i],arguments);
-			}
-		}
-
-		MulticastEvent.SPLICE_JS_EVENT = true; 
-
-		/* 
-			"This" keyword migrates between assigments
-			important to preserve the original instance
-		*/
-		MulticastEvent.subscribe = function(callback, instance){
-			if(!callback) return;
-			if(typeof callback !== 'function') throw 'Event subscriber must be a function';
-
-			if(!instance) instance = this;
-
-			callbacks.push(callback);
-			instances.push(instance);
-		}
-
-		if(!object || !property) return MulticastEvent;
-
-		/* handle object and property arguments */
-		var val = object[property];
-
-		if(val && val.SPLICE_JS_EVENT) return val;
-
-		if(typeof val ===  'function') {
-			MulticastEvent.subscribe(val, object);		
-		}
-		object[property] = MulticastEvent;
-		
-		
-		return MulticastEvent;
-	}
-
-	core.Event = Event;
 
 
 	var NAMESPACE_INDEX = [];
@@ -697,12 +968,7 @@ var _ = sjs = (function(window, document){
 	
 	var _url_cache = new Array();	
 	
-	String.prototype._endswith = function(ending){
-		var matcher = new RegExp("^.+"+ending.replace(/[.]/,"\\$&")+'$');
-		var result = matcher.test(this); 
-		return result;
-	};
-
+	
 	
 	function Iterator(collection){
 		this.data = collection;
@@ -778,9 +1044,10 @@ var _ = sjs = (function(window, document){
 
 		/*
 		 * */
-		if(	filename._endswith(".css") || 
-			filename._endswith(".js")  || 
-			filename._endswith(".htmlt") )
+
+		if(	endsWith(filename, ".css") || 
+			endsWith(filename, ".js")  || 
+			endsWith(filename, ".htmlt") )
 		if(_url_cache[filename] === true){
 			core.debug.log('File ' + filename + ' is already loaded, skipping...');
 			loader.progress--; loader.loadNext(watcher);
@@ -807,7 +1074,7 @@ var _ = sjs = (function(window, document){
 		/*
 		 * Load CSS Files
 		 * */
-		if(filename._endswith(".css")){
+		if(endsWith(filename, ".css")){
 			var linkref = document.createElement('link');
 			
 			//tell Splice what is loading
@@ -838,7 +1105,7 @@ var _ = sjs = (function(window, document){
 		/*
 		 * Load javascript files
 		 * */
-		if(filename._endswith(".js")) {
+		if(endsWith(filename, ".js")) {
 			var script = document.createElement('script');
 			
 			//tell Splice what is loading
@@ -861,7 +1128,7 @@ var _ = sjs = (function(window, document){
 		/*
 		 * Load html templates
 		 * */
-		if(filename._endswith('.htmlt')){
+		if(endsWith(filename, '.htmlt')){
 			//tell Splice what is loading
 			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
 			_.HttpRequest.get({

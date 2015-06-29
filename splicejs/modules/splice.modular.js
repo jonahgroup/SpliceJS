@@ -238,41 +238,7 @@ _.Module = (function(document){
 	}
 	
 	
-	function buildComponents(dom,tieInstance,scope){
 
-		/* 	process nested elements 
-			element tag name are not not case sensetive
-		*/
-		var nested = _.Doc.selectUnknownElements(dom);
-
-		for(var i=0; nested!=null && i < nested.length; i++){
-
-			var node = nested[i];
-			var parent = node.parentNode;
-
-			var idx = node.tagName;
-			
-			var obj = _.Namespace.lookupIndex(idx);
-			if(!obj) continue;
-
-			var parameters = {type:idx};
-			for(var j=0; j < node.attributes.length; j++){
-				var attr = node.attributes[j];
-				parameters[attr.name] = attr.value;
-			}
-
-
-			/* process content */
-			var proxy = _.Obj.call(scope,parameters);
-
-
-			var c_instance = new proxy({parent:tieInstance});
-
-			parent.replaceChild((c_instance.concrete.dom || c_instance.dom), node);
-
-			_.debug.log(node.tagName);
-		}
-	}
 
 
 	/**
