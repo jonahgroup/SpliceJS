@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="splice.test.config.js"></script>
+<script src="../../splicejs/splice.js"></script>
+
+<script>
+	_.debugEnable();
+	
+	_.boot(_.home([	
+		
+		'modules/splice.typextension.js',
+		'modules/splice.animation.js',
+      	'modules/splice.document.js',
+      	'modules/splice.network.js',
+        'modules/splice.text.js',
+      	'modules/splice.modular.js',
+        'modules/splice.data.js',
+        'modules/splice.controls.js'
+
+    ]))(['cssparser.js']);
+
+    _.run = function(){
+
+    	new CSSParser('../ControlsAndBindings/controlsandbindings.css');
+
+    }
+			
+</script>
+</head>
+<body>
+	
+
+	<script>
+
+
+
+	</script>
+
+
+
+
+<body>
+</html>
