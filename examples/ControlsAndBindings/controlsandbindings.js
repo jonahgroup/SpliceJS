@@ -40,7 +40,7 @@ definition:function(){
 		
 	});
 	
-	
+	ControlsAndBindings.prototype.applyCSSRules = SpliceJS.Controls.UIControl.prototype.applyCSSRules;
 
 	ControlsAndBindings.prototype.onSearchValue = function(dataItem){
 		_.debug.log('Searching for: ' + dataItem.value);

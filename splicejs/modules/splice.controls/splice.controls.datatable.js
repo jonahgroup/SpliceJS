@@ -90,6 +90,7 @@ definition:function(){
 
 				
 		/* add new rows*/
+		var domModified = false;
 		for(var i=j; i<data.length; i++){
 			var r = data[i];
 			
@@ -102,14 +103,17 @@ definition:function(){
 				dataRow.dataIn(r);
 				if(! (dataRow.concrete instanceof SpliceJS.Modular.Concrete)) throw 'DataTable: rowTemplate type is invalid must be concrete';
 				this.addDomRow(dataRow.concrete.dom);
+				domModified = true;
 				continue;
 			}
 			
 
 			this.addBodyRow(createDefaultRow(r));
+			domModified = true;
 		}
 		
-		
+		if(domModified) this.restyle();
+
 		this.reflow();
 
 	};

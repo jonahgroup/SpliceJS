@@ -6,6 +6,8 @@ required:[
 		   'controlsdemoapplication.htmlt'
 ],
 
+cssIsLocal:true,
+
 definition: function(){
 
 
@@ -81,6 +83,8 @@ definition: function(){
 		this.onChartData(sampleChartData);
 
 		this.onSampleData(sampleTableData);
+
+		this.applyCSSRules();
 	};
 
 

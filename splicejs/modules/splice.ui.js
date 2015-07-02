@@ -125,7 +125,6 @@ definition:function(){
 
 	};
 
-
 	UIControl.prototype.reflowChildren = function(position, size,bubbleup){
 		/*reflow all the children*/
 		for(var i=0; i<this.children.length; i++){
@@ -133,10 +132,37 @@ definition:function(){
 
 			this.children[i].reflow(position,size,bubbleup);
 		}
-	}
+	};
 
+	UIControl.prototype.applyCSSRules = function(){
+		if(!this.scope.cssrules) return;
+		//if(this.scope.isCSSValid) return;
 
+		var scope = this.scope;
+		//apply local CSS rules :)
+		if(scope.cssrules && scope.cssrules.length > 0) {
 
+			var pseudo = this.concrete.dom.parentNode; 
+			if(!pseudo) {
+				pseudo = document.createElement('span');
+				pseudo.appendChild(this.concrete.dom);
+			}
+			
+			for(var r=0; r<scope.cssrules.length; r++){
+				_.CSS.applyRules(scope.cssrules[r],pseudo);
+			}
+		}
+		this.scope.isCSSValid = true;
+
+	};
+
+	UIControl.prototype.restyle = function(){
+		var p = this.parent;
+		while(p){
+			if(p.applyCSSRules) p.applyCSSRules();
+			p = p.parent;
+		}
+	};
 
 
 
