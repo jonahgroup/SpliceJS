@@ -15,7 +15,6 @@
       	'modules/splice.document.js',
       	'modules/splice.network.js',
         'modules/splice.text.js',
-      	'modules/splice.modular.js',
         'modules/splice.data.js',
         'modules/splice.controls.js'
 
@@ -23,23 +22,34 @@
 
     _.run = function(){
 
-    	new CSSParser('../ControlsAndBindings/controlsandbindings.css');
+    	CSSParser('../ControlsAndBindings/controlsandbindings.css')(function(rules){
+    			_.debug.log('Complete Parsing CSS');
+    			_.debug.log('Applying CSS rules');
+    			ApplyCSSRules(rules,document.getElementById('template'));   
+    	});
+
+		
 
     }
 			
 </script>
 </head>
 <body>
-	
-
-	<script>
+<span id="template">	
 
 
+	<div class="applicationpanel">
+		<div class="menubar"></div>	
+		<div class="cool-blue-table">
 
-	</script>
+			<table class="-splicejs-datatable">
+				<tr><td>A</td><td>A1</td></tr>
+				<tr><td>B</td><td>B1</td></tr>
+			</table>
+		</div>
+	</div>
 
-
-
+</span>
 
 <body>
 </html>
