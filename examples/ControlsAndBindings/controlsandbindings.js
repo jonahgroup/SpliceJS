@@ -5,6 +5,8 @@ required:[_.home('modules/splice.controls.js'),
 		  '../ScrollPanel/scrollpanelapplication.js',
 		  'controlsandbindings.css',
           'controlsandbindings.htmlt'],	
+
+cssIsLocal:true,
 	
 definition:function(){
 	var LocalScope = this;

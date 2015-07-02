@@ -2091,6 +2091,8 @@ var Module =
 		var required 	= _.home(moduleDefinition.required,path);
 		var moduleName 	= moduleDefinition.name;
 		var definition  = moduleDefinition.definition;
+
+		var cssIsLocal = moduleDefinition.cssIsLocal;
 	
 		/* required collection is always an Array */
 		required = required instanceof Array ? required : null;
@@ -2102,6 +2104,8 @@ var Module =
 		_.debug.log(path);
 
 		var templateDefinitions = new Array();
+
+		var cssRules = [];
 		
 		/*
 		 * Handler to receive template file sources
@@ -2116,6 +2120,8 @@ var Module =
 			 * extract template information
 			 * */
 			if(!template) return;
+
+			
 			var t = extractTemplates.call(scope,template.data);
 			
 			for(var i=0; i< t.length; i++){
@@ -2131,10 +2137,13 @@ var Module =
 			return;
 		}
 		
+		// flag is CSS is loaded into a local scope only
+		required.cssIsLocal = cssIsLocal;
+
 		/* 
 		 * Load dependencies
 		 * */
-		 originalInclude.call(_,required, function(){	
+		 originalInclude.call(core, required, function(){	
 			
 			/*
 			 * Define a module
