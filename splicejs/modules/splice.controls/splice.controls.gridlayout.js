@@ -91,10 +91,19 @@ definition:function(){
 
 		_.Event.create(window,'onresize').subscribe(this.reflow,this);
 
+		var self = this;
+
+		this.layoutCells = [];
+
+		this.onDisplay.subscribe(function(){
+			self.display();
+		});
+
+
 	}).extend(SpliceJS.Controls.UIControl);
 
 
-	GridLayout.prototype.onAttach = function(){
+	GridLayout.prototype.display = function(){
 
 		/* processes layout cells */
 		if(this.cells && this.cells.length > 0){
@@ -103,18 +112,24 @@ definition:function(){
 
 				var cellContainer = _.Obj.call(scope,
 						{	type:'CellContainer',
+							col:this.cells[i].col, 
+							row:this.cells[i].row, 
+							colspan:this.cells[i].colspan, 
+							rowspan:this.cells[i].rowspan,
 							content:{body: this.cells[i].content}
 						});
 
-				this.cells[i].content = new cellContainer({parent:this}); //new this.cells[i].content({parent:this});
-				this.elements.controlContainer.appendChild(this.cells[i].content.concrete.dom);
+				var cell =  new cellContainer({parent:this}); //new this.cells[i].content({parent:this});
+				this.layoutCells.push(cell);
+				this.elements.controlContainer.appendChild(cell.concrete.dom);
+				cell.onDisplay();
 			}
 			
 			this.reflow();
 		}
 
 
-		SpliceJS.Controls.UIControl.prototype.onAttach.call(this);
+		
 	};
 
 
@@ -132,7 +147,7 @@ definition:function(){
 		var workarea = { clientWidth:  DOM.clientWidth  - 2 * outer_margin,
 					 	 clientHeight: DOM.clientHeight - 2 * outer_margin};
 	
-		var cards = this.cells;
+		var cards = this.layoutCells;
 	
 		/* calculate unit size 
 	 	* based on client and grid size
@@ -160,7 +175,7 @@ definition:function(){
 			/* update grid */
 			grid.fillGrid(cards[i].row, cards[i].col, cards[i].rowspan, cards[i].colspan, cards[i]);
 		
-			cards[i].content.reflow({left:l,top:t},{width:w, height:h});
+			cards[i].reflow({left:l,top:t},{width:w, height:h});
 		}
 
 

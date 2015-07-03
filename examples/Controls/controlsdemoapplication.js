@@ -3,10 +3,9 @@ _.Module({
 required:[
 	_.home('modules/splice.controls.js'),
 		   'controlsdemoapplication.css',
-		   'controlsdemoapplication.htmlt'
+		   'controlsdemoapplication.htmlt',
+		 //  'crazyapp.htmlt',
 ],
-
-cssIsLocal:true,
 
 definition: function(){
 
@@ -47,6 +46,7 @@ definition: function(){
 
 
 	var ControlsDemoApplication = _.Namespace('UserApplications').Class(function ControlsDemoApplication(){
+		SpliceJS.Controls.UIControl.call(this);
 		this.sampleListData = [
 			{name:'John Sample', number:'555-2324-1234'},
 			{name:'Susan Sample', number:'555-2324-1234'}
@@ -58,6 +58,8 @@ definition: function(){
 
 		this.currentView = 0;
 		this.currentView2 = 0;
+
+		this.onDisplay.subscribe(this.display, this);
 	
 	}).extend(SpliceJS.Controls.UIControl);
 
@@ -72,11 +74,11 @@ definition: function(){
 	}
 
 
-	ControlsDemoApplication.prototype.onDisplay = function(){
+	ControlsDemoApplication.prototype.display = function(){
+		if(this.ref.scrollPanel) {
+			this.ref.scrollPanel.reflow();
+		}
 
-		SpliceJS.Controls.UIControl.prototype.onDisplay.call(this);
-
-		this.ref.scrollPanel.reflow();
 
 		this.onListData(this.sampleListData);
 		
@@ -84,7 +86,6 @@ definition: function(){
 
 		this.onSampleData(sampleTableData);
 
-		this.applyCSSRules();
 	};
 
 
@@ -108,9 +109,6 @@ definition: function(){
 	};
 
 
-	ControlsDemoApplication.prototype.onBinding = function(item){
-		_.debug.log('pre binding call');
-	};
 
 
 

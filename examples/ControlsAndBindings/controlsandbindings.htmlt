@@ -129,6 +129,7 @@
 	<div>@6</div>
 	<div>@7</div>
 	<div>@8</div>
+	<div>@9</div>
 </sjs-template>	
 
 <sjs-template type="OrderRowTemplate" tie="SpliceJS.Controls.DataTableRow">
@@ -151,6 +152,13 @@
 		dataIn:		_.Binding.To('dataOut').Parent,
 		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
 	}</sjs-include>
+	</div>
+	<div>
+		<sjs-include>{
+			type:	'SpliceJS.Controls.Dial',
+			scale: 0.7,
+			value:	50
+		}</sjs-include>
 	</div>
 	<sjs-include>{
 		type: 'DataRowBuilder',

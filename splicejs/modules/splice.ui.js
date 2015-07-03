@@ -8,11 +8,14 @@ definition:function(){
 
 	var UIElement = _.Namespace('SpliceJS.Controls').Class(function UIElement(args){
 
-		var concrete = new args.html(args);
+		var self = this;
+		this.concrete.dom.onclick = function(){
+			self.onClick(self);
+		}
 
-		this.concrete = concrete.concrete;
+	}).extend(SpliceJS.Core.Controller);
 
-	});
+	UIElement.prototype.onClick = _.Event;
 
 
 
@@ -25,11 +28,31 @@ definition:function(){
 		/* attach style to the controlContainer */
 		if(args && args.style)
 			this.elements.controlContainer.className += ' ' + args.style; 
-
-
 		this.dataItem = null;
 
-	});
+		var self = this;
+
+
+		this.onDisplay.subscribe(function(){
+			if(!self.children) return;
+			for(var i=0; i< self.children.length; i++){
+				var child = self.children[i];
+				if(typeof child.onDisplay === 'function') 
+					child.onDisplay();
+			}
+		});
+
+
+		this.onAttach.subscribe(function(){
+			if(!self.children) return;
+			for(var i=0; i< self.children.length; i++){
+				var child = self.children[i];
+				if(typeof child.onAttach === 'function') 
+					child.onAttach();
+			}
+		});
+
+	}).extend(SpliceJS.Core.Controller);
 	
 	UIControl.prototype.hide = function(){
 		var self = this;
@@ -79,25 +102,6 @@ definition:function(){
 	UIControl.prototype.dataOut = _.Event;
 
 
-	UIControl.prototype.onDisplay = function(){
-		_.debug.log('UIControl.onDisplay');
-		if(!this.children) return;
-		for(var i=0; i< this.children.length; i++){
-			var child = this.children[i];
-			if(typeof child.onDisplay === 'function') 
-				child.onDisplay();
-		}
-	};
-
-
-	UIControl.prototype.onAttach = function(){
-
-		for(var i=0; i<this.children.length; i++){
-			if(typeof this.children[i].onAttach === 'function')
-				this.children[i].onAttach();
-		}
-
-	};
 
 	/**
 	 * Called by the layout manager or a parent view when container dimensions changed and

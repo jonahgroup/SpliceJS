@@ -616,6 +616,18 @@ function applyCSSRules(rules, element){
 	
 
 
+	function display(controller,target){
+		if(!target) target = document.body;
+
+		target.innerHTML = '';
+		target.appendChild(controller.concrete.dom);
+
+		controller.onAttach();
+		controller.onDisplay();
+
+	};
+
+
 /*
 
 ----------------------------------------------------------
@@ -940,7 +952,7 @@ function applyCSSRules(rules, element){
 				template.declaration = {type:'MainPage'};
 
 				var component = compileTemplate.call(scope,template);
-				_.Doc.display(new component());
+				display(new component());
 
 			})
 		}
@@ -1664,23 +1676,19 @@ function applyCSSRules(rules, element){
 	};
 
 
+	var Controller = core.Namespace('SpliceJS.Core').Class(function Controller(){
 
+	});
+
+	Controller.prototype.onAttach 	= Event;
+	Controller.prototype.onDisplay 	= Event;
+	Controller.prototype.onDomChanged = Event;
 	
+
 	var Concrete = core.Namespace('SpliceJS.Modular').Class(function Concrete(dom){
-		
 		this.dom = dom;
-
-
-		if(!this.concrete) return;
-		
-		var self = this;
-		this.concrete.dom.onclick = function(){
-			self.onClick(self);
-		}
 	});
 	
-	Concrete.prototype.onClick = core.Event;
-
 
 	Concrete.prototype.export = function(){
 		return this.dom;
@@ -1730,7 +1738,7 @@ function applyCSSRules(rules, element){
 	};
 
 	
-	var Template = core.Namespace('SpliceJS.Modular').Class(function Template(dom){
+	var Template = core.Class(function Template(dom){
 		this.dom = dom;
 		dom._template = this;
 		/*
@@ -1821,8 +1829,8 @@ function applyCSSRules(rules, element){
 		
 		/* process dom references */
 		var elements = deepClone.querySelectorAll('[data-sjs-element]');
+	
 		var element = deepClone;
-		
 		if(tieInstance)
 		for(var i=-1; i< elements.length; i++){
 			
@@ -1962,9 +1970,16 @@ function applyCSSRules(rules, element){
 				var inlineTemplateName = scope.getNextTemplateName();
 
 
-				var placeholder = document.createElement('sjs-include');
-				placeholder.appendChild(document.createTextNode('{type:\'' + inlineTemplateName +'\'}'));
-				tag.parentNode.replaceChild(placeholder, tag);
+				if(tagName == 'SJS-ELEMENT') {
+					var placeholder = document.createTextNode('null, type:\'' + inlineTemplateName + '\'' );
+					tag.parentNode.replaceChild(placeholder, tag);
+				}	
+				else {
+					var placeholder = document.createElement('sjs-include');
+					placeholder.appendChild(document.createTextNode('{type:\'' + inlineTemplateName +'\'}'));
+					tag.parentNode.replaceChild(placeholder, tag);
+				}
+
 
 				/* 
 					build new template and store within scope 
@@ -1974,8 +1989,14 @@ function applyCSSRules(rules, element){
 				wrapper.appendChild(tag);
 
 				var template = new Template(wrapper);
+
 				/* copy template declaration attributes */		
-				template.declaration = {type:inlineTemplateName};
+				if(tagName == 'SJS-ELEMENT'){
+					template.declaration = {type:inlineTemplateName, tie:'SpliceJS.Controls.UIElement'};
+				}
+				else {
+					template.declaration = {type:inlineTemplateName};
+				}
 
 				compileTemplate.call(scope,template);
 			}
@@ -1998,19 +2019,20 @@ function applyCSSRules(rules, element){
 			var element = elements[i];
 			if(element.tagName === 'SJS-INCLUDE'){
 				//create new template and repeat parsing
-				var text = '_.Obj.call(scope,'+convertToProxyJson(element)+')';
+				var text = '_.Obj.call(scope,' + convertToProxyJson(element, element.tagName)+')';
 				element.parentNode.replaceChild(document.createTextNode(text),element);
 			}
 		}
 
 		var json = dom.innerHTML;
 
+/*
 		//append implied type for sjs-element
 		if(tagName == 'SJS-ELEMENT'){
 			var ind = json.indexOf('{');
 			json = '{ type:\'SpliceJS.Controls.UIElement\',' + json.substring(ind+1);
 		}
-
+*/
 		return json;
 	};
 
@@ -2261,7 +2283,7 @@ function applyCSSRules(rules, element){
 			template.isLocal = true;
 			
 			var tie = tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : 
-					  scope[template_name] ? scope[template_name] : Concrete;
+					  scope[template_name] ? scope[template_name] : Controller;
 			
 			if(tie && tie.isComponent) tie = tie.tie;
 			
@@ -2292,7 +2314,7 @@ function applyCSSRules(rules, element){
 		 * and return
 		 * */
 		
-		var tie 	= tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : Concrete;	
+		var tie 	= tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : Controller;	
 		
 		if(tie && tie.isComponent) tie = tie.tie;
 		
@@ -2583,6 +2605,7 @@ var Module =
 		applyRules: applyCSSRules
 	};
 
+	core.display = display;
 
 	return core;
 

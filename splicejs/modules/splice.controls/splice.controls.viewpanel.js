@@ -32,10 +32,16 @@ definition:function(){
 
 	 	this.activePanelIndex = 0;
 
+	 	var self = this;
+	 	this.onDisplay.subscribe(function(){
+	 		self.display();
+	 	});
+
 	}).extend(SpliceJS.Controls.UIControl);
 
 
-	ViewPanel.prototype.onDisplay = function(){
+
+	ViewPanel.prototype.display = function(){
 
 		/*
 			size client panels

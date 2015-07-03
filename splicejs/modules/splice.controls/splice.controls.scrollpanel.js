@@ -38,10 +38,14 @@ definition:function(){
 
 		}
 	
+		this.onDisplay.subscribe(function(){
+			self.display();
+		});
+
 	}).extend(SpliceJS.Controls.UIControl);
 	
 
-	ScrollPanel.prototype.onDisplay = function(){
+	ScrollPanel.prototype.display = function(){
 		this.reflow();
 	};
 

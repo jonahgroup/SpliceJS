@@ -1,10 +1,4 @@
-
-<sjs-template type="MyButton" controller="SpliceJS.Controls.Button">
-	<button class="btn" data-sjs-element="controlContainer">@label</button>
-</sjs-template>
-
-
-<sjs-template type="UserApplications.ControlsDemoApplication">
+<sjs-template type="UserApplications.ControlsDemoApplication" tie="SpliceJS.Controls.UIControl">
 <div>
 <table>
 
@@ -18,11 +12,13 @@
 	</sjs-include>
 
 
+
 	<sjs-include>{
-		type:'MyButton',
-		content:{label:'test'},
+		type:'SpliceJS.Controls.Button',
+		content:{label:'Sample'},
 		onClick: _.Binding('buttonClicked').Parent
-	}</sjs-include>
+	}
+	</sjs-include>
 
 	</td>
 </tr>
@@ -321,7 +317,7 @@
 </sjs-template>
 
 
-<sjs-template type="UserApplications.CrazyApp" tie="SpliceJS.Controls.UIControl">
+<sjs-template type="UserApplications.CrazyApplication" tie="SpliceJS.Controls.UIControl">
 	<table><tr>
 		<td><sjs-include>{type:'UserApplications.ControlsDemoApplication'}</sjs-include></td>
 		<td><sjs-include>{type:'UserApplications.ControlsDemoApplication'}</sjs-include></td>

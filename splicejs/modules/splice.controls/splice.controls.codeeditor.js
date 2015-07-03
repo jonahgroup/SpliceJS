@@ -5,6 +5,7 @@ required:[
 	'splice.controls.codeeditor.htmlt'
 ],
 
+
 definition:function(){
 
 	var scope = this;
@@ -24,7 +25,7 @@ definition:function(){
 				self.displayCode(result.text);
 			}
 		});
-	});
+	}).extend(SpliceJS.Controls.UIControl);
 
 
 
@@ -37,6 +38,7 @@ definition:function(){
 			this.elements.controlContainer.appendChild(this.lines[i]);
 		}
 		
+		this.applyCSSRules();
 	};
 
 
@@ -99,6 +101,8 @@ definition:function(){
 			i--;
 		}
 	
+
+
 		return lines;
 	}
 

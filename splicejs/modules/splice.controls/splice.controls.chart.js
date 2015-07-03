@@ -288,8 +288,6 @@ function createChart(chartType, data){
     if(chartType == 'Pie')   return new Chart(this).Pie(data);
 }
 
-
-
 var SChart = _.Namespace('SpliceJS.Controls').Class(function Chart(args){
     
     SpliceJS.Controls.UIControl.apply(this,arguments);
@@ -312,6 +310,9 @@ var SChart = _.Namespace('SpliceJS.Controls').Class(function Chart(args){
     
     if(!this.chartType) this.cartType = 'Line';
 
+    
+    this.onDisplay.subscribe(this.display, this);
+
 }).extend(SpliceJS.Controls.UIControl);
 
 
@@ -321,7 +322,7 @@ SChart.prototype.dataIn = function(dataItem){
     this.onDisplay();
 };
 
-SChart.prototype.onDisplay = function() {
+SChart.prototype.display = function() {
     /* adjust canvas size */
     var containerWidth = this.elements.controlContainer.clientWidth;
     var containerHeight = this.elements.controlContainer.clientHeight;

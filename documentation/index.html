@@ -7,23 +7,20 @@
 
 <script>
 
-_.run = function(){
-_.include(_.home(['modules/splice.typextension.js',
-		          'modules/splice.animation.js',
-		          'modules/splice.document.js',
-		          'modules/splice.network.js',
-		          'modules/splice.data.js',
-		          'modules/splice.controls.js'
-		           ]), function(){
-			
-			_.include(['pages/splice.documentation.js'], function(){
-				_.Doc.display(new SpliceJS.Documentation.TableOfContent());
-			});	
-			
-		});};
-
+_.debugEnable();
+_.boot(_.home([
+	'modules/splice.typextension.js',
+	'modules/splice.animation.js',
+	'modules/splice.document.js',
+	'modules/splice.network.js',
+	'modules/splice.data.js',
+	'modules/splice.controls.js'
+]))([
+	'pages/splice.documentation.js'
+]);
 
 </script>
-
 </head>
+
+<sjs-include>{type:'SpliceJS.Documentation.TableOfContent'}</sjs-include>
 </html>

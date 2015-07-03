@@ -33,8 +33,11 @@ definition:function(){
 		};
 		
 		if(this.isDisabled) this.disable();
-		
-		
+
+		this.onDisplay.subscribe(function(){
+			_.debug.log('I am Button');
+		});
+
 	}).extend(SpliceJS.Controls.UIControl);
 
 	
@@ -79,7 +82,7 @@ definition:function(){
 			}
 			self.dataOut(self.dataItem);
 		}
-	});
+	}).extend(SpliceJS.Controls.UIControl);
 	
 	TextField.prototype.dataOut = function(){
 		

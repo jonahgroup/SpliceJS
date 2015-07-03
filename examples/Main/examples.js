@@ -10,7 +10,7 @@ function BasicApplication(){
 
 function ControlsApplication(){
 	_.load(['Controls/controlsdemoapplication.js'],function(){
-		_.Doc.display(new UserApplications.ControlsDemoApplication());		
+		_.display(new UserApplications.ControlsDemoApplication());		
 	});
 }
 
