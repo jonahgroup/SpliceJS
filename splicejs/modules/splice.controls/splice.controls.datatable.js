@@ -145,10 +145,23 @@ definition:function(){
 		
 		var newrow =  destination.insertRow();
 		
+		_.Event.create(newrow,'onmouseover').subscribe(function(){
+			for(var i=0; i<this.childNodes.length; i++){
+				this.childNodes[i].style.backgroundColor = "rgb(32, 58, 86)";
+			}
+		},newrow);
+
+		_.Event.create(newrow,'onmouseout').subscribe(function(){
+			for(var i=0; i<this.childNodes.length; i++){
+				this.childNodes[i].style.backgroundColor = "rgb(28,50,73)";
+			}
+		},newrow);
+
+
+
 		for(var i=0; i < row.length; i++ ){
-			
 			var cell = newrow.insertCell();
-			
+						
 			if(typeof(row[i]) == 'object')
 				cell.appendChild(row[i]);
 			else {

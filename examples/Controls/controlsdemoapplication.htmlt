@@ -1,4 +1,4 @@
-<sjs-template type="UserApplications.ControlsDemoApplication" tie="SpliceJS.Controls.UIControl">
+<sjs-template type="UserApplications.ControlsDemoApplication">
 <div>
 <table>
 

@@ -297,6 +297,8 @@ var CSSParser = function(){
 	function rule(parser){
 		if(!parser.token) return;
 
+		var rr = [];
+
 		whitespace(parser);
 
 		var r = '';
@@ -304,27 +306,34 @@ var CSSParser = function(){
 			r += parser.consume().text;
 		whitespace(parser);
 		parser.match(COLON);
+			rr[0] = r;
 			r += parser.consume().text;
 		whitespace(parser);
 		parser.match(IDENTIFIER);
-		
+		var style = '';
 		while(parser.token.type == IDENTIFIER || 
 		      parser.token.type == SPACE) {
-				r += parser.consume().text;
+				var x = parser.consume().text;
+				style += x;
+				r += x;
 
 				if(parser.token.type == OPEN_PARENTHESIS){
-					r += multivalue(parser);
+					x = multivalue(parser);
+					style += x;
+					r += x;
 				}	
 		}
 
 		whitespace(parser);
 
 		parser.match(SEMICOLON);
+			rr[1]= style;
 			r += parser.consume().text;
 
 		whitespace(parser);
 
-		return r;
+		rr[2] = formatCSSProperty(rr[0]);
+		return rr;
 	}
 
 	function multivalue(parser){
@@ -402,21 +411,39 @@ function cssMergeStyle(a, b) {
 	return a + ' ' + b;
 }
 
+function formatCSSProperty(property){
+
+	var result = '';
+	for(var i=0; i<property.length; i++){
+		var c = property[i];
+		if(c == '-') {
+			c = property[++i].toUpperCase();
+		}
+		result +=  c;
+	}
+	return result;
+}	
+
+
+function applyStyleProperties(style, rules){
+	for(var i=0; i<rules.length; i++){
+		style[rules[i][2]] = rules[i][1];
+	}
+}
+
+
 function applyCSSRules(rules, element){
 
 	for(var i=0; i<rules.length; i++){
 		var rule = rules[i];
 		var elements = element.querySelectorAll(rule.selector);		
 
-		var style = cssComposeStyle(rule.rules);
-
 		for (var n = 0; n < elements.length; n++) {
-			var currentStyle = elements[n].getAttribute('style');
+			var style = elements[n].style;
 			
-
-			elements[n].setAttribute('style', cssMergeStyle(currentStyle, style));
+			applyStyleProperties(style,rule.rules);
+			
 		}
-		_.debug.log('Getting elements by selector');
 
 	}
 
