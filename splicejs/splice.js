@@ -80,7 +80,7 @@ var CSSParser = function(){
 		OPEN_BRACKET = 'OPEN_BRACKET', CLOSE_BRACKET = 'CLOSE_BRACKET',
 		OPEN_BRACE = 'OPEN_BRACE', CLOSE_BRACE='CLOSE_BRACE',
 		OPEN_PARENTHESIS = 'OPEN_PARENTHESIS', CLOSE_PARENTHESIS='CLOSE_PARENTHESIS',
-		COLON = 'COLON', SEMICOLON = 'SEMICOLON', COMMA = 'COMMA';
+		COLON = 'COLON', SEMICOLON = 'SEMICOLON', COMMA = 'COMMA', OPERATOR = 'OPERATOR';
 
 	var SELECTOR = 1, OPENSCOPE = 2, CLOSESCOPE = 3, RULE = 4;	
 
@@ -124,6 +124,8 @@ var CSSParser = function(){
 			if(a = semicolon(this)) 	return a;
 
 			if(a = comma(this)) 		return a;
+
+			if(a = operator(this))		return a;
 
 	};
 
@@ -184,6 +186,10 @@ var CSSParser = function(){
 		return [IDENTIFIER, result];
 	}
 	
+	function operator(lex) {
+		if(lex.c == '=') return [OPERATOR, lex.consume()];
+	}
+
 	function bracket(lex){
 		if(lex.c == '[') return [OPEN_BRACKET,  lex.consume()];
 		if(lex.c == ']') return [CLOSE_BRACKET, lex.consume()];
@@ -240,15 +246,37 @@ var CSSParser = function(){
 		if(!this.token) return null;
 
 		whitespace(this);
+
+		var grp =  stylegroup(this);
+		if(grp) {
+			var group = {
+				isRuleGroup:true,
+				key:grp.key,
+				rules:[]
+			};
+			whitespace(this);
+			this.match(OPEN_BRACE); this.consume();
+
+				do {
+				whitespace(this);
+
+				var rule =  stylerule(this);
+
+				whitespace(this);   
+				group.rules.push(rule);
+
+				} while(this.token.type == IDENTIFIER);
+
+			this.match(CLOSE_BRACE); this.consume();
+
+			return group;
+		}
 		
-		var sel =  selector(this);
-				   this.match(OPEN_BRACE);  this.consume();
-		var rul =  rules(this);
-				   this.match(CLOSE_BRACE); this.consume();
+		var rule =  stylerule(this);
 
-		if(!sel || !rul) return null;		   
+		if(!rule) return null;		   
 
-		return {selector:sel, rules:rul};
+		return rule;
 	}
 
 	CSSParser.prototype.match = function(type){
@@ -268,6 +296,22 @@ var CSSParser = function(){
 				parser.token.type == SPACE || 
 				parser.token.type == COMMENT)
 			) parser.consume();
+	}
+
+
+	function stylegroup(parser) {
+		if(!parser.token) return;
+		if(!parser.token.type == IDENTIFIER || 
+			parser.token.text.toUpperCase() != 'SJS-STYLE') return;
+
+		parser.consume();	
+		parser.match(OPEN_BRACKET); parser.consume();
+		parser.match(IDENTIFIER); 	parser.consume();
+		parser.match(OPERATOR); 	parser.consume();
+		parser.match(IDENTIFIER); var key = parser.consume().text;
+		parser.match(CLOSE_BRACKET); parser.consume();	
+
+		return {key:key}; 	
 	}
 
 
@@ -294,7 +338,7 @@ var CSSParser = function(){
 	};
 
 
-	function rule(parser){
+	function propertystyle(parser){
 		if(!parser.token) return;
 
 		var rr = [];
@@ -352,12 +396,25 @@ var CSSParser = function(){
 		return result;
 	}
 
-	function rules(parser){
+	function stylerule(parser){
+
+		var sel =  selector(parser);
+	    parser.match(OPEN_BRACE);  parser.consume();
+		var stl =  styles(parser);
+	    parser.match(CLOSE_BRACE); parser.consume();
+
+	    if(!sel || !stl) return null;		   
+
+		return {selector:sel, styles:stl};
+	}
+
+
+	function styles(parser){
 		if(!parser.token) return;
 
 		var r = null;
 		var result = [];
-		while(r = rule(parser)){
+		while(r = propertystyle(parser)){
 			result.push(r);
 			if(parser.token.type == CLOSE_BRACE) break;
 		}
@@ -375,7 +432,14 @@ var CSSParser = function(){
 		var statement = null, counter = 0, result = [];
 
 		while(statement = parser.nextStatement()){
-			result.push(statement);
+			
+			if(statement.isRuleGroup) {
+				result[statement.key] = statement.rules;
+			}	
+			else {
+				result.push(statement);
+			}
+
 			counter++;
 			if(counter > 100000) break;
 			
@@ -432,16 +496,29 @@ function applyStyleProperties(style, rules){
 }
 
 
-function applyCSSRules(rules, element){
+function applyCSSRules(rules, element, parentId){
 
 	for(var i=0; i<rules.length; i++){
 		var rule = rules[i];
 		var elements = element.querySelectorAll(rule.selector);		
 
 		for (var n = 0; n < elements.length; n++) {
+			var process = false; 
+
+			if(parentId) {
+				var p = elements[n];
+				while(p) {
+					if(p.id == parentId) { process = true; break;}
+					if(p == element) break;
+					p = p.parentNode;
+				}
+			} else {
+				process = true;
+			}
+
+			if(!process) continue; 
 			var style = elements[n].style;
-			
-			applyStyleProperties(style,rule.rules);
+			applyStyleProperties(style,rule.styles);
 			
 		}
 
@@ -1827,8 +1904,6 @@ function applyCSSRules(rules, element){
 		}
 	}
 	
-	
-
 
 
 	/**
@@ -1899,7 +1974,7 @@ function applyCSSRules(rules, element){
 			var proxy 	= this.children[childId];
 			
 			
-			var c_instance = new proxy({parent:tieInstance});
+			var c_instance = new proxy({parent:tieInstance, parentscope:scope});
 			
 			var exportDom = c_instance.concrete.export();
 			
@@ -2411,6 +2486,12 @@ function applyCSSRules(rules, element){
 				}	
 			}	
 
+
+			/* inherit CSS scope from the template declaration */
+			if(template && template.declaration.css) {
+				obj['templateCSS'] = template.declaration.css;
+			}
+
 			/*
 			 * Bind declarative parameters
 			 *
@@ -2418,6 +2499,7 @@ function applyCSSRules(rules, element){
 			var tieInstance = obj; 
 			var parameters = args;
 			if(parameters) {
+
 				var keys = Object.keys(parameters);
 				for(var k=0; k< keys.length; k++) {
 				
@@ -2446,7 +2528,6 @@ function applyCSSRules(rules, element){
 
 			
 			if(obj.applyCSSRules) obj.applyCSSRules();
-			
 
 			return obj; 
 			

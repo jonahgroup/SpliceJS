@@ -15,7 +15,9 @@ required:[
 	'splice.controls/splice.controls.gridlayout.js',
 	'splice.controls/splice.controls.codeeditor.js'
 ], 	
-         	
+        
+cssIsLocal:true,        
+
 definition:function(){
 	
 	
@@ -33,11 +35,7 @@ definition:function(){
 		};
 		
 		if(this.isDisabled) this.disable();
-
-		this.onDisplay.subscribe(function(){
-			_.debug.log('I am Button');
-		});
-
+		
 	}).extend(SpliceJS.Controls.UIControl);
 
 	
@@ -60,11 +58,13 @@ definition:function(){
 	Button.prototype.enable = function(){
 		this.elements.controlContainer.className = '-splicejs-button';
 		this.isDisabled = false;
+		this.onDomChanged();
 	};
 	
 	Button.prototype.disable = function(){
 		this.elements.controlContainer.className = '-splicejs-button-disabled';
 		this.isDisabled = true;
+		this.onDomChanged();
 	}
 	
 	

@@ -52,6 +52,10 @@ definition:function(){
 			}
 		});
 
+		this.onDomChanged.subscribe(function(){
+			self.applyCSSRules();
+		});
+
 	}).extend(SpliceJS.Core.Controller);
 	
 	UIControl.prototype.hide = function(){
@@ -138,36 +142,42 @@ definition:function(){
 		}
 	};
 
-	UIControl.prototype.applyCSSRules = function(){
-		if(!this.scope.cssrules) return;
-		//if(this.scope.isCSSValid) return;
+	UIControl.prototype.applyCSSRules = function(key, override){
+		var scope = this.scope, 
+			localRules = null, 
+			overrideRules = null;
 
-		var scope = this.scope;
-		//apply local CSS rules :)
-		if(scope.cssrules && scope.cssrules.length > 0) {
+		localRules = scope.cssrules[0];
 
-			var pseudo = this.concrete.dom.parentNode; 
-			if(!pseudo) {
-				pseudo = document.createElement('span');
-				pseudo.appendChild(this.concrete.dom);
-			}
+		if(this.templateCSS) {
+			localRules = scope.cssrules[0][this.templateCSS];
+		}
+		
+		if(this.css && this.parentscope) {
+			overrideRules = this.parentscope.cssrules[0][this.css];
+		}
+
+
+		if(!localRules && !overrideRules) return;
 			
-			for(var r=0; r<scope.cssrules.length; r++){
-				_.CSS.applyRules(scope.cssrules[r],pseudo);
-			}
+		//apply local CSS rules :)
+		var dom = this.concrete.dom;
+		dom.id = 'SJS_CURRENT_CSS_TARGET'
+		var pseudo = dom.parentNode; 
+
+		if(!pseudo) {
+			pseudo = document.createElement('span');
+			pseudo.appendChild(this.concrete.dom);
 		}
-		this.scope.isCSSValid = true;
 
+		if(localRules && localRules.length > 0)
+			_.CSS.applyRules(localRules, pseudo, dom.id);
+
+		if(overrideRules && overrideRules.length > 0)
+			_.CSS.applyRules(overrideRules, pseudo, dom.id);
+
+		dom.removeAttribute('id');
 	};
-
-	UIControl.prototype.restyle = function(){
-		var p = this.parent;
-		while(p){
-			if(p.applyCSSRules) p.applyCSSRules();
-			p = p.parent;
-		}
-	};
-
 
 
 

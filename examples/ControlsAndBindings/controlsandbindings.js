@@ -3,7 +3,8 @@ _.Module({
 required:[_.home('modules/splice.controls.js'),
 		  '../BasicApplication/basicapplication.js',
 		  '../ScrollPanel/scrollpanelapplication.js',
-		  'controlsandbindings.css',
+		 // 'controlsandbindings.css',
+          'controlsandbindings_local.css',
           'controlsandbindings.htmlt'],	
 
 cssIsLocal:true,
@@ -33,14 +34,10 @@ definition:function(){
 				self.updateOrders();
 			}
 		});
-		
 
 		this.columnPaths = [0,1,2,3,4,5,6,7,8];
 
-		
-	});
-	
-	ControlsAndBindings.prototype.applyCSSRules = SpliceJS.Controls.UIControl.prototype.applyCSSRules;
+	}).extend(SpliceJS.Controls.UIControl);
 
 	ControlsAndBindings.prototype.onSearchValue = function(dataItem){
 		_.debug.log('Searching for: ' + dataItem.value);
@@ -61,8 +58,6 @@ definition:function(){
 		return this.currentSearchValue;
 	};
 
-
-
 	ControlsAndBindings.prototype.onAddRecord = function(){
 		_.info.log('Creating new record');
 		
@@ -75,9 +70,6 @@ definition:function(){
 
 		this.ref.addButton.setLabel('Save');
 		this.ref.addButton.onClick = this.onSaveNewRecord.bind(this);
-		
-		
-
 
 		this.actuateEditPanel().open((function(){
 			this.isAddMode = true;

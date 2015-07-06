@@ -35,6 +35,7 @@ definition:function(){
 	var Clock = _.Namespace('UserControls').Class(function Clock(){
 		if(this.autoStart === true) this.start();
 		if(this.staticDate === true) this.setDateTime(new Date());
+		this.start();
 	});
 	
 

@@ -1,4 +1,4 @@
-<sjs-template type="UserApplications.ControlsAndBindings">
+<sjs-template type="UserApplications.ControlsAndBindings" css="controlsAndBindings">
 	<div class="applicationpanel">
 	<div class="menubar">
 	
@@ -17,7 +17,8 @@
 			ref:'editButton',
 			style: 'button',
 			onClick:_.Binding('onEdit').Parent,
-			content:{label:'Edit'}
+			content:{label:'Edit'},
+			css:'myEditButton'
 		}</sjs-include>
 		
 		<sjs-include>{
@@ -67,9 +68,8 @@
 		<div style="position:absolute; top:125px; left:25px; bottom:0px; right:0px;">
 		<sjs-include>{
 			type:'SpliceJS.Controls.DataTable',
-
 			ref:'editTable',
-			style:'edit-fields-table',
+			css:'editTable',
 			dataIn: _.Binding('onEditRecordData').Parent,		
 			itemTemplate: 	<sjs-include>{type:'EditRecordRow'}</sjs-include>
 			
@@ -82,8 +82,8 @@
 			type:'SpliceJS.Controls.DataTable',
 
 			ref:'ordersTable',
-			style: 'cool-blue-table',
 			dataIn:			_.Binding('onOrderData').Parent,
+			css:'mydatatable',
 			headerTemplate: <sjs-include>{
 				type:'HeaderRowTemplate',
 				activate:_.Binding('onActivateHeader').Type('UserApplications.ControlsAndBindings')
@@ -126,6 +126,7 @@
 	<div>@5</div>
 	<div>@6</div>
 	<div>@7</div>
+	<div>@9</div>
 	<div>@8</div>
 </sjs-template>	
 
@@ -149,6 +150,20 @@
 		dataIn:		_.Binding.To('dataOut').Parent,
 		dataOut:	_.Binding.From('onEditItemSelected').Type('UserApplications.ControlsAndBindings')
 	}</sjs-include>
+	</div>
+	<div>
+			<sjs-include>
+				{type:'UserControls.Clock'}
+			</sjs-include>
+
+	</div>
+	<div>
+		<sjs-include>{
+			type:	'SpliceJS.Controls.Dial',
+			scale: 0.7,
+			value:	50
+		}</sjs-include>
+
 	</div>
 	<sjs-include>{
 		type: 'DataRowBuilder',

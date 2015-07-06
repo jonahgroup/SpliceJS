@@ -107,12 +107,11 @@ definition:function(){
 				continue;
 			}
 			
-
 			this.addBodyRow(createDefaultRow(r));
 			domModified = true;
 		}
-		
-		if(domModified) this.restyle();
+
+		this.onDomChanged();
 
 		this.reflow();
 
