@@ -1,0 +1,3 @@
+<sjs-template type="UserApplications.D3Rectangles">
+	<div data-sjs-element="controlContainer"></div>
+</sjs-template>

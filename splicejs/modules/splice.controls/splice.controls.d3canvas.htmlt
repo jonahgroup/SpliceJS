@@ -1,0 +1,3 @@
+<sjs-template type="SpliceJS.Controls.D3Canvas">
+	<div data-sjs-element="controlContainer"></div>
+</sjs-template>

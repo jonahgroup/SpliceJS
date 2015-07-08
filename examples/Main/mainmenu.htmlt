@@ -4,5 +4,7 @@
 		<div class="-link-container" onclick="ControlsApplication();">Controls Demo</div>
 		<div class="-link-container" onclick="ControlsAndBindings();">Controls and Binding</div>
 		<div class="-link-container" onclick="WebDashboard();">Web Dashboard</div>
+		<div class="-link-container" onclick="D3DemoA();">D3 Rectangles</div>
+		<div class="-link-container" onclick="D3DemoB();">D3 Streamgraph</div>
 	</div>
 </sjs-template>

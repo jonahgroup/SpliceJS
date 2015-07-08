@@ -3,6 +3,7 @@ _.Module({
 required:[_.home('modules/splice.controls.js'),
 		  '../BasicApplication/basicapplication.js',
 		  '../ScrollPanel/scrollpanelapplication.js',
+		  '../D3/rectangles.js',
 		 // 'controlsandbindings.css',
           'controlsandbindings_local.css',
           'controlsandbindings.htmlt'],	

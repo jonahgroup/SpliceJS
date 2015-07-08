@@ -34,3 +34,15 @@ function WebDashboard(){
 		_.Doc.display(new UserApplications.WebDashboard());
 	});
 }
+
+function D3DemoA(){
+	_.load(['D3/rectangles.js'],function(){
+		_.display(new UserApplications.D3Rectangles());
+	});
+}
+
+function D3DemoB(){
+	_.load(['D3/streamgraph.js'],function(){
+		_.display(new UserApplications.D3StreamGraph());
+	});
+}

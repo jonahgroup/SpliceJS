@@ -13,7 +13,8 @@ required:[
 	'splice.controls/splice.controls.viewpanel.js',
 	'splice.controls/splice.controls.map.js',
 	'splice.controls/splice.controls.gridlayout.js',
-	'splice.controls/splice.controls.codeeditor.js'
+	'splice.controls/splice.controls.codeeditor.js',
+	'splice.controls/splice.controls.d3canvas.js'
 ], 	
         
 cssIsLocal:true,        
