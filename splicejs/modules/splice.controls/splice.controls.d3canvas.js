@@ -16,11 +16,22 @@ definition:function(){
 
 		var d3 = function(){};
 		d3.prototype = Object.create(SpliceJS.Lib.d3);
+		
 		d3.prototype.select = function(){
 			return SpliceJS.Lib.d3.select(container);
 		}
 
+		d3.prototype.selectAll = function(selector){
+			var nodes = container.querySelectorAll(selector);
+			//var v = SpliceJS.Lib.d3.selectAll(selector);
+			var v2 = SpliceJS.Lib.d3.selectAll(nodes);
+			v2[0].parentNode = container;
+			return v2;
+		};
+
 		d3 = new d3();
+		this.d3 = d3;
+
 		var self = this;
 
 		this.onDisplay.subscribe(function(){

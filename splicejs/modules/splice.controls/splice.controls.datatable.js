@@ -104,6 +104,9 @@ definition:function(){
 				if(! (dataRow.concrete instanceof SpliceJS.Modular.Concrete)) throw 'DataTable: rowTemplate type is invalid must be concrete';
 				this.addDomRow(dataRow.concrete.dom);
 				domModified = true;
+
+				dataRow.onDisplay();
+
 				continue;
 			}
 			
@@ -281,7 +284,7 @@ definition:function(){
 
 	
 	var DataTableRow =  _.Namespace('SpliceJS.Controls').Class(function DataTableRow(args){
-		
+		SpliceJS.Controls.UIControl.call(this);
 		/* 
 		 * process content placeholders before they are 
 		 * pulled by parent control
@@ -300,10 +303,7 @@ definition:function(){
 			textNodes[i].parentNode.replaceChild(span,textNodes[i]);
 			this.contentMap[key] = span;
 		}
-		
-		
-		
-	});
+	}).extend(SpliceJS.Controls.UIControl);
 	
 	DataTableRow.prototype.selectRow = function(){
 		_.debug.log('select row');

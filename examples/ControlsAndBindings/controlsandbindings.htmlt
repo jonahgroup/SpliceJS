@@ -127,6 +127,7 @@
 	<div>@6</div>
 	<div>@7</div>
 	<div>@8</div>
+	<div>@9</div>
 </sjs-template>	
 
 <sjs-template type="OrderRowTemplate" tie="SpliceJS.Controls.DataTableRow">
@@ -151,7 +152,7 @@
 	}</sjs-include>
 	</div>
 	<div>
-		<sjs-include>{type:'UserApplications.D3Rectangles'}</sjs-include>
+		<sjs-include>{type:'UserApplications.D3StreamGraph', height:90}</sjs-include>
 	</div>
 	<sjs-include>{
 		type: 'DataRowBuilder',
