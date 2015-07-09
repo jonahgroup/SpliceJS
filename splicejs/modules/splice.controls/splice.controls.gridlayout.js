@@ -278,6 +278,8 @@ definition:function(){
 		
 		var DOM = this.elements.controlContainer;		
 		
+		var offset = SpliceJS.Ui.Positioning.absPosition(DOM);
+
 		var grid = this.grid; 
 		
 		var workarea = {dom: DOM,
@@ -290,7 +292,10 @@ definition:function(){
 		var unitHeight = (workarea.clientHeight- (grid.rows - 1) * margin) / grid.rows;	
 		unitHeight -= 2;
 		
-		var p = {x:p.x,y:p.y-DOM.offsetTop};
+		var p = {
+			x:p.x-offset.x, 
+			y:p.y-offset.y
+		};
 		
 		/* panel position*/
 		var col = Math.floor((p.x - outer_margin) / (unitWidth  + margin));
