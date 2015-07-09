@@ -731,6 +731,11 @@ function applyCSSRules(rules, element, parentId){
 
 	};
 
+	function isHTMLElement(object){
+		if(object.tagName && object.tagName != '') return true;
+		return false;
+	};
+
 
 /*
 
@@ -802,6 +807,30 @@ function applyCSSRules(rules, element, parentId){
 	
 	var Event = function Event(){};
 
+	function mousePosition(e){
+        //http://www.quirksmode.org/js/events_properties.html#position
+		var posx = 0;
+		var posy = 0;
+		
+		if (e.pageX || e.pageY) 	{
+			posx = e.pageX;
+			posy = e.pageY;
+		}
+		else if (e.clientX || e.clientY) 	{
+			posx = e.clientX + document.body.scrollLeft
+				+ document.documentElement.scrollLeft;
+			posy = e.clientY + document.body.scrollTop
+				+ document.documentElement.scrollTop;
+		}
+
+		return {x:posx,y:posy};
+	}
+
+	function eventArgs(e){
+		return {
+			mouse:mousePosition(e)
+		}		
+	};
 
 	Event.create = function(object, property){
 
@@ -841,11 +870,29 @@ function applyCSSRules(rules, element, parentId){
 		if(typeof val ===  'function') {
 			MulticastEvent.subscribe(val, object);		
 		}
-		object[property] = MulticastEvent;
-		
+
+		/*
+			if target object is a dom element 
+			collect event arguments
+		*/
+		if(isHTMLElement(object)) {
+			object[property] = function(e){
+
+				if(!e) e = window.event;
+
+				MulticastEvent(eventArgs(e));
+			}
+			object[property].subscribe = function(){
+				MulticastEvent.subscribe(arguments);
+			}			
+		}
+		else { 
+			object[property] = MulticastEvent;
+		}
 		
 		return MulticastEvent;
-	}
+	};
+	Event.attach = Event.create;
 
 	core.Event = Event;
 

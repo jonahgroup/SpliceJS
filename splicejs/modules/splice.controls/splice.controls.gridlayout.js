@@ -53,7 +53,10 @@ definition:function(){
 
 
 
-	
+	var left 	= 1
+	,	top 	= 2
+	,	right 	= 3
+	,	bottom 	= 4; 
 
 
 	/* 
@@ -63,7 +66,49 @@ definition:function(){
 	*/
 	var CellContainer = scope.CellContainer = _.Class(function CellContainer(){
 		SpliceJS.Controls.UIControl.call(this);
+
+		//attach events to drive resizing of the cell container
+		var self = this;
+
+		_.Event.attach(this.elements.leftEdge,'onmousedown').subscribe(
+			function(e){self.onStartResize(e,left);}
+		);
+
+		_.Event.attach(this.elements.topEdge,'onmousedown').subscribe(
+			function(e){self.onStartResize(e,top);}
+		);
+			
+
+		_.Event.attach(this.elements.rightEdge,'onmousedown').subscribe(
+			function(e){self.onStartResize(e,right);}
+		);
+
+
+		_.Event.attach(this.elements.bottomEdge,'onmousedown').subscribe(
+			function(e){self.onStartResize(e,bottom);}
+		);
+
+		this.onStartResize.subscribe(this.startResize, this);
+		this.onResize.subscribe(this.resize, this);
+		this.onEndResize.subscribe(this.endResize, this);
+
 	}).extend(SpliceJS.Controls.UIControl);
+
+
+	CellContainer.prototype.onStartResize = _.Event;
+	CellContainer.prototype.onResize = 		_.Event;
+	CellContainer.prototype.onEndResize = 	_.Event;
+
+
+	CellContainer.prototype.startResize = function(e,direction){
+		_.debug.log('Resizing in ' + direction + ' direction');
+		SpliceJS.Ui.DragAndDrop.startDrag();
+
+		var self = this;
+		SpliceJS.Ui.DragAndDrop.ondrag =  function(p,offset){
+			self.onResize({mouse:p,direction:direction, src:self});
+		}
+	};
 
 
 	CellContainer.prototype.reflowChildren = function(position, size, bubbleup){
@@ -89,7 +134,9 @@ definition:function(){
 		if(!this.grid)			this.grid = {columns:2, rows:2};
 		this.grid = new Grid(this.grid.rows, this.grid.columns);
 
-		_.Event.create(window,'onresize').subscribe(this.reflow,this);
+		_.Event.attach(window,'onresize').subscribe(function(){
+			this.reflow();}
+		,this);
 
 		var self = this;
 
@@ -98,8 +145,6 @@ definition:function(){
 		this.onDisplay.subscribe(function(){
 			self.display();
 		});
-
-
 	}).extend(SpliceJS.Controls.UIControl);
 
 
@@ -119,7 +164,13 @@ definition:function(){
 							content:{body: this.cells[i].content}
 						});
 
-				var cell =  new cellContainer({parent:this}); //new this.cells[i].content({parent:this});
+				var cell =  new cellContainer({parent:this, index:i}); //new this.cells[i].content({parent:this});
+				
+				cell.onResize.subscribe(function(args){
+						this.resizeCell(args);
+					}
+				,this);
+
 				this.layoutCells.push(cell);
 				this.elements.controlContainer.appendChild(cell.concrete.dom);
 				cell.onDisplay();
@@ -127,13 +178,44 @@ definition:function(){
 			
 			this.reflow();
 		}
+	};
 
+	GridLayout.prototype.resizeCell = function(args){
 
+		var cell = args.src;
+
+		var cellPosition = this.getCellForPoint(args.mouse);
+		var direction = args.direction;
+
+		if(direction == bottom) {
+			cell.rowspan = cellPosition.row - cell.row + 1; //at least a single row
+		}
 		
+		if(direction == right) {
+			cell.colspan = cellPosition.col - cell.col + 1; //at least a single row
+		}
+		
+		
+		if(direction == left) {
+			cell.col = cellPosition.col; //at least a single row
+		}
+		
+		if(direction == top) {
+
+			var newSpan = cell.row + cell.rowspan - cellPosition.row;
+
+			cell.row = cellPosition.row; //at least a single row
+
+			if(newSpan >= 1) cell.rowspan = newSpan;
+		}
+
+		this.reflow(cell.index);
+
+		_.debug.log('row:' + args.row + ' col:' + args.col)
 	};
 
 
-	GridLayout.prototype.reflow = function(){
+	GridLayout.prototype.reflow = function(cellIndex){
 
 		var margin 		 = this.margin;
 		var outer_margin = this.outerMargin;
@@ -160,7 +242,16 @@ definition:function(){
 
 		grid.clear();	
 		
-		for(var i=0; i< cards.length; i++){
+
+		var from = 0;
+		var to = cards.length - 1;
+
+		if(cellIndex != undefined) {
+			from = cellIndex;
+			to = cellIndex;
+		}
+
+		for(var i=from; i <= to; i++){
 			
 			//var style = cards[i].dom.style; 
 			
@@ -177,9 +268,36 @@ definition:function(){
 		
 			cards[i].reflow({left:l,top:t},{width:w, height:h});
 		}
-
-
 	}
+
+
+	GridLayout.prototype.getCellForPoint = function(p){
+	
+		var margin 		 = this.margin;
+		var outer_margin = this.outerMargin;
+		
+		var DOM = this.elements.controlContainer;		
+		
+		var grid = this.grid; 
+		
+		var workarea = {dom: DOM,
+						clientWidth:  DOM.clientWidth  - 2 * outer_margin,
+						clientHeight: DOM.clientHeight - 2 * outer_margin};
+		
+		var unitWidth = (workarea.clientWidth - (grid.columns - 1) * margin) / grid.columns;
+		unitWidth -= 2; /*border adjustment */
+
+		var unitHeight = (workarea.clientHeight- (grid.rows - 1) * margin) / grid.rows;	
+		unitHeight -= 2;
+		
+		var p = {x:p.x,y:p.y-DOM.offsetTop};
+		
+		/* panel position*/
+		var col = Math.floor((p.x - outer_margin) / (unitWidth  + margin));
+		var row = Math.floor((p.y - outer_margin) / (unitHeight + margin));
+		
+		return {row:row, col:col};
+	};
 
 
 }
