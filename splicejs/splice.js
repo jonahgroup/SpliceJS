@@ -1860,23 +1860,23 @@ var RouteParser = function(){
 
 
 		this.onDisplay.subscribe(function(){
-			if(!self.children) return;
-			for(var i=0; i< self.children.length; i++){
-				var child = self.children[i];
+			if(!this.children) return;
+			for(var i=0; i< this.children.length; i++){
+				var child = this.children[i];
 				if(typeof child.onDisplay === 'function') 
 					child.onDisplay();
 			}
-		});
+		},this);
 
 
 		this.onAttach.subscribe(function(){
-			if(!self.children) return;
-			for(var i=0; i< self.children.length; i++){
-				var child = self.children[i];
+			if(!this.children) return;
+			for(var i=0; i< this.children.length; i++){
+				var child = this.children[i];
 				if(typeof child.onAttach === 'function') 
 					child.onAttach();
 			}
-		});
+		},this);
 
 	});
 
