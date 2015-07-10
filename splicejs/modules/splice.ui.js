@@ -20,6 +20,8 @@ definition:function(){
 
 
 	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(args){
+		SpliceJS.Core.Controller.call(this);
+		
 		if(this.isHidden) {
 			this.prevDisplayState = this.elements.controlContainer.style.display; 
 			this.elements.controlContainer.style.display = 'none';
