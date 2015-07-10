@@ -7,4 +7,17 @@
 		<div class="-link-container" onclick="D3DemoA();">D3 Rectangles</div>
 		<div class="-link-container" onclick="D3DemoB();">D3 Streamgraph</div>
 	</div>
+
+	<sjs-include>{
+		type:'SpliceJS.Controls.DomIterator',
+		dom:<sjs-element>{
+				html:<table><tr><td>
+							<div class="-link-container">@linkname</div>
+					</td></tr></table>,
+				onClick:_.Binding('onLinkClick').Type('UserApplications.MainMenu')
+			}</sjs-element>,
+		dataIn:_.Binding('onData').Parent
+	}</sjs-include>
+
+
 </sjs-template>

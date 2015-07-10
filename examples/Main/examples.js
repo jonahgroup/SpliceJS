@@ -1,4 +1,51 @@
 
+_.Module({
+
+required:[
+	'examples.htmlt',
+	'examples.css'
+
+],
+
+definition:function(){
+
+
+	var MENU_DATA = [
+		{linkname:'BasicApplication'},
+		{linkname:'Controls Demo'},
+		{linkname:'Data Table'},
+		{linkname:'Web Dashboard'},
+		{linkname:'D3 Rectangles'}
+	]
+
+
+	var MainMenu = _.Namespace('UserApplications').Class(function MainMenu(){
+
+		this.onData(MENU_DATA);
+		this.onLinkClick.subscribe(function(a){
+
+			_.debug.log('booya');
+
+		});
+
+
+
+
+	});
+
+
+
+
+	MainMenu.prototype.onData = _.Event;
+	MainMenu.prototype.onLinkClick = _.Event;
+
+}
+
+
+});
+
+
+
 function BasicApplication(){
 	_.load(['BasicApplication/basicapplication.js'],function(){
 		new UserApplications.BasicApplication().exitApplication = function(){
@@ -37,12 +84,12 @@ function WebDashboard(){
 
 function D3DemoA(){
 	_.load(['D3/rectangles.js'],function(){
-		_.display(new UserApplications.D3Rectangles());
+		_.display(new UserApplications.D3Rectangles2());
 	});
 }
 
 function D3DemoB(){
 	_.load(['D3/streamgraph.js'],function(){
-		_.display(new UserApplications.D3StreamGraph());
+		_.display(new UserApplications.D3StreamGraph({width:800, height:400}));
 	});
 }

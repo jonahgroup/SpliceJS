@@ -1,3 +1,12 @@
 <sjs-template type="UserApplications.D3Rectangles">
 	<div data-sjs-element="controlContainer"></div>
 </sjs-template>
+
+
+
+<sjs-template type="UserApplications.D3Rectangles2" tie="SpliceJS.Controls.UIControl">
+	<sjs-include>{type:'UserApplications.D3Rectangles', width:300, height:200}</sjs-include>
+
+	<sjs-include>{type:'UserApplications.D3Rectangles', width:300, height:200}</sjs-include>
+	<sjs-include>{type:'UserApplications.D3Rectangles', width:300, height:200}</sjs-include>
+</sjs-template>

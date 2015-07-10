@@ -1,0 +1,44 @@
+/mainmenu	> {
+	
+	display:{type:'UserApplications.MainMenu'}
+	
+}
+
+/orders/laptop	>	{
+	display:{type:'UserApplications.OrdersLaptop'}
+}
+
+/orders/desktop	>	{
+	display:{type:'UserApplications.OrdersDesktop'}
+}
+
+
+/orders/@orderId/details >	{
+	UserApplications.Orders.showOrderDetails:{
+			orderid:@orderId,
+			who:'anybody'	
+	}
+}	
+
+/orders/books/@orderId/details >	{
+	type:'UserApplications.Orders',
+	invoke:[
+		{name:'showOrderDetails', 
+			args:{
+				orderid:@orderId,
+				who:'anybody'	
+			}
+		},
+		{name:'showOwner', args:{somethindid:@orderId}}
+
+	]
+}	
+
+
+
+
+
+
+/orders/234/details
+
+

@@ -21,7 +21,7 @@ cssIsLocal:true,
 
 definition:function(){
 	
-	
+	var localScope = this;
 	
 	var Button = _.Namespace('SpliceJS.Controls').Class(function Button(args){
 		
@@ -263,6 +263,39 @@ definition:function(){
 
 
 
+
+	var DomIterator = _.Namespace('SpliceJS.Controls').Class( function DomIterator(args){
+
+		var nodes = [];
+		this.conc = [];
+
+		this.dom = null; 
+		if(args && args.dom) this.dom = args.dom;
+
+		var self = this;
+
+		for(var i = 0; i < 100; i++ ){
+			this.conc.push(new args.dom({parent:this}));
+			nodes.push(this.conc[i].concrete.dom);
+		}
+	
+		this.concrete = {
+			export:function(){
+				return nodes;
+			}
+		};
+
+		if(!args.dom) return;
+
+	}).extend(SpliceJS.Core.Controller);
+
+	DomIterator.prototype.dataIn = function(data){
+		for(var i=0; i < data.length; i++){
+			this.conc[i].concrete.applyContent(data[i]);		
+		}
+	}
+
+	SpliceJS.Controls.DomIterator = localScope.createComponent(DomIterator,null);
 
 // end module definition		
 }});

@@ -33,24 +33,7 @@ definition:function(){
 		var self = this;
 
 
-		this.onDisplay.subscribe(function(){
-			if(!self.children) return;
-			for(var i=0; i< self.children.length; i++){
-				var child = self.children[i];
-				if(typeof child.onDisplay === 'function') 
-					child.onDisplay();
-			}
-		});
-
-
-		this.onAttach.subscribe(function(){
-			if(!self.children) return;
-			for(var i=0; i< self.children.length; i++){
-				var child = self.children[i];
-				if(typeof child.onAttach === 'function') 
-					child.onAttach();
-			}
-		});
+		
 
 		this.onDomChanged.subscribe(function(){
 			self.applyCSSRules();

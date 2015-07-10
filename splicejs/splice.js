@@ -528,6 +528,19 @@ function applyCSSRules(rules, element, parentId){
 };
 
 
+/*
+	
+----------------------------------------------------------
+
+	Routing FIle Parser
+
+*/
+
+var RouteParser = function(){
+
+
+};
+
 
 /*
 	
@@ -732,6 +745,7 @@ function applyCSSRules(rules, element, parentId){
 	};
 
 	function isHTMLElement(object){
+		if(!object) return false;
 		if(object.tagName && object.tagName != '') return true;
 		return false;
 	};
@@ -1483,9 +1497,8 @@ function applyCSSRules(rules, element, parentId){
 		/*
 		 * */
 
-		if(	endsWith(filename, ".css") || 
-			endsWith(filename, ".js")  || 
-			endsWith(filename, ".htmlt") )
+		if(	endsWith(filename, '.css') 	|| endsWith(filename, '.js')  || 
+			endsWith(filename, '.htmlt') || endsWith(filename,'.jsjroute') )
 		if(URL_CACHE[filename] === true){
 			core.debug.log('File ' + filename + ' is already loaded, skipping...');
 			loader.progress--; loader.loadNext(watcher);
@@ -1605,7 +1618,23 @@ function applyCSSRules(rules, element, parentId){
 			});
 			return;
 		}
-		
+	
+		/*
+		 *	Load routing file
+		 * */
+		 if(endsWith(filename, '.sjsroute')){
+		 	watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
+			HttpRequest.get({
+				url: filename,
+				onok:function(response){
+					URL_CACHE[filename] = true;
+					loader.onitemloaded({ext: 'sjsroute', filename:filename, data:response.text});
+					loader.progress--; loader.loadNext(watcher);
+				}
+			});		 	
+			return;
+		 }
+
 	};
 	
 	
@@ -1829,6 +1858,26 @@ function applyCSSRules(rules, element, parentId){
 
 	var Controller = core.Namespace('SpliceJS.Core').Class(function Controller(){
 
+
+		this.onDisplay.subscribe(function(){
+			if(!self.children) return;
+			for(var i=0; i< self.children.length; i++){
+				var child = self.children[i];
+				if(typeof child.onDisplay === 'function') 
+					child.onDisplay();
+			}
+		});
+
+
+		this.onAttach.subscribe(function(){
+			if(!self.children) return;
+			for(var i=0; i< self.children.length; i++){
+				var child = self.children[i];
+				if(typeof child.onAttach === 'function') 
+					child.onAttach();
+			}
+		});
+
 	});
 
 	Controller.prototype.onAttach 	= Event;
@@ -2030,16 +2079,19 @@ function applyCSSRules(rules, element, parentId){
 				var parentNode = anchors[i].parentNode;
 				var child = exportDom[0]; 
 				
+				if(isHTMLElement(child))
 				parentNode.replaceChild(child, anchors[i]);
 
 				for( var i = 1; i < exportDom.length; i++){
 					var sibling = child.nextSibling;
 					var child = exportDom[i];
+					if(isHTMLElement(child))
 					parentNode.insertBefore(child,sibling);
 				}	
 			}
 			else {	
-				anchors[i].parentNode.replaceChild((c_instance.concrete.dom || c_instance.dom), anchors[i]);
+				if(isHTMLElement(exportDom))
+				anchors[i].parentNode.replaceChild((exportDom), anchors[i]);
 			}
 		}
 
@@ -2138,9 +2190,10 @@ function applyCSSRules(rules, element, parentId){
 				wrapper.appendChild(tag);
 
 				var template = new Template(wrapper);
+				template.normalize();
 
 				/* copy template declaration attributes */		
-				if(tagName == 'SJS-ELEMENT'){
+				if(tag.tagName == 'SJS-ELEMENT'){
 					template.declaration = {type:inlineTemplateName, tie:'SpliceJS.Controls.UIElement'};
 				}
 				else {
