@@ -34,6 +34,11 @@ definition:function(){
 		}
 	};
 
+	Grid.prototype.setSize = function(rows, columns){
+		this.rows = rows;
+		this.columns = columns; 
+	};
+
 	/*
 	 * Returns content of the grid cell if any
 	 * */
@@ -214,7 +219,6 @@ definition:function(){
 		_.debug.log('row:' + args.row + ' col:' + args.col)
 	};
 
-
 	GridLayout.prototype.reflow = function(cellIndex){
 
 		var margin 		 = this.margin;
@@ -268,7 +272,12 @@ definition:function(){
 		
 			cards[i].reflow({left:l,top:t},{width:w, height:h});
 		}
-	}
+	};
+
+	GridLayout.prototype.setGrid = function(grid){
+		this.grid.setSize(grid);
+		this.reflow();
+	};
 
 
 	GridLayout.prototype.getCellForPoint = function(p){

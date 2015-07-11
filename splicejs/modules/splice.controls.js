@@ -297,5 +297,12 @@ definition:function(){
 
 	SpliceJS.Controls.DomIterator = localScope.createComponent(DomIterator,null);
 
+
+
+	var SideMenu = _.Namespace('SpliceJS.Controls').Class( function SideMenu(){
+
+	}).extend(SpliceJS.Controls.UIControl);
+
+
 // end module definition		
 }});
