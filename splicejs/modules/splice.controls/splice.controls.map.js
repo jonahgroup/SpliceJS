@@ -5,7 +5,7 @@ required:[
 	_.home('lib/leaflet-0.7.3/leaflet.css'),
 	_.home('lib/leaflet-0.7.3/leaflet-src.js'),
 	'splice.controls.map.css',
-	'splice.controls.map.htmlt',
+	'splice.controls.map.html',
 ],
 
 definition:function(){

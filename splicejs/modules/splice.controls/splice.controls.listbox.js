@@ -3,7 +3,7 @@ _.Module({
 required:[ 
 	_.home('modules/splice.ui.js'),
 	'splice.controls.listbox.css',
-	'splice.controls.listbox.htmlt'
+	'splice.controls.listbox.html'
 ],
 
 definition:function(){

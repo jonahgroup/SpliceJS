@@ -4,7 +4,7 @@ required:[
 	_.home('modules/splice.controls.js'),
 	'../BasicApplication/basicapplication.js',
 	'scrollpanelapplications.css',
-	'scrollpanelapplication.htmlt'
+	'scrollpanelapplication.html'
 ],
 
 definition:function(){

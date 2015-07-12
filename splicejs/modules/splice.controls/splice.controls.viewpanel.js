@@ -1,7 +1,7 @@
 _.Module({
 	
 required:[
-	'splice.controls.viewpanel.htmlt',
+	'splice.controls.viewpanel.html',
 	'splice.controls.viewpanel.css'
 ],
 

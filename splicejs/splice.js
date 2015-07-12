@@ -49,6 +49,14 @@ var _ = sjs = (function(window, document){
 	var BOOT_SOURCE = [];
 
 
+	var FILE_EXTENSIONS = {
+		javascript: '.js', 
+		template: 	'.html',
+		style: 		'.css',
+		route: 		'.sjsroute', 
+	};
+
+
 	/*
 		Core object released into global space
 	*/
@@ -1456,6 +1464,9 @@ var RouteParser = function(){
 	
 	};
 	
+
+
+
 	Loader.loaders = new Array();
 	
 	Loader.prototype.disable = function(){this.isActive = false; return this;};
@@ -1497,8 +1508,10 @@ var RouteParser = function(){
 		/*
 		 * */
 
-		if(	endsWith(filename, '.css') 	|| endsWith(filename, '.js')  || 
-			endsWith(filename, '.htmlt') || endsWith(filename,'.jsjroute') )
+		if(	endsWith(filename, FILE_EXTENSIONS.style) 		|| 
+			endsWith(filename, FILE_EXTENSIONS.javascript)  || 
+			endsWith(filename, FILE_EXTENSIONS.template) 	|| 
+			endsWith(filename, FILE_EXTENSIONS.route) )
 		if(URL_CACHE[filename] === true){
 			core.debug.log('File ' + filename + ' is already loaded, skipping...');
 			loader.progress--; loader.loadNext(watcher);
@@ -1525,7 +1538,7 @@ var RouteParser = function(){
 		/*
 		 * Load CSS Files - global
 		 * */
-		if(endsWith(filename, ".css") && !loader.cssIsLocal){
+		if(endsWith(filename, FILE_EXTENSIONS.style) && !loader.cssIsLocal){
 			
 			var linkref = document.createElement('link');
 			
@@ -1559,7 +1572,7 @@ var RouteParser = function(){
 		/*
 		 * Load CSS Files - local
 		 * */
-		if(endsWith(filename, ".css") && loader.cssIsLocal == true){
+		if(endsWith(filename, FILE_EXTENSIONS.style) && loader.cssIsLocal == true){
 			core.debug.log('Loading CSS Locally');
 			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
 			HttpRequest.get({
@@ -1569,7 +1582,7 @@ var RouteParser = function(){
 
 					CSSParser(response.text)(
 						function(rules){
-							loader.onitemloaded({ext: 'css', filename:filename, data:rules});
+							loader.onitemloaded({ext: FILE_EXTENSIONS.style, filename:filename, data:rules});
 							loader.progress--; loader.loadNext(watcher);
 						}
 					);
@@ -1582,7 +1595,7 @@ var RouteParser = function(){
 		/*
 		 * Load javascript files
 		 * */
-		if(endsWith(filename, ".js")) {
+		if(endsWith(filename, FILE_EXTENSIONS.javascript)) {
 			var script = document.createElement('script');
 			
 			//tell Splice what is loading
@@ -1605,14 +1618,14 @@ var RouteParser = function(){
 		/*
 		 * Load html templates
 		 * */
-		if(endsWith(filename, '.htmlt')){
+		if(endsWith(filename, FILE_EXTENSIONS.template)){
 			//tell Splice what is loading
 			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
 			HttpRequest.get({
 				url: filename,
 				onok:function(response){
 					URL_CACHE[filename] = true;
-					loader.onitemloaded({ext: 'htmlt', filename:filename, data:response.text});
+					loader.onitemloaded({ext: FILE_EXTENSIONS.template, filename:filename, data:response.text});
 					loader.progress--; loader.loadNext(watcher);
 				}
 			});
@@ -1622,13 +1635,13 @@ var RouteParser = function(){
 		/*
 		 *	Load routing file
 		 * */
-		 if(endsWith(filename, '.sjsroute')){
+		 if(endsWith(filename, FILE_EXTENSIONS.route)){
 		 	watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
 			HttpRequest.get({
 				url: filename,
 				onok:function(response){
 					URL_CACHE[filename] = true;
-					loader.onitemloaded({ext: 'sjsroute', filename:filename, data:response.text});
+					loader.onitemloaded({ext: FILE_EXTENSIONS.route, filename:filename, data:response.text});
 					loader.progress--; loader.loadNext(watcher);
 				}
 			});		 	
@@ -2673,7 +2686,7 @@ var RouteParser = function(){
 			
 			var arg = arguments[0];
 			if(!arg) return;
-			if(arg.ext !== 'htmlt') return;
+			if(arg.ext !== FILE_EXTENSIONS.template) return;
 			
 			var t = extractTemplates.call(scope,arg.data);
 			if(!t) return;
@@ -2735,7 +2748,7 @@ var Module =
 			 * */
 			if(!template) return;
 
-			if(template.ext == 'htmlt') {
+			if(template.ext == FILE_EXTENSIONS.template) {
 				var t = extractTemplates.call(scope,template.data);
 				
 				for(var i=0; i< t.length; i++){
@@ -2744,7 +2757,7 @@ var Module =
 			}
 
 			//css is configured for local loading
-			if(template.ext == 'css' && cssIsLocal == true){
+			if(template.ext == FILE_EXTENSIONS.style && cssIsLocal == true){
 				cssRules.push(template.data);
 			}
 		};

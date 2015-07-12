@@ -4,7 +4,7 @@ required:[
 	'splice.controls.css',
 	'splice.controls.scrollpanel.js',
 	'splice.controls.datatable.css',
-	'splice.controls.datatable.htmlt'
+	'splice.controls.datatable.html'
 ],
 
 definition:function(){

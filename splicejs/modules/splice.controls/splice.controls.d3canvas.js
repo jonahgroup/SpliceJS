@@ -2,7 +2,7 @@ _.Module({
 
 required:[
 	_.home('lib/d3-3.5.5/d3.min.js'),
-	'splice.controls.d3canvas.htmlt'
+	'splice.controls.d3canvas.html'
 ],
 
 definition:function(){

@@ -3,7 +3,7 @@ _.Module({
 required:[
 	
 	'splice.controls.gridlayout.css',
-	'splice.controls.gridlayout.htmlt'
+	'splice.controls.gridlayout.html'
 
 ],
 

@@ -2,7 +2,7 @@ _.Module({
 
 required:['../resources/fontfaces.css',
           'basicapplication.css',
-          'basicapplication.htmlt'],
+          'basicapplication.html'],
 
 definition:function(){
 

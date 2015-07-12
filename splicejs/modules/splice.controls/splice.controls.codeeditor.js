@@ -2,7 +2,7 @@ _.Module({
 
 required:[
 	'splice.controls.codeeditor.css',
-	'splice.controls.codeeditor.htmlt'
+	'splice.controls.codeeditor.html'
 ],
 
 

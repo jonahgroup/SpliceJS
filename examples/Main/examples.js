@@ -2,7 +2,7 @@
 _.Module({
 
 required:[
-	'examples.htmlt',
+	'examples.html',
 	'examples.css'
 
 ],

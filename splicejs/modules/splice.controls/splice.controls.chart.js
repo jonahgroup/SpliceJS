@@ -1,7 +1,7 @@
 _.Module({
 
 required:[
-    'splice.controls.chart.htmlt',
+    'splice.controls.chart.html',
     _.home('lib/Chart.js-1.0.2/Chart.js')
 ],
 

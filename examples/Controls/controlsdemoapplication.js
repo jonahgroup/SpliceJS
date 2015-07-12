@@ -3,7 +3,7 @@ _.Module({
 required:[
 	_.home('modules/splice.controls.js'),
 		   'controlsdemoapplication.css',
-		   'controlsdemoapplication.htmlt',
+		   'controlsdemoapplication.html',
 		 //  'crazyapp.htmlt',
 ],
 

@@ -4,7 +4,7 @@ required:[
 			
 	'splice.ui.js',
 	'splice.controls/splice.controls.css',
-  	'splice.controls/splice.controls.htmlt',
+  	'splice.controls/splice.controls.html',
 	'splice.controls/splice.controls.datatable.js',
 	'splice.controls/splice.controls.scrollpanel.js',
 	'splice.controls/splice.controls.chart.js',
@@ -274,7 +274,7 @@ definition:function(){
 
 		var self = this;
 
-		for(var i = 0; i < 100; i++ ){
+		for(var i = 0; i < 10; i++ ){
 			this.conc.push(new args.dom({parent:this}));
 			nodes.push(this.conc[i].concrete.dom);
 		}
@@ -299,7 +299,7 @@ definition:function(){
 
 
 
-	var SideMenu = _.Namespace('SpliceJS.Controls').Class( function SideMenu(){
+	var PullOutPanel = _.Namespace('SpliceJS.Controls').Class( function PullOutPanel(){
 
 	}).extend(SpliceJS.Controls.UIControl);
 

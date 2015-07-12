@@ -5,7 +5,7 @@ required:[
 	_.home('modules/splice.controls/splice.controls.scrollpanel.js'),
 	'splice.controls.transitions.css',
 	'splice.controls.drawerpanel.css',
-	'splice.controls.drawerpanel.htmlt'
+	'splice.controls.drawerpanel.html'
 ],
 
 definition:function(){

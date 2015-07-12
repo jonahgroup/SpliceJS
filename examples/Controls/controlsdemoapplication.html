@@ -1,0 +1,327 @@
+<sjs-template type="UserApplications.ControlsDemoApplication">
+<div>
+<table>
+
+<tr><td>Button</td>
+	<td>
+	<sjs-include>{
+		type:'SpliceJS.Controls.Button',
+		content:{label:'Sample Button'},
+		onClick: _.Binding('buttonClicked').Parent
+	}
+	</sjs-include>
+
+
+
+	<sjs-include>{
+		type:'SpliceJS.Controls.Button',
+		content:{label:'Sample'},
+		onClick: _.Binding('buttonClicked').Parent
+	}
+	</sjs-include>
+
+	</td>
+</tr>
+
+<tr><td>Checkbox</td>
+	<td>
+		<sjs-include>{
+			type:'SpliceJS.Controls.CheckBox',
+			content:{value:'Button'}
+		}</sjs-include>
+	</td>
+</tr>
+
+<tr><td>Radio button</td>
+	<td>
+	
+		<sjs-include>{
+			type:'SpliceJS.Controls.RadioButton',
+			content:{value:'Button'}
+		}
+		</sjs-include>
+	
+	</td>
+</tr>
+
+
+
+<tr><td> Grid Layout</td>
+<td>
+	<div class="-layout-boundary">
+	<sjs-include>{
+		
+		type:'SpliceJS.Controls.GridLayout',
+		grid: {rows:4, columns:4},
+		cells:[
+
+			{	col:0, row:0, colspan:1, rowspan:1,
+				content:<sjs-include>{
+					type:'SpliceJS.Controls.Button',
+					content:{label:'Hello'}
+				}</sjs-include>
+			},
+
+			{	col:1, row:0, colspan:1, rowspan:3,
+				content: <sjs-include>{
+					type:'SpliceJS.Controls.Button',
+					content:{label:'Big button'}
+				}</sjs-include>
+			},			
+
+			{	col:0, row:1, colspan:1, rowspan:3,
+				content: <sjs-include>{
+					type:'SpliceJS.Controls.Button',
+					content:{label:'Click Me'},
+					onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
+				}</sjs-include>
+			},
+
+
+			{	col:2, row:0, colspan:2, rowspan:4,
+				content: <sjs-include>{
+					type:'SpliceJS.Controls.ViewPanel',
+					switchView:_.Binding('onFlipViews').Type('UserApplications.ControlsDemoApplication'),
+					views:[	
+						{	key:'list',
+							view:<sjs-include>{
+								type:'SpliceJS.Controls.Button',
+								content:{label:'Click Me too'},
+								onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')		
+							}</sjs-include>
+						},
+
+						{	
+							key:'map',
+							view:<sjs-include>{
+								type:'SpliceJS.Controls.Button',
+								style:'-red-button',
+								content:{label:'Meh..'},
+								onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
+							}</sjs-include>
+						}
+					]
+				}</sjs-include>
+			},
+
+			{	col:1, row:3, colspan:1, rowspan:1,
+				content: <sjs-include>{
+					type:'SpliceJS.Controls.Button',
+					content:{label:'Click Me'},
+					onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
+				}</sjs-include>
+			},
+
+		]
+	}</sjs-include>
+	
+	</div>
+</td>
+</tr>
+
+
+
+<tr><td>Drop down list</td>
+<td>
+	<sjs-include>{
+		type:'SpliceJS.Controls.DropDownList',
+		content:{selectedValue:'test'}
+	}</sjs-include>
+</td>
+</tr>
+
+<tr><td>List Box</td>
+<td>
+	<sjs-include>{type:'LocalList'}</sjs-include>
+</td>
+
+
+<td>Drawer panel</td>
+	<td>
+	<div style="position:relative; width:400px; height:200px;">
+	<sjs-include> {
+		type: 	'SpliceJS.Controls.DrawerPanel',
+		content: {
+			body: <sjs-include>{
+				type:'SpliceJS.Controls.ScrollPanel',
+				content:{
+					scrollContent:<sjs-include>{type:'SampleContent'}</sjs-include>,
+					staticContent:''
+				}
+			}</sjs-include>,
+			drawer: <sjs-include>{type:'LocalList'}</sjs-include>
+		},
+		dataIn:	_.Binding('onSampleData').Parent
+	}
+	</sjs-include>
+	</div>
+</td>
+
+
+</tr>
+
+
+<tr><td>Dial</td>
+	<td>
+	<sjs-include>{
+		type:	'SpliceJS.Controls.Dial',
+		scale: 0.7,
+		value:	34
+	}</sjs-include>
+
+	</td>
+
+	<td>Map</td>
+	<td> <div style="position:relative; width:400px; height:400px;">
+	<sjs-include>{
+		ref:'map',
+		type: 'SpliceJS.Controls.Map'
+	}</sjs-include>
+	</div>
+
+</td>
+
+</tr>
+
+	
+<tr><td>Scroll panel</td>
+	<td>	
+	<div style="position:relative; width:400px; height:200px;">
+	<sjs-include>{
+		type:	'SpliceJS.Controls.ScrollPanel',
+		ref:	'scrollPanel',
+		content:{
+			scrollContent: <sjs-include>{type:'SampleContent'}</sjs-include>,
+			staticContent: ''
+		} 
+	}</sjs-include>
+	</div>
+	</td>
+	
+
+	<td>View Panel</td>
+	<td>
+		<div>
+			<sjs-include>{
+				type:'SpliceJS.Controls.Button',
+				content:{label:'Switch View'},
+				onClick: _.Binding.From('switchView').Type('UserApplications.ControlsDemoApplication')
+			}</sjs-include>
+		</div>
+		<div style="position:relative; width:400px; height:200px;">
+			<sjs-include>{
+				type:'SpliceJS.Controls.ViewPanel',
+				ref:'viewPanel',
+				views:[	
+					{key:'map',view:<sjs-include>{type:'SpliceJS.Controls.Map'}</sjs-include>},
+					{key:'list',view:<sjs-include>{type:'LocalList'}</sjs-include>}
+				]
+			}</sjs-include>
+		</div>	
+	</td>
+
+
+</tr>
+
+
+<tr><td>Data table</td>
+	<td>
+	<div style="position:relative; width:400px; height:200px;">
+	<sjs-include> {
+		type: 	'SpliceJS.Controls.DataTable',
+		style: '-sample-data-table',
+		dataIn:	_.Binding('onSampleData').Parent
+	}</sjs-include>
+	</div>
+</td></tr>
+
+<tr><td>Line Chart</td>
+	<td>
+	<div style="position:relative; width:400px; height:200px;">
+	<sjs-include>{
+		type: 	'SpliceJS.Controls.Chart',
+		chartType:	'Line',		
+		width:400, height:200,
+		dataIn:	_.Binding('onChartData').Parent
+	}</sjs-include>
+	</div>
+</td></tr>
+
+<tr><td>Bar Chart</td>
+	<td>
+	<div style="position:relative; width:400px; height:200px;">
+	<sjs-include>{
+		type: 	'SpliceJS.Controls.Chart',
+		chartType:	'Bar',		
+		width:400, height:200,
+		dataIn:	_.Binding('onChartData').Parent
+	}</sjs-include>
+	</div>
+	
+
+</td></tr>
+
+</table>
+</div>
+</sjs-template>
+
+
+<sjs-template type="PlainButton" tie="SpliceJS.Controls.Button"> 
+	<div data-sjs-element="controlContainer">
+		<div>@icon</div>
+		<div>@label</div>
+	</div>
+</sjs-template>
+
+<sjs-template type="LocalList">
+	<div style="position:relative; width:400px; height:200px;">
+	<sjs-include> {
+		type:'SpliceJS.Controls.ListBox',
+		isScrollable:true,
+		itemTemplate:<sjs-include>{
+			type:'SampleListItem',
+			onClick:_.Binding('listItemSelected').Type('UserApplications.ControlsDemoApplication')
+		}</sjs-include>,
+		dataIn: _.Binding('onListData').Type('UserApplications.ControlsDemoApplication')
+	}</sjs-include>
+	</div>
+</sjs-template>
+
+<sjs-template type="SampleListItem" tie="SpliceJS.Controls.ListItem">
+	<div style="border-bottom:1px solid #cecece; padding:0.5em; white-space:nowrap;">
+		<div>@name</div>
+		<div style="font-size:11px; color: #52A2E5; font-family:Arial;">@number</div>
+	</div>
+</sjs-template>
+
+
+
+<sjs-template type="SampleContent">
+	<div style="position:relative; width:400px; height:1000px;"> 
+	<p>
+	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, erat a finibus lobortis, nisl dui interdum sem, ut bibendum sem ligula vel risus. Vestibulum sagittis justo ac eros blandit, at blandit nunc scelerisque. Quisque non ipsum finibus nisl finibus facilisis. Fusce elementum commodo sodales. Praesent vitae odio at ante mattis tincidunt. Duis ac enim tempor, tempus diam nec, ornare leo. Suspendisse commodo lacus lorem, placerat scelerisque nulla feugiat vel.
+	</p>
+	<p>
+	Fusce non lacus sed est auctor aliquam. Vivamus blandit imperdiet accumsan. Mauris nibh nunc, semper et tempor sed, ultrices sed leo. Quisque cursus lacinia eros. Etiam iaculis nulla vel nibh rutrum, in molestie ipsum gravida. Quisque tincidunt lacus in sem consequat, sit amet suscipit massa fermentum. Vivamus tristique eros sed elit luctus suscipit. Fusce vel fringilla nunc, vel facilisis est. Donec at odio velit. Vestibulum a dui semper, cursus tortor ac, euismod massa. In nisi turpis, porta a euismod nec, imperdiet in diam. Fusce dolor justo, vehicula vel lectus vitae, consequat tristique sapien. Donec vestibulum condimentum pulvinar. Sed pretium metus eu ex lobortis, rutrum imperdiet ex sodales. Nunc neque lorem, semper ac tortor at, vestibulum viverra mauris.
+	</p>
+		<sjs-include>{
+			type:	'SpliceJS.Controls.Dial',
+			scale: 0.7,
+			value:	50
+		}</sjs-include>
+	<p>
+	Maecenas odio urna, pellentesque vel velit eu, auctor pretium orci. Donec fermentum enim bibendum ultrices eleifend. In est diam, luctus id lectus vel, blandit tincidunt enim. Nullam varius mi a urna interdum, quis dignissim odio eleifend. Nullam accumsan euismod odio, eget pellentesque ex. Aliquam dictum ligula ac iaculis accumsan. Vestibulum vitae enim nec enim fermentum mollis sed at enim. Sed gravida tempus lectus, a mattis lacus vestibulum quis. Nam accumsan ante nisi, iaculis rutrum orci ullamcorper in. Cras aliquet lobortis ipsum eget consequat. Nam eros justo, tincidunt ut est nec, sodales suscipit sem. Ut facilisis tincidunt neque, eget suscipit quam interdum a. Aliquam sagittis, lorem sit amet porttitor tempus, leo orci eleifend massa, laoreet varius ex tellus id orci. Proin sagittis diam ex, et cursus lectus semper et.
+	</p>
+	<p>
+	Etiam aliquet mi in velit porttitor, quis sagittis erat gravida. Etiam vitae scelerisque mauris, vel condimentum risus. Nunc tincidunt, sapien vitae dapibus iaculis, sapien diam egestas libero, non suscipit dolor erat sed libero. Nam finibus libero auctor, eleifend nibh nec, eleifend libero. Suspendisse vitae convallis arcu. Praesent a nunc elementum, placerat eros vel, lacinia risus. Suspendisse lorem ligula, suscipit id mi eget, iaculis tempor est. Nulla eu justo turpis. Vivamus commodo at purus at vulputate. Sed lacinia elit dolor, eu porta dolor vulputate et. Pellentesque id felis sagittis, laoreet nisi nec, pharetra tellus. Mauris fermentum at nisl eget egestas. Mauris vel lacinia nibh. Nunc porttitor ipsum eros, vel ornare lorem hendrerit vel. Vestibulum a metus feugiat, viverra purus eu, congue arcu. Curabitur eget venenatis mauris.
+	</p>
+	</div>
+</sjs-template>
+
+
+<sjs-template type="UserApplications.CrazyApplication" tie="SpliceJS.Controls.UIControl">
+	<table><tr>
+		<td><sjs-include>{type:'UserApplications.ControlsDemoApplication'}</sjs-include></td>
+		<td><sjs-include>{type:'UserApplications.ControlsDemoApplication'}</sjs-include></td>
+	</tr></table>
+</sjs-template>

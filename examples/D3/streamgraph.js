@@ -3,7 +3,7 @@ _.Module({
 
 required:[
 	_.home('modules/splice.controls/splice.controls.d3canvas.js'),
-	'streamgraph.htmlt'
+	'streamgraph.html'
 ],
 
 

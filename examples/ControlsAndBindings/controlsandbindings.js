@@ -7,7 +7,7 @@ required:[_.home('modules/splice.controls.js'),
 		  '../D3/streamgraph.js',
 		 // 'controlsandbindings.css',
           'controlsandbindings_local.css',
-          'controlsandbindings.htmlt'],	
+          'controlsandbindings.html'],	
 
 cssIsLocal:true,
 	

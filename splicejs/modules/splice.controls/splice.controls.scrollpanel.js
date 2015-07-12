@@ -3,7 +3,7 @@ _.Module({
 
 required:[
 	_.configuration.platform.IS_MOBILE?'splice.controls.scrollpanel-mobile.css':'splice.controls.scrollpanel.css',
-	'splice.controls.scrollpanel.htmlt'
+	'splice.controls.scrollpanel.html'
 ],
 
 definition:function(){
