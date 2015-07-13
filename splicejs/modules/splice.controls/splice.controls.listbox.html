@@ -4,14 +4,10 @@
 
 <sjs-template type="ScrollableListBox">
 	<div class="-splicejs-list-box" data-sjs-element="controlContainer">
-		<sjs-include>{
-			type:'SpliceJS.Controls.ScrollPanel',
+		<sjs-include type="SpliceJS.Controls.ScrollPanel">{
 			ref:'scrollPanel',
 			content:{
-				scrollContent:<sjs-include>{
-					type:'ContentClient',
-					ref:'contentClient'
-				}</sjs-include>,
+				scrollContent:<sjs-include type="ContentClient">{ref:'contentClient'}</sjs-include>,
 				staticContent:''
 			}
 		}</sjs-include>

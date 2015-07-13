@@ -1,4 +1,5 @@
 
+
 /*
 
 SpliceJS
@@ -2160,95 +2161,106 @@ var RouteParser = function(){
 	};
 
 
+	function handle_SJS_INCLUDE(node, parent, replace){
+		var type = node.getAttribute('type'),
+			json = '';
 
-	function convertToProxyJson(dom, tagName){
+		var idx = node.innerHTML.indexOf('{');
+		if( idx < 0){
+			json = '_.Obj.call(scope,{type:\''+type+'\'})';
+		}
+			
+		else {	
+			json = '_.Obj.call(scope,{type:\''+type+'\','+
+			node.innerHTML.substring(idx+1)
+			+')'
+		}
+
+		if(replace === true)
+			node.parentNode.replaceChild(document.createTextNode(json),node);
+
+		return json;
+	}
+
+	function handle_SJS_ELEMENT(node, parent, replace){
+		var type = node.getAttribute('type');
+
+		var json = '_.Obj.call(scope,{'+
+			node.innerHTML.substring(node.innerHTML.indexOf('{')+1)
+			+')'
+		
+		if(replace === true)
+			node.parentNode.replaceChild(document.createTextNode(json),node);
+	
+		return json;
+	}	
+
+	function handle_INLINE_HTML(node, parent, replace){
+		var scope = this;
+
+		var type = scope.getNextTemplateName(),
+			json = '';
+
+		if(parent.tagName == 'SJS-ELEMENT')
+			json = 'null, type:\'' + type + '\''; 			
+		else
+			json = '_.Obj.call(scope,{type:\''+ type + '\'})';
+
+		if(replace === true)
+			node.parentNode.replaceChild(document.createTextNode(json),node);
+
+		/* 
+			build new template and store within scope 
+			run template compiler
+		*/
+		var wrapper = document.createElement('span');
+		wrapper.appendChild(node);
+		var template = new Template(wrapper);
+		template.normalize();
+
+
+		if(parent.tagName == 'SJS-ELEMENT'){
+			template.declaration = {type:type, tie:'SpliceJS.Controls.UIElement'};
+		}
+		else {
+			template.declaration = {type:type};
+		}
+
+		compileTemplate.call(scope, template);
+
+		return json
+	}	
+
+	function convertToProxyJson(dom, parent, replace){
 		
 		var scope = this;
 
+		if(	dom.tagName != 'SJS-INCLUDE' && 
+			dom.tagName != 'SJS-ELEMENT')
+			return handle_INLINE_HTML.call(scope, dom, parent, true);	
 
-		var tags = _.Doc.selectNodes({childNodes:dom.childNodes},
+		var	elements = 	_.Doc.selectNodes({childNodes:dom.childNodes},
 				function(node){
-					if(node.nodeType == 1 && node.tagName != 'SJS-INCLUDE') return node;
+					if(node.nodeType == 1) return node;
 				},
 				function(node){
-					if(node.nodeType == 1 && node.tagName != 'SJS-INCLUDE') return [];
-					return node.childNodes;
-				});
-
-		//process tags as new implicit templates
-		if(tags != null){
-			for(var i=0; i<tags.length; i++){
-				var tag = tags[i];
-
-				/* generate template name */
-				var inlineTemplateName = scope.getNextTemplateName();
-
-
-				if(tagName == 'SJS-ELEMENT') {
-					var placeholder = document.createTextNode('null, type:\'' + inlineTemplateName + '\'' );
-					tag.parentNode.replaceChild(placeholder, tag);
-				}	
-				else {
-					var placeholder = document.createElement('sjs-include');
-					placeholder.appendChild(document.createTextNode('{type:\'' + inlineTemplateName +'\'}'));
-					tag.parentNode.replaceChild(placeholder, tag);
-				}
-
-
-				/* 
-					build new template and store within scope 
-					run template compiler
-				*/
-				var wrapper = document.createElement('span');
-				wrapper.appendChild(tag);
-
-				var template = new Template(wrapper);
-				template.normalize();
-
-				/* copy template declaration attributes */		
-				if(tag.tagName == 'SJS-ELEMENT'){
-					template.declaration = {type:inlineTemplateName, tie:'SpliceJS.Controls.UIElement'};
-				}
-				else {
-					template.declaration = {type:inlineTemplateName};
-				}
-
-				compileTemplate.call(scope,template);
-			}
-		}
-
-		//process include elements
-		var elements = 	_.Doc.selectNodes({childNodes:dom.childNodes},
-				function(node){
-					if(node.tagName == 'SJS-INCLUDE') return node;
-				},
-				function(node){
-					if(node.tagName == 'SJS-INCLUDE') return [];
+					if(node.nodeType == 1) return [];
 					return node.childNodes;	
 				}
-			);
+		);
 
-		if(!elements) return dom.innerHTML;
-		
-		for(var i=0; i<elements.length; i++){
-			var element = elements[i];
-			if(element.tagName === 'SJS-INCLUDE'){
-				//create new template and repeat parsing
-				var text = '_.Obj.call(scope,' + convertToProxyJson(element, element.tagName)+')';
-				element.parentNode.replaceChild(document.createTextNode(text),element);
+		//if sub elements found process recursivelly
+		if(elements && elements.length > 0){
+			for(var i=0; i< elements.length; i++){
+				var node = elements[i];
+				convertToProxyJson.call(scope,node, dom, true);
 			}
 		}
 
-		var json = dom.innerHTML;
-
-/*
-		//append implied type for sjs-element
-		if(tagName == 'SJS-ELEMENT'){
-			var ind = json.indexOf('{');
-			json = '{ type:\'SpliceJS.Controls.UIElement\',' + json.substring(ind+1);
-		}
-*/
-		return json;
+		//proces current element
+		if(dom.tagName === 'SJS-INCLUDE') return handle_SJS_INCLUDE(dom, parent, replace);
+		if(dom.tagName === 'SJS-ELEMENT') return handle_SJS_ELEMENT(dom, parent, replace);
+		
 	};
 
 
@@ -2278,22 +2290,23 @@ var RouteParser = function(){
 			
 			var node = nodes[i];
 			var parent = node.parentNode;
-				var json = convertToProxyJson.call(scope,node, node.tagName);
 
-				var result = null; 
-				eval('result = ' + json);
+			var json = convertToProxyJson.call(scope,node, node.tagName);
 
-				if(typeof result !==  'function'){				
-					result = _.Obj.call(scope,result);
-				}
+			var result = null; 
+			eval('result = ' + json);
 
-				var childId = template.addChild(result);
+			if(typeof result !==  'function'){				
+				result = _.Obj.call(scope,result);
+			}
 
-				var a = document.createElement('a');
-				a.setAttribute('data-sjs-tmp-anchor',result.type);
-				a.setAttribute('data-sjs-child-id',	childId);
-				
-				parent.replaceChild(a,node);
+			var childId = template.addChild(result);
+
+			var a = document.createElement('a');
+			a.setAttribute('data-sjs-tmp-anchor',result.type);
+			a.setAttribute('data-sjs-child-id',	childId);
+			
+			parent.replaceChild(a,node);
 		}
 	};
 

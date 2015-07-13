@@ -4,29 +4,24 @@
 
 <tr><td>Button</td>
 	<td>
-	<sjs-include>{
-		type:'SpliceJS.Controls.Button',
+	<sjs-include type="SpliceJS.Controls.Button">{
 		content:{label:'Sample Button'},
 		onClick: _.Binding('buttonClicked').Parent
-	}
-	</sjs-include>
+	}</sjs-include>
 
 
 
-	<sjs-include>{
-		type:'SpliceJS.Controls.Button',
+	<sjs-include type="SpliceJS.Controls.Button">{
 		content:{label:'Sample'},
 		onClick: _.Binding('buttonClicked').Parent
-	}
-	</sjs-include>
+	}</sjs-include>
 
 	</td>
 </tr>
 
 <tr><td>Checkbox</td>
 	<td>
-		<sjs-include>{
-			type:'SpliceJS.Controls.CheckBox',
+		<sjs-include type="SpliceJS.Controls.CheckBox">{
 			content:{value:'Button'}
 		}</sjs-include>
 	</td>
@@ -35,11 +30,9 @@
 <tr><td>Radio button</td>
 	<td>
 	
-		<sjs-include>{
-			type:'SpliceJS.Controls.RadioButton',
+		<sjs-include type="SpliceJS.Controls.RadioButton">{
 			content:{value:'Button'}
-		}
-		</sjs-include>
+		}</sjs-include>
 	
 	</td>
 </tr>
@@ -49,29 +42,24 @@
 <tr><td> Grid Layout</td>
 <td>
 	<div class="-layout-boundary">
-	<sjs-include>{
-		
-		type:'SpliceJS.Controls.GridLayout',
+	<sjs-include type="SpliceJS.Controls.GridLayout">{
 		grid: {rows:4, columns:4},
 		cells:[
 
 			{	col:0, row:0, colspan:1, rowspan:1,
-				content:<sjs-include>{
-					type:'SpliceJS.Controls.Button',
+				content:<sjs-include type="SpliceJS.Controls.Button">{
 					content:{label:'Hello'}
 				}</sjs-include>
 			},
 
 			{	col:1, row:0, colspan:1, rowspan:3,
-				content: <sjs-include>{
-					type:'SpliceJS.Controls.Button',
+				content: <sjs-include type="SpliceJS.Controls.Button">{
 					content:{label:'Big button'}
 				}</sjs-include>
 			},			
 
 			{	col:0, row:1, colspan:1, rowspan:3,
-				content: <sjs-include>{
-					type:'SpliceJS.Controls.Button',
+				content: <sjs-include type="SpliceJS.Controls.Button">{
 					content:{label:'Click Me'},
 					onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
 				}</sjs-include>
@@ -79,13 +67,11 @@
 
 
 			{	col:2, row:0, colspan:2, rowspan:4,
-				content: <sjs-include>{
-					type:'SpliceJS.Controls.ViewPanel',
+				content: <sjs-include type="SpliceJS.Controls.ViewPanel">{
 					switchView:_.Binding('onFlipViews').Type('UserApplications.ControlsDemoApplication'),
 					views:[	
 						{	key:'list',
-							view:<sjs-include>{
-								type:'SpliceJS.Controls.Button',
+							view:<sjs-include type="SpliceJS.Controls.Button">{
 								content:{label:'Click Me too'},
 								onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')		
 							}</sjs-include>
@@ -93,8 +79,7 @@
 
 						{	
 							key:'map',
-							view:<sjs-include>{
-								type:'SpliceJS.Controls.Button',
+							view:<sjs-include type="SpliceJS.Controls.Button">{
 								style:'-red-button',
 								content:{label:'Meh..'},
 								onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
@@ -105,8 +90,7 @@
 			},
 
 			{	col:1, row:3, colspan:1, rowspan:1,
-				content: <sjs-include>{
-					type:'SpliceJS.Controls.Button',
+				content: <sjs-include type="SpliceJS.Controls.Button">{
 					content:{label:'Click Me'},
 					onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
 				}</sjs-include>
@@ -123,8 +107,7 @@
 
 <tr><td>Drop down list</td>
 <td>
-	<sjs-include>{
-		type:'SpliceJS.Controls.DropDownList',
+	<sjs-include type="SpliceJS.Controls.DropDownList">{
 		content:{selectedValue:'test'}
 	}</sjs-include>
 </td>
@@ -132,24 +115,22 @@
 
 <tr><td>List Box</td>
 <td>
-	<sjs-include>{type:'LocalList'}</sjs-include>
+	<sjs-include type="LocalList"></sjs-include>
 </td>
 
 
 <td>Drawer panel</td>
 	<td>
 	<div style="position:relative; width:400px; height:200px;">
-	<sjs-include> {
-		type: 	'SpliceJS.Controls.DrawerPanel',
+	<sjs-include type="SpliceJS.Controls.DrawerPanel"> {
 		content: {
-			body: <sjs-include>{
-				type:'SpliceJS.Controls.ScrollPanel',
+			body: <sjs-include type="SpliceJS.Controls.ScrollPanel">{
 				content:{
 					scrollContent:<sjs-include>{type:'SampleContent'}</sjs-include>,
 					staticContent:''
 				}
 			}</sjs-include>,
-			drawer: <sjs-include>{type:'LocalList'}</sjs-include>
+			drawer: <sjs-include type="LocalList"></sjs-include>
 		},
 		dataIn:	_.Binding('onSampleData').Parent
 	}
@@ -163,8 +144,7 @@
 
 <tr><td>Dial</td>
 	<td>
-	<sjs-include>{
-		type:	'SpliceJS.Controls.Dial',
+	<sjs-include type="SpliceJS.Controls.Dial">{
 		scale: 0.7,
 		value:	34
 	}</sjs-include>
@@ -187,8 +167,7 @@
 <tr><td>Scroll panel</td>
 	<td>	
 	<div style="position:relative; width:400px; height:200px;">
-	<sjs-include>{
-		type:	'SpliceJS.Controls.ScrollPanel',
+	<sjs-include type="SpliceJS.Controls.ScrollPanel">{
 		ref:	'scrollPanel',
 		content:{
 			scrollContent: <sjs-include>{type:'SampleContent'}</sjs-include>,
@@ -202,15 +181,13 @@
 	<td>View Panel</td>
 	<td>
 		<div>
-			<sjs-include>{
-				type:'SpliceJS.Controls.Button',
+			<sjs-include type="SpliceJS.Controls.Button">{
 				content:{label:'Switch View'},
 				onClick: _.Binding.From('switchView').Type('UserApplications.ControlsDemoApplication')
 			}</sjs-include>
 		</div>
 		<div style="position:relative; width:400px; height:200px;">
-			<sjs-include>{
-				type:'SpliceJS.Controls.ViewPanel',
+			<sjs-include type="SpliceJS.Controls.ViewPanel">{
 				ref:'viewPanel',
 				views:[	
 					{key:'map',view:<sjs-include>{type:'SpliceJS.Controls.Map'}</sjs-include>},
@@ -227,8 +204,7 @@
 <tr><td>Data table</td>
 	<td>
 	<div style="position:relative; width:400px; height:200px;">
-	<sjs-include> {
-		type: 	'SpliceJS.Controls.DataTable',
+	<sjs-include type="SpliceJS.Controls.DataTable"> {
 		style: '-sample-data-table',
 		dataIn:	_.Binding('onSampleData').Parent
 	}</sjs-include>
@@ -238,8 +214,7 @@
 <tr><td>Line Chart</td>
 	<td>
 	<div style="position:relative; width:400px; height:200px;">
-	<sjs-include>{
-		type: 	'SpliceJS.Controls.Chart',
+	<sjs-include type="SpliceJS.Controls.Chart">{
 		chartType:	'Line',		
 		width:400, height:200,
 		dataIn:	_.Binding('onChartData').Parent
@@ -250,8 +225,7 @@
 <tr><td>Bar Chart</td>
 	<td>
 	<div style="position:relative; width:400px; height:200px;">
-	<sjs-include>{
-		type: 	'SpliceJS.Controls.Chart',
+	<sjs-include type="SpliceJS.Controls.Chart">{
 		chartType:	'Bar',		
 		width:400, height:200,
 		dataIn:	_.Binding('onChartData').Parent
@@ -275,11 +249,9 @@
 
 <sjs-template type="LocalList">
 	<div style="position:relative; width:400px; height:200px;">
-	<sjs-include> {
-		type:'SpliceJS.Controls.ListBox',
+	<sjs-include type="SpliceJS.Controls.ListBox"> {
 		isScrollable:true,
-		itemTemplate:<sjs-include>{
-			type:'SampleListItem',
+		itemTemplate:<sjs-include type="SampleListItem">{
 			onClick:_.Binding('listItemSelected').Type('UserApplications.ControlsDemoApplication')
 		}</sjs-include>,
 		dataIn: _.Binding('onListData').Type('UserApplications.ControlsDemoApplication')
@@ -304,8 +276,7 @@
 	<p>
 	Fusce non lacus sed est auctor aliquam. Vivamus blandit imperdiet accumsan. Mauris nibh nunc, semper et tempor sed, ultrices sed leo. Quisque cursus lacinia eros. Etiam iaculis nulla vel nibh rutrum, in molestie ipsum gravida. Quisque tincidunt lacus in sem consequat, sit amet suscipit massa fermentum. Vivamus tristique eros sed elit luctus suscipit. Fusce vel fringilla nunc, vel facilisis est. Donec at odio velit. Vestibulum a dui semper, cursus tortor ac, euismod massa. In nisi turpis, porta a euismod nec, imperdiet in diam. Fusce dolor justo, vehicula vel lectus vitae, consequat tristique sapien. Donec vestibulum condimentum pulvinar. Sed pretium metus eu ex lobortis, rutrum imperdiet ex sodales. Nunc neque lorem, semper ac tortor at, vestibulum viverra mauris.
 	</p>
-		<sjs-include>{
-			type:	'SpliceJS.Controls.Dial',
+		<sjs-include type="SpliceJS.Controls.Dial">{
 			scale: 0.7,
 			value:	50
 		}</sjs-include>
@@ -321,7 +292,7 @@
 
 <sjs-template type="UserApplications.CrazyApplication" tie="SpliceJS.Controls.UIControl">
 	<table><tr>
-		<td><sjs-include>{type:'UserApplications.ControlsDemoApplication'}</sjs-include></td>
-		<td><sjs-include>{type:'UserApplications.ControlsDemoApplication'}</sjs-include></td>
+		<td><sjs-include type="UserApplications.ControlsDemoApplication"></sjs-include></td>
+		<td><sjs-include type="UserApplications.ControlsDemoApplication"></sjs-include></td>
 	</tr></table>
 </sjs-template>
