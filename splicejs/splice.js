@@ -740,6 +740,54 @@ var RouteParser = function(){
 		return null;
 	};
 	
+	function dfs(dom, target, filterFn, nodesFn){
+		if(!dom) return;
+		
+		
+		if(typeof filterFn === 'function') {
+			var node = filterFn(dom);  
+			if(node) target.push(node);
+		} else {
+			target.push(dom);
+		} 
+		
+		
+		var children = [];
+		if(typeof nodesFn === 'function'){
+			children = nodesFn(dom);
+		}
+		else {
+			children = dom.childNodes;
+		}
+
+		for(var i=0; i < children.length; i++){
+			var n = dom.childNodes[i];
+			dfs(n,target,filterFn, nodesFn);
+		}
+	}; 
+
+	function selectNodes(dom,filterFn, nodesFn){
+		var nodes = new Array();
+		dfs(dom,nodes,filterFn, nodesFn);
+		if(nodes.length < 1) nodes = null;
+		return nodes;
+	};
+
+
+	function selectTextNodes(dom,filterFn){
+		var nodes = new Array();
+		//nodeType 3 is a text node
+		dfs(dom,nodes,function(node){ 
+			if(node.nodeType === 3) {
+				if(typeof filterFn === 'function')	return filterFn(node);
+				return node;
+			}
+			return null; 
+		});
+		if(nodes.length < 1) nodes = null;
+		return nodes;
+	};
+
 
 
 	function display(controller,target){
@@ -1913,7 +1961,7 @@ var RouteParser = function(){
 		var deepClone = this.dom;
 		var tieInstance = this.tieInstance;
 
-		var contentNodes = _.Doc.selectTextNodes(deepClone, function(node){
+		var contentNodes = selectTextNodes(deepClone, function(node){
 			if(node.nodeValue.indexOf('@') === 0) //starts with 
 				return node;
 			return null;
@@ -1978,16 +2026,7 @@ var RouteParser = function(){
 	Template.prototype.getBinding = function(){
 		return this.dom._binding;
 	};
-	
-	Template.prototype.clone = function(){
-		var deepClone = _.Doc.cloneNodeAndProperties(
-				 this.dom,{
-					 selectors:['[data-sgi-module],[data-sgi-api]'], 
-					 properties:['_config'],
-					 isDeep:true
-				 });
-		return new Template(deepClone);
-	};
+
 	
 	Template.prototype.normalize  = function(){
 
@@ -2021,16 +2060,9 @@ var RouteParser = function(){
 	 * */
 	Template.prototype.getInstance = function(tieInstance, parameters, scope){
 		
-		 
 		var build = this.dom;
-		 
-		//Clone node retaining _config property
-		var deepClone = _.Doc.cloneNodeAndProperties(
-				 build,{
-					 selectors:['[data-sjs-module],[data-sjs-api]'], 
-					 properties:['_config','_template'],
-					 isDeep:true
-				 });
+		
+		var deepClone = build.cloneNode(true);
 		deepClone.normalize();
 
 		 
@@ -2239,7 +2271,7 @@ var RouteParser = function(){
 			dom.tagName != 'SJS-ELEMENT')
 			return handle_INLINE_HTML.call(scope, dom, parent, true);	
 
-		var	elements = 	_.Doc.selectNodes({childNodes:dom.childNodes},
+		var	elements = 	selectNodes({childNodes:dom.childNodes},
 				function(node){
 					if(node.nodeType == 1) return node;
 				},
@@ -2274,7 +2306,7 @@ var RouteParser = function(){
 		/* select top level includes */
 		var inclusions = [];
 
-		var nodes = _.Doc.selectNodes({childNodes:template.dom.childNodes},
+		var nodes = selectNodes({childNodes:template.dom.childNodes},
 				function(node){
 					if(node.tagName == 'SJS-INCLUDE' || node.tagName == 'SJS-ELEMENT') return node;
 				},
