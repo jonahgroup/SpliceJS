@@ -11,27 +11,25 @@ definition:function(){
 
 
 	var MENU_DATA = [
-		{linkname:'BasicApplication'},
-		{linkname:'Controls Demo'},
-		{linkname:'Data Table'},
-		{linkname:'Web Dashboard'},
-		{linkname:'D3 Rectangles'}
+		['BasicApplication', 'A simple application to demonstrate template use... '],
+		['Controls Demo',	 'A simple application to demonstrate template use... '],
+		['Data Table',		 'A simple application to demonstrate template use... '],
+		['Web Dashboard',	 'A simple application to demonstrate template use... '],
+		['D3 Rectangles',	 'A simple application to demonstrate template use... ']
 	]
 
 
 	var MainMenu = _.Namespace('UserApplications').Class(function MainMenu(){
+		SpliceJS.Core.Controller.call(this);
 
+		var self = this;
 		this.onData(MENU_DATA);
+			
 		this.onLinkClick.subscribe(function(a){
-
-			_.debug.log('booya');
-
+			self.onClosePanel();
 		});
 
-
-
-
-	});
+	}).extend(SpliceJS.Core.Controller);
 
 
 
@@ -39,6 +37,8 @@ definition:function(){
 	MainMenu.prototype.onData = _.Event;
 	MainMenu.prototype.onLinkClick = _.Event;
 
+	MainMenu.prototype.onOpenPanel 	= _.Event;
+	MainMenu.prototype.onClosePanel = _.Event;
 }
 
 

@@ -48,7 +48,7 @@ var _ = sjs = (function(window, document){
 	  	Bootloading files
 	*/
 	var BOOT_SOURCE = [];
-
+	var LOADER_PROGRESS = {total:0, complete:0};
 
 	var FILE_EXTENSIONS = {
 		javascript: '.js', 
@@ -1484,7 +1484,14 @@ var RouteParser = function(){
 		return this.data[++this.i];
 	};
 	
-		
+	
+
+
+	core.getLoaderProgress = function(){
+		return LOADER_PROGRESS;
+	}
+
+
 	
 	/**
 	 * Sequential resource loader Loader
@@ -1508,6 +1515,8 @@ var RouteParser = function(){
 
 		//flags local css loading strategy
 		this.cssIsLocal = resources.cssIsLocal;
+
+		LOADER_PROGRESS.total += resources.length;
 
 		if(!this.onitemloaded) this.onitemloaded = function(){}; //noop
 	
@@ -1537,15 +1546,7 @@ var RouteParser = function(){
 		if(!obj) return;
 		
 		var filename = obj;
-		var runnable = null;
 		
-		/*
-		 * this is inline file 
-		 */		
-		if(typeof filename == 'object') {
-			filename =  obj.name;
-			runnable =  obj.source;
-		}
 		
 		/*
 		 * qualify filename
@@ -1563,7 +1564,9 @@ var RouteParser = function(){
 			endsWith(filename, FILE_EXTENSIONS.route) )
 		if(URL_CACHE[filename] === true){
 			core.debug.log('File ' + filename + ' is already loaded, skipping...');
-			loader.progress--; loader.loadNext(watcher);
+			loader.progress--; 
+			LOADER_PROGRESS.complete++;
+			loader.loadNext(watcher);
 			return;
 		}
 		
@@ -1571,19 +1574,6 @@ var RouteParser = function(){
 		
 		var head = document.getElementsByTagName('head')[0];
 		
-	    /*
-		 * Run the inline pseudo file
-		 */
-		if(runnable){
-
-			runnable();
-			URL_CACHE[filename] = true;
-			loader.onitemloaded();
-			loader.progress--; loader.loadNext(watcher);
-			return;
-		
-		} 	
-
 		/*
 		 * Load CSS Files - global
 		 * */
@@ -1611,7 +1601,9 @@ var RouteParser = function(){
 				if(!linkref.readyState || linkref.readyState == 'complete') {
 					URL_CACHE[filename] = true;
 					loader.onitemloaded();
-					loader.progress--; loader.loadNext(watcher);
+					loader.progress--; 
+					LOADER_PROGRESS.complete++;
+					loader.loadNext(watcher);
 				}
 			};
 			head.appendChild(linkref);
@@ -1632,7 +1624,9 @@ var RouteParser = function(){
 					CSSParser(response.text)(
 						function(rules){
 							loader.onitemloaded({ext: FILE_EXTENSIONS.style, filename:filename, data:rules});
-							loader.progress--; loader.loadNext(watcher);
+							loader.progress--; 
+							LOADER_PROGRESS.complete++;
+							loader.loadNext(watcher);
 						}
 					);
 				}
@@ -1657,7 +1651,9 @@ var RouteParser = function(){
 				if(!script.readyState || script.readyState == 'complete' || script.readyState == 'loaded') {
 					URL_CACHE[filename] = true;
 					loader.onitemloaded();
-					loader.progress--; loader.loadNext(watcher);
+					loader.progress--; 
+					LOADER_PROGRESS.complete++;
+					loader.loadNext(watcher);
 				}
 			};
 			head.appendChild(script); 
@@ -1675,7 +1671,9 @@ var RouteParser = function(){
 				onok:function(response){
 					URL_CACHE[filename] = true;
 					loader.onitemloaded({ext: FILE_EXTENSIONS.template, filename:filename, data:response.text});
-					loader.progress--; loader.loadNext(watcher);
+					loader.progress--; 
+					LOADER_PROGRESS.complete++;
+					loader.loadNext(watcher);
 				}
 			});
 			return;
@@ -1691,7 +1689,9 @@ var RouteParser = function(){
 				onok:function(response){
 					URL_CACHE[filename] = true;
 					loader.onitemloaded({ext: FILE_EXTENSIONS.route, filename:filename, data:response.text});
-					loader.progress--; loader.loadNext(watcher);
+					loader.progress--; 
+					LOADER_PROGRESS.complete++;
+					loader.loadNext(watcher);
 				}
 			});		 	
 			return;
@@ -1978,9 +1978,31 @@ var RouteParser = function(){
 
 				if(typeof obj === 'function') {
 					var contentInstance = new obj({parent:tieInstance});
-					if(contentInstance.concrete) 
-						newNode = contentInstance.concrete.dom; 
-					
+					if(contentInstance.concrete) {
+						
+						newNode = contentInstance.concrete.export();
+						if(newNode instanceof Array) {
+							var parentNode = contentNodes[i].parentNode;
+							var child = newNode[0]; 
+							
+							if(isHTMLElement(child))
+							parentNode.replaceChild(child, contentNodes[i]);
+
+							for( var n = 1; n < newNode.length; n++){
+								var sibling = child.nextSibling;
+								var child = newNode[n];
+								if(isHTMLElement(child))
+								parentNode.insertBefore(child,sibling);
+							}	
+						} else {
+							contentNodes[i].parentNode.replaceChild(newNode, contentNodes[i]);			
+						}
+						
+						if(contentInstance.onAttach) contentInstance.onAttach();
+						if(contentInstance.onDisplay) contentInstance.onDisplay();	
+						
+						continue;
+					}
 				}
 
 				if(typeof obj === 'string'){
@@ -2128,9 +2150,9 @@ var RouteParser = function(){
 				if(isHTMLElement(child))
 				parentNode.replaceChild(child, anchors[i]);
 
-				for( var i = 1; i < exportDom.length; i++){
+				for( var n = 1; n < exportDom.length; n++){
 					var sibling = child.nextSibling;
-					var child = exportDom[i];
+					var child = exportDom[n];
 					if(isHTMLElement(child))
 					parentNode.insertBefore(child,sibling);
 				}	

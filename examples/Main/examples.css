@@ -16,3 +16,43 @@ div.-link-container:hover {
 	background-color:#C800FF;
 	transition:background-color 0.5s;
 }
+
+
+
+
+
+.-splicejs-pullout-panel {
+
+	background-color:#222222;
+}
+
+
+.-splicejs-pullout-panel .-link {
+	cursor:pointer;
+	padding-left:16px;
+	
+	color:#fefefe;
+	transition:background-color 0.5s;
+
+	padding:10px;
+
+
+}
+
+
+.-splicejs-pullout-panel .-link:hover {
+	/*color:#222222;*/
+	/*background-color:#C800FF;*/
+	
+	background-color: #C89000;
+	transition:background-color 0.5s;
+	transition:color 0.5s;
+
+
+}
+
+
+.-splicejs-pullout-panel .-link .link-sub {
+
+	font-size:0.8em;
+}

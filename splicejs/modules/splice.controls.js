@@ -300,8 +300,24 @@ definition:function(){
 
 
 	var PullOutPanel = _.Namespace('SpliceJS.Controls').Class( function PullOutPanel(){
-
+		SpliceJS.Controls.UIControl.call(this);
 	}).extend(SpliceJS.Controls.UIControl);
+
+
+	PullOutPanel.prototype.onOpen = _.Event;
+	PullOutPanel.prototype.onClose = _.Event;
+
+
+	PullOutPanel.prototype.open = function(){
+		this.elements.controlContainer.style.left = '0px';
+		this.onOpen();
+
+	};
+
+	PullOutPanel.prototype.close = function(){
+		this.elements.controlContainer.style.left = '-500px';
+		this.onClose();
+	};
 
 
 // end module definition		
