@@ -274,7 +274,7 @@ definition:function(){
 
 		var self = this;
 
-		for(var i = 0; i < 10; i++ ){
+		for(var i = 0; i < 100; i++ ){
 			this.conc.push(new args.dom({parent:this}));
 			nodes.push(this.conc[i].concrete.dom);
 		}

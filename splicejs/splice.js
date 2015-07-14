@@ -1956,7 +1956,7 @@ var RouteParser = function(){
 		return this.dom;
 	};
 
-	Concrete.prototype.applyContent = function(content){
+	Concrete.prototype.applyContent = function(content, suspendNotify){
 		
 		var deepClone = this.dom;
 		var tieInstance = this.tieInstance;
@@ -1998,6 +1998,7 @@ var RouteParser = function(){
 							contentNodes[i].parentNode.replaceChild(newNode, contentNodes[i]);			
 						}
 						
+						if(suspendNotify) continue;
 						if(contentInstance.onAttach) contentInstance.onAttach();
 						if(contentInstance.onDisplay) contentInstance.onDisplay();	
 						
@@ -2113,7 +2114,7 @@ var RouteParser = function(){
 		* Getcontent nodes
 		*/	
 		if(parameters.content) 
-		instance.applyContent(parameters.content);
+		instance.applyContent(parameters.content, true);
 
 
 		if(typeof tieInstance.handleContent === 'function'){
