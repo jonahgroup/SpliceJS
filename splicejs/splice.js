@@ -905,13 +905,14 @@ var RouteParser = function(){
 
 	Event.create = function(object, property){
 
+		
 
-		var callbacks = [], instances = [];
+		var callbacks = [[]], instances = [[]];
 
 		var MulticastEvent = function MulticastEvent(){
-
-			for(var i=0; i < callbacks.length; i++) {
-				callbacks[i].apply(instances[i],arguments);
+			var idx = callbacks.length-1;
+			for(var i=0; i < callbacks[idx].length; i++) {
+				callbacks[idx][i].apply(instances[idx][i],arguments);
 			}
 		}
 
@@ -927,9 +928,24 @@ var RouteParser = function(){
 
 			if(!instance) instance = this;
 
-			callbacks.push(callback);
-			instances.push(instance);
-		}
+			var idx = callbacks.length-1;
+			
+			callbacks[idx].push(callback);
+			instances[idx].push(instance);
+		};
+
+		MulticastEvent.push = function(){
+			callbacks.push([]);
+			instances.push([]);
+		};
+
+		MulticastEvent.pop = function(){
+			if(callbacks.length == 1) return;
+			callbacks.pop();
+			instances.pop();
+		};
+
+
 
 		if(!object || !property) return MulticastEvent;
 
