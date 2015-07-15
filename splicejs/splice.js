@@ -1977,65 +1977,76 @@ var RouteParser = function(){
 		var deepClone = this.dom;
 		var tieInstance = this.tieInstance;
 
-		var contentNodes = selectTextNodes(deepClone, function(node){
-			if(node.nodeValue.indexOf('@') === 0) //starts with 
-				return node;
-			return null;
-		});	
 		
+		if(!this.contentMap) {
+			var contentNodes = selectTextNodes(deepClone, function(node){
+				if(node.nodeValue.indexOf('@') === 0) //starts with 
+					return node;
+				return null;
+			});	
+			
+			//build content nodes key map
+			if(!contentNodes) return;
 
-		if(contentNodes) {
+			this.contentMap = {};
 			for(var i=0; i < contentNodes.length; i++){
-				var value = contentNodes[i].nodeValue; 
-				value = value.substring(1,value.length);
-
-				var obj = content[value];
-				var newNode = null;
-
-				if(typeof obj === 'function') {
-					var contentInstance = new obj({parent:tieInstance});
-					if(contentInstance.concrete) {
-						
-						newNode = contentInstance.concrete.export();
-						if(newNode instanceof Array) {
-							var parentNode = contentNodes[i].parentNode;
-							var child = newNode[0]; 
-							
-							if(isHTMLElement(child))
-							parentNode.replaceChild(child, contentNodes[i]);
-
-							for( var n = 1; n < newNode.length; n++){
-								var sibling = child.nextSibling;
-								var child = newNode[n];
-								if(isHTMLElement(child))
-								parentNode.insertBefore(child,sibling);
-							}	
-						} else {
-							contentNodes[i].parentNode.replaceChild(newNode, contentNodes[i]);			
-						}
-						
-						if(suspendNotify) continue;
-						if(contentInstance.onAttach) contentInstance.onAttach();
-						if(contentInstance.onDisplay) contentInstance.onDisplay();	
-						
-						continue;
-					}
-				}
-
-				if(typeof obj === 'string'){
-					newNode = document.createTextNode(obj);		
-				}
-
-				if(typeof obj === 'number'){
-					newNode = document.createTextNode(obj);			
-				}
-
-				if(newNode) contentNodes[i].parentNode.replaceChild(
-						newNode, 
-						contentNodes[i]
-				);	
+				var key = contentNodes[i].nodeValue.substring(1); 
+				this.contentMap[key] = contentNodes[i];
 			}
 		}
+
+		var contentMap = this.contentMap;
+		var keys = Object.keys(contentMap);		
+		for(var i=0; i < keys.length; i++ ){
+		
+			var key = keys[i];
+			var obj = content[key];
+			var newNode = null;
+
+			if(typeof obj === 'function') {
+				var contentInstance = new obj({parent:tieInstance});
+				if(contentInstance.concrete) {
+					
+					newNode = contentInstance.concrete.export();
+					if(newNode instanceof Array) {
+						var parentNode = contentNodes[i].parentNode;
+						var child = newNode[0]; 
+						
+						if(isHTMLElement(child))
+						parentNode.replaceChild(child, contentNodes[i]);
+
+						for( var n = 1; n < newNode.length; n++){
+							var sibling = child.nextSibling;
+							var child = newNode[n];
+							if(isHTMLElement(child))
+							parentNode.insertBefore(child,sibling);
+						}	
+					} else {
+						contentNodes[i].parentNode.replaceChild(newNode, contentNodes[i]);			
+					}
+					
+					if(suspendNotify) continue;
+					if(contentInstance.onAttach) contentInstance.onAttach();
+					if(contentInstance.onDisplay) contentInstance.onDisplay();	
+					
+					continue;
+				}
+			}
+
+			if(typeof obj === 'string'){
+				newNode = document.createTextNode(obj);		
+			}
+
+			if(typeof obj === 'number'){
+				newNode = document.createTextNode(obj);			
+			}
+
+			if(!newNode) continue;
+
+			contentMap[key].parentNode.replaceChild(newNode, contentMap[key]);
+			contentMap[key] = newNode;	
+		}
+		
 	};
 
 	
@@ -2469,7 +2480,7 @@ var RouteParser = function(){
 		/*  this is event binding only allow functions to be bound to events */
 		if(dest.value() && dest.value().SPLICE_JS_EVENT) {
 			if(typeof source.value() !== 'function') 
-				throw 'Origin property '+ key +' is not a functions. Events may only bind to functions';
+				throw 'Cannot establish binding between \''+ key + '\' and \'' + binding.prop + '\'. Check that properties are of types \'function\'';
 
 			dest.instance[dest.path].subscribe(source.value(), source.instance);
 
@@ -2866,9 +2877,13 @@ var Module =
 			 * Define a module
 			 * and create template scope 
 			 * for template compilation
-			 * */
+			 *
+			 * Some modules may be simple dependency aggregators 
+			 * in which case definition function is not available 
+			 **/
 			
-			definition.call(scope,scope);
+			if(typeof definition === 'function') definition.call(scope,scope);
+			
 			scope.templates = templateDefinitions;
 			scope.cssrules = cssRules;
 			

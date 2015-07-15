@@ -16,8 +16,6 @@ required:[
 	'splice.controls/splice.controls.codeeditor.js',
 	'splice.controls/splice.controls.d3canvas.js'
 ], 	
-        
-cssIsLocal:true,        
 
 definition:function(){
 	
@@ -74,20 +72,27 @@ definition:function(){
 		SpliceJS.Controls.UIControl.apply(this,arguments);
 
 		var self = this;
-		this.elements.controlContainer.onchange = function(){
+		
+		var f = function(){
 			if(self.dataPath) {
 				self.dataItem[self.dataPath] = this.value;
 			}
 			else {
 				self.dataItem = {value:this.value};
 			}
-			self.dataOut(self.dataItem);
+			self.onData(self.dataItem);
+		};
+
+		if(this.isRealTime){
+			this.elements.controlContainer.onkeyup = f;
 		}
+		else { 
+			this.elements.controlContainer.onchange = f;
+		}
+
 	}).extend(SpliceJS.Controls.UIControl);
 	
-	TextField.prototype.dataOut = function(){
-		
-	};
+	TextField.prototype.onData = _.Event;
 		
 	TextField.prototype.dataIn = function(dataItem){
 		SpliceJS.Controls.UIControl.prototype.dataIn.call(this,dataItem);
@@ -266,7 +271,6 @@ definition:function(){
 
 	var DomIterator = _.Namespace('SpliceJS.Controls').Class( function DomIterator(args){
 
-		var nodes = [];
 		this.conc = [];
 
 		this.dom = null; 
@@ -274,14 +278,18 @@ definition:function(){
 
 		var self = this;
 
+		this.template = args.dom;
+		this.container = document.createElement('span');
+
+/*
 		for(var i = 0; i < 100; i++ ){
 			this.conc.push(new args.dom({parent:this}));
 			nodes.push(this.conc[i].concrete.dom);
 		}
-	
+*/	
 		this.concrete = {
 			export:function(){
-				return nodes;
+				return self.container;
 			}
 		};
 
@@ -290,9 +298,31 @@ definition:function(){
 	}).extend(SpliceJS.Core.Controller);
 
 	DomIterator.prototype.dataIn = function(data){
-		for(var i=0; i < data.length; i++){
-			this.conc[i].concrete.applyContent(data[i]);		
+		var nToUpdate = Math.min(this.conc.length, data.length);
+		var nExisting = this.conc.length;
+		var nCreate = data.length - this.conc.length;
+
+		for(var i=0; i < nToUpdate; i++){
+			this.conc[i].concrete.applyContent(data[i]);
+			this.conc[i].data = data[i];		
 		}
+
+		if(nCreate > 0) //add new nodes
+		for(var i=0; i < nCreate; i++) {
+			var n = new this.template({parent:this});
+			
+			n.concrete.applyContent(data[nExisting + i]);
+			n.data = data[i];
+			this.container.appendChild(n.concrete.dom);
+			this.conc.push(n);
+		}
+
+		if(nCreate < 0) //remove existing modes
+		for(var i=this.conc.length-1; i >= nToUpdate; i--){
+			this.container.removeChild(this.conc[i].concrete.dom);
+			this.conc.splice(i,1);
+		}	
+
 	}
 
 	SpliceJS.Controls.DomIterator = localScope.createComponent(DomIterator,null);
