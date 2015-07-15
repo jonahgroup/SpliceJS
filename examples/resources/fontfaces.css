@@ -7,3 +7,19 @@
 	font-family:Station;
 	src:url('fonts/station.ttf');
 }
+
+
+@font-face {
+	font-family:RobotoLight;
+	src:url('fonts/Roboto/Roboto-Light.ttf');
+}
+
+@font-face {
+	font-family:RobotoMedium;
+	src:url('fonts/Roboto/Roboto-Medium.ttf');
+}
+
+@font-face {
+	font-family:RobotoRegular;
+	src:url('fonts/Roboto/Roboto-Regular.ttf');
+}
