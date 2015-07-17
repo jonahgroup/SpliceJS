@@ -69,7 +69,7 @@ definition:function(){
 	*	Cell container class 
 	*
 	*/
-	var CellContainer = scope.CellContainer = _.Class(function CellContainer(){
+	var CellContainer = scope.CellContainer = _.Namespace('SpliceJS.Controls.Container').Class(function CellContainer(){
 		SpliceJS.Controls.UIControl.call(this);
 
 		//attach events to drive resizing of the cell container
@@ -96,13 +96,19 @@ definition:function(){
 		this.onStartResize.subscribe(this.startResize, this);
 		this.onResize.subscribe(this.resize, this);
 		this.onEndResize.subscribe(this.endResize, this);
+		this.onStartMove.subscribe(this.startMove,this);
 
 	}).extend(SpliceJS.Controls.UIControl);
 
 
+	CellContainer.prototype.onStartMove   =	_.Event;
+	CellContainer.prototype.onMove 	  	  = _.Event;
+	CellContainer.prototype.onEndMove 	  = _.Event;
+
+
 	CellContainer.prototype.onStartResize = _.Event;
-	CellContainer.prototype.onResize = 		_.Event;
-	CellContainer.prototype.onEndResize = 	_.Event;
+	CellContainer.prototype.onResize 	  =	_.Event;
+	CellContainer.prototype.onEndResize   =	_.Event;
 
 
 	CellContainer.prototype.startResize = function(e,direction){
@@ -113,6 +119,11 @@ definition:function(){
 		SpliceJS.Ui.DragAndDrop.ondrag =  function(p,offset){
 			self.onResize({mouse:p,direction:direction, src:self});
 		}
+	};
+
+
+	CellContainer.prototype.startMove = function(){
+		_.debug.log('starting to move');
 	};
 
 
@@ -160,29 +171,55 @@ definition:function(){
 
 			for(var i=0; i< this.cells.length; i++) {
 
-				var cellContainer = _.Obj.call(scope,
-						{	type:'CellContainer',
-							col:this.cells[i].col, 
-							row:this.cells[i].row, 
-							colspan:this.cells[i].colspan, 
-							rowspan:this.cells[i].rowspan,
-							content:{body: this.cells[i].content}
-						});
-
-				var cell =  new cellContainer({parent:this, index:i}); //new this.cells[i].content({parent:this});
-				
-				cell.onResize.subscribe(function(args){
-						this.resizeCell(args);
-					}
-				,this);
-
-				this.layoutCells.push(cell);
-				this.elements.controlContainer.appendChild(cell.concrete.dom);
-				cell.onDisplay();
+				addCell.call(this,	this.cells[i].content, 
+					this.cells[i].row, this.cells[i].col,
+					this.cells[i].rowspan, this.cells[i].colspan);
+			
 			}
 			
 			this.reflow();
 		}
+	};
+
+	/* private */
+	function addCell(content, row, col, rowSpan, colSpan){
+
+		var cellContainer = _.Obj.call(scope,
+		{	type:'CellContainer',
+			row:row, 
+			col:col, 
+			colspan:colSpan, 
+			rowspan:rowSpan,
+			content:{body: content}
+		});
+
+		var cellIndex = this.layoutCells.length;
+
+		var cell =  new cellContainer({parent:this, index:cellIndex}); 
+		
+		cell.onResize.subscribe(function(args){
+				this.resizeCell(args);
+			}
+		,this);
+
+		this.layoutCells.push(cell);
+		this.elements.controlContainer.appendChild(cell.concrete.dom);
+		cell.onDisplay();
+
+	};
+
+	GridLayout.prototype.addCell = function(){
+		addCell.apply(this,arguments);
+		this.reflow();
+	};
+
+	GridLayout.prototype.addCellAuto = function(component){
+
+	};
+
+
+	GridLayout.prototype.moveCell = function(args){
+		_.debug.log('moving cell');
 	};
 
 	GridLayout.prototype.resizeCell = function(args){

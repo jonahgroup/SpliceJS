@@ -808,6 +808,13 @@ var RouteParser = function(){
 	};
 
 
+	function required(typeName){
+		return function(callback){
+			core.include([typeName],callback);
+		}
+	};
+
+
 /*
 
 ----------------------------------------------------------
@@ -1883,7 +1890,22 @@ var RouteParser = function(){
 			/* create instance of the proxy object
 			 * local scope lookup takes priority
 			 */
-			var obj = scope.templates[args.type] || scope[args.type] || _.Namespace.lookup(args.type);
+			var obj = null;
+			
+			if(!obj) try {
+				obj = scope.templates[args.type];
+			} catch(ex) {}
+					  
+			if(!obj) try {
+				obj = scope[args.type]; 
+			} catch(ex) {}
+			
+
+			if(!obj) try {
+				obj = _.Namespace.lookup(args.type);
+			} catch(ex) {}
+
+			
 			var tieOverride = null;
 
 			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
@@ -1932,6 +1954,10 @@ var RouteParser = function(){
 		return Proxy;
 		
 	};
+
+
+	
+
 
 
 	var Controller = core.Namespace('SpliceJS.Core').Class(function Controller(){
@@ -2440,6 +2466,7 @@ var RouteParser = function(){
 							  	path: 		v.path(binding.prop),
 							  	value: 		function(){return this.instance[this.path];}
 							};
+					break;
 				}
 				parent = parent.parent;
 			}
@@ -2926,6 +2953,8 @@ var Module =
 	};
 
 	core.display = display;
+
+	core.required = required;
 
 	return core;
 
