@@ -1117,9 +1117,17 @@ var RouteParser = function(){
 
 				for (var i = 0; i< nPath.length-1; i++){
 			
-					result = result[nPath[i]];
-
+					if(typeof result._bindingRouter === 'function'){
+						result = result._bindingRouter(nPath[i]);
+					}
+					else {	
+						result = result[nPath[i]];
+					}
 					if (!result) return null;	
+				}
+
+				if(typeof result._bindingRouter === 'function'){
+					result = result._bindingRouter(nPath[nPath.length-1]);
 				}
 
 				return result;
@@ -2727,6 +2735,19 @@ var RouteParser = function(){
 				obj['templateCSS'] = template.declaration.css;
 			}
 
+
+			obj.scope = scope;	
+
+			
+			/*
+				Instantiate Template
+			*/
+
+			if(template)
+			obj.concrete = template.getInstance(obj, args, scope);
+
+
+
 			/*
 			 * Bind declarative parameters
 			 *
@@ -2754,10 +2775,7 @@ var RouteParser = function(){
 				}
 			}
 
-			obj.scope = scope;	
 
-			if(template)
-			obj.concrete = template.getInstance(obj, args, scope);
 
 			tie.apply(obj, [args]);
 

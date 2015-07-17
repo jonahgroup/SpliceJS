@@ -350,5 +350,21 @@ definition:function(){
 	};
 
 
+
+
+	var DropDownSelector = _.Namespace('SpliceJS.Controls').Class( function DropDownSelector(){
+		SpliceJS.Core.Controller.call(this);
+	}).extend(SpliceJS.Core.Controller)
+
+
+	DropDownSelector.prototype.dataIn = function(data){
+		this.data = data;
+		this.elements.selector.innerHTML = data.toString();		
+	};
+
+
+
+
+
 // end module definition		
 }});

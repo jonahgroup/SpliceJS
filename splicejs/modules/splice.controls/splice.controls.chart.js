@@ -2,6 +2,7 @@ _.Module({
 
 required:[
     'splice.controls.chart.html',
+    'splice.controls.chart.css',
     _.home('lib/Chart.js-1.0.2/Chart.js')
 ],
 
@@ -311,15 +312,28 @@ var SChart = _.Namespace('SpliceJS.Controls').Class(function Chart(args){
     if(!this.chartType) this.cartType = 'Line';
 
     
-    this.onDisplay.subscribe(this.display, this);
+//    this.onDisplay.subscribe(this.display, this);
+    this.onAttach.subscribe(this.attach, this);
 
 }).extend(SpliceJS.Controls.UIControl);
+
+SChart.prototype.attach = function(){
+
+    var containerWidth =  this.elements.controlContainer.clientWidth;
+    var containerHeight = this.elements.controlContainer.clientHeight;
+
+    this.canvas.width = containerWidth;
+    this.canvas.height = containerHeight;
+
+
+    _.debug.log('Attaching chart');
+};
 
 
 SChart.prototype.dataIn = function(dataItem){
     SpliceJS.Controls.UIControl.prototype.dataIn.call(this, dataItem);
     this.isDirty = true;
-    this.onDisplay();
+   this.chart =  createChart.call(this.ctx, this.chartType, this.dataItem);
 };
 
 SChart.prototype.display = function() {
@@ -328,10 +342,10 @@ SChart.prototype.display = function() {
     var containerHeight = this.elements.controlContainer.clientHeight;
     
 
-    this.canvas.width = containerWidth;
-    this.canvas.height = containerHeight;
+    this.canvas.width = 400;//containerWidth;
+    this.canvas.height = 200;//containerHeight;
 
-
+    this.isDirty = true;
     if(this.isDirty) {
         this.chart =  createChart.call(this.ctx, this.chartType, this.dataItem);
     }
@@ -339,7 +353,7 @@ SChart.prototype.display = function() {
 };
 
 SChart.prototype.reflow = function(position, size, bubbleup){
-    
+ /*   
     SpliceJS.Controls.UIControl.prototype.reflow.call(this,position,size,bubbleup);
 
 
@@ -360,6 +374,7 @@ SChart.prototype.reflow = function(position, size, bubbleup){
         this.chart.update();
     }
 */
+
 };
 
 

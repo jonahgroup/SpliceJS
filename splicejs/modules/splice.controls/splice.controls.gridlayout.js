@@ -61,7 +61,9 @@ definition:function(){
 	var left 	= 1
 	,	top 	= 2
 	,	right 	= 3
-	,	bottom 	= 4; 
+	,	bottom 	= 4
+	,	move 	= 5;
+
 
 
 	/* 
@@ -123,7 +125,12 @@ definition:function(){
 
 
 	CellContainer.prototype.startMove = function(){
-		_.debug.log('starting to move');
+		SpliceJS.Ui.DragAndDrop.startDrag();
+
+		var self = this;
+		SpliceJS.Ui.DragAndDrop.ondrag =  function(p,offset){
+			self.onResize({mouse:p,direction:move, src:self});
+		}	
 	};
 
 
@@ -204,6 +211,7 @@ definition:function(){
 
 		this.layoutCells.push(cell);
 		this.elements.controlContainer.appendChild(cell.concrete.dom);
+		cell.onAttach();
 		cell.onDisplay();
 
 	};
@@ -250,6 +258,12 @@ definition:function(){
 
 			if(newSpan >= 1) cell.rowspan = newSpan;
 		}
+
+		if(direction == move) {
+			cell.col = cellPosition.col; //at least a single row
+			cell.row = cellPosition.row; //at least a single row
+		}
+
 
 		this.reflow(cell.index);
 
