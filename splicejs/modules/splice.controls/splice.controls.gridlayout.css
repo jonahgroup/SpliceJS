@@ -9,6 +9,7 @@
 
 .-splicejs-grid-layout-cell {
 	position:absolute;
+	transition:left 0.3s ease-in, top 0.3s ease-in;
 }
 
 .-splicejs-grid-layout-cell .body {
@@ -66,3 +67,4 @@
 	cursor:s-resize; 
 	background-position-x:center;
 }
+

@@ -359,8 +359,19 @@ definition:function(){
 
 	DropDownSelector.prototype.dataIn = function(data){
 		this.data = data;
-		this.elements.selector.innerHTML = data.toString();		
+		
+		var value = '';
+		if(this.format) {
+			value = _.Text.format('{0:'+this.format+'}',data);
+		} else {
+			value = value.toString();
+		}
+
+
+		this.elements.selector.innerHTML = value;		
 	};
+
+
 
 
 
