@@ -4,7 +4,7 @@ var Formatter = (function(){
 var STRINGBODY = 0
 , 	FORMAT = 1
 ,	ARGUMENTPOSITION = 3
-,	FORMATSYMBOL = 4
+,	FORMATOPTION = 4
 ,	SYMBOL = 5;
 
 var FormatLexer = function FormatLexer(input, isFormatMode){
@@ -63,15 +63,10 @@ function isLetter(c){
 }
 
 
-function isFormatSymbol(c){
-
+function isSymbol(c){
 	var code = c.charCodeAt();
-
-	if(	c == '#' || c == '(' || c == ')' || c == ',' || c == '.' ||
-		(code >= 65 && code <= 90 ) || 	/*A-Z*/
-		(code >= 97 && code <= 122) 	/*a-z*/) return true;
+	if(!isLetter(c) && !isDigit(c)) return true;
 	return false;	
-
 }
 
 
@@ -125,28 +120,24 @@ function argumentposition(){
 	return [ARGUMENTPOSITION,result];
 }
 
-function formatsymbol(){
-	
-	var result = '';
+function formatOption(){
+	var result = "";
 
-	while(!this.isEOF && isFormatSymbol(this.c)  ){
+	while(!this.isEOF && 
+		  (isDigit(this.c) || isLetter(this.c) )){
 		result += this.consume();
 	}
-	
-	return [FORMATSYMBOL, result];
+	return [FORMATOPTION,result];
 }
 
-function symbol(){
+function formatSeparator(){
 
-	var result = '';
-	while(!this.isEOF && !isFormatSymbol(this.c) ){
-		result += this.consume();
+	var result = "";
+
+	if(!this.isEOF && isSymbol(this.c)){
+		result = this.consume();
 	}
-	
-	return [SYMBOL, result];
-
-	
-
+	return [SYMBOL,result];
 }
 
 
@@ -176,15 +167,17 @@ FormatLexer.prototype.formatMode = function(){
 
 	if(a[1]) return a;
 
-	a = formatsymbol.call(this);
+	a = formatOption.call(this);
 
 	if(a[1]) return a;
 
-	a = symbol.call(this);
+	a = formatSeparator.call(this);
 
 	if(a[1]) return a;
+
 
 	return null;
+
 }
 
 
@@ -196,6 +189,133 @@ FormatLexer.prototype.nextToken = function(){
 
 };
 
+
+var Fast = function Fast(input){
+	
+	this.lex = new FormatLexer(input,true);
+	this.consume();
+
+	this.tree = this.root = {fn:null, operand:null};
+
+};
+
+Fast.prototype.consume = function(){
+	this.token = this.lex.nextToken();
+}
+
+Fast.prototype.isToken = function(value){
+	if(!this.token) return false;
+	if(this.token[1] == value) return true;
+	return false;
+}
+
+
+Fast.prototype.exec = function(valueArgs){
+	
+	var argument = null;
+	var result = '';
+
+	while(this.token != null){
+
+		var t = this.token[1];
+
+		if(this.token[0] == ARGUMENTPOSITION) {
+			argument = valueArgs[(this.token[1]*1+1)];
+			this.consume();
+			continue;
+		}
+
+		if(t == '#' || t == '0' || t == '('){
+			return result + numberFormat.call(this, argument);
+		}
+
+		if(t == 'dd' || t == 'yyyy' || t== 'mm'){
+			return result + dateFormat.call(this, argument);
+		}
+
+		result += this.token[1];
+		this.consume();
+	}
+
+};
+
+//this - Fast
+function numberFormat(argument){
+	var padding = 0
+	, 	factoring = 0
+	,	precision = 0
+	,	scope = 0
+	,	b = ['','']
+	,	sign = (argument/Math.abs(argument))<0?'-':'';
+
+	if( this.isToken('(') ) {
+		this.consume();
+		scope++
+		if(sign < 0) b = ['(',')'];
+		sign = '';
+	}
+
+	//parse padding size
+	while(this.isToken('0') || this.isToken('#')) {
+		if(this.isToken('0') ) padding++;
+		this.consume();
+	}
+
+	//parse factor size
+	if(this.isToken(',') ){
+		this.consume();
+		while(this.isToken('#')){
+			factoring++;
+			this.consume();
+		}		
+	}
+
+	if( this.isToken('.')){
+		this.consume();
+		while(this.isToken('#')){
+			precision++;
+			this.consume();
+		}
+		if(precision == 0) argument = Math.round(argument);
+	}
+
+
+	if(this.isToken(')')) {
+		scope--; this.consume();
+	}
+
+	if(scope != 0) throw 'Invalid number format';
+
+	//Apply format calculation
+
+	var precisionAmount = '';
+	if(precision > 0) {
+		var n = Math.pow(10,precision);
+
+		argument = Math.round(argument * n );
+		precisionAmount = (argument % n).toString();
+		argument = Math.floor(argument / n);
+	}
+
+	if(factoring > 0) {
+		var n = Math.pow(10,factoring)
+		, 	result = ''
+		,	f = argument;
+
+		for(; f >= n; f = Math.floor(f/n) ) {
+	        result = ','+ (f % n) +result;
+    	}
+    	argument = f + result;
+	}
+
+	var result = b[0] + sign + argument + (precisionAmount?('.'+precisionAmount):'') + b[1];
+		
+
+	return result;
+}
+
+
+//--- Operations 
 var formatLookup = {
 	"yyyy":function(d){
 		if(!(d instanceof Date)) return '{error}';
@@ -213,47 +333,25 @@ var formatLookup = {
 	}
 };
 	
-function executeFormat(format, value){
 
-	var fn = formatLookup[format];
-	if(typeof fn == 'function') {
-		return fn(value);
+
+
+// ()
+function bracketOperation(value){
+	if(typeof value == 'number') {
+		if( value < 0) return '('+Math.abs(value)+')';
+		return value;
 	}
+	return '('+value+')';
+}
 
-	return value;
 
-};
+
 
 
 function processFormat(format, valueArgs){
-	//start in format mode
-	var lexer = new FormatLexer(format, true)
-	,	token = ''
-	,	result = ''
-	,	count = 0;
-
-	var value = null;
-	while(token = lexer.nextToken()){
-		
-		if(token[0] == ARGUMENTPOSITION) {
-			value = valueArgs[token[1]*1+1];
-			continue;
-		}
-
-		if(token[0] == FORMATSYMBOL){
-			result += executeFormat(token[1], value); 
-			continue;
-		}
-
-		if(token[0] == SYMBOL){
-			result += token[1];
-			continue;
-		}
-
-		if(count++ > 100) throw 'Format parsing error!';
-	}
-
-	return result;
+	var fast  = new Fast(format);
+	return fast.exec(valueArgs);
 }
 
 function format(){
