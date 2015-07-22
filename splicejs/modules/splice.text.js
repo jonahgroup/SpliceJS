@@ -123,8 +123,12 @@ function argumentposition(){
 function formatOption(){
 	var result = "";
 
-	while(!this.isEOF && 
-		  (isDigit(this.c) || isLetter(this.c) )){
+	if(!this.isEOF && isDigit(this.c)) {
+		result = this.consume();
+		return [FORMATOPTION, result];
+	}
+
+	while(!this.isEOF && isLetter(this.c) ){
 		result += this.consume();
 	}
 	return [FORMATOPTION,result];
@@ -163,11 +167,7 @@ FormatLexer.prototype.formatMode = function(){
 
 	if(this.isEOF) return;
 
-	var a = argumentposition.call(this);
-
-	if(a[1]) return a;
-
-	a = formatOption.call(this);
+	var a = formatOption.call(this);
 
 	if(a[1]) return a;
 
@@ -212,18 +212,26 @@ Fast.prototype.isToken = function(value){
 
 Fast.prototype.exec = function(valueArgs){
 	
-	var argument = null;
 	var result = '';
+
+	if(this.token[0] == FORMATOPTION){
+	
+		var argument = valueArgs[(this.token[1]*1+1)];
+
+		this.consume();
+
+		if(this.token[1] != ':') throw 'Invalid format argument posittion syntax';
+		this.consume(); 
+	} else { 
+		throw 'Invalid format argument posittion syntax';
+	}
+
+	
 
 	while(this.token != null){
 
 		var t = this.token[1];
-
-		if(this.token[0] == ARGUMENTPOSITION) {
-			argument = valueArgs[(this.token[1]*1+1)];
-			this.consume();
-			continue;
-		}
+	
 
 		if(t == '#' || t == '0' || t == '('){
 			return result + numberFormat.call(this, argument);
@@ -243,18 +251,25 @@ Fast.prototype.exec = function(valueArgs){
 function numberFormat(argument){
 	var padding = 0
 	, 	factoring = 0
-	,	precision = 0
-	,	scope = 0
-	,	b = ['','']
-	,	sign = (argument/Math.abs(argument))<0?'-':'';
+	,	precision = 0;
+	
 
 	if( this.isToken('(') ) {
+		var b = ['',''];
+		if(argument < 0) b = ['(',')'];
+		
 		this.consume();
-		scope++
-		if(sign < 0) b = ['(',')'];
-		sign = '';
+		
+		var result = b[0] + numberFormat.call(this, Math.abs(argument)) + b[1]; 
+		
+		if(this.token[1] != ')') throw 'Invalid format syntax';
+
+		return result;
 	}
 
+	var sign = (argument/Math.abs(argument))<0?'-':'';
+
+	argument = Math.abs(argument);
 	//parse padding size
 	while(this.isToken('0') || this.isToken('#')) {
 		if(this.isToken('0') ) padding++;
@@ -280,12 +295,6 @@ function numberFormat(argument){
 	}
 
 
-	if(this.isToken(')')) {
-		scope--; this.consume();
-	}
-
-	if(scope != 0) throw 'Invalid number format';
-
 	//Apply format calculation
 
 	var precisionAmount = '';
@@ -295,7 +304,13 @@ function numberFormat(argument){
 		argument = Math.round(argument * n );
 		precisionAmount = (argument % n).toString();
 		argument = Math.floor(argument / n);
+	} else {
+		var x = argument.toString();
+		var idx = x.indexOf('.');
+		if(idx > -1) precisionAmount = x.substring(idx+1);
 	}
+
+	argument = Math.floor(argument);
 
 	if(factoring > 0) {
 		var n = Math.pow(10,factoring)
@@ -308,9 +323,7 @@ function numberFormat(argument){
     	argument = f + result;
 	}
 
-	var result = b[0] + sign + argument + (precisionAmount?('.'+precisionAmount):'') + b[1];
-		
-
+	var result = sign + argument + (precisionAmount?('.'+precisionAmount):'');
 	return result;
 }
 
@@ -333,7 +346,21 @@ var formatLookup = {
 	}
 };
 	
+function dateFormat(value){
+	var result = ""
+	,	token = null;
 
+	while(token = this.token){
+		var fn = formatLookup[token[1]]; 
+		if(fn) {
+			result += fn(value);
+			this.consume();	
+			continue;
+		}
+		result += token[1];
+		this.consume();
+	}	
+};
 
 
 // ()

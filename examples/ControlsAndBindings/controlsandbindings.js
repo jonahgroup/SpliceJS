@@ -5,11 +5,11 @@ required:[_.home('modules/splice.controls.js'),
 		  '../ScrollPanel/scrollpanelapplication.js',
 		  '../D3/rectangles.js',
 		  '../D3/streamgraph.js',
-		 // 'controlsandbindings.css',
-          'controlsandbindings_local.css',
+		  'controlsandbindings.css',
+          //'controlsandbindings_local.css',
           'controlsandbindings.html'],	
 
-cssIsLocal:true,
+
 	
 definition:function(){
 	var LocalScope = this;
