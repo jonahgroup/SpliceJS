@@ -237,7 +237,7 @@ Fast.prototype.exec = function(valueArgs){
 			return result + numberFormat.call(this, argument);
 		}
 
-		if(t == 'dd' || t == 'yyyy' || t== 'mm'){
+		if(t == 'dd' || t == 'yyyy' || t == 'mm' || t == 'm' || t == 'MM' || t == 'MMM'){
 			return result + dateFormat.call(this, argument);
 		}
 
@@ -339,11 +339,20 @@ var formatLookup = {
 		var month = d.getMonth()+1;
 		return (100 + 1*month).toString().substring(1);
 	},
+	"m":function(d){
+		if(!(d instanceof Date)) return '{error}';
+		return d.getMonth()+1;
+	},
 	"dd":function(d){
 		if(!(d instanceof Date)) return '{error}';
-		var date = d.getDate()+1;
+		var date = d.getDate();
 		return (100 + 1*date).toString().substring(1);
+	},
+	"d":function(d){
+		if(!(d instanceof Date)) return '{error}';
+		return d.getDate();
 	}
+
 };
 	
 function dateFormat(value){
@@ -359,7 +368,9 @@ function dateFormat(value){
 		}
 		result += token[1];
 		this.consume();
-	}	
+	}
+
+	return result;	
 };
 
 

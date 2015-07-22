@@ -14,7 +14,8 @@ required:[
 	'splice.controls/splice.controls.map.js',
 	'splice.controls/splice.controls.gridlayout.js',
 	'splice.controls/splice.controls.codeeditor.js',
-	'splice.controls/splice.controls.d3canvas.js'
+	'splice.controls/splice.controls.d3canvas.js',
+	'splice.controls/splice.controls.calendar.js'
 ], 	
 
 definition:function(){
@@ -354,6 +355,12 @@ definition:function(){
 
 	var DropDownSelector = _.Namespace('SpliceJS.Controls').Class( function DropDownSelector(){
 		SpliceJS.Core.Controller.call(this);
+	
+		var self = this;
+		this.elements.controlContainer.onclick = function(){
+			self.dropDown();
+		} 
+
 	}).extend(SpliceJS.Core.Controller)
 
 
@@ -371,6 +378,22 @@ definition:function(){
 		this.elements.selector.innerHTML = value;		
 	};
 
+
+	DropDownSelector.prototype.dropDown = function(){
+
+		
+		var left = this.elements.selector.offsetLeft;
+		var height = this.elements.selector.offsetHeight;
+		
+		var cs = _.Doc.style(this.elements.selector);
+
+		var s = this.elements.dropdownContainer.style;
+
+		s.left = left + 'px';
+		s.top =  cs.padding.top.value + cs.padding.bottom.value + height + 'px';
+
+		s.display='block';
+	};
 
 
 

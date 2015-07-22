@@ -83,7 +83,7 @@ Doc.prototype.style = function(element){
 
 	return {
 		
-		height:getValue('height'),
+		height: css.getPropertyValue('height'),
 		padding:{
 			left: 	getValue('padding-left'),
 			right:  getValue('padding-right'),

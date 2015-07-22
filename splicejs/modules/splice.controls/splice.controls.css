@@ -140,7 +140,18 @@
   border: 0.1em solid #cecece;
   padding: 0.3em;
   padding-left: 0.4em;
-  padding-right: 0.4em;
+ 
+  
+  /* creates room for the drop-down arrow*/
+  padding-right: 25px;
+  cursor: pointer;
+
+  background: url('resources/splicejs.dropdown.selector/black/dropdownarrow.png') no-repeat right 0px center;
+}
+
+.-splicejs-dropdown-selector .selector:hover {
+	background-color:#3F3F3F;
+
 }
 
 .-splicejs-dropdown-container {
