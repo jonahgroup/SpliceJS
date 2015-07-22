@@ -1,24 +1,12 @@
 _.Module({
-	
+required:[
+	'splice.controls.calendar.html',
+	'splice.controls.calendar.css'
+	],	
 definition:function(){ 
 
-	var Calendar = {
+	var _Calendar = {
 	
-		HTML_CAL_GRID : '<table>'+
-						'<tr class="cl-control-row"><td colspan="7">'+
-						'<div id="id-popup-calendar-controls">'+
-						'<div class="cl-prev"><a onclick="CSDialogs.Calendar.prev(event);"><img src="public/images/previous.gif" align="absmiddle"></a></div>'+
-						'<div class="cl-current-date"><div id="id-popup-calendar-current-date">Month</div></div>'+
-						'<div class="cl-next"><a onclick="CSDialogs.Calendar.next(event);"><img src="public/images/next.gif" align="absmiddle"></a></div></div>'+
-						'</td></tr>'+
-						'<tr class="cl-popup-calendar-days"><td>S</td><td>M</td><td>T</td><td>W</td><td>T</td><td>F</td><td>S</td></tr>'+
-						'<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'+
-						'<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'+
-						'<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'+
-						'<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'+
-						'<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'+
-						'<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'+
-						'</table>',
 		
 		DAYS_MONTH : [/* non leap year*/ [31,28,31,30,31,30,31,31,30,31,30,31],
 					  /* leap year */	 [31,29,31,30,31,30,31,31,30,31,30,31]],
@@ -45,7 +33,7 @@ definition:function(){
 				cldr.innerHTML = this.HTML_CAL_GRID;
 				
 				this.CALENDAR = cldr;
-				document.body.appendChild(this.CALENDAR);
+				
 				
 				var anchors = _$_('id-popup-calendar-controls').getElementsByTagName('a');
 				
@@ -326,12 +314,11 @@ definition:function(){
 
 
 
-	var sCalendar = _.Namespace('SpliceJS.Controls').Class(function Calendar(){
+	var Calendar = _.Namespace('SpliceJS.Controls').Class(function Calendar(){
 
 
 
-
-	});
+	}).extend(SpliceJS.Core.Controller);
 
 
 
