@@ -2,70 +2,30 @@ _.Module({
 
 required:[	
 			
-	'splice.ui.js',
-	'splice.controls/splice.controls.css',
-  	'splice.controls/splice.controls.html',
-	'splice.controls/splice.controls.datatable.js',
-	'splice.controls/splice.controls.scrollpanel.js',
-	'splice.controls/splice.controls.chart.js',
-	'splice.controls/splice.controls.listbox.js',
-	'splice.controls/splice.controls.drawerpanel.js',
-	'splice.controls/splice.controls.viewpanel.js',
-	'splice.controls/splice.controls.map.js',
-	'splice.controls/splice.controls.gridlayout.js',
-	'splice.controls/splice.controls.codeeditor.js',
-	'splice.controls/splice.controls.d3canvas.js',
-	'splice.controls/splice.controls.calendar.js'
-], 	
+	'splice.ui.js'
+,	'splice.controls/splice.controls.css'
+,  	'splice.controls/splice.controls.html'
+,  	'splice.controls/splice.controls.buttons.js'
+,	'splice.controls/splice.controls.datatable.js'
+,	'splice.controls/splice.controls.scrollpanel.js'
+,	'splice.controls/splice.controls.chart.js'
+,	'splice.controls/splice.controls.listbox.js'
+,	'splice.controls/splice.controls.drawerpanel.js'
+,	'splice.controls/splice.controls.viewpanel.js'
+,	'splice.controls/splice.controls.map.js'
+,	'splice.controls/splice.controls.gridlayout.js'
+,	'splice.controls/splice.controls.codeeditor.js'
+,	'splice.controls/splice.controls.d3canvas.js'
+,	'splice.controls/splice.controls.calendar.js'
+,	'splice.controls/splice.controls.datepicker.js'
+,	'splice.controls/splice.controls.selectors.js'
 
+]
+, 	
 definition:function(){
 	
 	var localScope = this;
-	
-	var Button = _.Namespace('SpliceJS.Controls').Class(function Button(args){
-		
-		SpliceJS.Controls.UIControl.apply(this,arguments);
-		
-			
-		var self = this;
-		this.elements.controlContainer.onclick = function(){
-			if(self.isDisabled == true) return;
-			self.onClick(self.dataItem);
 
-		};
-		
-		if(this.isDisabled) this.disable();
-		
-	}).extend(SpliceJS.Controls.UIControl);
-
-	
-	Button.prototype.handleContent = function(content){
-		if(!content) return;
-		
-		if(content['label']){
-			this.elements.controlContainer.value = content['label']; 
-		} else {
-			this.elements.controlContainer.value = 'button';
-		}
-	};
-
-	Button.prototype.setLabel = function(label){
-		this.elements.controlContainer.value = label;
-	};
-	
-	Button.prototype.onClick = _.Event;
-	
-	Button.prototype.enable = function(){
-		this.elements.controlContainer.className = '-splicejs-button';
-		this.isDisabled = false;
-		this.onDomChanged();
-	};
-	
-	Button.prototype.disable = function(){
-		this.elements.controlContainer.className = '-splicejs-button-disabled';
-		this.isDisabled = true;
-		this.onDomChanged();
-	}
 	
 	
 	
@@ -106,82 +66,10 @@ definition:function(){
 		this.elements.controlContainer.value = '';
 	};
 	
-	
-	/**
-	 * 
-	 * Check box
-	 * */
-	var CheckBox = _.Namespace('SpliceJS.Controls').Class(function CheckBox(args){
-		SpliceJS.Controls.UIControl.apply(this,arguments);
-
-		var self = this;
-		
-		
-		
-		this.concrete.dom.onclick = function(){
-			_.debug.log('I am check box');
-			var isChecked = self.concrete.dom.checked; 
-			if(self.dataItem) {
-				self.dataItem[self.dataPath] = isChecked;
-			}
-			
-			if(self.dataOut) 	self.dataOut(self.dataItem);
-			if(self.onCheck)	self.onCheck(isChecked);
-		};
-	
-	}).extend(SpliceJS.Controls.UIControl);
 
 	
-	CheckBox.prototype.dataIn = function(dataItem){
-		this.dataItem = dataItem;
-		if(this.dataItem && (this.dataItem[this.dataPath] === true)){
-			this.concrete.dom.checked = true;
-		}
-		else this.concrete.dom.checked = false; 
-	};
-	
-	CheckBox.prototype.clear = function(){
-		this.concrete.dom.checked = false;
-	};
-	
 
-	/**
-	 * RadioButton
-	 * */
-	var RadioButton = _.Namespace('SpliceJS.Controls').Class(function RadioButton(args){
-		SpliceJS.Controls.UIControl.apply(this,arguments);
-	
-		var self = this;
-		this.elements.controlContainer.onclick = function(){
 
-			if(self.elements.controlContainer.checked) {
-				if(self.dataPath)
-				self.dataItem[self.dataPath] = true
-			} else {
-				if(self.dataPath)
-				self.dataItem[self.dataPath] = false;
-			}
-			self.dataOut(self.dataItem);
-		}
-	
-	}).extend(SpliceJS.Controls.UIControl);
-	
-	
-	RadioButton.prototype.dataIn = function(dataItem){
-		SpliceJS.Controls.UIControl.prototype.dataIn.call(this,dataItem);
-
-		if(!this.dataPath) {
-			this.elements.controlContainer.checked = false;
-			return;
-		}
-
-		if(this.dataItem[this.dataPath] === true) {
-			this.elements.controlContainer.checked = true;
-		}
-		else {
-			this.elements.controlContainer.checked = false;	
-		}
-	};
 
 
 
@@ -351,49 +239,6 @@ definition:function(){
 	};
 
 
-
-
-	var DropDownSelector = _.Namespace('SpliceJS.Controls').Class( function DropDownSelector(){
-		SpliceJS.Core.Controller.call(this);
-	
-		var self = this;
-		this.elements.controlContainer.onclick = function(){
-			self.dropDown();
-		} 
-
-	}).extend(SpliceJS.Core.Controller)
-
-
-	DropDownSelector.prototype.dataIn = function(data){
-		this.data = data;
-		
-		var value = '';
-		if(this.format) {
-			value = _.Text.format('{0:'+this.format+'}',data);
-		} else {
-			value = value.toString();
-		}
-
-
-		this.elements.selector.innerHTML = value;		
-	};
-
-
-	DropDownSelector.prototype.dropDown = function(){
-
-		
-		var left = this.elements.selector.offsetLeft;
-		var height = this.elements.selector.offsetHeight;
-		
-		var cs = _.Doc.style(this.elements.selector);
-
-		var s = this.elements.dropdownContainer.style;
-
-		s.left = left + 'px';
-		s.top =  cs.padding.top.value + cs.padding.bottom.value + height + 'px';
-
-		s.display='block';
-	};
 
 
 

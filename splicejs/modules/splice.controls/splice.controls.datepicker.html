@@ -1,0 +1,10 @@
+<sjs-template type="SpliceJS.Controls.DatePicker">
+	<sjs-include type="SpliceJS.Controls.DropDownSelector">
+	{	content:{selectedItem: new Date().toString()},
+		dataIn:_.Binding('onDateSelected').Parent,
+		content:{
+			dropDownItem:<sjs-include type="SpliceJS.Controls.Calendar"></sjs-include>
+		}
+	}
+	</sjs-include>
+</sjs-template>

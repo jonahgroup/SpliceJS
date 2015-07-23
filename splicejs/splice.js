@@ -915,12 +915,19 @@ var RouteParser = function(){
 		
 
 		var callbacks = [[]], instances = [[]];
+		var cleanup = {fn:null, instance:null };
 
 		var MulticastEvent = function MulticastEvent(){
 			var idx = callbacks.length-1;
 			for(var i=0; i < callbacks[idx].length; i++) {
 				callbacks[idx][i].apply(instances[idx][i],arguments);
 			}
+			if(typeof cleanup.fn === 'function') {
+				cleanup.fn.call(cleanup.instance);
+			}
+
+			cleanup.fn 		 = null;
+			cleanup.instance = null;
 		}
 
 		MulticastEvent.SPLICE_JS_EVENT = true; 
@@ -939,19 +946,39 @@ var RouteParser = function(){
 			
 			callbacks[idx].push(callback);
 			instances[idx].push(instance);
+			return this;
+		};
+
+		MulticastEvent.unsubscribe = function(callback){
+			var idx = callbacks.length-1;
+			for(var i=0; i < callbacks[idx].length; i++) {
+				if( callbacks[idx][i] == callback ) {
+					core.debug.log('unsubscribing...');
+					callbacks[idx].splice(i,1);		
+					instances[idx].splice(i,1);
+					break;
+				}
+			}
 		};
 
 		MulticastEvent.push = function(){
 			callbacks.push([]);
 			instances.push([]);
+			return this;
 		};
 
 		MulticastEvent.pop = function(){
 			if(callbacks.length == 1) return;
 			callbacks.pop();
 			instances.pop();
+			return this;
 		};
-
+		
+		MulticastEvent.cleanup = function(callback, instance){
+			cleanup.fn 		 = callback;
+			cleanup.instance = instance;
+			return this;
+		};
 
 
 		if(!object || !property) return MulticastEvent;
