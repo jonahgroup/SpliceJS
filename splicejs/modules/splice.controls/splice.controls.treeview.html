@@ -1,0 +1,20 @@
+<sjs-template type="SpliceJS.Controls.TreeView">
+	<div class="-splicejs-treeview" data-sjs-element="controlContainer">
+		<sjs-include type="SpliceJS.Controls.ScrollPanel">
+		{
+			content:{
+			staticContent:'',
+			scrollContent:<ul data-sjs-element="treeRoot">@children</ul>		
+			}
+		}
+		</sjs-include>
+	</div>
+</sjs-template>
+
+<sjs-template type="SpliceJS.Controls.TreeViewRoot">
+	<li>@content<ul data-sjs-element="treeRoot">@children</ul></li>		
+</sjs-template>
+
+<sjs-template type="SpliceJS.Controls.TreeViewRoot">
+	<li>@content</li>
+</sjs-template>

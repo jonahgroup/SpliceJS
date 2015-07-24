@@ -86,10 +86,11 @@ definition:function(){
 
 	UIControl.prototype.dataIn = function(data){
 		this.dataItem = data;
+		this.onDataIn(this.dataItem);
 	};
 	
 	UIControl.prototype.dataOut = _.Event;
-
+	UIControl.prototype.onDataIn = _.Event;
 
 
 	/**

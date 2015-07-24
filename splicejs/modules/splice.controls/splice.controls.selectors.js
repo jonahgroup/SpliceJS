@@ -26,15 +26,24 @@ definition:function(){
 
 	DropDownSelector.prototype.dropDown = function(){
 		
-		var left = this.elements.selector.offsetLeft;
-		var height = this.elements.selector.offsetHeight;
+		var left = this.elements.selector.offsetLeft
+		,	height = this.elements.selector.offsetHeight
+		,	top = height
+		,	s = this.elements.dropdownContainer.style
+		,	pos = SpliceJS.Ui.Positioning.absPosition(this.elements.selector)
+		;
 		
-		var cs = _.Doc.style(this.elements.selector);
+		//append drop down to the document root
+		document.body.appendChild(this.elements.dropdownContainer);
 
-		var s = this.elements.dropdownContainer.style;
+		//cs.padding.top.value + cs.padding.bottom.value
+
+		left = pos.x;
+		top =  height +  pos.y;
+
 
 		s.left = left + 'px';
-		s.top =  cs.padding.top.value + cs.padding.bottom.value + height + 'px';
+		s.top =  top + 'px';
 
 		s.display='block';
 
@@ -43,10 +52,12 @@ definition:function(){
 			s.display = 'none';
 		};	 
 
+		// close on body mouse down
 		event.push().subscribe(handler, this).cleanup(function(){
 			event.unsubscribe(handler);
 			event.pop();
 		}, this);
+	
 	};
 
 }});

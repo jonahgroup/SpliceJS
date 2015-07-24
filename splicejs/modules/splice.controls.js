@@ -19,6 +19,7 @@ required:[
 ,	'splice.controls/splice.controls.calendar.js'
 ,	'splice.controls/splice.controls.datepicker.js'
 ,	'splice.controls/splice.controls.selectors.js'
+,	'splice.controls/splice.controls.treeview.js'
 
 ]
 , 	
@@ -237,11 +238,6 @@ definition:function(){
 		this.elements.controlContainer.style.left = '-500px';
 		this.onClose();
 	};
-
-
-
-
-
 
 
 

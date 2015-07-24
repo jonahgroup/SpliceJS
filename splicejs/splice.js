@@ -1018,6 +1018,22 @@ var RouteParser = function(){
 	core.Event = Event;
 
 
+/*
+
+----------------------------------------------------------
+
+	Reference Model
+
+*/
+
+	var Reference = function(){
+		if(!(this instanceof Reference)) return {
+			Type:function(type){
+
+			}
+		}
+	};
+
 
 /*
 
@@ -3000,6 +3016,7 @@ var Module =
 	core.display = display;
 
 	core.required = required;
+	core.Reference = Reference;
 
 	return core;
 
