@@ -11,11 +11,17 @@ definition:function(){
 		SpliceJS.Core.Controller.call(this);
 	
 		var self = this;
-		this.elements.controlContainer.onclick = function(){
+		this.elements.controlContainer.onmousedown = function(e){
+			if(!e) e = window.event;
+			e.cancelBubble = true;
+			if (e.stopPropagation) e.stopPropagation();
 			self.dropDown();
 		} 
 
 	}).extend(SpliceJS.Core.Controller)
+
+
+	DropDownSelector.prototype.onDropDown = _.Event;
 
 
 	DropDownSelector.prototype.dataIn = function(data){
@@ -58,6 +64,8 @@ definition:function(){
 			event.pop();
 		}, this);
 	
+		this.onDropDown();
+
 	};
 
 }});

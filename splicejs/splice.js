@@ -1018,22 +1018,6 @@ var RouteParser = function(){
 	core.Event = Event;
 
 
-/*
-
-----------------------------------------------------------
-
-	Reference Model
-
-*/
-
-	var Reference = function(){
-		if(!(this instanceof Reference)) return {
-			Type:function(type){
-
-			}
-		}
-	};
-
 
 /*
 
@@ -1042,10 +1026,21 @@ var RouteParser = function(){
 	Binding Model
 
 */
-
+	var BINDING_TYPES = {
+			SELF 		 : 1
+		/* Look for properties within immediate instance */
+		,	PARENT 		 : 2
+		/* Look for properties within direct parent of the immediate instance*/
+		,	FIRST_PARENT : 3
+		/* Look for properties within a first parent  where property if found */
+		,	ROOT 		 : 4
+		/* Look for properties within a root of the parent chain */
+		,	TYPE 		 : 5
+		/* Indicates type lookup lookup */
+	}
 	
 	/* 
-	 * !!! Bidirectional bindings are not allowed 
+	 * !!! Bidirectional bindings are not allowed, use event-based data contract instead 
 	 * */
 	var Binding = function Binding(propName,type,dir){
 		if(!(this instanceof Binding)) return {
@@ -1067,9 +1062,41 @@ var RouteParser = function(){
 	};
 	
 	
-	Binding.Template = function(templateName){
-		return new Binding(templateName, Binding.TEMPLATE, Binding.Direction.FROM);
+	Binding.prototype.getTargetInstance = function(originInstance, scope){
+
+		switch(this.type){
+
+			case BINDING_TYPES.PARENT:
+				if(!originInstance.parent) throw 'Unable to locate parent instance';
+				return originInstance.parent;
+			break;
+
+
+			case BINDING_TYPES.TYPE:
+
+				/*locate var type */
+				var vartype = scope[this.vartype]
+				,	parent = originInstance;
+
+				if(!vartype) vartype = _.Namespace.lookup(this.vartype);
+
+				if(!vartype) throw 'Unable to resolve binding target type';
+			
+				
+				while(parent) {
+
+					if(parent instanceof vartype) return parent;
+
+					parent = parent.parent;
+				}
+
+			break;
+		}
+
 	};
+
+
+	
 	
 	Binding.From = function(propName){
 		return {
@@ -2714,6 +2741,32 @@ var RouteParser = function(){
 	};
 		
 
+	function configureHierarchy(instance, args){
+		if(!instance) return;
+		instance.parent = args.parent;
+
+		if(!instance.parent) return; 
+
+		
+		instance.parent.children.push(instance);						
+		
+		if(!args.ref) return;
+
+		if(typeof args.ref == 'string') {
+			instance.parent.ref[args.ref] = instance;
+			return;
+		}
+		
+		if(args.ref instanceof Binding){
+			var ti = args.ref.getTargetInstance(instance,this);
+			if(!ti) throw 'Unable to locate target instance';
+			ti.ref[args.ref.prop] = instance;
+			return;
+		}
+
+		throw 'Invalid [ref] value, must be a string or an instance of _.Binding';
+	}
+
 	
 	/** 
 	 * 
@@ -2743,7 +2796,7 @@ var RouteParser = function(){
 			var obj = Object.create(tie.prototype);
 			obj.constructor = tie;
 			
-			obj.parent = args.parent;
+			
 			obj.ref = {};
 			obj.elements = {};
 			obj.children = [];
@@ -2752,13 +2805,7 @@ var RouteParser = function(){
 			 * assign reference to a parent and 
 			 * append to children array
 			 * */
-			if(obj.parent) { 
-				obj.parent.ref 		= obj.parent.ref || [];
-				obj.parent.children = obj.parent.children || [];
-
-				if(args.ref) obj.parent.ref[args.ref] = obj;
-				obj.parent.children.push(obj);						
-			}
+			configureHierarchy.call(scope,obj,args);
 			
 
 			/*
@@ -2808,8 +2855,7 @@ var RouteParser = function(){
 					if(key === 'content') 	continue; //content is processed separately
 					
 					if(parameters[key] instanceof _.Binding) {
-						var binding = parameters[key]; 
-						resolveBinding(binding, tieInstance, key, scope);
+						resolveBinding(parameters[key], tieInstance, key, scope);
 						continue;
 					}
 				
@@ -3016,7 +3062,6 @@ var Module =
 	core.display = display;
 
 	core.required = required;
-	core.Reference = Reference;
 
 	return core;
 

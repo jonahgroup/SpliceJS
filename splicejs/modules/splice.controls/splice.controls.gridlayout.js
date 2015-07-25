@@ -213,22 +213,32 @@ definition:function(){
 		this.elements.controlContainer.appendChild(cell.concrete.dom);
 		cell.onAttach();
 		cell.onDisplay();
-
 	};
+
 
 	GridLayout.prototype.addCell = function(){
 		addCell.apply(this,arguments);
 		this.reflow();
 	};
 
+
 	GridLayout.prototype.addCellAuto = function(component){
 
 	};
 
 
-	GridLayout.prototype.moveCell = function(args){
-		_.debug.log('moving cell');
+	GridLayout.prototype.getEmptyCell = function(){
+		
+		var to = this.grid.rows * this.grid.columns
+		,	cells = this.layoutCells;
+
+		for(var i=0; i < to; i++){
+			for(var j=0; j< cells.length; j++){
+				
+			}			
+		}		
 	};
+
 
 	GridLayout.prototype.resizeCell = function(args){
 

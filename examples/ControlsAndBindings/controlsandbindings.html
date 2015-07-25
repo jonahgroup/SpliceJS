@@ -61,6 +61,7 @@
 		<div style="position:absolute; top:125px; left:25px; bottom:0px; right:0px;">
 		<sjs-include type="SpliceJS.Controls.DataTable">{
 			ref:'editTable',
+			style:'edit-fields-table',
 			dataIn: _.Binding('onEditRecordData').Parent,		
 			itemTemplate: 	<sjs-include>{type:'EditRecordRow'}</sjs-include>
 			

@@ -3,7 +3,7 @@
 
 
 	
-	_.Remote = {};
+	_.Remote = Object.create(null);
 	
 	_.RemoteCalls = function(calls){
 		
@@ -11,6 +11,7 @@
 			
 		for(var i=0; i<calls.length; i++) {
 			var call = calls[i];
+			if(_.Remote[call] != null && _.Remote[call] != undefined ) continue;
 			_.Remote[call] = (function(){
 				var methodName = this.methodName;
 				var args = arguments;
@@ -24,7 +25,7 @@
 						
 						onok:function(result){
 								oncomplete(eval(result.text));
-							},
+						},
 							
 						onfail:function(result){
 							if(typeof(onfailure) === 'function')	
