@@ -801,6 +801,19 @@ var RouteParser = function(){
 
 	};
 
+	function overlay(controller, target) {
+	    if (!target) target = document.body;
+
+	    target.appendChild(controller.concrete.dom);
+
+	    controller.onAttach();
+	    controller.onDisplay();
+	};
+
+	function close(controller) {
+	    controller.concrete.dom.parentNode.removeChild(controller.concrete.dom);
+	}
+
 	function isHTMLElement(object){
 		if(!object) return false;
 		if(object.tagName && object.tagName != '') return true;
@@ -2402,7 +2415,7 @@ var RouteParser = function(){
 		var wrapper = document.createElement('span');
 		wrapper.appendChild(node);
 		var template = new Template(wrapper);
-		template.normalize();
+		//template.normalize(); -- broken
 
 
 		if(parent.tagName == 'SJS-ELEMENT'){
@@ -3032,10 +3045,6 @@ var Module =
 	};
 
 
-
-
-
-
 /*
 
 --------------------------------------
@@ -3060,6 +3069,8 @@ var Module =
 	};
 
 	core.display = display;
+	core.overlay = overlay;
+	core.close = close;
 
 	core.required = required;
 

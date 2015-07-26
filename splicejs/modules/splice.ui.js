@@ -239,6 +239,10 @@ definition:function(){
 	        docHeight = document.body.offsetHeight?document.body.offsetHeight:window.innerHeight;
 	        
 	        return {width:docWidth, height:docHeight};
+	    },
+
+	    windowDimensions: function () {
+	        return { width: window.innerWidth, height: window.innerHeight };
 	    }
 	};
 
