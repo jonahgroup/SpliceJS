@@ -2,7 +2,6 @@ _.Module({
 
 required:[
 	'splice.controls.pageloader.html',
-	'splice.controls.pageloader.css'
 ]
 ,
 definition:function(){
