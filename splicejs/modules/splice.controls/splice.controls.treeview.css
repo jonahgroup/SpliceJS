@@ -1,0 +1,51 @@
+/*
+	TreeView
+------------------------------------------- 
+*/
+
+.-splicejs-treeview ul.-splicejs-tree-root {
+	margin:0px;
+	padding:0px;
+}
+.-splicejs-treeview ul.-splicejs-tree-root ul{
+	margin:0px;
+	padding:0px;
+	padding-left:20px; /* controls child offset */
+}
+
+.-splicejs-treeview ul.-splicejs-tree-root li{
+	list-style-type:none;
+}
+
+.-splicejs-treeview div.-splicejs-tree-item{
+	position:relative;
+	padding:3px; padding-left:26px; /* to allow for exapdo button */
+	cursor:pointer;
+	color:#fefefe;
+	white-space:nowrap;
+}
+
+.-splicejs-treeview div.-sc-tree-expandor {
+	position:absolute;
+	left:0px;
+	top:0px;
+	width:21px;
+	bottom:0px;
+}
+
+.-splicejs-treeview div.-sc-tree-expandor:hover {
+	background-color: #09AAE8;	
+}
+
+.-splicejs-treeview .-sc-tree-node-expanded {
+	background: url('resources/treeview/black/downarrow.png') no-repeat left 0px center;
+}
+
+.-splicejs-treeview .-sc-tree-node-collapsed {
+	background: url('resources/treeview/black/rightarrow.png') no-repeat left 0px center;
+}
+
+.-splicejs-treeview ul.-splicejs-tree-root div.-splicejs-tree-item:hover {
+	background-color:#11B9F7;
+	color:#fefefe;
+}

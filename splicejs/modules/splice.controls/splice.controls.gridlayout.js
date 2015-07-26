@@ -233,10 +233,28 @@ definition:function(){
 		,	cells = this.layoutCells;
 
 		for(var i=0; i < to; i++){
+			var row = Math.floor(i / this.grid.columns)
+			, 	col = i % this.grid.columns
+			,	test = true;		
+
 			for(var j=0; j< cells.length; j++){
+				var cell = cells[j]
 				
+				if(row >= cell.row && row <= (cell.row + cell.rowspan-1))
+				if(col >= cell.col && col <= (cell.col + cell.colspan-1))
+					test = false;
+
+				if(col >= cell.col && col <= (cell.col + cell.colspan-1))
+				if(row >= cell.row && row <= (cell.row + cell.rowspan-1))
+					test = false;
+
+
 			}			
-		}		
+
+			if(test == true) return {row:row, col:col};	
+		}
+
+		return null;		
 	};
 
 

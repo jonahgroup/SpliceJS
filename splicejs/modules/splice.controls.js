@@ -20,7 +20,8 @@ required:[
 ,	'splice.controls/splice.controls.datepicker.js'
 ,	'splice.controls/splice.controls.selectors.js'
 ,	'splice.controls/splice.controls.treeview.js'
-
+,	'splice.controls/splice.controls.popup.js'
+,	'splice.controls/splice.controls.pageloader.js'
 ]
 , 	
 definition:function(){
