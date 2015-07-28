@@ -21,7 +21,8 @@ required:[
 ,	'splice.controls/splice.controls.selectors.js'
 ,	'splice.controls/splice.controls.treeview.js'
 ,	'splice.controls/splice.controls.popup.js'
-,	'splice.controls/splice.controls.pageloader.js'
+,   'splice.controls/splice.controls.pageloader.js'
+,   'splice.controls/splice.controls.slider.js'
 ]
 , 	
 definition:function(){

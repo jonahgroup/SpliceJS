@@ -151,7 +151,7 @@ definition:function(){
 
 		/* default gap values */
 		if(!this.margin) 		this.margin = 10;
-		if(!this.outerMargin) 	this.outerMargin = 20;
+		if(!this.outerMargin) 	this.outerMargin = 10;
 
 		/* default grid configuration */
 		if(!this.grid)			this.grid = {columns:2, rows:2};

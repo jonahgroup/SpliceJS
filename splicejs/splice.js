@@ -801,7 +801,8 @@ var RouteParser = function(){
 
 	};
 
-	function overlay(controller, target) {
+
+	display.overlay = function(controller, target) {
 	    if (!target) target = document.body;
 
 	    target.appendChild(controller.concrete.dom);
@@ -3069,7 +3070,6 @@ var Module =
 	};
 
 	core.display = display;
-	core.overlay = overlay;
 	core.close = close;
 
 	core.required = required;

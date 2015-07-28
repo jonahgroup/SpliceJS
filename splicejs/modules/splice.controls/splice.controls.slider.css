@@ -1,0 +1,74 @@
+﻿.-splicejs-controls-slider {
+    
+    position:absolute;
+    left:0px; top:0px; right:0px; bottom:0px;
+
+}
+
+.-splicejs-controls-slider  .slider-bay {
+    position:absolute;
+    left:0px; top:0px; right:0px; bottom:50%;
+}
+
+.-splicejs-controls-slider  .scale-bay {
+    position:absolute;
+    left:0px; top:50%; right:0px; bottom:0px;
+}
+
+.-splicejs-controls-slider .range-limiter {
+    position:absolute;
+    left:1em; top:0px; right:1em;  bottom:0px;
+}
+
+.-splicejs-controls-slider  .slider-guide {
+
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 50%;
+    height: 1px;
+    background-color: #cecece;
+
+}
+
+.-splicejs-controls-slider  .slider-range {
+
+    position:absolute;
+    left:0px;
+    right:0px;
+    top:50%;
+    height:9px;
+
+    margin-top:-4px;
+    background-color:#848484;
+
+}
+
+.-splicejs-controls-slider  .slider-left-thumb {
+    position:absolute;
+    top:50%; left:0px;
+    width:9px; height:9px;
+    margin-top:-4px;
+    background-color:#aeaeae;
+
+    cursor: ew-resize;
+}
+
+.-splicejs-controls-slider  .slider-right-thumb {
+    position:absolute;
+    top:50%; right:0px;
+    width:9px; height:9px;
+    margin-top:-4px;
+    background-color:#aeaeae;
+
+    cursor: ew-resize;
+    
+}
+
+.-splicejs-controls-slider .slider-left-thumb:hover {
+    background-color:#DCDCDC;
+}
+
+.-splicejs-controls-slider .slider-right-thumb:hover {
+    background-color:#DCDCDC;
+}
