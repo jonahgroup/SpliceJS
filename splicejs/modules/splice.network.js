@@ -1,6 +1,5 @@
 (function(){
-
-
+    "use strict";
 
 	
 	_.Remote = Object.create(null);
@@ -61,11 +60,19 @@
 	};
 	
 	function constructCall(methodName, args) {
+		var json = null
+	    ,   adapter = _.Namespace.lookup(SPLICE_REMOTE_CALL_ADAPTER);
+        
+		if (!args) args = [];
+
+		if (adapter != null)
+		    json = adapter.serialize(methodName, args);
+        else 
+		    json = '{"request":{"Call":"' + methodName + '","Parameters":' + JSON.stringify(args) + '}}';
+
+		_.debug.log(json);
 		
-		jsonCall = '{"request":{"Call":"'+methodName+'","Parameters":'+ JSON.stringify(args) + '}}';
-		_.debug.log(jsonCall);
-		
-		return jsonCall;
+		return json;
 	};
 
 	
