@@ -8,7 +8,7 @@ required:[
 ,  	'splice.controls/splice.controls.buttons.js'
 ,	'splice.controls/splice.controls.datatable.js'
 ,	'splice.controls/splice.controls.scrollpanel.js'
-,	'splice.controls/splice.controls.chart.js'
+,	'splice.controls/splice.controls.charts.js'
 ,	'splice.controls/splice.controls.listbox.js'
 ,	'splice.controls/splice.controls.drawerpanel.js'
 ,	'splice.controls/splice.controls.viewpanel.js'
@@ -23,6 +23,7 @@ required:[
 ,	'splice.controls/splice.controls.popup.js'
 ,   'splice.controls/splice.controls.pageloader.js'
 ,   'splice.controls/splice.controls.slider.js'
+
 ]
 , 	
 definition:function(){
