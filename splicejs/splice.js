@@ -849,36 +849,51 @@ var RouteParser = function(){
 
 	HttpRequest.prototype.request = function(type,config){
 
-	 	var params = '';
-        var separator = '';
-        if(config.data)
-        for(var d=0; d < config.data.length; d++){
-        	params += separator + config.data[d].name + '=' + encodeURIComponent(config.data[d].value);
+	 	var params = ''
+        ,   separator = ''
+	 	,   requestURL = config.url
+	 	,   self = this;
+
+        if (config.formData)
+        for(var d=0; d < config.formData.length; d++){
+        	params += separator + config.formData[d].name + '=' + encodeURIComponent(config.formData[d].value);
            	separator = '&';
         }
-
-        var requestURL = config.url;
 
         if(params.length > 0 && type === 'GET'){
         	requestURL = requestURL + "?" + params;
         }
 
 		this.transport.open(type,requestURL,true);
-		this.transport.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded charset=utf-8');
+        
+	    //custom content type
+		if (config.contentType) {
+		    this.transport.setRequestHeader('Content-Type', config.contentType);
+		}
+
+	    //form url encoded data
+		else if (config.formData) {
+		    this.transport.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
+		}
+
+        //post plain text 
+		else if (config.data) {
+		    this.transport.setRequestHeader('Content-Type', 'text/html; charset=utf-8');
+		}
+        
+       
 
         //in ie8 onreadystatechange is attached to a quasy window object
-        var self = this;
-        
         this.transport.onload = function(){
         	var response = {text:self.transport.responseText, xml:self.transport.responseXML};
         	if(config.onok)	config.onok(response);
         }
 
+        if (type == 'POST' && !params) params = config.data;
+        
 		this.transport.send(params); 
 		return this;
 	};
-
-	
 
 	HttpRequest.post = function(config){
 		return new HttpRequest().request('POST',config);
@@ -901,8 +916,8 @@ var RouteParser = function(){
 
 	function mousePosition(e){
         //http://www.quirksmode.org/js/events_properties.html#position
-		var posx = 0;
-		var posy = 0;
+		var posx = 0
+		,   posy = 0;
 		
 		if (e.pageX || e.pageY) 	{
 			posx = e.pageX;

@@ -39,11 +39,15 @@
 					_.HttpRequest.post({
 						/* TODO: server end point URL, turn into a configurable property */
 					    url: SPLICE_REMOTE_ENDPOINT,
+											   
+					    contentType: 'application/json;charset=UTF-8',
+
+						data:constructCall(methodName,args),
 						
-						data:[{name:'rpc', value:_.ConstructCall(methodName,args)}],
-						
-						onok:function(result){
-								oncomplete(eval(result.text));
+						onok: function (response) {
+						    var result = null;
+						    eval("result=" + response.text);
+						    oncomplete(result);
 						},
 							
 						onfail:function(result){
@@ -56,9 +60,9 @@
 		}
 	};
 	
-	_.ConstructCall = function(methodName, args){
+	function constructCall(methodName, args) {
 		
-		jsonCall = '{"call":"'+methodName+'","parameters":'+ JSON.stringify(args) + '}';
+		jsonCall = '{"request":{"Call":"'+methodName+'","Parameters":'+ JSON.stringify(args) + '}}';
 		_.debug.log(jsonCall);
 		
 		return jsonCall;
