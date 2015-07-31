@@ -41,12 +41,10 @@
 											   
 					    contentType: 'application/json;charset=UTF-8',
 
-						data:constructCall(methodName,args),
+						data:serialize(methodName,args),
 						
 						onok: function (response) {
-						    var result = null;
-						    eval("result=" + response.text);
-						    oncomplete(result);
+						    oncomplete(deserialize(response.text));
 						},
 							
 						onfail:function(result){
@@ -59,7 +57,21 @@
 		}
 	};
 	
-	function constructCall(methodName, args) {
+
+	function deserialize(response){
+		var adapter = _.Namespace.lookup(SPLICE_REMOTE_CALL_ADAPTER);
+	
+		if(adapter != null){
+			return adapter.deserialize(response);	
+		}
+
+		var result = null;
+		eval("result=" + response.text);
+		return result;
+	};
+
+
+	function serialize(methodName, args) {
 		var json = null
 	    ,   adapter = _.Namespace.lookup(SPLICE_REMOTE_CALL_ADAPTER);
         
