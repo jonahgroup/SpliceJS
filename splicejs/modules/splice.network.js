@@ -65,8 +65,7 @@
 			return adapter.deserialize(response);	
 		}
 
-		var result = null;
-		eval("result=" + response.text);
+		var result = JSON.parse(response.text);
 		return result;
 	};
 

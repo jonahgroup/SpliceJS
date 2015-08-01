@@ -1476,7 +1476,10 @@ var RouteParser = function(){
 	 * returns Namespace or a namespace proxy object
 	 * */
 	core.Namespace = function(namespace) {
-		var ns = getNamespace(namespace,false, false);
+
+		if(typeof namespace !== 'string' ) throw "_.Namespace(string) argument type must be a string";
+
+		var ns = getNamespace(namespace, false, false);
 		
 		if(ns && !(ns instanceof Namespace)) 
 			throw "Namespace " + namespace + " is ocupied by an object ";
@@ -2503,13 +2506,12 @@ var RouteParser = function(){
 
 		for(var i=0; i<nodes.length; i++){
 			
-			var node = nodes[i];
-			var parent = node.parentNode;
-
-			var json = convertToProxyJson.call(scope,node, node.tagName);
-
-			var result = null; 
-			eval('result = ' + json);
+			var node = nodes[i]
+			,	parent = node.parentNode
+			,	json = convertToProxyJson.call(scope,node, node.tagName)
+			, 	fn = new Function("var scope = this; var window = document = null; return " + json)
+			 	
+			var result = fn.call(scope);
 
 			if(typeof result !==  'function'){				
 				result = _.Obj.call(scope,result);
