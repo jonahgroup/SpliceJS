@@ -17,7 +17,15 @@ definition:function(){
 		var d3 = function(){};
 		d3.prototype = Object.create(SpliceJS.Lib.d3);
 		
-		d3.prototype.select = function(){
+		d3.prototype.select = function(node){
+			
+			/* 
+				do not override selection on object types
+				only on CSS selectors, since they will run in the document
+			*/
+			if(typeof node === 'object')
+				return SpliceJS.Lib.d3.select(node);
+
 			return SpliceJS.Lib.d3.select(container);
 		}
 

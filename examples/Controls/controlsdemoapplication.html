@@ -222,7 +222,12 @@
 	</div>
 </td></tr>
 
-<tr><td>Bar Chart</td>
+<tr><td>Bar Chart
+		<sjs-include type="SpliceJS.Controls.Button">{
+			content:{label:'Update Graph'},
+			onClick:_.Binding('randomizeGraphs').Parent
+		}</sjs-include>
+	</td>
 	<td>
 	<div style="position:relative; width:400px; height:200px;">
 	<sjs-include type="SpliceJS.Controls.Chart">{

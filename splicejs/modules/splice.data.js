@@ -168,7 +168,7 @@ _.data = (function(){
 			if(this.hasOwnProperty(keys[i])){
 				var value = this[keys[i]];	
 				if(typeof onitem === 'function')
-					value = onitem({key:keys[i], value:value});
+					value = onitem(value, keys[i]);
 				
 				if(!value) continue;
 				result.push(value);

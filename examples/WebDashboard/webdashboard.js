@@ -21,7 +21,7 @@ definition:function(){
 		_.HttpRequest.get({
 			url:SPLICE_PUBLIC_ROOT + '/../examples/WebDashboard/data/daily-unique-visitors.json',
 			onok:function(data){
-				eval('var sampleData = ' + data.text);
+				var sampleData = JSON.parse(data.text);
 			
 				self.data.UNIQUE_VISITORS = sampleData;
 			

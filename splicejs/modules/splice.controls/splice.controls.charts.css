@@ -1,0 +1,60 @@
+.-splicejs-chart {
+
+}
+
+.-splicejs-chart svg rect {
+  fill: steelblue;
+}
+
+.-splicejs-chart svg text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
+
+
+.-splicejs-chart svg.bar {
+
+}
+
+.-splicejs-chart svg circle:hover {
+	fill:#cecece;
+}
+
+
+.-splicejs-chart svg.line {
+
+}
+
+.-splicejs-chart svg g.line text {
+
+	fill:black;
+	text-anchor: initial;
+}
+
+.-splicejs-chart .vertical-axis text {
+	font:10px sans-serif;
+	fill:#000;
+}
+
+
+.-splicejs-chart .vertical-axis line,
+.-splicejs-chart .vertical-axis path {
+	 fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+
+
+.-splicejs-chart .horizontal-axis text {
+	font:10px sans-serif;
+	fill:#000;
+}
+
+.-splicejs-chart .horizontal-axis line,
+.-splicejs-chart .horizontal-axis path {
+	 fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}

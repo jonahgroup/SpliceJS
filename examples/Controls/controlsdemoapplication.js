@@ -27,18 +27,15 @@ definition: function(){
             pointHighlightStroke: "rgba(151,187,205,1)",
             data: [28, 48, 40, 19, 86, 27, 90]
         }
-    ],
-
-    styling: [
-
     ]
+
 	};
 
 	var sampleTableData = {
 			headers: sampleChartData.labels,
 			data: _.data(sampleChartData.datasets).toArray(function(item){
-				var v = _.data(item.value.data).toArray().result;
-				v.splice(0,0,item.value.label);
+				var v = _.data(item.data).toArray().result;
+				v.splice(0,0,item.label);
 				return v;
 			}).result,
 	}
@@ -64,6 +61,8 @@ definition: function(){
 	}).extend(SpliceJS.Controls.UIControl);
 
 
+
+
 	ControlsDemoApplication.prototype.onListData   = _.Event;
 	ControlsDemoApplication.prototype.onSampleData = _.Event;
 	ControlsDemoApplication.prototype.onChartData  = _.Event;
@@ -71,6 +70,24 @@ definition: function(){
 
 	ControlsDemoApplication.prototype.buttonClicked = function(){
 		_.debug.log('Button clicked HAHA');
+	}
+
+
+	ControlsDemoApplication.prototype.randomizeGraphs = function(){
+		var data = [[],[]];
+
+		var count = Math.floor(Math.random()*10)+5;
+
+		for(var i=0; i < count; i++){
+			data[0].push(Math.floor(Math.random()*100));	
+		}
+
+		for(var i=0; i < count; i++){
+			data[1].push(Math.floor(Math.random()*100));	
+		}
+
+		this.onChartData( [{plot:'Bar',data:data[0]}, 
+						   {plot:'Line',data:data[1]}]	);
 	}
 
 
@@ -82,7 +99,7 @@ definition: function(){
 
 		this.onListData(this.sampleListData);
 		
-		this.onChartData(sampleChartData);
+		//this.onChartData(sampleChartData.datasets[0].data);
 
 		this.onSampleData(sampleTableData);
 

@@ -20,7 +20,7 @@ definition:function(){
 		_.HttpRequest.get({
 			url:SPLICE_PUBLIC_ROOT + '/../examples/ControlsAndBindings/data/dataApr-2-2015.json',
 			onok:function(data){
-				eval('var sampleData = ' + data.text);
+				var sampleData = JSON.parse(data.text);
 			
 				self.sourceData = sampleData.data; 
 				self.dataColumns = sampleData.cols;
