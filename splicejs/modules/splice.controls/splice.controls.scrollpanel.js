@@ -97,6 +97,8 @@ definition:function(){
 	
 	ScrollPanel.prototype.reflow = function(args){
 		
+		this.reflowChildren(null,null,true);
+
 		/* nothing to reflow on mobile platforms*/
 		if(isMobile) return; 
 

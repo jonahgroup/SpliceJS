@@ -103,10 +103,15 @@ definition:function(){
 	 * @param {position: {left:{number}, top:{Number}}} - top left corner position
 	 * @param {size: {width:{Number}, height:{Number}}} - parent container' dimensions
 	 * */
+/*
 	UIControl.prototype.onReflow = _.Event;
 	UIControl.prototype.reflow = function(position,size,bubbleup){
 
-			
+		if(bubbleup == true) {
+			this.reflowChildren(null,null,bubbleup);
+			return ;
+		}
+
 		// Get style object once and apply settings
 		var style = this.concrete.dom.style;
 		
@@ -118,20 +123,19 @@ definition:function(){
 		
 		this.reflowChildren(position,size,bubbleup);
 
-		/* fire on reflow event */
 		this.onReflow(position,size);
 
 	};
 
 	UIControl.prototype.reflowChildren = function(position, size,bubbleup){
-		/*reflow all the children*/
+		
 		for(var i=0; i<this.children.length; i++){
 			if(typeof this.children[i].reflow !== 'function') continue;
 
 			this.children[i].reflow(position,size,bubbleup);
 		}
 	};
-
+*/
 	UIControl.prototype.applyCSSRules = function(key, override){
 		var scope = this.scope, 
 			localRules = null, 

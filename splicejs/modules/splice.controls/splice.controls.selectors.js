@@ -37,8 +37,12 @@ definition:function(){
 		,	top = height
 		,	s = this.elements.dropdownContainer.style
 		,	pos = SpliceJS.Ui.Positioning.absPosition(this.elements.selector)
+		,	self = this
 		;
 		
+
+		this.elements.selector.className = 'selector open';
+
 		//append drop down to the document root
 		document.body.appendChild(this.elements.dropdownContainer);
 
@@ -56,6 +60,7 @@ definition:function(){
 		var event 	= _.Event.attach(document.body, 'onmousedown');
 		var handler = function(){
 			s.display = 'none';
+			self.elements.selector.className = 'selector';
 		};	 
 
 		// close on body mouse down

@@ -24,7 +24,7 @@ definition:function(){
 
 
 	var CHART_MARGIN = {
-		left:30,top:10, right:10, bottom:20
+		left:30,top:20, right:10, bottom:20
 	};
 
 
@@ -35,19 +35,6 @@ definition:function(){
 		,	width = this.width
 		,	height = this.height
 
-		/*
-			dimensions of the outermost container
-		*/
-		this.width 	= width = !width ? 400 : width;
-		this.height = height = !height ? 300 : height;
-
-
-		/*
-			chart area dimensions		
-		*/
-		
-		this.chartWidth = this.width - CHART_MARGIN.left - CHART_MARGIN.right;
-		this.chartHeight = this.height - CHART_MARGIN.top - CHART_MARGIN.bottom; 
 
 
 		this.dM = {};	//data measures
@@ -78,18 +65,39 @@ definition:function(){
 
 		this.chartArea = this.svg.append('g').attr('class','chart-area');
 
+
+		/*
+			dimensions are only valid when element is 
+			attached the DOM tree
+			of the outermost container
+		*/
+
+		if(!this.width) this.width = this.elements.controlContainer.clientWidth;
+		if(!this.height) this.height = this.elements.controlContainer.clientHeight;
+
+
 		this.reflow(this.width, this.height);
+		
+		
 	}
 
 
 	Chart.prototype.reflow = function(width, height){
-
-		var s = this.elements.controlContainer.style;
-
-		s.width = width + 'px';
-		s.height = height + 'px';
 		
-		this.svg.attr('width',width).attr('height',height);
+
+		this.width = this.elements.controlContainer.clientWidth;
+		this.height = this.elements.controlContainer.clientHeight;
+
+		if(this.width <= 0) return;
+		if(this.height <= 0) return;
+
+		//var s = this.elements.controlContainer.style;		
+		
+		////s.width = width + 'px';
+		//s.height = height + 'px';
+		
+		this.svg.attr('width',this.width).attr('height',this.height);
+		this.render(this.d3);
 
 	};
 
@@ -120,22 +128,26 @@ definition:function(){
 		if(!this.dataItem) return;
 
 		
-		var width = this.chartWidth;
-		var height = this.chartHeight;
+		var width = this.width - CHART_MARGIN.left - CHART_MARGIN.right;
+		var height = this.height - CHART_MARGIN.top - CHART_MARGIN.bottom;
 
+
+        /* !!!!! UGLY PATCH, REWORK the reflowing framework */
+		if(width <= 0) return;
+		if(height <= 0) return;
 
 		/* 
 			set scales
 			all plots use same scale
 		*/
-		var x = d3.scale.linear()
+		var y = d3.scale.linear()
 		    .domain([0, this.dM.max])
-		    .range([0, width]);
+		    .range([height, 0]);
 
-		var y = d3.scale
-			.linear()
-			.domain([0,  this.dM.count])
-    		.range([height, 0]);
+	
+		var x = d3.scale.ordinal()
+			.domain(_.data(this.dM.count).toArray())
+    		.rangeRoundBands([0, width]);
 
     	/*
 			draw axis x, y
@@ -183,7 +195,14 @@ definition:function(){
 		g.each(function(d,i){
 
 			chartModule(d.plot).prototype.render.call(
-				{dataItem : d.data, svg : d3.select(this), width:width, height:height}
+				{	id:d.name, 
+					dataItem : d.data, 
+					showPoints:d.showPoints, 
+					pointSize:d.pointSize,
+					svg : d3.select(this), 
+					scale:{x,y}, 
+					width:width, 
+					height:height}
 				,d3
 			);
 
@@ -204,7 +223,7 @@ definition:function(){
 
 		var c = _.Namespace.lookup(CHART_MAP[ct]);
 
-		if(!c) throw 'Unable to locate component:' + cc; 
+		if(!c) throw 'Unable to locate component:' + c; 
 
 		return c;
 	}

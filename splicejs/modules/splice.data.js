@@ -160,6 +160,21 @@ _.data = (function(){
 
 		var result = [];
 
+		if(typeof this == 'number' || (this instanceof Number)){
+			var n = +this; 
+			for(var i=0; i < n; i++){
+
+				var value = i;
+
+				if(typeof onitem === 'function')
+					value = onitem(value, i);	
+
+				if(value == null || value == undefined) continue;
+				result.push(value);
+			}
+			return result;
+		}
+
 		var keys = Object.keys(this);
 		if(!keys) return result;
 		if(keys.length < 1) return result;
@@ -170,14 +185,12 @@ _.data = (function(){
 				if(typeof onitem === 'function')
 					value = onitem(value, keys[i]);
 				
-				if(!value) continue;
+				if(value == null || value == undefined) continue;
 				result.push(value);
 			}
 		}
 		return data(result);
 	};
-
-
 
 
 	function paginator(pageSize){

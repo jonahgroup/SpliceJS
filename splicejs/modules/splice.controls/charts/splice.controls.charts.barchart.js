@@ -11,48 +11,67 @@ definition:function(){
 	BarChart.prototype.render = function(d3){
 
 		var data = this.dataItem;
+		
+		_.debug.log("Bar Chart");
 		_.debug.log(data);
+		
 		if(!data) return;
+
+
 
 		var width = this.width
 		,	height = this.height
-		,    barHeight = 20;
+		,	spacing = 1;
 
-		var x = d3.scale.linear()
-		    .domain([0, d3.max(data)])
-		    .range([0, width]);
-
-		var y = d3.scale.linear()
-    			  .range([height, 0]);
-
-    	var barWidth = width / data.length;		  
-
+		var x = this.scale.x
+		,	y = this.scale.y;
 
 		var chart = this.svg
-					 .attr('class', 'bar')
+					 .attr('class', ('bar' + (this.id != null ? (' ' + this.id) : '')))
 					 .attr("width", width)
-		    		 .attr("height", barHeight * data.length);
-
-		var bar = chart.selectAll("g")
-		    .data(data)
-			.enter().append("g")
-		    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+		    		 .attr("height", height);
 
 
-		bar.append("rect")
-		    .attr("width", x)
-		    .attr("height", barHeight - 1);
+		var g = chart.selectAll("g").data(data);
 
-		bar.append("text")
-		    .attr("x", function(d) { return x(d) - 3; })
-		    .attr("y", barHeight / 2)
-		    .attr("dy", ".35em")
-		    .text(function(d) { return d; });
+		//appending selector
+		var ag = g.enter().append("g");
 
-		var text = chart.selectAll('text').
-				   data(data).
-				   enter().append('text')
-				   .text(function(d){return d;})    
+
+		/*
+
+			Create new group, bars and text
+
+		*/
+
+		ag.attr("transform", function(d, i) { 
+		 	var position = x(i);
+			return 'translate(' + position + ',0)'; 
+		});
+
+
+		ag.append('rect')
+		    .attr('width', x.rangeBand() - spacing * 2)
+		    .attr('x', spacing)
+		    .attr('y', function(d){return y(d);})
+		    .attr('height', function(d){ return height - y(d); });
+
+
+		g.exit().remove();    
+
+
+		g.attr("transform", function(d, i) { 
+		 	var position = x(i);
+			return 'translate(' + position + ',0)'; 
+		});
+
+
+		g.select('rect')
+		    .attr('width', x.rangeBand() - spacing * 2)
+		    .attr('x', spacing)
+		    .attr('y', function(d){return y(d);})
+		    .attr('height', function(d){ return height - y(d); });
+    
 
 
 

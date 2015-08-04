@@ -935,7 +935,9 @@ var RouteParser = function(){
 
 	function eventArgs(e){
 		return {
-			mouse:mousePosition(e)
+		    mouse: mousePosition(e),
+		    source: e.srcElement,
+            e:e     // source event
 		}		
 	};
 
@@ -1855,10 +1857,10 @@ var RouteParser = function(){
 			showPreloader();
 			
 			var foo = oncomplete;
-			var oncomplete = function(){
+			oncomplete = function(){
 				removePreloader();
 				if(typeof foo === 'function') foo();
-			}
+			};
 			this.isInitialInclude = true;
 		}
 
@@ -2097,6 +2099,40 @@ var RouteParser = function(){
 	Controller.prototype.onAttach 	= Event;
 	Controller.prototype.onDisplay 	= Event;
 	Controller.prototype.onDomChanged = Event;
+
+
+	Controller.prototype.onReflow = Event;
+	Controller.prototype.reflow = function(position,size,bubbleup){
+
+		if(bubbleup == true) {
+			this.reflowChildren(null,null,bubbleup);
+			return ;
+		}
+
+		// Get style object once and apply settings
+		var style = this.concrete.dom.style;
+		
+		style.left 		= position.left +'px';
+		style.top  		= position.top + 'px';
+		
+		style.width  	= size.width + 'px';
+		style.height 	= size.height + 'px';
+		
+		this.reflowChildren(position,size,bubbleup);
+
+		this.onReflow(position,size);
+
+	};
+
+	Controller.prototype.reflowChildren = function(position, size,bubbleup){
+		
+		for(var i=0; i<this.children.length; i++){
+			if(typeof this.children[i].reflow !== 'function') continue;
+
+			this.children[i].reflow(position,size,bubbleup);
+		}
+	};
+
 	
 
 	var Concrete = core.Namespace('SpliceJS.Modular').Class(function Concrete(dom){
@@ -2378,6 +2414,8 @@ var RouteParser = function(){
 		return templates;
 	};
 
+	var RESERVED_ATTRIBUTES = ["type","ref", "width","height"];
+
 
 	function handle_SJS_INCLUDE(node, parent, replace){
 		var type = node.getAttribute('type'),
@@ -2562,7 +2600,7 @@ var RouteParser = function(){
 			var parent = instance;
 			
 			var vartype = _.Namespace.lookup(binding.vartype);
-			if(!vartype) throw 'Unable to resolve binding target type';
+			if (!vartype) throw 'Unable to resolve binding target type: ' + binding.vartype;
 			
 			while(parent) {
 				if(parent instanceof vartype) {

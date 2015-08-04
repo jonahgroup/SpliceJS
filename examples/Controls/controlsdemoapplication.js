@@ -86,8 +86,10 @@ definition: function(){
 			data[1].push(Math.floor(Math.random()*100));	
 		}
 
-		this.onChartData( [{plot:'Bar',data:data[0]}, 
-						   {plot:'Line',data:data[1]}]	);
+		this.onChartData( [
+			{plot:'Bar',data:data[0]}, 
+			{plot:'Line', showPoints: true, pointSize:3, data:data[1]}
+		]);
 	}
 
 

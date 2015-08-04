@@ -50,12 +50,17 @@ definition:function(){
 		,	day 	= dt.getDate()
 		;
 		
+		var monthFirst = new Date(year, month, 1, 0, 0, 0, 0);
+
 		var is_leap = isLeapYear(year)?1:0
 		, 	days 	= DAYS_MONTH[is_leap][month]
 		;
 
-		var start_week_day = new Date(year, month,1,0,0,0,0).getDay();  
-				
+		var start_week_day = monthFirst.getDay()
+		,   dayCounter = 0;
+
+		
+		var gridOriginDate = new Date((+monthFirst) - start_week_day * DAY_MILS);
 		
 		/* Iterate over days */
 		var row = 0
@@ -71,7 +76,7 @@ definition:function(){
 	
 	
 		/*
-		 * Back track into a previous month
+		 * Backtrack into a previous month
 		 * */
 		if(start_week_day > 0) {
 		
@@ -88,20 +93,12 @@ definition:function(){
 				cell.xdateprev = true;  
 				
 				if(!cell ) return;
-				/* 
-				 * register bubble mode event handler 
-				 * */
-				if(!cell.onclick) cell.onclick = function(e){
-					if(!e) e = window.event;
-					
-					CSDialogs.Calendar.decorateCell(this); 
-					CSDialogs.Calendar.hide();
-				};
-				
-				cell.onmousedown = function(e){CSDialogs.Calendar.trapEvent(e);};
-			
+
+				cell.className = 'prev-month';
 				cell.innerHTML = _day;
-				cell.className = 'none';
+				cell.__sjs__date = new Date((+gridOriginDate) + dayCounter * DAY_MILS);
+
+				dayCounter++;
 			}
 		}
 	
@@ -117,25 +114,18 @@ definition:function(){
 			var cell = getCell.call(this, row+2, col);
 			
 			if(!cell) return;
-			if(!cell.onclick) cell.onclick = function(e){
-				if(!e) e = window.event;
-				e.cancelBubble = true;
-				if (e.stopPropagation) e.stopPropagation();
-				
-				CSDialogs.Calendar.decorateCell(this);
-				CSDialogs.Calendar.hide();
-			};
-			
-			cell.onmousedown = function(e){CSDialogs.Calendar.trapEvent(e);};
 		
 			cell.innerHTML = _day;
+			cell.__sjs__date = new Date((+gridOriginDate) + dayCounter * DAY_MILS);
+            dayCounter++;
+            
 			/* style this month*/
 			if(i < days+start_week_day) {
 				cell.className = 'this-month';
 				cell.xdatenext = false;
 				cell.xdateprev = false;
 			} else {
-				cell.className = 'none';
+				cell.className = 'next-month';
 				cell.xdatenext = true;  
 			}
 
@@ -206,14 +196,20 @@ definition:function(){
 
 
 
-
-
 	var Calendar = _.Namespace('SpliceJS.Controls').Class(function Calendar(){
 
 		renderMonth.call(this, new Date());
+		var self = this;
+
+		_.Event.attach(this.elements.grid, 'onmousedown').subscribe(function(e){
+		    self.onDateSelected(e.source.__sjs__date);
+		});
+
 
 	}).extend(SpliceJS.Core.Controller);
 
+
+	Calendar.prototype.onDateSelected = _.Event;
 
 
 

@@ -27,6 +27,20 @@ definition:function(){
 
 	DatePicker.prototype.onDateSelected = _.Event;
 
+	DatePicker.prototype.selectDate = function (date) {
+	    if (!date) return;
+
+	    if (this.format) {
+	        date = _.Text.format('{0:' + this.format + '}', date);
+	    }
+
+	    this.onDateSelected(date.toString());
+	}
+
+	//override reflow call from parent componenets
+	DatePicker.prototype.reflow = function(){};
+
+
 }
 
 });

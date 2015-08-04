@@ -11,7 +11,8 @@ definition:function(){
 	_.Namespace('SpliceJS.Lib').add('d3',d3);
 
 	_.Namespace('SpliceJS.Controls').Class(function D3Canvas(){
-
+		SpliceJS.Controls.UIControl.call(this);
+		
 		var container = this.elements.controlContainer;
 
 		var d3 = function(){};

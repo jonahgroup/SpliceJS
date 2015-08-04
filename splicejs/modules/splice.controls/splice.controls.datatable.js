@@ -143,12 +143,20 @@ definition:function(){
 	
 
 	
-	DataTable.prototype.addRowTo = function(destination, row){
+	DataTable.prototype.addRowTo = function(destination, row,isHeader){
 		
 		var newrow =  destination.insertRow();
 
 		for(var i=0; i < row.length; i++ ){
-			var cell = newrow.insertCell();
+		    var cell = null;
+
+		    if (isHeader) {
+		        cell = document.createElement('th');
+		        newrow.appendChild(cell);
+		    }
+		    else {
+		        cell = newrow.insertCell();
+		    }
 						
 			if(typeof(row[i]) == 'object')
 				cell.appendChild(row[i]);
@@ -166,7 +174,7 @@ definition:function(){
 		
 		var tHead = dom.createTHead();
 		
-		this.addRowTo(tHead, headers);
+		this.addRowTo(tHead, headers, true);
 	};
 
 
