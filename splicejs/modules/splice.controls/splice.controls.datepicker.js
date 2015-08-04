@@ -19,27 +19,41 @@ definition:function(){
 			date = _.Text.format('{0:'+this.format+'}',date);
 		}
 
-
-		this.onDateSelected(date.toString());
+        //listen for date updates from outside
+		this.onDataIn.subscribe(function (date) {
+		    this.setDate(date);
+		}, this);
 
 	}).extend(SpliceJS.Controls.UIControl);
 
 
-	DatePicker.prototype.onDateSelected = _.Event;
+	
 
-	DatePicker.prototype.selectDate = function (date) {
+	DatePicker.prototype.receiveFromCalendar = function (date) {
+	    this.setDate(date);
+	    this.onData(date);
+	}
+
+
+
+    //sets dates and will not trigger events    
+	DatePicker.prototype.setDate = function (date) {
 	    if (!date) return;
 
 	    if (this.format) {
 	        date = _.Text.format('{0:' + this.format + '}', date);
 	    }
 
-	    this.onDateSelected(date.toString());
+	    this.ref.selector.dataIn(date);
 	}
+
 
 	//override reflow call from parent componenets
 	DatePicker.prototype.reflow = function(){};
 
+    // fires when date has been selected
+	DatePicker.prototype.onDateSelected = _.Event;
+	DatePicker.prototype.onData = _.Event;
 
 }
 
