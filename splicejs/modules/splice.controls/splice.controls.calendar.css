@@ -10,13 +10,7 @@
 	color:#cecece;
 }
 
-.-splicejs-calendar .grid .controls .next {
 
-}
-
-.-splicejs-calendar .grid .controls .previous {
-	
-}
 .-splicejs-calendar .grid {
 	border-collapse: collapse;
 }
@@ -63,4 +57,20 @@
 .-splicejs-calendar .grid td.today:hover {
 	background-color: #FDCA00;
   	color: #ffffff;
+}
+
+.-splicejs-calendar .grid .controls .prev {
+	position:absolute;
+	background:url('resources/calendar/black/previous.gif');
+	height:11px; width:11px;
+	left:0px; top:50%;
+	margin-top:-6px; margin-left:7px;
+}
+
+.-splicejs-calendar .grid .controls .next {
+	position:absolute;
+	background:url('resources/calendar/black/next.gif');
+	height:11px; width:11px;
+	right:0px; top:50%; 
+	margin-top:-6px; margin-right: 7px;
 }

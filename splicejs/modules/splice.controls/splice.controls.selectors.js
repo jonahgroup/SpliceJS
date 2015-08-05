@@ -11,12 +11,14 @@ definition:function(){
 		SpliceJS.Core.Controller.call(this);
 	
 		var self = this;
-		this.elements.controlContainer.onmousedown = function(e){
-			if(!e) e = window.event;
-			e.cancelBubble = true;
-			if (e.stopPropagation) e.stopPropagation();
-			self.dropDown();
-		} 
+	    /*
+            Subscribe to onclick instead of mousedown, because firing mousedown 
+            will immediately execute event within dropDown() closing the dropdown
+        */
+	    _.Event.attach(this.elements.controlContainer, 'onmousedown').subscribe(function (e) {
+	        this.dropDown();
+	        e.cancel();
+		}, this);
 
 	}).extend(SpliceJS.Core.Controller)
 
@@ -29,6 +31,17 @@ definition:function(){
 		this.elements.selector.innerHTML = data.toString();		
 	};
 
+
+	DropDownSelector.prototype.close = function () {
+	    this.onModalClose();
+	};
+
+
+	function hide() {
+	    this.elements.dropdownContainer.style.display = 'none';
+	    document.body.removeChild(this.elements.dropdownContainer);
+	    this.elements.selector.className = 'selector';
+	}
 
 	DropDownSelector.prototype.dropDown = function(){
 		
@@ -57,15 +70,11 @@ definition:function(){
 
 		s.display='block';
 
-		var event 	= _.Event.attach(document.body, 'onmousedown');
-		var handler = function(){
-			s.display = 'none';
-			self.elements.selector.className = 'selector';
-		};	 
+		this.onModalClose = _.Event.attach(document.body, 'onmousedown');
 
 		// close on body mouse down
-		event.push().subscribe(handler, this).cleanup(function(){
-			event.unsubscribe(handler);
+		this.onModalClose.push().subscribe(hide, this).cleanup(function (event) {
+			event.unsubscribe(hide);
 			event.pop();
 		}, this);
 	

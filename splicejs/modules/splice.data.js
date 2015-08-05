@@ -172,7 +172,7 @@ _.data = (function(){
 				if(value == null || value == undefined) continue;
 				result.push(value);
 			}
-			return result;
+			return data(result);
 		}
 
 		var keys = Object.keys(this);
@@ -193,15 +193,6 @@ _.data = (function(){
 	};
 
 
-	function paginator(pageSize){
-		return 
-	};
-
-	function windownator(windowSize, shiftSize){
-
-	};
-
-
 	function sort(){
 
 	};
@@ -213,12 +204,13 @@ _.data = (function(){
 
 	function data(dataObj){
 		return {
-			forEach		:function(callback){return forEach.call(dataObj,callback);},
+			foreach		:function(callback){return forEach.call(dataObj,callback);},
 			filter		:function(callback){return filter.call(dataObj,callback);},
-			groupBy		:function(callback,gfn){return groupBy.call(dataObj,callback,gfn);},
+			group		:function(callback,gfn){return groupBy.call(dataObj,callback,gfn);},
 			first		:function(callback){return first.call(dataObj)},
-			toArray 	:function(callback){return toArray.call(dataObj,callback);},
-			paginator 	:function(pageSize){return new Paginator(dataObj,pageSize);}, 	 
+			to 	        :function(callback){return toArray.call(dataObj,callback);},
+			page        :function (size) { return new Paginator(dataObj, size); },
+			frame       :function(size,move){return new Frame(size,move);},
 			result  :dataObj
 		}
 	};

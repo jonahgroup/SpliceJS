@@ -198,12 +198,30 @@ definition:function(){
 
 	var Calendar = _.Namespace('SpliceJS.Controls').Class(function Calendar(){
 
-		renderMonth.call(this, new Date());
+		var dt = new Date();
+		
+		this.year 	= dt.getFullYear();
+		this.month 	= dt.getMonth()-1 
+		this.day 	= dt.getDate()
+
+		this.selectedDate = new Date();
+		
+		this.update();
+
 		var self = this;
 
-		_.Event.attach(this.elements.grid, 'onmousedown').subscribe(function(e){
-		    self.onDateSelected(e.source.__sjs__date);
-		});
+		_.Event.attach(this.elements.grid, 'onmousedown', true).subscribe(function(e){
+		    this.selectedDate = e.source.__sjs__date
+		    this.onDateSelected(this.selectedDate);
+		},this);
+
+		_.Event.attach(this.elements.previous, 'onmousedown', true).subscribe(function(e){
+			this.previousMonth();
+		},this);
+
+		_.Event.attach(this.elements.next, 'onmousedown', true).subscribe(function(e){
+			this.nextMonth();
+		},this);
 
 
 	}).extend(SpliceJS.Core.Controller);
@@ -211,6 +229,20 @@ definition:function(){
 
 	Calendar.prototype.onDateSelected = _.Event;
 
+
+	Calendar.prototype.previousMonth = function(){
+		this.month --;
+		this.update();
+	};
+
+	Calendar.prototype.nextMonth = function(){
+		this.month++;
+		this.update();
+	};
+
+	Calendar.prototype.update = function(){
+		renderMonth.call(this, new Date(this.year, this.month, this.day));
+	};	
 
 
 }

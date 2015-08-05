@@ -32,6 +32,7 @@ definition:function(){
 	DatePicker.prototype.receiveFromCalendar = function (date) {
 	    this.setDate(date);
 	    this.onData(date);
+	    this.ref.selector.close();
 	}
 
 

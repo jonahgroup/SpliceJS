@@ -105,12 +105,12 @@ definition:function(){
 	Chart.prototype.measureData = function(d3){
 		
 
-		this.dM.max = d3.max(_.data(this.dataItem).toArray(function(item){
+		this.dM.max = d3.max(_.data(this.dataItem).to(function(item){
 			return d3.max(item.data)
 		}).result);
 
 
-		this.dM.count = d3.max(_.data(this.dataItem).toArray(function(item){
+		this.dM.count = d3.max(_.data(this.dataItem).to(function(item){
 			return item.data.length;
 		}).result);
 
@@ -146,7 +146,7 @@ definition:function(){
 
 	
 		var x = d3.scale.ordinal()
-			.domain(_.data(this.dM.count).toArray())
+			.domain(_.data(this.dM.count).to().result)
     		.rangeRoundBands([0, width]);
 
     	/*

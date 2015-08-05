@@ -883,10 +883,30 @@ var RouteParser = function(){
         
        
 
-        //in ie8 onreadystatechange is attached to a quasy window object
+	    /*
+            in ie8 onreadystatechange is attached to a quasy window object 
+            [this] inside handler function will refer to window object and not transport object
+        */
         this.transport.onload = function(){
-        	var response = {text:self.transport.responseText, xml:self.transport.responseXML};
-        	if(config.onok)	config.onok(response);
+            var transport = self.transport;
+
+            var response = {
+                text: transport.responseText,
+                xml:  transport.responseXML
+            };
+
+            switch (transport.status) {
+                case 200:
+                    if(typeof config.onok == 'function') config.onok(response);
+                    break;
+                case 400, 401, 402, 403, 404, 405, 406:
+                case 500: 
+                default:
+                    if (typeof config.onfail == 'function') config.onfail(response);
+                    break;
+                
+            }
+        	
         }
 
         if (type == 'POST' && !params) params = config.data;
@@ -895,7 +915,7 @@ var RouteParser = function(){
 		return this;
 	};
 
-	HttpRequest.post = function(config){
+	HttpRequest.post = function (config) {
 		return new HttpRequest().request('POST',config);
 	};
 
@@ -933,15 +953,20 @@ var RouteParser = function(){
 		return {x:posx,y:posy};
 	}
 
-	function eventArgs(e){
+	
+	function domEventArgs(e){
 		return {
-		    mouse: mousePosition(e),
-		    source: e.srcElement,
-            e:e     // source event
-		}		
-	};
+			mouse: mousePosition(e),
+		   	source: e.srcElement,
+            e:e,     // source event			
+			cancel: function(){
+            	this.cancelled = true;
+            	e.__jsj_cancelled = true;
+            }
+		}
+	}
 
-	Event.create = function(object, property){
+	Event.create = function(object, property, cancelBubble){
 
 		
 
@@ -950,15 +975,37 @@ var RouteParser = function(){
 
 		var MulticastEvent = function MulticastEvent(){
 			var idx = callbacks.length-1;
-			for(var i=0; i < callbacks[idx].length; i++) {
-				callbacks[idx][i].apply(instances[idx][i],arguments);
-			}
-			if(typeof cleanup.fn === 'function') {
-				cleanup.fn.call(cleanup.instance);
+
+			/*
+				Grab callbacks and instance reference
+				stacks may be popped during handler execution
+				by another handler that subscribed to the currently
+				bubbling event inside an already invoked event handler
+			*/
+			var cbak = callbacks[idx]
+			,	inst = instances[idx]
+			,	eventBreak = false;
+
+			for(var i=0; i < cbak.length; i++) {
+				/*check if event was cancelled and stop handing */
+				if(arguments.length > 0 && arguments[0])
+				if(arguments[0].cancelled || (arguments[0].e && 
+				   							  arguments[0].e.__jsj_cancelled == true)) {
+					
+					eventBreak = true;
+					break;
+				}
+				
+				cbak[i].apply(inst[i], arguments);
+
 			}
 
-			cleanup.fn 		 = null;
-			cleanup.instance = null;
+			if(!eventBreak && typeof cleanup.fn === 'function') {
+				cleanup.fn.call(cleanup.instance, MulticastEvent );
+				cleanup.fn 		 = null;
+				cleanup.instance = null;
+			}
+			
 		}
 
 		MulticastEvent.SPLICE_JS_EVENT = true; 
@@ -1028,19 +1075,32 @@ var RouteParser = function(){
 			collect event arguments
 		*/
 		if(isHTMLElement(object)) {
+			/* 
+				wrap DOM event
+			*/
 			object[property] = function(e){
 
 				if(!e) e = window.event;
+				if(cancelBubble) {
+					e.cancelBubble = true;
+					if (e.stopPropagation) e.stopPropagation();
+				}
 
-				MulticastEvent(eventArgs(e));
+				MulticastEvent(domEventArgs(e));
 			}
+		
+			// expose subscribe method
 			object[property].subscribe = function(){
 				MulticastEvent.subscribe(arguments);
-			}			
+			}	
+
 		}
 		else { 
 			object[property] = MulticastEvent;
+			
 		}
+
+				
 		
 		return MulticastEvent;
 	};
