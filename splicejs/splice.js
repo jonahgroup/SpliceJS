@@ -3071,7 +3071,7 @@ var Module =
 	 * @param moduleDefinition
 	 */
 	function Module(moduleDefinition){
-		
+	    console.log("Currently loading: " + _.currentlyLoading.name);
 		var path = _.getPath(_.currentlyLoading.name).path;
 
 		var required 	= _.home(moduleDefinition.required,path);
@@ -3173,21 +3173,20 @@ var Module =
 
 	core.absPath = absPath;
 	core.getPath = getPath;
+	core.display = display;
+	core.close = close;
+    core.required = required;
 
 	core.Obj = Obj;
 	core.Binding = Binding;
-
-	core.HttpRequest = HttpRequest;	
+    core.HttpRequest = HttpRequest;	
 	core.Module = Module;
 	core.CSS = {
 		parser: 	CSSParser,
 		applyRules: applyCSSRules
 	};
 
-	core.display = display;
-	core.close = close;
 
-	core.required = required;
 
 	return core;
 

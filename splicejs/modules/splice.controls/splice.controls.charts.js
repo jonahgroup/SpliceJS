@@ -60,8 +60,9 @@ definition:function(){
 		this.svg = this.d3.select().append('svg')
 
 
-		this.hAxis = this.svg.append('g').attr('class','horizontal-axis');
-		this.vAxis = this.svg.append('g').attr('class','vertical-axis');
+		this.hAxis = this.svg.append('g').attr('class', 'horizontal-axis');
+		this.vAxis = this.svg.append('g').attr('class', 'vertical-axis');
+        this.grid  = this.svg.append('g').attr('class', 'chart-grid')
 
 		this.chartArea = this.svg.append('g').attr('class','chart-area');
 
@@ -109,12 +110,16 @@ definition:function(){
 			return d3.max(item.data)
 		}).result);
 
+		this.dM.min = d3.min(_.data(this.dataItem).to(function (item) {
+		    return d3.min(item.data);
+		}).result);
 
 		this.dM.count = d3.max(_.data(this.dataItem).to(function(item){
 			return item.data.length;
 		}).result);
 
 
+		if (this.dM.min > 0) this.dM.min = 0;
 	
 
 		_.debug.log('Max ' + this.dM.max);
@@ -140,12 +145,12 @@ definition:function(){
 			set scales
 			all plots use same scale
 		*/
-		var y = d3.scale.linear()
-		    .domain([0, this.dM.max])
+		var y = this.y = d3.scale.linear()
+		    .domain([this.dM.min, this.dM.max])
 		    .range([height, 0]);
 
 	
-		var x = d3.scale.ordinal()
+		var x = this.x = d3.scale.ordinal()
 			.domain(_.data(this.dM.count).to().result)
     		.rangeRoundBands([0, width]);
 
@@ -167,6 +172,16 @@ definition:function(){
     	this.chartArea.attr('width',width)
     	.			   attr('height', height)
     	.			   attr('transform','translate('+ CHART_MARGIN.left +','+ CHART_MARGIN.top +')');			
+
+
+        /* reposition grid */
+	    /* translate charting area to allow margin*/
+    	this.grid.attr('width', width)
+    	.         attr('height', height)
+    	.         attr('transform', 'translate(' + CHART_MARGIN.left + ',' + CHART_MARGIN.top + ')');
+
+        /* render grid */
+        renderGrid.call(this, width, height);
 
 
     	// select chart nodes and axis nodes			
@@ -216,17 +231,60 @@ definition:function(){
 	}; 
 
 
-	function chartModule(ct){
-		if(!ct) throw 'Invalid chart type, data set must include chart type : ' + ct
-		
-		if(!CHART_MAP[ct]) throw 'Unable to locate component class for chart:' + ct; 	
 
-		var c = _.Namespace.lookup(CHART_MAP[ct]);
+	function renderGrid(width, height) {
+	    
+	    var y = this.y
+        ,   x = this.x;
 
-		if(!c) throw 'Unable to locate component:' + c; 
 
-		return c;
-	}
+        // horizontal lines - over Y
+	    var g = this.grid.selectAll('line[sjs-grid-y]').data(y.ticks());
+        
+	    g.enter().append('line').attr('sjs-grid-y', '').attr('class', 'y-line');
+        
+	    //n.remove();
+
+	    g.attr({   
+                'x1': 0,
+                'x2': this.width,
+                'y1': function (d) { return y(d); },
+                'y2': function (d) { return y(d); }
+	    });
+
+
+	    //vertical lines - over X
+	    var g = this.grid.selectAll('line[sjs-grid-x]').data(x.range());
+
+	    g.enter().append('line').attr('sjs-grid-x', '').attr('class', 'x-line');
+
+	    //n.remove();
+
+	    g.attr({
+	        'y1': 0,
+	        'y2': this.height,
+	        'x1': function (d,i) { return x(i) + x.rangeBand()/2; },
+	        'x2': function (d,i) { return x(i) + x.rangeBand()/2; }
+	    });
+
+
+
+	    
+	};
+
+
+
+	function chartModule(ct) {
+	    if (!ct) throw 'Invalid chart type, data set must include chart type : ' + ct
+
+	    if (!CHART_MAP[ct]) throw 'Unable to locate component class for chart:' + ct;
+
+	    var c = _.Namespace.lookup(CHART_MAP[ct]);
+
+	    if (!c) throw 'Unable to locate component:' + c;
+
+	    return c;
+	};
 
 
 

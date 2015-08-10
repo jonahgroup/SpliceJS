@@ -173,6 +173,11 @@ definition:function(){
 		dom.removeAttribute('id');
 	};
 
+	//returns zero or a value
+	function z(n){
+		if(!n) return 0;
+		return n;
+	}
 
 
 	/*
@@ -201,22 +206,28 @@ definition:function(){
 		return {x:posx,y:posy};
 	    },	
 	    
-	    //does not include container scroll values
-	    //container scrolls must be subtracted
+	    /*
+	    	Returns element coordinates in 
+	    	document.body coordinate space
+	    */
 	    absPosition: function(obj_element) {
 	        var n = obj_element;
 	    	var location  = new Array(0,0);
 
 	    	while (n != undefined) {
 	            
-	            location[0] += (n.offsetLeft)? n.offsetLeft : 0;
-	            location[1] += (n.offsetTop)?  n.offsetTop : 0;
+	            location[0] += z(n.offsetLeft);
+	            location[1] += z(n.offsetTop);
 	            
 	            location[1] -= n.scrollTop;
 	            
 	            n = n.offsetParent;
 			}
-			return {x:location[0],y:location[1]};
+
+			return {
+				x:location[0] + z(document.body.scrollLeft),
+				y:location[1] + z(document.body.scrollTop)
+			};
 	    },
 	    
 	    
