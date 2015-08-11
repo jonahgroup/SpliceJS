@@ -25,7 +25,9 @@ definition:function(){
 		
 	}).extend(SpliceJS.Controls.UIControl);
 
-	
+	Button.prototype.onClick = _.Event;
+
+
 	Button.prototype.handleContent = function(content){
 		if(!content) return;
 		
@@ -40,7 +42,7 @@ definition:function(){
 		this.elements.controlContainer.value = label;
 	};
 	
-	Button.prototype.onClick = _.Event;
+	
 	
 	Button.prototype.enable = function(){
 		this.elements.controlContainer.className = '-splicejs-button';

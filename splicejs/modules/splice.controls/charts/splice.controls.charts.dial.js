@@ -1,3 +1,4 @@
+/* global JSPositioning */
 _.Module({
 	
 required:[
