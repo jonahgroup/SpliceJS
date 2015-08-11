@@ -75,480 +75,6 @@ var _ = sjs = (function(window, document){
 	}
 
 
-/*
-	
-----------------------------------------------------------
-
-	CSS Parser
-
-*/
-
-var CSSParser = function(){
-
-	var SPACE = 'SPACE', COMMENT = 'COMMENT', IDENTIFIER = 'IDENTIFIER', 
-		OPEN_BRACKET = 'OPEN_BRACKET', CLOSE_BRACKET = 'CLOSE_BRACKET',
-		OPEN_BRACE = 'OPEN_BRACE', CLOSE_BRACE='CLOSE_BRACE',
-		OPEN_PARENTHESIS = 'OPEN_PARENTHESIS', CLOSE_PARENTHESIS='CLOSE_PARENTHESIS',
-		COLON = 'COLON', SEMICOLON = 'SEMICOLON', COMMA = 'COMMA', OPERATOR = 'OPERATOR';
-
-	var SELECTOR = 1, OPENSCOPE = 2, CLOSESCOPE = 3, RULE = 4;	
-
-	var CSSLexer = function CSSLexer(input){
-		
-		this.i = 0;
-		this.input = input;
-		this.c = input[0];
-	};
-
-	CSSLexer.prototype.consume = function(){
-		var cons = this.c;
-		this.c = this.input[++this.i];
-
-		return cons;
-	};
-
-	CSSLexer.prototype.lookahead = function(n){
-		return this.input[this.i+n];
-	}
-
-	CSSLexer.prototype.getNextToken = function(){
-
-			if(this.c == undefined) return null;
-
-			var a = space(this);
-			if(a) return a;
-
-			if(a = comment(this)) 		return a;
-			
-			if(a = identifier(this)) 	return a;
-
-			if(a = bracket(this)) 		return a;
-
-			if(a = brace(this)) 		return a;
-
-			if(a = parenthesis(this)) 	return a;
-			
-			if(a = colon(this)) 		return a;
-
-			if(a = semicolon(this)) 	return a;
-
-			if(a = comma(this)) 		return a;
-
-			if(a = operator(this))		return a;
-
-	};
-
-
-	function isSpace(c){
-		if(	c === ' ' 	|| 
-			c === '\n'	||
-			c === '\r'  ||	
-			c === '\t') return true;
-	};
-
-
-	function space(lex){
-		if(isSpace(lex.c)) return [SPACE, lex.consume()];
-	}
-
-
-	function comment(lex){
-		var c 	= lex.c;
-		var c1 	= lex.lookahead(1);
-		var comment = '';
-
-		if(c == '/' && c1 == '*') {
-			comment += lex.consume();
-			c = lex.c;
-			while(c && c != '/') {
-				comment += lex.consume();
-				c = lex.c;
-			}
-			comment += lex.consume();
-		}
-		if(!comment || comment == '') return null;
-		return [COMMENT, comment];
-	}
-
-
-	function identifier(lex){
-
-		var c = lex.c;
-		var code = c.charCodeAt();
-
-		var result = '';
-
-		while(	c == '.' || c == '#' || c =='-'  || 
-				c == '%' || c == '*' ||
-				(code >= 48 && code <= 57)	||	/*0-9*/ 
-				(code >= 65 && code <= 90 ) || 	/*A-Z*/
-				(code >= 97 && code <= 122) 	/*a-z*/ ){
-			
-			result += lex.consume();
-
-			c = lex.c;
-			code = c.charCodeAt();
-			
-		}
-
-		if(!result || result == '') return null;
-		return [IDENTIFIER, result];
-	}
-	
-	function operator(lex) {
-		if(lex.c == '=') return [OPERATOR, lex.consume()];
-	}
-
-	function bracket(lex){
-		if(lex.c == '[') return [OPEN_BRACKET,  lex.consume()];
-		if(lex.c == ']') return [CLOSE_BRACKET, lex.consume()];
-	}
-
-	function brace(lex){
-		if(lex.c == '{') return [OPEN_BRACE,  lex.consume()];
-		if(lex.c == '}') return [CLOSE_BRACE, lex.consume()];
-	}
-
-	function parenthesis(lex) {
-		if(lex.c == '(') return [OPEN_PARENTHESIS, lex.consume()];
-		if(lex.c == ')') return [CLOSE_PARENTHESIS,lex.consume()];
-	}
-
-	function colon(lex){
-		if(lex.c == ':') return [COLON, lex.consume()];
-	}
-
-	function semicolon(lex){
-		if(lex.c == ';') return [SEMICOLON, lex.consume()];
-	}
-
-	function comma(lex){
-		if(lex.c == ',') return [COMMA, lex.consume()];	
-	}
-
-
-
-	
-	var CSSParser = function(input){
-
-		this.lexer =  new CSSLexer(input);
-		this.consume();
-
-	}
-
-	CSSParser.prototype.consume = function(){
-	
-		var token = this.token;
-		var t = this.lexer.getNextToken();
-		
-		if(!t) { this.token = null; return token; }
-
-		if(t[0] == COMMENT) this.consume(); //skip comments
-		this.token = {type:t[0], text:t[1]};
-
-		return token;
-	}
-
-
-	CSSParser.prototype.nextStatement = function(){
-
-		if(!this.token) return null;
-
-		whitespace(this);
-
-		var grp =  stylegroup(this);
-		if(grp) {
-			var group = {
-				isRuleGroup:true,
-				key:grp.key,
-				rules:[]
-			};
-			whitespace(this);
-			this.match(OPEN_BRACE); this.consume();
-
-				do {
-				whitespace(this);
-
-				var rule =  stylerule(this);
-
-				whitespace(this);   
-				group.rules.push(rule);
-
-				} while(this.token.type == IDENTIFIER);
-
-			this.match(CLOSE_BRACE); this.consume();
-
-			return group;
-		}
-		
-		var rule =  stylerule(this);
-
-		if(!rule) return null;		   
-
-		return rule;
-	}
-
-	CSSParser.prototype.match = function(type){
-		if(!this.token) return;
-
-		for(var i=0; i<arguments.length; i++){
-			if(this.token.type == arguments[i]) return;
-		}
-		
-		throw 'Invalid syntax';
-	}
-
-
-	function whitespace(parser){
-		if(!parser.token) return;
-		while( parser.token &&	(
-				parser.token.type == SPACE || 
-				parser.token.type == COMMENT)
-			) parser.consume();
-	}
-
-
-	function stylegroup(parser) {
-		if(!parser.token) return;
-		if(!parser.token.type == IDENTIFIER || 
-			parser.token.text.toUpperCase() != 'SJS-STYLE') return;
-
-		parser.consume();	
-		parser.match(OPEN_BRACKET); parser.consume();
-		parser.match(IDENTIFIER); 	parser.consume();
-		parser.match(OPERATOR); 	parser.consume();
-		parser.match(IDENTIFIER); var key = parser.consume().text;
-		parser.match(CLOSE_BRACKET); parser.consume();	
-
-		return {key:key}; 	
-	}
-
-
-	function selector(parser){
-		if(!parser.token) return null;
-		var text = '';
-		while(parser.token.type == IDENTIFIER) {
-			text += parser.consume().text; 
-			parser.match(SPACE, OPEN_BRACE, COLON);
-			
-			if(parser.token.type == COLON) {
-				text += parser.consume().text;
-				parser.match(IDENTIFIER);
-				continue;
-			}
-
-			if(parser.token.type == SPACE) {
-				text += parser.consume().text;
-				whitespace(parser);
-			}
-
-		}
-		return text;
-	};
-
-
-	function propertystyle(parser){
-		if(!parser.token) return;
-
-		var rr = [];
-
-		whitespace(parser);
-
-		var r = '';
-		parser.match(IDENTIFIER);
-			r += parser.consume().text;
-		whitespace(parser);
-		parser.match(COLON);
-			rr[0] = r;
-			r += parser.consume().text;
-		whitespace(parser);
-		parser.match(IDENTIFIER);
-		var style = '';
-		while(parser.token.type == IDENTIFIER || 
-		      parser.token.type == SPACE) {
-				var x = parser.consume().text;
-				style += x;
-				r += x;
-
-				if(parser.token.type == OPEN_PARENTHESIS){
-					x = multivalue(parser);
-					style += x;
-					r += x;
-				}	
-		}
-
-		whitespace(parser);
-
-		parser.match(SEMICOLON);
-			rr[1]= style;
-			r += parser.consume().text;
-
-		whitespace(parser);
-
-		rr[2] = formatCSSProperty(rr[0]);
-		return rr;
-	}
-
-	function multivalue(parser){
-		if(!parser.token) return;
-
-		var result = parser.consume().text;
-		whitespace(parser);
-		while(	parser.token.type == IDENTIFIER || 
-				parser.token.type == SPACE ||
-				parser.token.type == COMMA ){
-			result += parser.consume().text;
-		}
-		parser.match(CLOSE_PARENTHESIS);
-			result += parser.consume().text;
-
-		return result;
-	}
-
-	function stylerule(parser){
-
-		var sel =  selector(parser);
-	    parser.match(OPEN_BRACE);  parser.consume();
-		var stl =  styles(parser);
-	    parser.match(CLOSE_BRACE); parser.consume();
-
-	    if(!sel || !stl) return null;		   
-
-		return {selector:sel, styles:stl};
-	}
-
-
-	function styles(parser){
-		if(!parser.token) return;
-
-		var r = null;
-		var result = [];
-		while(r = propertystyle(parser)){
-			result.push(r);
-			if(parser.token.type == CLOSE_BRACE) break;
-		}
-		whitespace(parser);
-		
-		return result;
-	}
-
-
-	function parse(input,oncomplete){
-		if(!oncomplete || typeof(oncomplete)!= 'function' ) return;
-
-		var parser = new CSSParser(input);
-		
-		var statement = null, counter = 0, result = [];
-
-		while(statement = parser.nextStatement()){
-			
-			if(statement.isRuleGroup) {
-				result[statement.key] = statement.rules;
-			}	
-			else {
-				result.push(statement);
-			}
-
-			counter++;
-			if(counter > 100000) break;
-			
-		}
-
-		oncomplete(result);
-	}
-
-	return function(input){
-		return function(oncomplete){
-			if(!oncomplete || typeof(oncomplete)!= 'function' ) return;
-			parse(input, oncomplete);
-		}
-	}; 
-
-}();
-
-
-function cssComposeStyle(rules){
-
-	var r = '';
-	for (var i =0; i <  rules.length; i++) {
-		r+= ' ' + rules[i];
-	};
-
-	return r;
-}
-
-function cssMergeStyle(a, b) {
-	if(a == b) return b;
-	if(a == null) a = '';
-	if(b == null) b = '';
-	return a + ' ' + b;
-}
-
-function formatCSSProperty(property){
-
-	var result = '';
-	for(var i=0; i<property.length; i++){
-		var c = property[i];
-		if(c == '-') {
-			c = property[++i].toUpperCase();
-		}
-		result +=  c;
-	}
-	return result;
-}	
-
-
-function applyStyleProperties(style, rules){
-	for(var i=0; i<rules.length; i++){
-		style[rules[i][2]] = rules[i][1];
-	}
-}
-
-
-function applyCSSRules(rules, element, parentId){
-
-	for(var i=0; i<rules.length; i++){
-		var rule = rules[i];
-		var elements = element.querySelectorAll(rule.selector);		
-
-		for (var n = 0; n < elements.length; n++) {
-			var process = false; 
-
-			if(parentId) {
-				var p = elements[n];
-				while(p) {
-					if(p.id == parentId) { process = true; break;}
-					if(p == element) break;
-					p = p.parentNode;
-				}
-			} else {
-				process = true;
-			}
-
-			if(!process) continue; 
-			var style = elements[n].style;
-			applyStyleProperties(style,rule.styles);
-			
-		}
-
-	}
-
-	_.debug.log('Working on CSS Rules');
-};
-
-
-/*
-	
-----------------------------------------------------------
-
-	Routing FIle Parser
-
-*/
-
-var RouteParser = function(){
-
-
-};
 
 
 /*
@@ -3060,6 +2586,9 @@ var RouteParser = function(){
 	};
 	
 
+var PATH_MAP = {
+
+};
 
 var Module = 
 	/**
@@ -3128,9 +2657,6 @@ var Module =
 			return;
 		}
 		
-		// flag is CSS is loaded into a local scope only
-		required.cssIsLocal = cssIsLocal;
-
 		/* 
 		 * Load dependencies
 		 * */
@@ -3143,13 +2669,23 @@ var Module =
 			 *
 			 * Some modules may be simple dependency aggregators 
 			 * in which case definition function is not available 
-			 **/
+			 * */
+
+			 /*
+
+				Scope object will contain dependency imports
+			 */
 			
-			if(typeof definition === 'function') definition.call(scope,scope);
+			
+			if(typeof definition === 'function') {
+				var _exports = definition.call(scope,scope); 
+				PATH_MAP[path] = _exports;	
+			}
 			
 			scope.templates = templateDefinitions;
 			scope.cssrules = cssRules;
 			
+
 
 			/* 
 			 * Templates are compiled after module has been defined
@@ -3181,10 +2717,8 @@ var Module =
 	core.Binding = Binding;
     core.HttpRequest = HttpRequest;	
 	core.Module = Module;
-	core.CSS = {
-		parser: 	CSSParser,
-		applyRules: applyCSSRules
-	};
+	core.PATH_MAP = PATH_MAP;
+	
 
 
 

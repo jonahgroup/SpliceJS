@@ -242,7 +242,10 @@ definition:function(){
 		this.onClose();
 	};
 
-
+	return {
+		PullOutPanel: PullOutPanel,
+		DomIterator: DomIterator
+	}
 
 // end module definition		
 }});
