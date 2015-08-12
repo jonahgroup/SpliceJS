@@ -1,8 +1,10 @@
 _.Module({
 	
 required:[
+	
+	{'SpliceJS.UI':'../splice.ui.js'},
+	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	'splice.controls.css',
-	'splice.controls.scrollpanel.js',
 	'splice.controls.datatable.css',
 	'splice.controls.datatable.html'
 ],
@@ -10,12 +12,17 @@ required:[
 definition:function(){
 	
 	
+	var Class = this.framework.Class;
+	var Event = this.framework.Event;
+	
+	var UIControl = this.SpliceJS.UI.UIControl; 
+	
 	/**
 	 * DataTable
 	 * */
-	var DataTable = _.Namespace('SpliceJS.Controls').Class(function DataTable(args){
+	var DataTable = Class(function DataTable(args){
 		/* call parent constructor */
-		SpliceJS.Controls.UIControl.apply(this,arguments);
+		UIControl.apply(this,arguments);
 		
 		var self = this;
 
@@ -26,9 +33,9 @@ definition:function(){
 		this.dataRows = [];
 		this.headerRow = null;
 
-		_.Event.create(window, 'onresize').subscribe(function(){self.reflow();});
+		Event.create(window, 'onresize').subscribe(function(){self.reflow();});
 		
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 	
 	
 
@@ -277,8 +284,8 @@ definition:function(){
 
 
 	
-	var DataTableRow =  _.Namespace('SpliceJS.Controls').Class(function DataTableRow(args){
-		SpliceJS.Controls.UIControl.call(this);
+	var DataTableRow =  Class(function DataTableRow(args){
+		UIControl.call(this);
 		/* 
 		 * process content placeholders before they are 
 		 * pulled by parent control
@@ -297,7 +304,7 @@ definition:function(){
 			textNodes[i].parentNode.replaceChild(span,textNodes[i]);
 			this.contentMap[key] = span;
 		}
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 	
 	DataTableRow.prototype.selectRow = function(){
 		_.debug.log('select row');
@@ -339,11 +346,18 @@ definition:function(){
 		this.dataOut(this.data);
 	};
 	
-	DataTableRow.prototype.dataOut = _.Event;
+	DataTableRow.prototype.dataOut = Event;
 
 	function splitHighlightValue(value,hv){
 		if(value == null || value == undefined) return value;
 		return value.replace(new RegExp(hv,'gi'),'<span class="-search-result-highlight">'+hv+'</span>');
+	}
+
+
+	//module exports
+	return {
+		DataTable: DataTable,
+		DataTableRow: DataTableRow
 	}
 
 // end module definition

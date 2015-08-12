@@ -3,7 +3,10 @@ _.Module({
 
 definition:function(){
 
-	var BarChart = _.Namespace('SpliceJS.Controls.Charts').Class(function BarChart(){
+	var Class = this.framework.Class;
+
+
+	var BarChart = Class(function BarChart(){
 
 	});
 
@@ -76,6 +79,13 @@ definition:function(){
 
 
 	};
+
+
+	return {
+		
+		BarChart:BarChart
+		
+	}
 
 
 }});

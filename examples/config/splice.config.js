@@ -1,5 +1,5 @@
 /* Location of SpliceJS relative to applications' URL */
-var SPLICE_PUBLIC_ROOT = '../splicejs';
+var SPLICE_HOME = '../splicejs';
 
 /*
  * When set to "true" preloader will not be shown

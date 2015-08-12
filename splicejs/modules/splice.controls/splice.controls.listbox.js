@@ -1,16 +1,22 @@
 _.Module({
 
 required:[ 
-	_.home('modules/splice.ui.js'),
+	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.listbox.css',
 	'splice.controls.listbox.html'
 ],
 
 definition:function(){
 
-	var localScope = this;
+	var scope = this
+	,	f = this.framework;
+	
+	var Obj  = f.Obj
+	, 	Class = f.Class
+	,	UIControl = this.SpliceJS.UI.UIControl;
+	
 
-	var ListBox = _.Namespace('SpliceJS.Controls').Class(function ListBox(args){
+	var ListBox = Class(function ListBox(args){
 
 		if(!args) args = [];
 
@@ -20,15 +26,13 @@ definition:function(){
 			args['type'] = 'StretchListBox';
 
 		if(this.ref) args['ref'] = this.ref;
-		
-		var obj = _.Obj.call(localScope,args);
-	
-		return new obj();  
+			
+		return new (Obj.call(scope,args));  
 
 	});
 
 
-	var ScrollableListBox = this.ScrollableListBox = _.Class(
+	var ScrollableListBox = this.ScrollableListBox = Class(
 		function ScrollableListBox(){
 
 			_.debug.log('Creating ScrollableListBox');
@@ -69,7 +73,7 @@ definition:function(){
 	};
 
 
-	var StretchListBox = this.StretchListBox = _.Class(
+	var StretchListBox = this.StretchListBox = Class(
 		function StretchListBox(){
 
 			_.debug.log('Creating StretchListBox');
@@ -77,11 +81,8 @@ definition:function(){
 	);
 
 
-
-
-
-	var ListItem = _.Namespace('SpliceJS.Controls').Class(function ListItem(args){
-		SpliceJS.Controls.UIControl.call(this,args);
+	var ListItem = Class(function ListItem(args){
+		UIControl.call(this,args);
 	
 		var self = this;
 		this.concrete.dom.onclick = function(){
@@ -89,7 +90,7 @@ definition:function(){
 				self.onClick(self.dataItem);
 		};
 
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
 
 	ListItem.prototype.dataIn = function(dataItem){
@@ -101,7 +102,7 @@ definition:function(){
 
 
 
-	var GroupedListItem = _.Namespace('SpliceJS.Controls').Class(function GroupedListItem(args){
+	var GroupedListItem = Class(function GroupedListItem(args){
 		this.groupInstance = null;
 		this.itemInstances = [];
 	});
@@ -132,6 +133,13 @@ definition:function(){
 
 	};
 
+	//exporting objects
+	return {
+		ListBox:		ListBox,
+		StretchListBox:	StretchListBox,
+		ListItem:		ListItem,
+		GroupedListItem:GroupedListItem
+	}
 
 }
 

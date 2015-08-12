@@ -2,19 +2,26 @@ _.Module({
 
 
 required:[
+	{'SpliceJS.UI':'../splice.ui.js'},
+	
 	_.configuration.platform.IS_MOBILE?'splice.controls.scrollpanel-mobile.css':'splice.controls.scrollpanel.css',
 	'splice.controls.scrollpanel.html'
 ],
 
 definition:function(){
 
+	var Class = this.framework.Class;
+	
+	var UIControl = this.SpliceJS.UI.UIControl;
+	var DragAndDrop = this.SpliceJS.UI.DragAndDrop;
+
 	var isTouch 	= _.configuration.platform.IS_TOUCH_ENABLED;
 	var isMobile 	= _.configuration.platform.IS_MOBILE;
 
-	var ScrollPanel = _.Namespace('SpliceJS.Controls').Class(function ScrollPanel(args){
+	var ScrollPanel = Class(function ScrollPanel(args){
 		if(!args) return;
 		
-		SpliceJS.Controls.UIControl.call(this,args);
+		UIControl.call(this,args);
 		
 		this.horizontalDisable = this.isDisableHorizontal;
 		this.domRoot = this.concrete.dom;
@@ -42,7 +49,7 @@ definition:function(){
 			self.display();
 		});
 
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 	
 
 	ScrollPanel.prototype.display = function(){
@@ -247,11 +254,11 @@ definition:function(){
 			e.cancelBubble = true;
 			if (e.stopPropagation) e.stopPropagation();
 			
-			SpliceJS.Ui.DragAndDrop.startDrag(this,e);
+			DragAndDrop.startDrag(this,e);
 			var top = this.offsetTop - parent.scrollTop ;
 			
 		
-			SpliceJS.Ui.DragAndDrop.ondrag = function(position,offset){
+			DragAndDrop.ondrag = function(position,offset){
 				
 				var t = (top + position.y-offset.y);
 				if(t <=10) t = 10;
@@ -272,12 +279,12 @@ definition:function(){
 			e.cancelBubble = true;
 			if (e.stopPropagation) e.stopPropagation();
 			
-			SpliceJS.Ui.DragAndDrop.startDrag(this,e);
+			DragAndDrop.startDrag(this,e);
 			var left = this.offsetLeft - parent.scrollLeft ;
 			var scale = thumbSizes.horizontal.scale;
 		
 		
-			SpliceJS.Ui.DragAndDrop.ondrag = function(position,offset){
+			DragAndDrop.ondrag = function(position,offset){
 				
 				var t = (left + position.x-offset.x);
 				if(t <=10) t = 10;
@@ -313,7 +320,11 @@ definition:function(){
 		
 		
 		return status;
-		
-		
-	};
+	}; //end attach scrollbars
+
+	//module exports
+	return {
+		ScrollPanel:ScrollPanel
+	}
+
 }});

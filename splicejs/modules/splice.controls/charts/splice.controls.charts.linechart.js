@@ -3,7 +3,9 @@ _.Module({
 
 definition:function(){
 
-	var LineChart = _.Namespace('SpliceJS.Controls.Charts').Class(function LineChart(){
+	var Class = this.framework.Class;
+
+	var LineChart = Class(function LineChart(){
 
 	});
 
@@ -120,11 +122,13 @@ definition:function(){
 		    .attr("y", function(d){return y(d) - 10;})
 		    .attr("dy", ".35em")
 		    .text(function(d) { return d; });
-
-		
-
-
-		
 	};
+
+
+	return {
+		
+		LineChart:LineChart
+		
+	}
 
 }});

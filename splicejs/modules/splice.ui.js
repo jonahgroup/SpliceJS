@@ -1,26 +1,38 @@
-_.Module({
+/*blobal sjs */
+sjs.Module({
 
 definition:function(){
 
 	//enable strict mode
 	"use strict"; 
 	
+	// importing framework features makes our code less verbose
+	var Class = this.framework.Class;
+	var Controller = this.framework.Controller;
 
-	var UIElement = _.Namespace('SpliceJS.Controls').Class(function UIElement(args){
 
+
+	/**
+	 * HTML Element decorator
+	 */
+	var UIElement = Class(function UIElement(args){
 		var self = this;
 		this.concrete.dom.onclick = function(){
 			self.onClick(self);
 		}
+	}).extend(Controller);
 
-	}).extend(SpliceJS.Core.Controller);
-
-	UIElement.prototype.onClick = _.Event;
-
+	UIElement.prototype.onClick = sjs.Event;
 
 
-	var UIControl = _.Namespace('SpliceJS.Controls').Class(function UIControl(args){
-		SpliceJS.Core.Controller.call(this);
+
+
+	/**
+	 * Base UIControl class
+	 */
+	var UIControl = Class(function UIControl(args){
+		
+		sjs.Controller.call(this);
 		
 		if(this.isHidden) {
 			this.prevDisplayState = this.elements.controlContainer.style.display; 
@@ -34,14 +46,11 @@ definition:function(){
 
 		var self = this;
 
-
-		
-
 		this.onDomChanged.subscribe(function(){
 			self.applyCSSRules();
 		});
 
-	}).extend(SpliceJS.Core.Controller);
+	}).extend(Controller);
 	
 	UIControl.prototype.hide = function(){
 		var self = this;
@@ -183,7 +192,7 @@ definition:function(){
 	/*
 		Element positioning utilies
 	*/
-	var Positioning = _.Namespace('SpliceJS.Ui').Class(function Positioning(){});
+	var Positioning = Class(function Positioning(){});
 
 	Positioning.prototype = {
 
@@ -234,15 +243,15 @@ definition:function(){
 	    containsPoint:function(element,p) {
 	        pos = JSPositioning.absPosition(element);
 	        
-		pos.height = element.clientHeight;
-		pos.width = element.clientWidth;
+			pos.height = element.clientHeight;
+			pos.width = element.clientWidth;
 			
-		if( p.x >= pos.x && p.x <= (pos.x + pos.width)) {
-		if(p.y >= pos.y && p.y <= pos.y + (pos.height / 2))
+			if( p.x >= pos.x && p.x <= (pos.x + pos.width)) {
+			if(p.y >= pos.y && p.y <= pos.y + (pos.height / 2))
 	            return 1;
-		else if(p.y >= pos.y + (pos.height / 2) && p.y <= pos.y + pos.height )
+			else if(p.y >= pos.y + (pos.height / 2) && p.y <= pos.y + pos.height )
 	            return -1;
-		}
+			}
 	            return 0;	
 	    },
 	    
@@ -261,13 +270,13 @@ definition:function(){
 	    }
 	};
 
-	SpliceJS.Ui.Positioning = new SpliceJS.Ui.Positioning();
+	
 
 	/*
 		Drag and Drop implementation 
 	*/
 
-	var DragAndDrop = _.Namespace('SpliceJS.Ui').Class(function DragAndDrop(){});
+	var DragAndDrop = Class(function DragAndDrop(){});
 
 	DragAndDrop.prototype = {
 
@@ -360,8 +369,12 @@ definition:function(){
         }
 };
 
-SpliceJS.Ui.DragAndDrop = new SpliceJS.Ui.DragAndDrop();
-
+	//module exports
+	return {
+		UIControl:	 UIControl,
+		Positioning: new Positioning(),
+		DragAndDrop: new DragAndDrop()
+	}
 
 
 }});

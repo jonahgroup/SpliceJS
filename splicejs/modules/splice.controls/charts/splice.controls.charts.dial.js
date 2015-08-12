@@ -6,9 +6,10 @@ required:[
 ],
 
 definition:function(){
+	
+	var Class = this.framework.Class;
 
-
-	var Dial = _.Namespace('SpliceJS.Controls').Class(function Dial(){
+	var Dial = Class(function Dial(){
 	
 	    this.dom = this.canvas = this.elements.controlContainer;
 		var canvas = this.canvas;
@@ -271,6 +272,14 @@ definition:function(){
 	};
 
 	Dial.prototype.onchange = function(){};
+
+
+	return {
+		
+		Dial:Dial
+		
+	}
+
 
 	}
 

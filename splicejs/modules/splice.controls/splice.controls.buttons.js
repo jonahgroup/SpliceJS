@@ -1,17 +1,18 @@
 _.Module({
 required:[
+	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.buttons.css',
 	'splice.controls.buttons.html'
 ]
 ,
 definition:function(){
 
-	var scope = this;
-
+	var Class = this.framework.Class;
+	var UIControl = this.SpliceJS.UI.UIControl;
 	
-	var Button = _.Namespace('SpliceJS.Controls').Class(function Button(args){
+	var Button = Class(function Button(args){
 		
-		SpliceJS.Controls.UIControl.apply(this,arguments);
+		UIControl.apply(this,arguments);
 		
 			
 		var self = this;
@@ -23,7 +24,7 @@ definition:function(){
 		
 		if(this.isDisabled) this.disable();
 		
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
 	Button.prototype.onClick = _.Event;
 
@@ -64,8 +65,8 @@ definition:function(){
 	 * 
 	 * Check box
 	 * */
-	var CheckBox = _.Namespace('SpliceJS.Controls').Class(function CheckBox(args){
-		SpliceJS.Controls.UIControl.apply(this,arguments);
+	var CheckBox = Class(function CheckBox(args){
+		UIControl.apply(this,arguments);
 
 		var self = this;
 		
@@ -82,7 +83,7 @@ definition:function(){
 			if(self.onCheck)	self.onCheck(isChecked);
 		};
 	
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
 	
 	CheckBox.prototype.dataIn = function(dataItem){
@@ -102,8 +103,8 @@ definition:function(){
 	/**
 	 * RadioButton
 	 * */
-	var RadioButton = _.Namespace('SpliceJS.Controls').Class(function RadioButton(args){
-		SpliceJS.Controls.UIControl.apply(this,arguments);
+	var RadioButton = Class(function RadioButton(args){
+		UIControl.apply(this,arguments);
 	
 		var self = this;
 		this.elements.controlContainer.onclick = function(){
@@ -118,11 +119,11 @@ definition:function(){
 			self.dataOut(self.dataItem);
 		}
 	
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 	
 	
 	RadioButton.prototype.dataIn = function(dataItem){
-		SpliceJS.Controls.UIControl.prototype.dataIn.call(this,dataItem);
+		UIControl.prototype.dataIn.call(this,dataItem);
 
 		if(!this.dataPath) {
 			this.elements.controlContainer.checked = false;
@@ -137,8 +138,12 @@ definition:function(){
 		}
 	};
 
-
-
+	//returning exports
+	return {
+		Button:	Button,
+		CheckBox: CheckBox,
+		RadioButton: RadioButton	
+	}
 
 }
 

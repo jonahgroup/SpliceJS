@@ -1,15 +1,18 @@
-_.Module({
+/* global sjs */
+sjs.Module({
 
 required:[	
 			
-	'splice.ui.js'
+	{'SpliceJS.UI':'splice.ui.js'}
 ,	'splice.controls/splice.controls.css'
 ,  	'splice.controls/splice.controls.html'
 ,  	'splice.controls/splice.controls.buttons.js'
 ,	'splice.controls/splice.controls.datatable.js'
 ,	'splice.controls/splice.controls.scrollpanel.js'
 ,	'splice.controls/splice.controls.charts.js'
+
 ,	'splice.controls/splice.controls.listbox.js'
+/*
 ,	'splice.controls/splice.controls.drawerpanel.js'
 ,	'splice.controls/splice.controls.viewpanel.js'
 ,	'splice.controls/splice.controls.map.js'
@@ -23,18 +26,21 @@ required:[
 ,	'splice.controls/splice.controls.popup.js'
 ,   'splice.controls/splice.controls.pageloader.js'
 ,   'splice.controls/splice.controls.slider.js'
-
+*/
 ]
 , 	
 definition:function(){
 	
-	var localScope = this;
+	var scope = this;
 
+	/* imports */
+	var Class = this.framework.Class;
+	var Event = this.framework.Event;
+	var UIControl = this.SpliceJS.UI.UIControl;
 	
 	
-	
-	var TextField = _.Namespace('SpliceJS.Controls').Class(function TextField(){
-		SpliceJS.Controls.UIControl.apply(this,arguments);
+	var TextField = Class(function TextField(){
+		UIControl.apply(this,arguments);
 
 		var self = this;
 		
@@ -55,12 +61,12 @@ definition:function(){
 			this.elements.controlContainer.onchange = f;
 		}
 
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 	
-	TextField.prototype.onData = _.Event;
+	TextField.prototype.onData = Event;
 		
 	TextField.prototype.dataIn = function(dataItem){
-		SpliceJS.Controls.UIControl.prototype.dataIn.call(this,dataItem);
+		UIControl.prototype.dataIn.call(this,dataItem);
 		var value = this.dataItem[this.dataPath];
 		
 		if(value) this.elements.controlContainer.value = value;
@@ -69,23 +75,15 @@ definition:function(){
 	TextField.prototype.clear = function(){
 		this.elements.controlContainer.value = '';
 	};
-	
-
-	
-
-
-
 
 
 	/**
 	 * Drop down list
 	 * */
-	var DropDownList = _.Namespace('SpliceJS.Controls').Class(function DropDownList(args){
+	var DropDownList = sjs.Class(function DropDownList(args){
+		UIControl.call(this);
 		this.dom = this.concrete.dom;
-	}).extend(SpliceJS.Controls.UIControl); 
-
-
-
+	}).extend(UIControl); 
 
 
 	DropDownList.prototype.show = function(args){
@@ -119,7 +117,7 @@ definition:function(){
 		
 		document.body.onmousedown = (function(){
 			this.hide();
-			document.body.onmousedown = '';
+			document.body.onmousedown = undefined;
 		}).bind(this); 
 		
 	};
@@ -140,7 +138,7 @@ definition:function(){
 	 *	Image Selector
      *
 	 * */
-	var ImageSelector = _.Namespace('SpliceJS.Controls').Class(function ImageSelector(){
+	var ImageSelector = Class(function ImageSelector(){
 		
 		var container = this.elements.controlContainer;
 
@@ -148,7 +146,6 @@ definition:function(){
 		if(this.height) container.height = this.height;
 
 		if(this.src) this.elements.controlContainer.src = this.src;
-
 
 	});
 
@@ -162,7 +159,7 @@ definition:function(){
 
 
 
-	var DomIterator = _.Namespace('SpliceJS.Controls').Class( function DomIterator(args){
+	var DomIterator = Class( function DomIterator(args){
 
 		this.conc = [];
 
@@ -188,7 +185,7 @@ definition:function(){
 
 		if(!args.dom) return;
 
-	}).extend(SpliceJS.Core.Controller);
+	}).extend(sjs.Controller);
 
 	DomIterator.prototype.dataIn = function(data){
 		var nToUpdate = Math.min(this.conc.length, data.length);
@@ -218,17 +215,17 @@ definition:function(){
 
 	}
 
-	SpliceJS.Controls.DomIterator = localScope.createComponent(DomIterator,null);
+	 DomIterator = scope.createComponent(DomIterator,null);
 
 
 
-	var PullOutPanel = _.Namespace('SpliceJS.Controls').Class( function PullOutPanel(){
-		SpliceJS.Controls.UIControl.call(this);
-	}).extend(SpliceJS.Controls.UIControl);
+	var PullOutPanel = Class( function PullOutPanel(){
+		UIControl.call(this);
+	}).extend(UIControl);
 
 
-	PullOutPanel.prototype.onOpen = _.Event;
-	PullOutPanel.prototype.onClose = _.Event;
+	PullOutPanel.prototype.onOpen  = Event;
+	PullOutPanel.prototype.onClose = Event;
 
 
 	PullOutPanel.prototype.open = function(){
@@ -242,9 +239,15 @@ definition:function(){
 		this.onClose();
 	};
 
+
+	// module exports
 	return {
-		PullOutPanel: PullOutPanel,
-		DomIterator: DomIterator
+		
+		TextField:		TextField,
+		PullOutPanel: 	PullOutPanel,
+		DomIterator: 	DomIterator,
+		ImageSelector:  ImageSelector
+		
 	}
 
 // end module definition		

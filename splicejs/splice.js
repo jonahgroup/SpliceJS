@@ -29,12 +29,12 @@ SOFTWARE.
 */
 
 
-var _ = sjs = (function(window, document){
+var _ = sjs = _js = (function(window, document){
 	"use strict";
 
 	var configuration = {
 		APPLICATION_HOME: 				getPath(window.location.href).path, 
-		PUBLIC_ROOT:         			window.SPLICE_PUBLIC_ROOT,
+		SPLICE_HOME:         			window.SPLICE_HOME,
 		ONLOAD_DISP_SHORT_FILENAME: 	window.SPLICE_ONLOAD_DISP_SHORT_FILENAME, 
 		platform: {	
 			IS_MOBILE: 			window.SPLICE_PLATFORM_IS_MOBILE,
@@ -42,9 +42,12 @@ var _ = sjs = (function(window, document){
 		}
 	};
 
+	/** 
+	 *	
+	 */
 	var URL_CACHE = new Array();	
 
-	/*
+	/** 
 	  	Bootloading files
 	*/
 	var BOOT_SOURCE = [];
@@ -67,7 +70,7 @@ var _ = sjs = (function(window, document){
 	/* 
 	 	Cache loading indicator 
 	*/
-	new Image().src = ( configuration.PUBLIC_ROOT || '') + '/resources/images/bootloading.gif';
+	new Image().src = ( configuration.SPLICE_HOME || '') + '/resources/images/bootloading.gif';
 
 	
 	if(!window.console) { 
@@ -146,7 +149,7 @@ var _ = sjs = (function(window, document){
 		document.body.innerHTML = 
 		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:0.7em; color:#101010;">'+
 		'<div style="position:relative; top:-20px">'+
-			'<div style="display:inline;"><img style="vertical-align:middle;" src="'+window.SPLICE_PUBLIC_ROOT+'/resources/images/bootloading.gif"/></div>'+
+			'<div style="display:inline;"><img style="vertical-align:middle;" src="'+configuration.SPLICE_HOME+'/resources/images/bootloading.gif"/></div>'+
 			'<div style="display:inline; padding-left:1em;"><span></span></div>'+
 		'</div>'+
 		'</div>';
@@ -877,8 +880,7 @@ var _ = sjs = (function(window, document){
 	/*
 	 * loader initializers
 	 * */
-	core.PUBLIC_ROOT = window.SPLICE_PUBLIC_ROOT ? window.SPLICE_PUBLIC_ROOT : '';
-	
+		
 	window.onload = function(){
 		
 		var mainPageHtml = document.body.innerHTML;
@@ -920,7 +922,7 @@ var _ = sjs = (function(window, document){
 	
 
 
-	core.boot = function(args){
+	function boot(args){
 
 		if(!args) return null;
 		if(!(args instanceof Array) ) return null;
@@ -934,15 +936,15 @@ var _ = sjs = (function(window, document){
 
 
 
-	core.home = function(obj,path){
+	function home(obj,path){
 
 
-		if(!path) var path = window.SPLICE_PUBLIC_ROOT;
+		if(!path) var path = configuration.SPLICE_HOME;
 
 		if(!obj) return path;
 
 		if(typeof obj === 'string'){
-			if(obj.indexOf(window.SPLICE_PUBLIC_ROOT) === 0) return obj;
+			if(obj.indexOf(configuration.SPLICE_HOME) === 0) return obj;
 			return path + '/' + obj;
 		}
 
@@ -1003,6 +1005,14 @@ var _ = sjs = (function(window, document){
 			Class: function(constructor){
 				var idx = (this._path + '.' + getFunctionName(constructor)).toUpperCase(); 
 				return core.Class.call({namespace:this,idx:idx},constructor);
+			},
+			
+			place:function(obj){
+				for(var key in obj){
+					if(!obj.hasOwnProperty) continue;
+					
+					this[key] = obj[key];
+				}	
 			},
 			
 			add:function(name, object){
@@ -1067,7 +1077,7 @@ var _ = sjs = (function(window, document){
 
 		if(typeof namespace !== 'string' ) throw "_.Namespace(string) argument type must be a string";
 
-		var ns = getNamespace(namespace, false, false);
+		var ns = getNamespace.call(window,namespace, false, false);
 		
 		if(ns && !(ns instanceof Namespace)) 
 			throw "Namespace " + namespace + " is ocupied by an object ";
@@ -1080,7 +1090,7 @@ var _ = sjs = (function(window, document){
 				Class:function(constructor){
 					
 					var idx = (namespace + '.' + getFunctionName(constructor)).toUpperCase(); 
-					var newNamespace = getNamespace(namespace,true);
+					var newNamespace = getNamespace.call(window,namespace,true);
 					return core.Class.call({namespace:newNamespace, idx:idx}, constructor);
 
 				},
@@ -1089,7 +1099,7 @@ var _ = sjs = (function(window, document){
 					
 					var idx = (namespace + '.' + name).toUpperCase(); 
 
-					var newNamespace = getNamespace(namespace,true);
+					var newNamespace = getNamespace.call(window,namespace,true);
 					NAMESPACE_INDEX[idx] = newNamespace[name] = object;
 
 				}
@@ -1125,7 +1135,7 @@ var _ = sjs = (function(window, document){
 
 	core.Namespace.lookup = function(qualifiedName){
 		core.debug.log('searching ' + qualifiedName);
-		return getNamespace(qualifiedName,false, true);
+		return getNamespace.call(window,qualifiedName,false, true);
 	};
 
 	core.Namespace.lookupIndex = function(qualifiedName){
@@ -1146,7 +1156,7 @@ var _ = sjs = (function(window, document){
 		 * Class is being declaired within a namespace
 		 * Attached constructor to a namespace instance
 		 * */
-		if(this.namespace){
+		if(this && this.namespace){
 			var constructorName = getFunctionName(constructor); 
 
 			/*
@@ -1272,9 +1282,8 @@ var _ = sjs = (function(window, document){
 		/*
 		 * qualify filename
 		 * */
-		//filename = window.SPLICE_PUBLIC_ROOT +'/'+filename;
 		var relativeFileName = filename; 
-		filename = _.absPath(filename);
+		filename = absPath(filename);
 
 		/*
 		 * */
@@ -1295,15 +1304,16 @@ var _ = sjs = (function(window, document){
 		
 		var head = document.getElementsByTagName('head')[0];
 		
+		//tell Splice what is loading
+		watcher.notifyCurrentlyLoading({name:relativeFileName, url:filename});
+		
+		
 		/*
 		 * Load CSS Files - global
 		 * */
 		if(endsWith(filename, FILE_EXTENSIONS.style) && !loader.cssIsLocal){
 			
 			var linkref = document.createElement('link');
-			
-			//tell Splice what is loading
-			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:linkref});
 			
 			linkref.setAttribute("rel", "stylesheet");
 			linkref.setAttribute("type", "text/css");
@@ -1336,7 +1346,6 @@ var _ = sjs = (function(window, document){
 		 * */
 		if(endsWith(filename, FILE_EXTENSIONS.style) && loader.cssIsLocal == true){
 			core.debug.log('Loading CSS Locally');
-			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
 			HttpRequest.get({
 				url: filename,
 				onok:function(response){
@@ -1362,9 +1371,6 @@ var _ = sjs = (function(window, document){
 		if(endsWith(filename, FILE_EXTENSIONS.javascript)) {
 			var script = document.createElement('script');
 			
-			//tell Splice what is loading
-			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:script});
-			
 			script.setAttribute("type", "text/javascript");
 			script.setAttribute("src", filename);
 			
@@ -1385,8 +1391,6 @@ var _ = sjs = (function(window, document){
 		 * Load html templates
 		 * */
 		if(endsWith(filename, FILE_EXTENSIONS.template)){
-			//tell Splice what is loading
-			watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
 			HttpRequest.get({
 				url: filename,
 				onok:function(response){
@@ -1404,7 +1408,6 @@ var _ = sjs = (function(window, document){
 		 *	Load routing file
 		 * */
 		 if(endsWith(filename, FILE_EXTENSIONS.route)){
-		 	watcher.notifyCurrentlyLoading({name:relativeFileName,obj:null});
 			HttpRequest.get({
 				url: filename,
 				onok:function(response){
@@ -1509,7 +1512,9 @@ var _ = sjs = (function(window, document){
 		
 		var parts = namespace.split('.');
 		
-		var ns = window;
+		var ns = this;
+		if(!ns) ns = window;
+		
 		var last = null;
 		
 
@@ -1558,7 +1563,7 @@ var _ = sjs = (function(window, document){
 
 */
 	
-	var Scope = function Scope(path){
+	function Scope(path){
 		this.templates = [];
 		this.path = path;
 		this.compindex = [];
@@ -1658,7 +1663,7 @@ var _ = sjs = (function(window, document){
 
 
 
-	var Controller = core.Namespace('SpliceJS.Core').Class(function Controller(){
+	var Controller = core.Class(function Controller(){
 
 
 		this.onDisplay.subscribe(function(){
@@ -2425,9 +2430,9 @@ var _ = sjs = (function(window, document){
 	
 	/** 
 	 * 
-	 * @tie
+	 * @tie controller type function
 	 * 
-	 * @template
+	 * @template template object
 	 * 
 	 * @module is a scope object where modules have been declared
 	 * used for resolving references to local-scoped templates
@@ -2590,6 +2595,33 @@ var PATH_MAP = {
 
 };
 
+/*
+
+	@path is a relative path to SPLICE_HOME
+	@a is a dependency list of file names
+*/
+function prepareImports(a, path){
+	if(!a) return {namespaces:null, filenames:null};
+
+	var namespaces = [] , filenames = [];
+	
+	for(var i=0; i<a.length; i++){
+		//this is a namespaced dependency
+		if(typeof a[i] === 'object') {
+			for(var key in a[i]){
+				if(a[i].hasOwnProperty(key)) {
+					namespaces.push({ns:key,path:home(a[i][key],path)});
+					filenames.push(home(a[i][key],path));
+					break;
+				}	
+			}
+		} else {
+			filenames.push(home(a[i],path));
+		}
+	}
+	return {namespaces:namespaces, filenames:filenames};
+};
+
 var Module = 
 	/**
 	 * Builds module and compiles template(s) from module definition. 
@@ -2600,19 +2632,25 @@ var Module =
 	 * @param moduleDefinition
 	 */
 	function Module(moduleDefinition){
-	    console.log("Currently loading: " + _.currentlyLoading.name);
+	    var scope = new Scope(path); //our module scope
+		
+		scope.framework = sjs;
+		
+		//use absolute URL there is no reason not to
 		var path = _.getPath(_.currentlyLoading.name).path;
-
-		var required 	= _.home(moduleDefinition.required,path);
-		var moduleName 	= moduleDefinition.name;
+		var url = _.currentlyLoading.url;
+		
+		var imp = prepareImports(moduleDefinition.required, path);
+		
+		var required 	= imp.filenames;
 		var definition  = moduleDefinition.definition;
 
 		var cssIsLocal = moduleDefinition.cssIsLocal;
 	
 		/* required collection is always an Array */
 		required = required instanceof Array ? required : null;
-
-		var scope = new Scope(path);
+		
+		
 
 		scope.createComponent = function(tie,template){return createComponent(tie,template,this);};
 			
@@ -2653,7 +2691,7 @@ var Module =
 		 * Module has no required includes
 		 * */
 		if(!required || required.length < 1) {
-			definition(); 
+			PATH_MAP[url] = definition.call(scope,scope); 
 			return;
 		}
 		
@@ -2676,10 +2714,24 @@ var Module =
 				Scope object will contain dependency imports
 			 */
 			
+			/*
+				Inject Scope Dependencies
+			 */
+			if(imp.namespaces) {
+				for(var i=0; i<imp.namespaces.length; i++){
+					var ns = imp.namespaces[i];
+					//looking up exportsd
+					var x = PATH_MAP[absPath(ns.path)];
+					if(!x) continue;
+					ns = getNamespace.call(scope,ns.ns,true,false);
+					ns.place(x);
+				}
+			}
+			
 			
 			if(typeof definition === 'function') {
 				var _exports = definition.call(scope,scope); 
-				PATH_MAP[path] = _exports;	
+				PATH_MAP[url] = _exports;	
 			}
 			
 			scope.templates = templateDefinitions;
@@ -2706,7 +2758,9 @@ var Module =
 */
 	
 	//core.debug = debug;
-
+	core.boot = boot;
+	core.home = home;
+	
 	core.absPath = absPath;
 	core.getPath = getPath;
 	core.display = display;
@@ -2717,10 +2771,9 @@ var Module =
 	core.Binding = Binding;
     core.HttpRequest = HttpRequest;	
 	core.Module = Module;
+	core.Controller = Controller;
 	core.PATH_MAP = PATH_MAP;
 	
-
-
 
 	return core;
 

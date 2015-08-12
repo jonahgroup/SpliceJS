@@ -3,23 +3,25 @@ _.Module({
 required:[
 
 	_.home('modules/splice.data.js'),
-	'splice.controls.d3canvas.js',
+	{'SpliceJS.Controls' : 'splice.controls.d3canvas.js'},
+	{'Charts' : 'charts/splice.controls.charts.dial.js'},
+	{'Charts' : 'charts/splice.controls.charts.barchart.js'},
+	{'Charts' : 'charts/splice.controls.charts.linechart.js'},
 	'splice.controls.charts.html',
 	'splice.controls.charts.css',
-	'charts/splice.controls.charts.dial.js',
-	'charts/splice.controls.charts.barchart.js',
-	'charts/splice.controls.charts.linechart.js'
 
 ],
 
 definition:function(){
 
-	var scope = this;
-
+	var scope = this
+	,	D3Canvas = this.SpliceJS.Controls.D3Canvas
+	,	Class = this.framework.Class;
+	
 
 	var CHART_MAP = {
-		Bar:'SpliceJS.Controls.Charts.BarChart',
-		Line:'SpliceJS.Controls.Charts.LineChart'
+		Bar:  this.Charts.BarChart,
+		Line: this.Charts.LineChart
 	};
 
 
@@ -28,8 +30,8 @@ definition:function(){
 	};
 
 
-	var Chart = _.Namespace('SpliceJS.Controls').Class(function Chart(){
-		SpliceJS.Controls.D3Canvas.call(this);	//call parent constructor
+	var Chart = Class(function Chart(){
+		D3Canvas.call(this);	//call parent constructor
 
 		var self = this
 		,	width = this.width
@@ -51,7 +53,7 @@ definition:function(){
 		//subscribe to onAttach event, update chat dimensions
 		this.onAttach.subscribe(this.attach, this);
 
-	}).extend(SpliceJS.Controls.D3Canvas);
+	}).extend(D3Canvas);
 
 
 	Chart.prototype.attach = function(){
@@ -266,10 +268,6 @@ definition:function(){
 	        'x1': function (d,i) { return x(i) + x.rangeBand()/2; },
 	        'x2': function (d,i) { return x(i) + x.rangeBand()/2; }
 	    });
-
-
-
-	    
 	};
 
 
@@ -286,8 +284,14 @@ definition:function(){
 	    return c;
 	};
 
-
-
-
 //end definition
-}});
+
+	return {
+		
+		Chart: Chart
+		
+	}
+}
+
+
+});
