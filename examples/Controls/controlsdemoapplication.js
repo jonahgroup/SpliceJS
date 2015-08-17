@@ -1,13 +1,21 @@
 _.Module({
 	
 required:[
-	_.home('modules/splice.controls.js'),
-		   'controlsdemoapplication.css',
-		   'controlsdemoapplication.html',
-		 //  'crazyapp.htmlt',
+	{'SpliceJS.Controls':_.home('modules/splice.controls.js')},
+	 'controlsdemoapplication.css',
+	 'controlsdemoapplication.html',
+		
 ],
 
 definition: function(){
+
+
+	var Component = this.framework.Component
+	,	Class = this.framework.Class
+	,	scope = this;
+
+	var UIControl = this.SpliceJS.Controls.UIControl;
+
 
 
 	var sampleChartData = {
@@ -41,9 +49,10 @@ definition: function(){
 	}
 
 
-
-	var ControlsDemoApplication = _.Namespace('UserApplications').Class(function ControlsDemoApplication(){
-		SpliceJS.Controls.UIControl.call(this);
+	var ControlsDemoApplication = Component('ControlsDemoApplication')(
+	function ControlsDemoApplication(){
+		UIControl.call(this);
+		
 		this.sampleListData = [
 			{name:'John Sample', number:'555-2324-1234'},
 			{name:'Susan Sample', number:'555-2324-1234'}
@@ -58,7 +67,7 @@ definition: function(){
 
 		this.onDisplay.subscribe(this.display, this);
 	
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
 
 
@@ -128,10 +137,9 @@ definition: function(){
 	};
 
 
+	return {
+		ControlsDemoApplication:ControlsDemoApplication
+	}
+}
 
-
-
-	
-
-
-}});
+});

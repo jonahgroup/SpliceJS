@@ -887,16 +887,45 @@ var _ = sjs = _js = (function(window, document){
 		document.body.innerHTML = '';
 
 		if(BOOT_SOURCE.length > 1) {
+			
+			
+			var url = window.location.origin + window.location.pathname;
+			if(url.indexOf(configuration.APPLICATION_HOME) == 0){
+				
+				url = url.substring(configuration.APPLICATION_HOME.length);
+				var name = getPath(url);
+				_.currentlyLoading = {name:name.name,url:url};	
+			}
+			
+			
+			Module({
+				
+				required:BOOT_SOURCE,
+				definition:function(){
+					var scope = this;
+					var template = constructTemplate(mainPageHtml);
+					template.declaration = {type:'MainPage'}; 
+					
+					var component = createComponent(Controller, template, scope);
+					display(new component());
+				}
+			});
+			
+			/*
 			core.include(BOOT_SOURCE, function(){
 				if(typeof(core.run) === 'function') { 	core.run();  return; }	
 				var scope = new Scope();
 				var template = constructTemplate(mainPageHtml);
 				template.declaration = {type:'MainPage'};
 
-				var component = compileTemplate.call(scope,template);
+				//compiled template
+				template = compileTemplate.call(scope,template);
+				var component = createComponent(Controller, template, scope);
+				
 				display(new component());
 
-			})
+			});
+			*/
 		}
 		else {
 			if(typeof(core.run) === 'function') { core.run(); return; }
@@ -935,22 +964,59 @@ var _ = sjs = _js = (function(window, document){
 	}
 
 
-
-	function home(obj,path){
-
-
-		if(!path) var path = configuration.SPLICE_HOME;
+	function appHome(obj,path){
+		if(!path) path = configuration.APPLICATION_HOME;
 
 		if(!obj) return path;
 
 		if(typeof obj === 'string'){
-			if(obj.indexOf(configuration.SPLICE_HOME) === 0) return obj;
+			if(obj.indexOf(configuration.APPLICATION_HOME) === 0) return obj;
 			return path + '/' + obj;
 		}
 
 		if(obj instanceof Array){
 			for(var i=0; i < obj.length; i++){
-				obj[i] = core.home(obj[i],path);
+				obj[i] = appHome(obj[i],path);
+			}
+			return obj;
+		}
+		
+	}
+
+	function toPath(obj, path){
+		
+		if(!path) return obj;
+
+		if(typeof obj === 'string'){
+			if(obj.indexOf(path) === 0) return obj;
+			if(path.charAt(path.length-1) == '/') path = path.substring(0, path.length - 1);
+			return path + '/' + obj;
+		}
+
+		if(obj instanceof Array){
+			for(var i=0; i < obj.length; i++){
+				obj[i] = home(obj[i],toPath);
+			}
+			return obj;
+		}
+	}
+
+	function home(obj,path){
+
+
+		if(!path) path = configuration.SPLICE_HOME;
+
+		if(!obj) return path;
+
+		if(typeof obj === 'string'){
+			if(obj.indexOf(configuration.SPLICE_HOME) === 0) return obj;
+			var result = path + '/' + obj;
+			return result;
+		}
+
+		if(obj instanceof Array){
+			for(var i=0; i < obj.length; i++){
+				obj[i] = home(obj[i],path);
 			}
 			return obj;
 		}
@@ -1200,7 +1266,18 @@ var _ = sjs = _js = (function(window, document){
 		return constructor;
 	};
 	
-	
+	function Component(templateName){
+		//locate template by name
+		var template = this.templates[templateName];
+		
+				
+		return function(fn){
+			var cl = core.Class(fn);
+			
+			return createComponent(cl,template);
+		}
+		
+	}		
 	
 
 	
@@ -2325,79 +2402,9 @@ var _ = sjs = _js = (function(window, document){
 		
 		template.normalize();
 
+		return scope.templates[template.declaration.type] = template; 
+				   
 		
-
-		
-		var template_name 			 = template.declaration.type;
-		var template_component_index = template.declaration.type.toUpperCase();
-		var tie_name  				 = template.declaration.tie; 
-		
-		var split_name 	= _.splitQualifiedName(template_name);
-		var split_tie 	= _.splitQualifiedName(tie_name);
-		
-		
-		/* 
-		 * 4 options
-		 * 
-		 * local 	local
-		 * local 	global
-		 * 
-		 * 
-		 * global 	local
-		 * global 	global
-		 * */
-		
-		
-		/* 
-		 * this is a local scope template declaration 
-		 * local templates may only couple with explicitly defined ties
-		 * same-name linkage is not possible,
-		 !!! unless implicit tie is also within the local scope
-		 * */
-		if(!split_name.namespace || split_name.namespace === '') { 	
-			template.isLocal = true;
-			
-			var tie = tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : 
-					  scope[template_name] ? scope[template_name] : Controller;
-			
-			if(tie && tie.isComponent) tie = tie.tie;
-			
-
-
-			return scope.templates[template.declaration.type] = 
-				   scope.compindex[template_component_index] =
-				   createComponent(tie,template, scope);
-		
-		}
-
-		/*
-		 * Namespace bound template declaration
-		 * allow same-name binding
-		 * */
-		
-		
-		var nameLookup 	= _.Namespace.lookup(template_name);
-		
-		/* 
-		 * found object by the same name 
-		 * */
-		if(nameLookup && typeof nameLookup !== 'function') throw 'Template declaration name: '+ name + ' is ocupied by another object!'; 
-		
-		if(nameLookup && !tie) tie_name = template_name;
-		/* 
-		 * If no tie code, add template object to a namespace
-		 * and return
-		 * */
-		
-		var tie 	= tie_name ? (_.Namespace.lookup(tie_name) || scope[tie_name]) : Controller;	
-		
-		if(tie && tie.isComponent) tie = tie.tie;
-		
-		var component = createComponent(tie, template, scope);
-		var ns = _.Namespace(split_name.namespace);
-		ns.add(split_name.name,component);
-		
-		return scope.templates[template.declaration.type] = component;
 	};
 		
 
@@ -2553,6 +2560,26 @@ var _ = sjs = _js = (function(window, document){
 		Component.tie = tie;
 		Component.prototype = tie.prototype;
 		Component.constructor = tie;
+		
+		Component.extend = function(base){
+			if(!base) throw 'Can\'t extend the undefined or null base constructor';
+			if(typeof(base) !== 'function') throw 'Base must be a constructor function';
+					
+			
+			this.tie.prototype = Object.create(base.prototype);
+			/* retain inheritance chain */
+			this.tie.base = this.tie.prototype.constructor;			
+			this.tie.prototype.constructor = this;
+			this.prototype = this.tie.prototype;
+			/*
+			this.prototype.super = function(){
+				base.apply(this,arguments);
+			}
+			*/
+			
+			return this;
+		};
+		
 		return Component;
 	}; 
 	
@@ -2610,13 +2637,13 @@ function prepareImports(a, path){
 		if(typeof a[i] === 'object') {
 			for(var key in a[i]){
 				if(a[i].hasOwnProperty(key)) {
-					namespaces.push({ns:key,path:home(a[i][key],path)});
-					filenames.push(home(a[i][key],path));
+					namespaces.push({ns:key,path:toPath(a[i][key],path)});
+					filenames.push(toPath(a[i][key],path));
 					break;
 				}	
 			}
 		} else {
-			filenames.push(home(a[i],path));
+			filenames.push(toPath(a[i],path));
 		}
 	}
 	return {namespaces:namespaces, filenames:filenames};
@@ -2634,7 +2661,18 @@ var Module =
 	function Module(moduleDefinition){
 	    var scope = new Scope(path); //our module scope
 		
-		scope.framework = sjs;
+		scope.framework = {Controller:Controller};
+		scope.framework.Class = function(fn){
+			var nm = getFunctionName(fn);
+			scope[nm] = sjs.Class(fn);
+			return scope[nm];
+		};
+		scope.framework.Component = function(){
+			return Component.apply(scope,arguments);
+		};
+			
+		
+		
 		
 		//use absolute URL there is no reason not to
 		var path = _.getPath(_.currentlyLoading.name).path;
@@ -2720,13 +2758,22 @@ var Module =
 			if(imp.namespaces) {
 				for(var i=0; i<imp.namespaces.length; i++){
 					var ns = imp.namespaces[i];
-					//looking up exportsd
+					//looking up exports
 					var x = PATH_MAP[absPath(ns.path)];
 					if(!x) continue;
 					ns = getNamespace.call(scope,ns.ns,true,false);
 					ns.place(x);
 				}
 			}
+
+
+			scope.templates = templateDefinitions;
+				/* 
+			 * Templates are compiled after module has been defined
+			 * 
+			 * */
+			compileTemplates(scope);
+
 			
 			
 			if(typeof definition === 'function') {
@@ -2734,16 +2781,6 @@ var Module =
 				PATH_MAP[url] = _exports;	
 			}
 			
-			scope.templates = templateDefinitions;
-			scope.cssrules = cssRules;
-			
-
-
-			/* 
-			 * Templates are compiled after module has been defined
-			 * 
-			 * */
-			compileTemplates(scope);
 			
 		},collectTemplates);
 	};
@@ -2759,7 +2796,9 @@ var Module =
 	
 	//core.debug = debug;
 	core.boot = boot;
+	core.toPath = toPath;
 	core.home = home;
+	core.appHome = appHome;
 	
 	core.absPath = absPath;
 	core.getPath = getPath;

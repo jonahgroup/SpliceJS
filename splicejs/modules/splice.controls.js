@@ -6,7 +6,7 @@ required:[
 	{'SpliceJS.UI':'splice.ui.js'}
 ,	'splice.controls/splice.controls.css'
 ,  	'splice.controls/splice.controls.html'
-,  	'splice.controls/splice.controls.buttons.js'
+,  	{'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	'splice.controls/splice.controls.datatable.js'
 ,	'splice.controls/splice.controls.scrollpanel.js'
 ,	'splice.controls/splice.controls.charts.js'
@@ -243,10 +243,12 @@ definition:function(){
 	// module exports
 	return {
 		
+		UIControl:		scope.SpliceJS.UI.UIControl,
 		TextField:		TextField,
 		PullOutPanel: 	PullOutPanel,
 		DomIterator: 	DomIterator,
-		ImageSelector:  ImageSelector
+		ImageSelector:  ImageSelector,
+		Button:			scope.Buttons.Button
 		
 	}
 

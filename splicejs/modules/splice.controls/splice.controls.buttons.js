@@ -8,12 +8,15 @@ required:[
 definition:function(){
 
 	var Class = this.framework.Class;
+	var Component = this.framework.Component;
 	var UIControl = this.SpliceJS.UI.UIControl;
 	
-	var Button = Class(function Button(args){
+	
+		
+	
+	var Button = Component('Button')(function Button(args){
 		
 		UIControl.apply(this,arguments);
-		
 			
 		var self = this;
 		this.elements.controlContainer.onclick = function(){
@@ -27,7 +30,6 @@ definition:function(){
 	}).extend(UIControl);
 
 	Button.prototype.onClick = _.Event;
-
 
 	Button.prototype.handleContent = function(content){
 		if(!content) return;
@@ -43,8 +45,6 @@ definition:function(){
 		this.elements.controlContainer.value = label;
 	};
 	
-	
-	
 	Button.prototype.enable = function(){
 		this.elements.controlContainer.className = '-splicejs-button';
 		this.isDisabled = false;
@@ -59,18 +59,14 @@ definition:function(){
 
 
 
-
-
 	/**
 	 * 
 	 * Check box
 	 * */
-	var CheckBox = Class(function CheckBox(args){
+	var CheckBox = Component('Checkbox')(function CheckBox(args){
 		UIControl.apply(this,arguments);
 
 		var self = this;
-		
-		
 		
 		this.concrete.dom.onclick = function(){
 			_.debug.log('I am check box');
@@ -103,7 +99,7 @@ definition:function(){
 	/**
 	 * RadioButton
 	 * */
-	var RadioButton = Class(function RadioButton(args){
+	var RadioButton = Component('RadioButton')(function RadioButton(args){
 		UIControl.apply(this,arguments);
 	
 		var self = this;

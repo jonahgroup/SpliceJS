@@ -9,6 +9,8 @@ required:[
 
 definition:function(){
 
+	var Controller = this.framework.Controller
+	,	Component = this.framework.Component;
 
 	var MENU_DATA = [
 		['BasicApplication', 'A simple application to demonstrate template use... '],
@@ -19,8 +21,8 @@ definition:function(){
 	]
 
 
-	var MainMenu = _.Namespace('UserApplications').Class(function MainMenu(){
-		SpliceJS.Core.Controller.call(this);
+	var MainMenu = Component('MainMenu')(function MainMenu(){
+		Controller.call(this);
 
 		var self = this;
 		this.onData(MENU_DATA);
@@ -29,7 +31,7 @@ definition:function(){
 			self.onClosePanel();
 		});
 
-	}).extend(SpliceJS.Core.Controller);
+	}).extend(Controller);
 
 
 
@@ -39,6 +41,16 @@ definition:function(){
 
 	MainMenu.prototype.onOpenPanel 	= _.Event;
 	MainMenu.prototype.onClosePanel = _.Event;
+
+
+
+	return {
+		
+		MainMenu:MainMenu
+		
+	}
+
+
 }
 
 
