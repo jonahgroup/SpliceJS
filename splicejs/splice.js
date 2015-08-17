@@ -906,6 +906,8 @@ var _ = sjs = _js = (function(window, document){
 					var template = constructTemplate(mainPageHtml);
 					template.declaration = {type:'MainPage'}; 
 					
+					template = compileTemplate.call(scope,template);
+					
 					var component = createComponent(Controller, template, scope);
 					display(new component());
 				}
@@ -1077,7 +1079,7 @@ var _ = sjs = _js = (function(window, document){
 			},
 			
 			lookup:function(name){
-				getNamespace.call(this,name,false, true);
+				return getNamespace.call(this,name,false, true);
 			},
 			
 			list: function(){
@@ -1663,6 +1665,11 @@ var _ = sjs = _js = (function(window, document){
 			 * local scope lookup takes priority
 			 */
 			var obj = null;
+			
+			if(!obj) try{
+				obj = scope.lookup(args.type);
+			} catch(ex){}
+			
 			
 			if(!obj) try {
 				obj = scope.templates[args.type];

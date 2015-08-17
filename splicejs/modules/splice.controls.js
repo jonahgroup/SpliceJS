@@ -248,7 +248,9 @@ definition:function(){
 		PullOutPanel: 	PullOutPanel,
 		DomIterator: 	DomIterator,
 		ImageSelector:  ImageSelector,
-		Button:			scope.Buttons.Button
+		Button:			scope.Buttons.Button,
+		CheckBox:		scope.Buttons.CheckBox,
+		RadioButton:	scope.Buttons.RadioButton
 		
 	}
 

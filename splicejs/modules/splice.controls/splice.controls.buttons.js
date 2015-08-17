@@ -63,7 +63,7 @@ definition:function(){
 	 * 
 	 * Check box
 	 * */
-	var CheckBox = Component('Checkbox')(function CheckBox(args){
+	var CheckBox = Component('CheckBox')(function CheckBox(args){
 		UIControl.apply(this,arguments);
 
 		var self = this;

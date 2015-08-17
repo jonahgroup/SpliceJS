@@ -145,7 +145,9 @@ definition:function(){
 		}
 	};
 */
-	UIControl.prototype.applyCSSRules = function(key, override){
+
+UIControl.prototype.applyCSSRules = function(){}
+	UIControl.prototype.applyCSSRules_NOOP = function(key, override){
 		var scope = this.scope, 
 			localRules = null, 
 			overrideRules = null;
