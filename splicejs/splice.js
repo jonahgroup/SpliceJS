@@ -964,25 +964,6 @@ var _ = sjs = _js = (function(window, document){
 	}
 
 
-	function appHome(obj,path){
-		if(!path) path = configuration.APPLICATION_HOME;
-
-		if(!obj) return path;
-
-		if(typeof obj === 'string'){
-			if(obj.indexOf(configuration.APPLICATION_HOME) === 0) return obj;
-			return path + '/' + obj;
-		}
-
-		if(obj instanceof Array){
-			for(var i=0; i < obj.length; i++){
-				obj[i] = appHome(obj[i],path);
-			}
-			return obj;
-		}
-		
-	}
-
 	function toPath(obj, path){
 		
 		if(!path) return obj;
@@ -1010,8 +991,7 @@ var _ = sjs = _js = (function(window, document){
 
 		if(typeof obj === 'string'){
 			if(obj.indexOf(configuration.SPLICE_HOME) === 0) return obj;
-			var result = path + '/' + obj;
-			return result;
+			return {ishome:true, path:(path + '/' + obj)};
 		}
 
 		if(obj instanceof Array){
@@ -1064,9 +1044,17 @@ var _ = sjs = _js = (function(window, document){
 	 * */
 	var Namespace = function Namespace(path){
 		this._path = path;
+		this.templates = [];
+		this.path = path;
+		this.compindex = [];
+		this.itc = 0;
 	};
 
 	Namespace.prototype = {
+			
+			getNextTemplateName : function(){
+				return '__impTemplate' + (this.itc++);
+			},
 			
 			Class: function(constructor){
 				var idx = (this._path + '.' + getFunctionName(constructor)).toUpperCase(); 
@@ -1086,6 +1074,10 @@ var _ = sjs = _js = (function(window, document){
 				var idx = (this._path + '.' + name).toUpperCase(); 
 				NAMESPACE_INDEX[idx] = this[name] = object;
 
+			},
+			
+			lookup:function(name){
+				getNamespace.call(this,name,false, true);
 			},
 			
 			list: function(){
@@ -2630,20 +2622,38 @@ var PATH_MAP = {
 function prepareImports(a, path){
 	if(!a) return {namespaces:null, filenames:null};
 
-	var namespaces = [] , filenames = [];
+	var namespaces = [] , filenames = [],  p = '';
 	
 	for(var i=0; i<a.length; i++){
 		//this is a namespaced dependency
-		if(typeof a[i] === 'object') {
+		if(typeof a[i] === 'object' && !a[i].ishome) {
 			for(var key in a[i]){
 				if(a[i].hasOwnProperty(key)) {
-					namespaces.push({ns:key,path:toPath(a[i][key],path)});
-					filenames.push(toPath(a[i][key],path));
+					
+					
+					if(a[i][key].ishome) {
+						p = a[i][key].path;
+					}
+					else {
+						p = toPath(a[i][key],path);
+					}
+					
+					namespaces.push({ns:key,path:p});
+					filenames.push(p);
 					break;
 				}	
 			}
 		} else {
-			filenames.push(toPath(a[i],path));
+			
+			
+			if(a[i].ishome) {
+				p = a[i].path;
+			}
+			else {
+				p = toPath(a[i],path);
+			}
+			
+			filenames.push(p);
 		}
 	}
 	return {namespaces:namespaces, filenames:filenames};
@@ -2659,7 +2669,7 @@ var Module =
 	 * @param moduleDefinition
 	 */
 	function Module(moduleDefinition){
-	    var scope = new Scope(path); //our module scope
+	    var scope = new Namespace(path); //our module scope
 		
 		scope.framework = {Controller:Controller};
 		scope.framework.Class = function(fn){
@@ -2798,7 +2808,7 @@ var Module =
 	core.boot = boot;
 	core.toPath = toPath;
 	core.home = home;
-	core.appHome = appHome;
+	
 	
 	core.absPath = absPath;
 	core.getPath = getPath;
