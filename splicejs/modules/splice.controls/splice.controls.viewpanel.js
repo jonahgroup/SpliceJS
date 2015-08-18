@@ -1,12 +1,15 @@
 _.Module({
 	
 required:[
+	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.viewpanel.html',
 	'splice.controls.viewpanel.css'
 ],
 
 definition:function(){
 	
+	var UIControl = this.SpliceJS.UI.UIControl;
+
 
 	/**
 	 *	
@@ -14,9 +17,10 @@ definition:function(){
 	 * Allows transitioning between views
 	 */
 
-	var ViewPanel = _.Namespace('SpliceJS.Controls').Class(function ViewPanel(){
-
-	 	this.viewInstances = [];
+	var ViewPanel = this.framework.Component('ViewPanel')(function ViewPanel(){
+		UIControl.call(this);
+	 	
+		this.viewInstances = [];
 
 	 	if(this.views && this.views.length > 0) {
 	 		for(var i=0; i < this.views.length; i++){
@@ -37,7 +41,7 @@ definition:function(){
 	 		self.display();
 	 	});
 
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
 
 
@@ -98,6 +102,12 @@ definition:function(){
 		offscrPanel.style.left = 0;
 
 	};
+
+	return {
+		
+		ViewPanel : ViewPanel
+		
+	}
 
 }
 

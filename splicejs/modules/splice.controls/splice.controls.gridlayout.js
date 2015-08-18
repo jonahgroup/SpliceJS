@@ -1,15 +1,18 @@
 _.Module({
 
 required:[
-	
+	{'SpliceJS.UI':_.home('modules/splice.ui.js')},
 	'splice.controls.gridlayout.css',
 	'splice.controls.gridlayout.html'
 
 ],
 
 definition:function(){
+	var scope = this
+	,	Component = this.framework.Component;
 
-	var scope = this;
+	var UIControl = this.SpliceJS.UI.UIControl
+	,	DragAndDrop = this.SpliceJS.UI.DragAndDrop;
 
 
 	var Grid = function(rows,columns){
@@ -71,8 +74,8 @@ definition:function(){
 	*	Cell container class 
 	*
 	*/
-	var CellContainer = scope.CellContainer = _.Namespace('SpliceJS.Controls.Container').Class(function CellContainer(){
-		SpliceJS.Controls.UIControl.call(this);
+	var CellContainer = Component('CellContainer')(function CellContainer(){
+		UIControl.call(this);
 
 		//attach events to drive resizing of the cell container
 		var self = this;
@@ -100,7 +103,7 @@ definition:function(){
 		this.onEndResize.subscribe(this.endResize, this);
 		this.onStartMove.subscribe(this.startMove,this);
 
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
 
 	CellContainer.prototype.onStartMove   =	_.Event;
@@ -115,27 +118,27 @@ definition:function(){
 
 	CellContainer.prototype.startResize = function(e,direction){
 		_.debug.log('Resizing in ' + direction + ' direction');
-		SpliceJS.Ui.DragAndDrop.startDrag();
+		DragAndDrop.startDrag();
 
 		var self = this;
-		SpliceJS.Ui.DragAndDrop.ondrag =  function(p,offset){
+		DragAndDrop.ondrag =  function(p,offset){
 			self.onResize({mouse:p,direction:direction, src:self});
 		}
 	};
 
 
 	CellContainer.prototype.startMove = function(){
-		SpliceJS.Ui.DragAndDrop.startDrag();
+		DragAndDrop.startDrag();
 
 		var self = this;
-		SpliceJS.Ui.DragAndDrop.ondrag =  function(p,offset){
+		DragAndDrop.ondrag =  function(p,offset){
 			self.onResize({mouse:p,direction:move, src:self});
 		}	
 	};
 
 
 	CellContainer.prototype.reflowChildren = function(position, size, bubbleup){
-		SpliceJS.Controls.UIControl.prototype.reflowChildren.call(this,{left:0, top:0}, size, bubbleup);
+		UIControl.prototype.reflowChildren.call(this,{left:0, top:0}, size, bubbleup);
 	};
 
 
@@ -145,9 +148,9 @@ definition:function(){
 	*	Grid Layout implementation
 	*
 	*/
-	var GridLayout = _.Namespace('SpliceJS.Controls').Class(function GridLayout(){
+	var GridLayout = Component('GridLayout')(function GridLayout(){
 
-		SpliceJS.Controls.UIControl.call(this);
+		UIControl.call(this);
 
 		/* default gap values */
 		if(!this.margin) 		this.margin = 10;
@@ -168,7 +171,7 @@ definition:function(){
 		this.onDisplay.subscribe(function(){
 			self.display();
 		});
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
 
 	GridLayout.prototype.display = function(){
@@ -191,7 +194,7 @@ definition:function(){
 	/* private */
 	function addCell(content, row, col, rowSpan, colSpan){
 
-		var cellContainer = _.Obj.call(scope,
+		var _CellContainer = _.Obj.call(scope,
 		{	type:'CellContainer',
 			row:row, 
 			col:col, 
@@ -202,7 +205,7 @@ definition:function(){
 
 		var cellIndex = this.layoutCells.length;
 
-		var cell =  new cellContainer({parent:this, index:cellIndex}); 
+		var cell =  new _CellContainer({parent:this, index:cellIndex}); 
 		
 		cell.onResize.subscribe(function(args){
 				this.resizeCell(args);
@@ -366,7 +369,7 @@ definition:function(){
 		
 		var DOM = this.elements.controlContainer;		
 		
-		var offset = SpliceJS.Ui.Positioning.absPosition(DOM);
+		var offset = scope.SpliceJS.UI.Positioning.absPosition(DOM);
 
 		var grid = this.grid; 
 		
@@ -391,6 +394,13 @@ definition:function(){
 		
 		return {row:row, col:col};
 	};
+
+
+	return  {
+		
+		GridLayout: GridLayout
+		
+	}
 
 
 }

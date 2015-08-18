@@ -1,5 +1,5 @@
-/* global sjs */
-sjs.Module({
+/* global _ */
+_.Module({
 
 required:[	
 			
@@ -9,14 +9,15 @@ required:[
 ,  	{'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	'splice.controls/splice.controls.datatable.js'
 ,	'splice.controls/splice.controls.scrollpanel.js'
-,	'splice.controls/splice.controls.charts.js'
-
+,	{'Charts':'splice.controls/splice.controls.charts.js'}
 ,	'splice.controls/splice.controls.listbox.js'
+,	{'Panels':'splice.controls/splice.controls.drawerpanel.js'}
+,	{'Grids':'splice.controls/splice.controls.gridlayout.js'}
+
+,	{'Panels':'splice.controls/splice.controls.viewpanel.js'}
 /*
-,	'splice.controls/splice.controls.drawerpanel.js'
-,	'splice.controls/splice.controls.viewpanel.js'
 ,	'splice.controls/splice.controls.map.js'
-,	'splice.controls/splice.controls.gridlayout.js'
+
 ,	'splice.controls/splice.controls.codeeditor.js'
 ,	'splice.controls/splice.controls.d3canvas.js'
 ,	'splice.controls/splice.controls.calendar.js'
@@ -30,13 +31,16 @@ required:[
 ]
 , 	
 definition:function(){
-	
+	"use strict";
 	var scope = this;
 
 	/* imports */
-	var Class = this.framework.Class;
-	var Event = this.framework.Event;
-	var UIControl = this.SpliceJS.UI.UIControl;
+	var Class = this.framework.Class
+	, 	Event = this.framework.Event
+	,	Controller = this.framework.Controller
+	, 	UIControl = this.SpliceJS.UI.UIControl
+	,	Component = this.framework.Component;
+	
 	
 	
 	var TextField = Class(function TextField(){
@@ -80,7 +84,7 @@ definition:function(){
 	/**
 	 * Drop down list
 	 * */
-	var DropDownList = sjs.Class(function DropDownList(args){
+	var DropDownList = Class(function DropDownList(args){
 		UIControl.call(this);
 		this.dom = this.concrete.dom;
 	}).extend(UIControl); 
@@ -124,9 +128,6 @@ definition:function(){
 	
 
 	DropDownList.prototype.dataIn = function(data){
-
-
-
 	};
 	
 	DropDownList.prototype.hide = function() {
@@ -159,7 +160,7 @@ definition:function(){
 
 
 
-	var DomIterator = Class( function DomIterator(args){
+	var DomIterator = Component(null)( function DomIterator(args){
 
 		this.conc = [];
 
@@ -185,7 +186,7 @@ definition:function(){
 
 		if(!args.dom) return;
 
-	}).extend(sjs.Controller);
+	}).extend(Controller);
 
 	DomIterator.prototype.dataIn = function(data){
 		var nToUpdate = Math.min(this.conc.length, data.length);
@@ -215,7 +216,6 @@ definition:function(){
 
 	}
 
-	 DomIterator = scope.createComponent(DomIterator,null);
 
 
 
@@ -250,8 +250,11 @@ definition:function(){
 		ImageSelector:  ImageSelector,
 		Button:			scope.Buttons.Button,
 		CheckBox:		scope.Buttons.CheckBox,
-		RadioButton:	scope.Buttons.RadioButton
-		
+		RadioButton:	scope.Buttons.RadioButton,
+		DrawerPanel:	scope.Panels.DrawerPanel,
+		ViewPanel:		scope.Panels.ViewPanel,
+		Chart:			scope.Charts.Chart,
+		GridLayout:		scope.Grids.GridLayout
 	}
 
 // end module definition		

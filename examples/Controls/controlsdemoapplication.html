@@ -38,7 +38,7 @@
 </tr>
 
 
-<!--
+
 <tr><td> Grid Layout</td>
 <td>
 	<div class="-layout-boundary">
@@ -61,19 +61,19 @@
 			{	col:0, row:1, colspan:1, rowspan:3,
 				content: <sjs-include type="SpliceJS.Controls.Button">{
 					content:{label:'Click Me'},
-					onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
+					onClick: _.Binding('flipView').Type('ControlsDemoApplication')
 				}</sjs-include>
 			},
 
 
 			{	col:2, row:0, colspan:2, rowspan:4,
 				content: <sjs-include type="SpliceJS.Controls.ViewPanel">{
-					switchView:_.Binding('onFlipViews').Type('UserApplications.ControlsDemoApplication'),
+					switchView:_.Binding('onFlipViews').Type('ControlsDemoApplication'),
 					views:[	
 						{	key:'list',
 							view:<sjs-include type="SpliceJS.Controls.Button">{
 								content:{label:'Click Me too'},
-								onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')		
+								onClick: _.Binding('flipView').Type('ControlsDemoApplication')		
 							}</sjs-include>
 						},
 
@@ -82,7 +82,7 @@
 							view:<sjs-include type="SpliceJS.Controls.Button">{
 								style:'-red-button',
 								content:{label:'Meh..'},
-								onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
+								onClick: _.Binding('flipView').Type('ControlsDemoApplication')
 							}</sjs-include>
 						}
 					]
@@ -92,7 +92,7 @@
 			{	col:1, row:3, colspan:1, rowspan:1,
 				content: <sjs-include type="SpliceJS.Controls.Button">{
 					content:{label:'Click Me'},
-					onClick: _.Binding('flipView').Type('UserApplications.ControlsDemoApplication')
+					onClick: _.Binding('flipView').Type('ControlsDemoApplication')
 				}</sjs-include>
 			},
 
@@ -104,7 +104,7 @@
 </tr>
 
 
-
+<!--
 <tr><td>Drop down list</td>
 <td>
 	<sjs-include type="SpliceJS.Controls.DropDownList">{

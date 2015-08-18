@@ -1,8 +1,8 @@
 _.Module({
 	
 required:[ 
-	_.home('modules/splice.ui.js'),
-	_.home('modules/splice.controls/splice.controls.scrollpanel.js'),
+	{'SpliceJS.UI':_.home('modules/splice.ui.js')},
+	'splice.controls.scrollpanel.js',
 	'splice.controls.transitions.css',
 	'splice.controls.drawerpanel.css',
 	'splice.controls.drawerpanel.html'
@@ -10,10 +10,14 @@ required:[
 
 definition:function(){
 
+	var scope = this
+	,	Component = this.framework.Component
+	,	UIControl = this.SpliceJS.UI.UIControl;
+
 	/* DrawerPanel*/
 
-	var DrawerPanel = _.Namespace('SpliceJS.Controls').Class(
-		function DrawerPanel(){
+	var DrawerPanel = Component('DrawerPanel')(function DrawerPanel(){
+			UIControl.call(this);
 			
 			this.isOpen = false;
 
@@ -24,11 +28,11 @@ definition:function(){
 				self.activateDrawer();		
 			}
 		}
-	).extend(SpliceJS.Controls.UIControl);
+	).extend(UIControl);
 
 
 	DrawerPanel.prototype.onDisplay = function(){
-		SpliceJS.Controls.UIControl.prototype.onDisplay.call(this);
+		UIControl.prototype.onDisplay.call(this);
 
 		var openWidth = this.openWidth = this.elements.controlContainer.clientWidth * this.openTo;
 		
@@ -104,13 +108,11 @@ definition:function(){
 		if(!self.isOpen) actuator_to = 10;
 
 		this.elements.actuator.style.left = actuator_to + 'px';
-
-
-
 	};
 
-
-
+	return {
+		DrawerPanel : DrawerPanel
+	}
 
 }
 

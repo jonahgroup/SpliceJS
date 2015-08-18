@@ -29,7 +29,7 @@ SOFTWARE.
 */
 
 
-var _ = sjs = _js = (function(window, document){
+var _ = (function(window, document){
 	"use strict";
 
 	var configuration = {
@@ -60,13 +60,6 @@ var _ = sjs = _js = (function(window, document){
 		route: 		'.sjsroute', 
 	};
 
-
-	/*
-		Core object released into global space
-	*/
-	var core = {};
-
-
 	/* 
 	 	Cache loading indicator 
 	*/
@@ -78,6 +71,13 @@ var _ = sjs = _js = (function(window, document){
 	}
 
 
+	var logging = {
+		
+		debug : {log:function(){}},
+		info  : console
+	}; 
+	
+	
 
 
 /*
@@ -220,7 +220,7 @@ var _ = sjs = _js = (function(window, document){
 		var lastMatch = 0;
 
 		while(  match = regex.exec( src ) ){
-			var apath = absPath(_.home(match[1],path));
+			var apath = absPath(home(match[1],path));
 			
 			var left = src.substring(lastMatch, match.index);
 						
@@ -228,7 +228,7 @@ var _ = sjs = _js = (function(window, document){
 			asrc = asrc + left + '<img src="' + apath + '" ';
 			lastMatch += match.index + match[0].length;
 
-			core.debug.log(apath);
+			logging.debug.log(apath);
 		}
 
 		asrc = asrc + src.substring(lastMatch, src.length);
@@ -560,7 +560,7 @@ var _ = sjs = _js = (function(window, document){
 			var idx = callbacks.length-1;
 			for(var i=0; i < callbacks[idx].length; i++) {
 				if( callbacks[idx][i] == callback ) {
-					core.debug.log('unsubscribing...');
+					logging.debug.log('unsubscribing...');
 					callbacks[idx].splice(i,1);		
 					instances[idx].splice(i,1);
 					break;
@@ -635,10 +635,6 @@ var _ = sjs = _js = (function(window, document){
 	};
 	Event.attach = Event.create;
 
-	core.Event = Event;
-
-
-
 /*
 
 ----------------------------------------------------------
@@ -698,7 +694,7 @@ var _ = sjs = _js = (function(window, document){
 				var vartype = scope[this.vartype]
 				,	parent = originInstance;
 
-				if(!vartype) vartype = _.Namespace.lookup(this.vartype);
+				if(!vartype) vartype = Namespace.lookup(this.vartype);
 
 				if(!vartype) throw 'Unable to resolve binding target type';
 			
@@ -875,81 +871,45 @@ var _ = sjs = _js = (function(window, document){
 */
 
 
-	core.configuration = configuration;
-
 	/*
 	 * loader initializers
 	 * */
-		
+	
 	window.onload = function(){
 		
 		var mainPageHtml = document.body.innerHTML;
 		document.body.innerHTML = '';
-
-		if(BOOT_SOURCE.length > 1) {
 			
+		var url = window.location.origin + window.location.pathname;
+		if(url.indexOf(configuration.APPLICATION_HOME) == 0){
 			
-			var url = window.location.origin + window.location.pathname;
-			if(url.indexOf(configuration.APPLICATION_HOME) == 0){
-				
-				url = url.substring(configuration.APPLICATION_HOME.length);
-				var name = getPath(url);
-				_.currentlyLoading = {name:name.name,url:url};	
-			}
+			url = url.substring(configuration.APPLICATION_HOME.length);
+			var name = getPath(url);
+			LoadingWatcher.name = name.name;
+			LoadingWatcher.url =url;	
+		}
+		
+		
+		Module({
 			
-			
-			Module({
-				
-				required:BOOT_SOURCE,
-				definition:function(){
-					var scope = this;
-					var template = constructTemplate(mainPageHtml);
-					template.declaration = {type:'MainPage'}; 
-					
-					template = compileTemplate.call(scope,template);
-					
-					var component = createComponent(Controller, template, scope);
-					display(new component());
-				}
-			});
-			
-			/*
-			core.include(BOOT_SOURCE, function(){
-				if(typeof(core.run) === 'function') { 	core.run();  return; }	
-				var scope = new Scope();
+			required:BOOT_SOURCE,
+			definition:function(){
+				var scope = this;
 				var template = constructTemplate(mainPageHtml);
-				template.declaration = {type:'MainPage'};
-
-				//compiled template
-				template = compileTemplate.call(scope,template);
-				var component = createComponent(Controller, template, scope);
+				template.declaration = {type:'MainPage'}; 
 				
-				display(new component());
-
-			});
-			*/
-		}
-		else {
-			if(typeof(core.run) === 'function') { core.run(); return; }
-		}
+				template = compileTemplate.call(scope,template);
+								
+				display(new (createComponent(Controller, template, scope)));
+			}
+		});
+		
+		
 
 	};
 
 	
-	
-	/**
-	 * Debug and info log harness
-	 * */
-	core.debug  = {log:function(){}};
-	core.info = console;
-	
-	core.debugDisable = function(){
-		core.debug = {log:function(){}};
-	};	
-	
-	core.debugEnable = function(){
-		core.debug = console;
-	};
+
 	
 
 
@@ -962,7 +922,7 @@ var _ = sjs = _js = (function(window, document){
 			BOOT_SOURCE.push(args[i]);
 		}
 
-		return core.boot;
+		return boot;
 	}
 
 
@@ -1004,24 +964,9 @@ var _ = sjs = _js = (function(window, document){
 		}
 
 	};
-
-	
-	if(window.performance && window.performance.now)
-	core.performance = {
-			now:function(){
-				return window.performance.now();
-			}
-	};
 	
 	
-	if(!window.performance || !window.performance.now)
-		core.performance = {
-			now:function(){
-				return (new Date()).getTime();
-			}
-	};
-	
-	core.splitQualifiedName = function(name){
+	function splitQualifiedName(name){
 		
 		if(!name) return null;
 		var parts = name.split('.');
@@ -1044,14 +989,61 @@ var _ = sjs = _js = (function(window, document){
 	/** Namespace object
 	 * 
 	 * */
-	var Namespace = function Namespace(path){
+	 
+	function _Namespace(namespace){
+		
+		if(typeof namespace !== 'string' ) throw "Namespace(string) argument type must be a string";
+
+		var ns = getNamespace.call(window,namespace, false, false);
+		
+		if(ns && !(ns instanceof Namespace)) 
+			throw "Namespace " + namespace + " is ocupied by an object ";
+		
+		/* 
+		 * return Namespace proxy with Class constructor
+		 * */
+		if(ns == null){
+			return {
+				Class:function(constructor){
+					
+					var idx = (namespace + '.' + getFunctionName(constructor)).toUpperCase(); 
+					var newNamespace = getNamespace.call(window,namespace,true);
+					return Class.call({namespace:newNamespace, idx:idx}, constructor);
+
+				},
+
+				add:function(name, object){
+					
+					var idx = (namespace + '.' + name).toUpperCase(); 
+
+					var newNamespace = getNamespace.call(window,namespace,true);
+					NAMESPACE_INDEX[idx] = newNamespace[name] = object;
+
+				}
+			}
+		}
+		
+		
+		return ns;
+	} 
+	 
+	 
+	function Namespace(path){
+		
+		if(!(this instanceof Namespace) ){
+			return _Namespace(path);			
+		}
+			
+		
 		this._path = path;
 		this.templates = [];
 		this.path = path;
 		this.compindex = [];
 		this.itc = 0;
+	
 	};
 
+	
 	Namespace.prototype = {
 			
 			getNextTemplateName : function(){
@@ -1060,7 +1052,7 @@ var _ = sjs = _js = (function(window, document){
 			
 			Class: function(constructor){
 				var idx = (this._path + '.' + getFunctionName(constructor)).toUpperCase(); 
-				return core.Class.call({namespace:this,idx:idx},constructor);
+				return Class.call({namespace:this,idx:idx},constructor);
 			},
 			
 			place:function(obj){
@@ -1133,44 +1125,8 @@ var _ = sjs = _js = (function(window, document){
 	 * Public Namespace interface
 	 * returns Namespace or a namespace proxy object
 	 * */
-	core.Namespace = function(namespace) {
-
-		if(typeof namespace !== 'string' ) throw "_.Namespace(string) argument type must be a string";
-
-		var ns = getNamespace.call(window,namespace, false, false);
-		
-		if(ns && !(ns instanceof Namespace)) 
-			throw "Namespace " + namespace + " is ocupied by an object ";
-		
-		/* 
-		 * return Namespace proxy with Class constructor
-		 * */
-		if(ns == null){
-			return {
-				Class:function(constructor){
-					
-					var idx = (namespace + '.' + getFunctionName(constructor)).toUpperCase(); 
-					var newNamespace = getNamespace.call(window,namespace,true);
-					return core.Class.call({namespace:newNamespace, idx:idx}, constructor);
-
-				},
-
-				add:function(name, object){
-					
-					var idx = (namespace + '.' + name).toUpperCase(); 
-
-					var newNamespace = getNamespace.call(window,namespace,true);
-					NAMESPACE_INDEX[idx] = newNamespace[name] = object;
-
-				}
-			}
-		}
-		
-		
-		return ns;
-	};
 	
-	core.Namespace.list = function(){
+	Namespace.list = function(){
 		/* 
 		 * get owened properties on the global window object 
 		 * */
@@ -1186,19 +1142,19 @@ var _ = sjs = _js = (function(window, document){
 		}
 	};
 	
-	core.Namespace.listIndex = function(){
+	Namespace.listIndex = function(){
 		for(var key in NAMESPACE_INDEX){
 			if(NAMESPACE_INDEX.hasOwnProperty(key))
-				core.debug.log(key);
+				logging.debug.log(key);
 		}
 	};
 
-	core.Namespace.lookup = function(qualifiedName){
-		core.debug.log('searching ' + qualifiedName);
+	Namespace.lookup = function(qualifiedName){
+		logging.debug.log('searching ' + qualifiedName);
 		return getNamespace.call(window,qualifiedName,false, true);
 	};
 
-	core.Namespace.lookupIndex = function(qualifiedName){
+	Namespace.lookupIndex = function(qualifiedName){
 		var idx = qualifiedName.toUpperCase();
 
 		return NAMESPACE_INDEX[idx];
@@ -1207,7 +1163,7 @@ var _ = sjs = _js = (function(window, document){
 	/**
 	 * pseudo class wrapper
 	 * */
-	core.Class = function Class(constructor){
+	var Class = function Class(constructor){
 		
 		if(!constructor) throw 'constructor function may not be empty';
 		if(typeof(constructor) !== 'function' ) throw 'Constructor must be a function';
@@ -1264,13 +1220,11 @@ var _ = sjs = _js = (function(window, document){
 		//locate template by name
 		var template = this.templates[templateName];
 		
-				
+		var scope = this;		
 		return function(fn){
-			var cl = core.Class(fn);
-			
-			return createComponent(cl,template);
+			var	c = createComponent(Class(fn),template,scope); 
+			return scope[getFunctionName(fn)] = c;
 		}
-		
 	}		
 	
 
@@ -1286,14 +1240,6 @@ var _ = sjs = _js = (function(window, document){
 		return this.data[++this.i];
 	};
 	
-	
-
-
-	core.getLoaderProgress = function(){
-		return LOADER_PROGRESS;
-	}
-
-
 	
 	/**
 	 * Sequential resource loader Loader
@@ -1364,19 +1310,19 @@ var _ = sjs = _js = (function(window, document){
 			endsWith(filename, FILE_EXTENSIONS.template) 	|| 
 			endsWith(filename, FILE_EXTENSIONS.route) )
 		if(URL_CACHE[filename] === true){
-			core.debug.log('File ' + filename + ' is already loaded, skipping...');
+			logging.debug.log('File ' + filename + ' is already loaded, skipping...');
 			loader.progress--; 
 			LOADER_PROGRESS.complete++;
 			loader.loadNext(watcher);
 			return;
 		}
 		
-		core.debug.log('Loading: ' + filename);
+		logging.debug.log('Loading: ' + filename);
 		
 		var head = document.getElementsByTagName('head')[0];
 		
 		//tell Splice what is loading
-		watcher.notifyCurrentlyLoading({name:relativeFileName, url:filename});
+		watcher.notify({name:relativeFileName, url:filename});
 		
 		
 		/*
@@ -1410,28 +1356,6 @@ var _ = sjs = _js = (function(window, document){
 			};
 			head.appendChild(linkref);
 
-			return;
-		}
-		/*
-		 * Load CSS Files - local
-		 * */
-		if(endsWith(filename, FILE_EXTENSIONS.style) && loader.cssIsLocal == true){
-			core.debug.log('Loading CSS Locally');
-			HttpRequest.get({
-				url: filename,
-				onok:function(response){
-					URL_CACHE[filename] = true;
-
-					CSSParser(response.text)(
-						function(rules){
-							loader.onitemloaded({ext: FILE_EXTENSIONS.style, filename:filename, data:rules});
-							loader.progress--; 
-							LOADER_PROGRESS.complete++;
-							loader.loadNext(watcher);
-						}
-					);
-				}
-			});
 			return;
 		}
 
@@ -1496,24 +1420,47 @@ var _ = sjs = _js = (function(window, document){
 	
 	
 
-	core.dumpUrlCache = function (){ 
+	function dumpUrlCache(){ 
 		var cache = [];
 		for(var key in URL_CACHE){
 			if( URL_CACHE.hasOwnProperty(key)) {
-				_.info.log(key);
+				logging.info.log(key);
 				cache.push(key);
 			}
 		}
 		return cache;
 	};
 	
-	core.include = function(resources, oncomplete, onitemloaded){
+	
+	var LoadingWatcher = {
+		
+		getLoaderProgress : function(){
+			return LOADER_PROGRESS;
+		},
+		
+		notify:function(current){
+			this.name = current.name;
+			this.url = current.url;
+			
+			if(!progressLabel) return;
+	
+			var label = current.name;
+			
+			if(configuration.ONLOAD_DISP_SHORT_FILENAME)
+				label = getPath(current.name).name;
+	
+			progressLabel.innerHTML = label;
+		}
+	};
+	
+	
+	function include(resources, oncomplete, onitemloaded){
 		
 		/*
 		 * Initial bootstrap
 		 * */
 		
-		if(!this.isInitialInclude) {
+		if(!LoadingWatcher.isInitialInclude) {
 			showPreloader();
 			
 			var foo = oncomplete;
@@ -1521,53 +1468,40 @@ var _ = sjs = _js = (function(window, document){
 				removePreloader();
 				if(typeof foo === 'function') foo();
 			};
-			this.isInitialInclude = true;
+			LoadingWatcher.isInitialInclude = true;
 		}
 
 		/*
 		 * Always perform nested loading
 		 * */
-		core.debug.log('Nested loading...');
-		var loader = new Loader(resources, (function(){
+		logging.debug.log('Nested loading...');
+		var loader = new Loader(resources, function(){
 			Loader.loaders.pop();
 			if(typeof(oncomplete)  === 'function') oncomplete();
 			
 			var queuedLoader = 	peek(Loader.loaders);
 
-			if(queuedLoader) queuedLoader.enable().loadNext(this);
+			if(queuedLoader) queuedLoader.enable().loadNext(LoadingWatcher);
 			
-		}).bind(this), onitemloaded);
+		}, onitemloaded);
 		 
 		//suspend current loader
 		var currentLoader = peek(Loader.loaders);
 		if(currentLoader) currentLoader.disable();
 		
 		Loader.loaders.push(loader); 
-		loader.loadNext(this);
+		loader.loadNext(LoadingWatcher);
 	};
 
 	
 	
-	core.notifyCurrentlyLoading = function(current){
-		this.currentlyLoading = current;
-		if(!progressLabel) return;
-
-		var label = current.name;
-		
-		if(configuration.ONLOAD_DISP_SHORT_FILENAME)
-			label = getPath(current.name).name;
-
-		progressLabel.innerHTML = label;
-	};
 	
 	
-	core.load = function(moduleUrls, oncomplete){
-		this.include(moduleUrls, oncomplete);
+	function load(moduleUrls, oncomplete){
+		include(moduleUrls, oncomplete);
 	};
 
 
-	
-	core.getFunctionName = getFunctionName;
 	
 	/*	
 	 * 
@@ -1655,6 +1589,7 @@ var _ = sjs = _js = (function(window, document){
 	var Obj = function Obj(args){
 		/*
 		 * Scope object
+		 * Includers scope - should be used for resolving bindings
 		 * */
 		var scope = this;
 		
@@ -1681,7 +1616,7 @@ var _ = sjs = _js = (function(window, document){
 			
 
 			if(!obj) try {
-				obj = _.Namespace.lookup(args.type);
+				obj = Namespace.lookup(args.type);
 			} catch(ex) {}
 
 			
@@ -1693,7 +1628,7 @@ var _ = sjs = _js = (function(window, document){
 
 			/* locate tie, if override was specified */
 			if(args.tie) {
-				tieOverride = scope[args.tie] || _.Namespace.lookup(args.tie);
+				tieOverride = scope[args.tie] || Namespace.lookup(args.tie);
 				if(!tieOverride) throw 'Tie type cannot be found';
 			}
 
@@ -1722,7 +1657,10 @@ var _ = sjs = _js = (function(window, document){
 				obj = createComponent(tieOverride, obj.template, scope);
 			}
 
-
+			/*
+				invoke component constructor
+			*/
+			parameters._includer_scope = scope;
 			return new obj(parameters);	
 		}
 		
@@ -1739,7 +1677,7 @@ var _ = sjs = _js = (function(window, document){
 
 
 
-	var Controller = core.Class(function Controller(){
+	var Controller = function Controller(){
 
 
 		this.onDisplay.subscribe(function(){
@@ -1761,7 +1699,7 @@ var _ = sjs = _js = (function(window, document){
 			}
 		},this);
 
-	});
+	};
 
 	Controller.prototype.onAttach 	= Event;
 	Controller.prototype.onDisplay 	= Event;
@@ -1802,9 +1740,9 @@ var _ = sjs = _js = (function(window, document){
 
 	
 
-	var Concrete = core.Namespace('SpliceJS.Modular').Class(function Concrete(dom){
+	var Concrete = function Concrete(dom){
 		this.dom = dom;
-	});
+	};
 	
 
 	Concrete.prototype.export = function(){
@@ -1889,7 +1827,7 @@ var _ = sjs = _js = (function(window, document){
 	};
 
 	
-	var Template = core.Class(function Template(dom){
+	function Template(dom){
 		this.dom = dom;
 		dom._template = this;
 		/*
@@ -1899,8 +1837,7 @@ var _ = sjs = _js = (function(window, document){
 		 * templates DOMs
 		 * */
 		this.children = [];
-		
-	});
+	};
 		
 	Template.prototype.addChild = function(childTemplate){
 		this.children.push(childTemplate);
@@ -2219,7 +2156,7 @@ var _ = sjs = _js = (function(window, document){
 			var result = fn.call(scope);
 
 			if(typeof result !==  'function'){				
-				result = _.Obj.call(scope,result);
+				result = Obj.call(scope,result);
 			}
 
 			var childId = template.addChild(result);
@@ -2236,15 +2173,15 @@ var _ = sjs = _js = (function(window, document){
 
 
 	function resolveBinding(binding, instance, key, scope){
-		if( !(binding instanceof _.Binding) ) throw 'Cannot resolve binding, source property is not a binding object';
+		if( !(binding instanceof Binding) ) throw 'Cannot resolve binding, source property is not a binding object';
 		
 		var source = null;
 		
 		switch(binding.type){
-		case _.Binding.SELF:
+		case Binding.SELF:
 			break;
 		
-		case _.Binding.PARENT:
+		case Binding.PARENT:
 			if(!instance.parent) throw 'Cannot resolve parent binding, instance parent is not null';
 			
 			var v = Binding.Value(instance.parent);
@@ -2256,22 +2193,22 @@ var _ = sjs = _js = (function(window, document){
 					};
 			break;
 			
-		case _.Binding.FIRST_PARENT:
+		case Binding.FIRST_PARENT:
 			break;
 			
-		case _.Binding.ROOT:
+		case Binding.ROOT:
 			break;
 			
-		case _.Binding.TYPE:
-			_.debug.log('Resolving binding to type: ' + binding.vartype);
+		case Binding.TYPE:
+			logging.debug.log('Resolving binding to type: ' + binding.vartype);
 			var parent = instance;
 			
-			var vartype = _.Namespace.lookup(binding.vartype);
+			var vartype = scope.lookup(binding.vartype);
 			if (!vartype) throw 'Unable to resolve binding target type: ' + binding.vartype;
 			
 			while(parent) {
 				if(parent instanceof vartype) {
-					_.debug.log('Found instance of type: ' + binding.vartype);
+					logging.debug.log('Found instance of type: ' + binding.vartype);
 					
 					var v = Binding.Value(parent);
 
@@ -2297,8 +2234,8 @@ var _ = sjs = _js = (function(window, document){
 
 
 		/* Initialize events where applicable */
-		if(dest.value() === _.Event )  { dest.instance[dest.path] 	  = _.Event.create(); }
-		if(source.value() === _.Event) { source.instance[source.path] = _.Event.create(); }
+		if(dest.value() === Event )  { dest.instance[dest.path] 	= Event.create(); }
+		if(source.value() === Event) { source.instance[source.path] = Event.create(); }
 
 
 		/* Default binding mode is FROM */
@@ -2392,7 +2329,7 @@ var _ = sjs = _js = (function(window, document){
 		 * Run notations and scripts to form a 
 		 * final template DOM
 		 * */
-		_.debug.log('Processing template notations for module: ');		
+		logging.debug.log('Processing template notations for module: ');		
 		//AnnotationRunner.call(scope,template);
 		resolveCustomElements.call(scope,template);
 
@@ -2430,7 +2367,7 @@ var _ = sjs = _js = (function(window, document){
 			return;
 		}
 
-		throw 'Invalid [ref] value, must be a string or an instance of _.Binding';
+		throw 'Invalid [ref] value, must be a string or an instance of Binding';
 	}
 
 	
@@ -2479,9 +2416,9 @@ var _ = sjs = _js = (function(window, document){
 				
 			*/
 			for(var key in  obj){
-				if(obj[key] == _.Event){
-					_.debug.log('Found event object');
-					obj[key] = _.Event.create();
+				if(obj[key] == Event){
+					logging.debug.log('Found event object');
+					obj[key] = Event.create();
 				}	
 			}	
 
@@ -2520,8 +2457,8 @@ var _ = sjs = _js = (function(window, document){
 					if(key === 'ref') 		continue;
 					if(key === 'content') 	continue; //content is processed separately
 					
-					if(parameters[key] instanceof _.Binding) {
-						resolveBinding(parameters[key], tieInstance, key, scope);
+					if(parameters[key] instanceof Binding) {
+						resolveBinding(parameters[key], tieInstance, key, args._includer_scope);
 						continue;
 					}
 				
@@ -2588,12 +2525,12 @@ var _ = sjs = _js = (function(window, document){
 	/*
 	 * Alter include behavior to understand templates
 	 * */
-	var originalInclude = core.include;
-	core.include = function(resources, oncomplete, onitemloaded){
+	
+	function includeWithTemplate(resources, oncomplete, onitemloaded){
 		
 		var handler = function(){
 
-			var path = _.getPath(_.currentlyLoading.name).path;
+			var path = getPath(LoadingWatcher.name).path;
 			var scope = new Scope(path);
 
 			if(typeof onitemloaded === 'function')
@@ -2613,7 +2550,7 @@ var _ = sjs = _js = (function(window, document){
 			scope.templates = templates;
 			compileTemplates(scope);
 		}
-		originalInclude.call(_,resources, oncomplete,handler);
+		include.call(_,resources, oncomplete,handler);
 	};
 	
 
@@ -2666,9 +2603,8 @@ function prepareImports(a, path){
 	return {namespaces:namespaces, filenames:filenames};
 };
 
-var Module = 
 	/**
-	 * Builds module and compiles template(s) from module definition. 
+	 * Builds module and compiles late(s) from module definition. 
 	 * The templates will be compiled recursively, 
 	 * where inner templates are compiled first and then outer. 
 	 * Any scripts embedded into template will be evaluated and 
@@ -2678,22 +2614,24 @@ var Module =
 	function Module(moduleDefinition){
 	    var scope = new Namespace(path); //our module scope
 		
-		scope.framework = {Controller:Controller};
-		scope.framework.Class = function(fn){
-			var nm = getFunctionName(fn);
-			scope[nm] = sjs.Class(fn);
-			return scope[nm];
-		};
-		scope.framework.Component = function(){
-			return Component.apply(scope,arguments);
-		};
-			
+		scope.framework = {
+			Class : function(fn){
+				var nm = getFunctionName(fn);
+				scope[nm] = Class(fn);
+				return scope[nm];
+			},
+			Component : function(){
+				return Component.apply(scope,arguments);
+			},
+			Event : Event,
+			Controller: Controller
+		}
 		
 		
 		
 		//use absolute URL there is no reason not to
-		var path = _.getPath(_.currentlyLoading.name).path;
-		var url = _.currentlyLoading.url;
+		var path = getPath(LoadingWatcher.name).path;
+		var url = LoadingWatcher.url;
 		
 		var imp = prepareImports(moduleDefinition.required, path);
 		
@@ -2707,9 +2645,9 @@ var Module =
 		
 		
 
-		scope.createComponent = function(tie,template){return createComponent(tie,template,this);};
+		
 			
-		_.debug.log(path);
+		logging.debug.log(path);
 
 		var templateDefinitions = new Array();
 		var cssRules = [];
@@ -2753,7 +2691,7 @@ var Module =
 		/* 
 		 * Load dependencies
 		 * */
-		 originalInclude.call(core, required, function(){	
+		 include(required, function(){	
 			
 			/*
 			 * Define a module
@@ -2810,28 +2748,51 @@ var Module =
 	Core exports
 
 */
+	var consoleLog = console.log.bind(console); 
+
+	return {
+		
+		debug:{
+			log : consoleLog,
+			info: logging.info,
+			enable:function(){
+				this.log = consoleLog;
+				logging.debug.log = consoleLog;
+			},
+			disable:function(){
+				this.log  = function(){}	
+			}
+		},
+		
+		configuration : configuration,
+		
+		boot : boot,
+		toPath : toPath,
+		home : home,
+		
+		absPath : absPath,
+		getPath : getPath,
+		display : display,
+		close : close,
+    	required : required,
 	
+		include : includeWithTemplate,
+		getFunctionName:getFunctionName,
+	
+		Namespace: Namespace,
+		Class : Class,
+		Controller : Controller,
+		Obj : Obj,
+		Binding : Binding,
+    	HttpRequest : HttpRequest,	
+		Event : Event,	
+		Module : Module,
+		
+		
+		PATH_MAP : PATH_MAP
+		
+	}
 	//core.debug = debug;
-	core.boot = boot;
-	core.toPath = toPath;
-	core.home = home;
-	
-	
-	core.absPath = absPath;
-	core.getPath = getPath;
-	core.display = display;
-	core.close = close;
-    core.required = required;
-
-	core.Obj = Obj;
-	core.Binding = Binding;
-    core.HttpRequest = HttpRequest;	
-	core.Module = Module;
-	core.Controller = Controller;
-	core.PATH_MAP = PATH_MAP;
-	
-
-	return core;
 
 })(window,document);
 

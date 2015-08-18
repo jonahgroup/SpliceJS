@@ -1,5 +1,5 @@
-/*blobal sjs */
-sjs.Module({
+/*blobal _ */
+_.Module({
 
 definition:function(){
 
@@ -9,7 +9,7 @@ definition:function(){
 	// importing framework features makes our code less verbose
 	var Class = this.framework.Class;
 	var Controller = this.framework.Controller;
-
+	var Event = this.framework.Event;
 
 
 	/**
@@ -22,7 +22,7 @@ definition:function(){
 		}
 	}).extend(Controller);
 
-	UIElement.prototype.onClick = sjs.Event;
+	UIElement.prototype.onClick = Event;
 
 
 
@@ -32,7 +32,7 @@ definition:function(){
 	 */
 	var UIControl = Class(function UIControl(args){
 		
-		sjs.Controller.call(this);
+		Controller.call(this);
 		
 		if(this.isHidden) {
 			this.prevDisplayState = this.elements.controlContainer.style.display; 
@@ -194,9 +194,7 @@ UIControl.prototype.applyCSSRules = function(){}
 	/*
 		Element positioning utilies
 	*/
-	var Positioning = Class(function Positioning(){});
-
-	Positioning.prototype = {
+	var Positioning =  {
 
 		//@ Take mouse event object to return mouse position coordinates
 	    mousePosition:function(e){
@@ -278,9 +276,7 @@ UIControl.prototype.applyCSSRules = function(){}
 		Drag and Drop implementation 
 	*/
 
-	var DragAndDrop = Class(function DragAndDrop(){});
-
-	DragAndDrop.prototype = {
+	var DragAndDrop =  {
 
 		draggable:null,
 		dummy:null,
@@ -301,14 +297,14 @@ UIControl.prototype.applyCSSRules = function(){}
 	    	this.disableSelection(document.body, event);
 			//get original position of the trigger node
 			//p = JSPositioning.absPosition(elementnode);
-			var p = SpliceJS.Ui.Positioning.mousePosition(event);
+			var p = Positioning.mousePosition(event);
 			
 			this.offset = {x:p.x,y:p.y};
 					
 			
 			
-			document.body.onmousemove = function(event) {SpliceJS.Ui.DragAndDrop.drag(event);	};	
-			document.body.onmouseup   = function(event) {SpliceJS.Ui.DragAndDrop.stopdrag(event);	}; 	
+			document.body.onmousemove = function(event) {DragAndDrop.drag(event);	};	
+			document.body.onmouseup   = function(event) {DragAndDrop.stopdrag(event);	}; 	
 
 			
 			
@@ -329,8 +325,8 @@ UIControl.prototype.applyCSSRules = function(){}
 		},
 		
 		drag:function(e) {
-			var mousePos = SpliceJS.Ui.Positioning.mousePosition(e);
-			this.ondrag(mousePos,SpliceJS.Ui.DragAndDrop.offset);
+			var mousePos = Positioning.mousePosition(e);
+			this.ondrag(mousePos,DragAndDrop.offset);
 			if(this.ondragfired === false) {
 				this.onbegin();
 			}
@@ -364,18 +360,15 @@ UIControl.prototype.applyCSSRules = function(){}
             
 		},
 	        
-        addTracker: function(tracker){
-            var self = JSDragAndDrop;
-            if(!self.trackers) self.trackers = new Array();
-            self.trackers.push(tracker);
-        }
+       
 };
 
 	//module exports
 	return {
 		UIControl:	 UIControl,
-		Positioning: new Positioning(),
-		DragAndDrop: new DragAndDrop()
+		//singletons
+		Positioning: Positioning,
+		DragAndDrop: DragAndDrop
 	}
 
 
