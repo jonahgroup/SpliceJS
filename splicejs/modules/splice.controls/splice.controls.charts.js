@@ -16,8 +16,8 @@ definition:function(){
 
 	var scope = this
 	,	D3Canvas = this.SpliceJS.Controls.D3Canvas
-	,	Class = this.framework.Class;
-	
+	,	Class = this.framework.Class
+	, 	Component = this.framework.Component;
 
 	var CHART_MAP = {
 		Bar:  this.Charts.BarChart,
@@ -29,8 +29,8 @@ definition:function(){
 		left:30,top:20, right:10, bottom:20
 	};
 
-
-	var Chart = Class(function Chart(){
+	
+	var Chart = Component('Chart')(function Chart(){
 		D3Canvas.call(this);	//call parent constructor
 
 		var self = this
@@ -289,7 +289,7 @@ definition:function(){
 	return {
 		
 		Chart: 	Chart,
-		Dial:	scope.Charts.Dial
+		Dial:	Component('Dial')(scope.Charts.Dial)
 	}
 }
 
