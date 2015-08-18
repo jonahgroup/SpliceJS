@@ -288,8 +288,8 @@ definition:function(){
 
 	return {
 		
-		Chart: Chart
-		
+		Chart: 	Chart,
+		Dial:	scope.Charts.Dial
 	}
 }
 

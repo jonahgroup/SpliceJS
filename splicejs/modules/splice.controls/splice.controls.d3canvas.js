@@ -9,8 +9,8 @@ required:[
 
 definition:function(){
 
-	var Class = this.framework.Class;
-	var UIControl = this.SpliceJS.UI.UIControl;
+	var Component = this.framework.Component
+	, 	UIControl = this.SpliceJS.UI.UIControl;
 
 	_.Namespace('SpliceJS.Lib').add('d3',d3);
 
@@ -36,7 +36,7 @@ definition:function(){
 	};
 
 
-	var D3Canvas = Class(function D3Canvas(){
+	var D3Canvas = Component('D3Canvas')(function D3Canvas(){
 		UIControl.call(this);
 		
 		this.d3 = new D3(this.elements.controlContainer);

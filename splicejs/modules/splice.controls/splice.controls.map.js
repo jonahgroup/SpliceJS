@@ -10,8 +10,8 @@ required:[
 
 definition:function(){
 
-	var Map = _.Namespace('SpliceJS.Controls').Class(
-		function Map(){
+	
+	var Map = this.framework.Component('Map')(function Map(){
 		}
 	);
 
@@ -37,6 +37,11 @@ definition:function(){
 
 	};
 
+
+	return {
+		
+		Map:Map
+	}
 
 }
 });

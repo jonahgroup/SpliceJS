@@ -13,13 +13,12 @@ required:[
 ,	'splice.controls/splice.controls.listbox.js'
 ,	{'Panels':'splice.controls/splice.controls.drawerpanel.js'}
 ,	{'Grids':'splice.controls/splice.controls.gridlayout.js'}
-
 ,	{'Panels':'splice.controls/splice.controls.viewpanel.js'}
+,	{'Charts':'splice.controls/splice.controls.d3canvas.js'}
+,	{'Maps':'splice.controls/splice.controls.map.js'}
 /*
-,	'splice.controls/splice.controls.map.js'
-
 ,	'splice.controls/splice.controls.codeeditor.js'
-,	'splice.controls/splice.controls.d3canvas.js'
+
 ,	'splice.controls/splice.controls.calendar.js'
 ,	'splice.controls/splice.controls.datepicker.js'
 ,	'splice.controls/splice.controls.selectors.js'
@@ -254,7 +253,11 @@ definition:function(){
 		DrawerPanel:	scope.Panels.DrawerPanel,
 		ViewPanel:		scope.Panels.ViewPanel,
 		Chart:			scope.Charts.Chart,
-		GridLayout:		scope.Grids.GridLayout
+		Dial:			scope.Charts.Dial,
+		GridLayout:		scope.Grids.GridLayout,
+		D3Canvas:		scope.Charts.D3Canvas,
+		Map:			scope.Maps.Map
+		
 	}
 
 // end module definition		
