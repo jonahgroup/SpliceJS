@@ -1,18 +1,24 @@
 _.Module({
 
 required:[
-	_.home('modules/splice.text.js')
-,	'splice.controls.calendar.js'
-,	'splice.controls.selectors.js'
+	{'SpliceJS.UI':'../splice.ui.js'}
+,	_.home('modules/splice.text.js')
+,	{'SpliceJS.Controls':'splice.controls.calendar.js'}
+,	{'SpliceJS.Controls':'splice.controls.selectors.js'}
 ,	'splice.controls.datepicker.html'
 ]
 ,
 
 definition:function(){
 
+	var Component = this.framework.Component
+	,	Event = this.framework.Event;
+	
+	var UIControl = this.SpliceJS.UI.UIControl;
 
-	var DatePicker = _.Namespace('SpliceJS.Controls').Class(function DatePicker(){
-
+	var DatePicker = Component('DatePicker')(function DatePicker(){
+		UIControl.call(this);
+		
 		var date = new Date();
 
 		if(this.format){
@@ -24,7 +30,7 @@ definition:function(){
 		    this.setDate(date);
 		}, this);
 
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
 
 	
@@ -53,9 +59,13 @@ definition:function(){
 	DatePicker.prototype.reflow = function(){};
 
     // fires when date has been selected
-	DatePicker.prototype.onDateSelected = _.Event;
-	DatePicker.prototype.onData = _.Event;
+	DatePicker.prototype.onDateSelected = Event;
+	DatePicker.prototype.onData 		= Event;
 
+
+	return {
+		DatePicker: DatePicker
+	}
 }
 
 });

@@ -6,22 +6,25 @@ required:[
 	{'SpliceJS.UI':'splice.ui.js'}
 ,	'splice.controls/splice.controls.css'
 ,  	'splice.controls/splice.controls.html'
+
 ,  	{'Buttons':'splice.controls/splice.controls.buttons.js'}
-,	'splice.controls/splice.controls.datatable.js'
-,	'splice.controls/splice.controls.scrollpanel.js'
+,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
 ,	{'Charts':'splice.controls/splice.controls.charts.js'}
-,	'splice.controls/splice.controls.listbox.js'
+,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
 ,	{'Panels':'splice.controls/splice.controls.drawerpanel.js'}
-,	{'Grids':'splice.controls/splice.controls.gridlayout.js'}
+,	{'Panels':'splice.controls/splice.controls.scrollpanel.js'}	
 ,	{'Panels':'splice.controls/splice.controls.viewpanel.js'}
+,	{'Grids':'splice.controls/splice.controls.gridlayout.js'}
 ,	{'Charts':'splice.controls/splice.controls.d3canvas.js'}
 ,	{'Maps':'splice.controls/splice.controls.map.js'}
+,	{'Selectors':'splice.controls/splice.controls.selectors.js'}
+,	{'Selectors':'splice.controls/splice.controls.datepicker.js'}
+,	{'Selectors':'splice.controls/splice.controls.dropdownlist.js'}
 /*
 ,	'splice.controls/splice.controls.codeeditor.js'
 
 ,	'splice.controls/splice.controls.calendar.js'
-,	'splice.controls/splice.controls.datepicker.js'
-,	'splice.controls/splice.controls.selectors.js'
+
 ,	'splice.controls/splice.controls.treeview.js'
 ,	'splice.controls/splice.controls.popup.js'
 ,   'splice.controls/splice.controls.pageloader.js'
@@ -80,58 +83,7 @@ definition:function(){
 	};
 
 
-	/**
-	 * Drop down list
-	 * */
-	var DropDownList = Class(function DropDownList(args){
-		UIControl.call(this);
-		this.dom = this.concrete.dom;
-	}).extend(UIControl); 
-
-
-	DropDownList.prototype.show = function(args){
-		if(!args || !args.parent) return;
-		
-		var parent_size 	= _.Doc.elementSize(args.parent);
-		var parent_position = _.Doc.elementPosition(args.parent);
-		var documentHeight 	= _.Doc.getHeight();
-		
-		this.dom.style.maxHeight = (documentHeight - parent_position.y - parent_size.height - 5) + 'px';
-		
-		
-		document.body.appendChild(this.dom);
-		
-		if(typeof(args.content) ==  'string') {
-			this.dom.innerHTML = args.content;
-		} else if( typeof(args.content) == 'object'){
-			this.dom.innerHTML = '';
-			this.dom.appendChild(args.content);
-		}
-		
-		
-		var style = this.dom.style;
-		style.left = parent_position.x + 'px';
-		style.top  = parent_position.y + parent_size.height + 'px';
-		
-		this.dom.className = '-sc-drop-down-list -sc-show';
-		
-		
-		/* remove list on defocus*/
-		
-		document.body.onmousedown = (function(){
-			this.hide();
-			document.body.onmousedown = undefined;
-		}).bind(this); 
-		
-	};
 	
-
-	DropDownList.prototype.dataIn = function(data){
-	};
-	
-	DropDownList.prototype.hide = function() {
-		this.dom.className = '-sc-drop-down-list -sc-hide';
-	};
 
 
 	/*
@@ -241,23 +193,37 @@ definition:function(){
 
 	// module exports
 	return {
-		
-		UIControl:		scope.SpliceJS.UI.UIControl,
-		TextField:		TextField,
-		PullOutPanel: 	PullOutPanel,
-		DomIterator: 	DomIterator,
-		ImageSelector:  ImageSelector,
-		Button:			scope.Buttons.Button,
-		CheckBox:		scope.Buttons.CheckBox,
-		RadioButton:	scope.Buttons.RadioButton,
-		DrawerPanel:	scope.Panels.DrawerPanel,
-		ViewPanel:		scope.Panels.ViewPanel,
-		Chart:			scope.Charts.Chart,
-		Dial:			scope.Charts.Dial,
-		GridLayout:		scope.Grids.GridLayout,
-		D3Canvas:		scope.Charts.D3Canvas,
-		Map:			scope.Maps.Map
-		
+		/* utility controls */
+		UIControl:			scope.SpliceJS.UI.UIControl,
+		TextField:			TextField,
+		DomIterator: 		DomIterator,
+		ImageSelector:  	ImageSelector,
+		/* buttons */
+		Button:				scope.Buttons.Button,
+		CheckBox:			scope.Buttons.CheckBox,
+		RadioButton:		scope.Buttons.RadioButton,
+		/* panels */
+		PullOutPanel: 		PullOutPanel,
+		DrawerPanel:		scope.Panels.DrawerPanel,
+		ViewPanel:			scope.Panels.ViewPanel,
+		ScrollPanel:		scope.Panels.ScrollPanel,
+		/* charts */
+		Chart:				scope.Charts.Chart,
+		Dial:				scope.Charts.Dial,
+		GridLayout:			scope.Grids.GridLayout,
+		D3Canvas:			scope.Charts.D3Canvas,
+		Map:				scope.Maps.Map,
+		/* selectors */
+		DropDownSelector:	scope.Selectors.DropDownSelector,
+		DropDownList:		scope.Selectors.DropDownList,		
+		DatePicker:			scope.Selectors.DatePicker,
+		/* data controls */
+		DataTable:			scope.DataControls.DataTable,
+		ListBox:			scope.DataControls.ListBox,
+		ListItem:			scope.DataControls.ListItem,
+		ScrollableListBox:	scope.DataControls.ScrollableListBox,
+		StretchListBox:		scope.DataControls.StretchListBox,
+		GroupedListItem:	scope.DataControls.GroupedListItem
 	}
 
 // end module definition		

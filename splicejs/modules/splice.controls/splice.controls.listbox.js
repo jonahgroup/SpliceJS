@@ -2,17 +2,18 @@ _.Module({
 
 required:[ 
 	{'SpliceJS.UI':'../splice.ui.js'},
+	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	'splice.controls.listbox.css',
 	'splice.controls.listbox.html'
 ],
 
 definition:function(){
 
-	var scope = this
-	,	f = this.framework;
+	var scope = this;
 	
-	var Obj  = f.Obj
-	, 	Class = f.Class
+	var Component = this.framework.Component
+	,	Obj  = this.framework.Obj
+	, 	Class = this.framework.Class
 	,	UIControl = this.SpliceJS.UI.UIControl;
 	
 
@@ -21,28 +22,24 @@ definition:function(){
 		if(!args) args = [];
 
 		if(args.isScrollable)
-			args['type'] = 'ScrollableListBox';	
+			return new ScrollableListBox(args);	
 		else 
 			args['type'] = 'StretchListBox';
 
 		if(this.ref) args['ref'] = this.ref;
 			
-		return new (Obj.call(scope,args));  
+		//return new (Obj.call(scope,args));  
 
 	});
 
 
-	var ScrollableListBox = this.ScrollableListBox = Class(
-		function ScrollableListBox(){
-
+	var ScrollableListBox = Component('ScrollableListBox')(function ScrollableListBox(){
 			_.debug.log('Creating ScrollableListBox');
 
 			this.scrollPanel 	= this.ref.scrollPanel;
 			this.contentClient 	= this.ref.scrollPanel.ref.contentClient;	 
-
-
 		}
-	);
+	).extend(UIControl);
 
 	ScrollableListBox.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
@@ -63,19 +60,14 @@ definition:function(){
 		}
 
 		this.reflow();
-
 		_.debug.log('DataItem' + item);	
 	};
-
 
 	ScrollableListBox.prototype.reflow = function(){
 		this.ref.scrollPanel.reflow();
 	};
 
-
-	var StretchListBox = this.StretchListBox = Class(
-		function StretchListBox(){
-
+	var StretchListBox = Component('StretchListBox')(function StretchListBox(){
 			_.debug.log('Creating StretchListBox');
 		}
 	);
@@ -135,10 +127,11 @@ definition:function(){
 
 	//exporting objects
 	return {
-		ListBox:		ListBox,
-		StretchListBox:	StretchListBox,
-		ListItem:		ListItem,
-		GroupedListItem:GroupedListItem
+		ListBox:			ListBox,
+		ScrollableListBox:	ScrollableListBox,
+		StretchListBox:		StretchListBox,
+		ListItem:			ListItem,
+		GroupedListItem:	GroupedListItem
 	}
 
 }

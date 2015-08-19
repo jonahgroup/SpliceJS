@@ -196,8 +196,13 @@ definition:function(){
 
 
 
-	var Calendar = _.Namespace('SpliceJS.Controls').Class(function Calendar(){
+	var Controller = this.framework.Controller
+	,	Component = this.framework.Component
 
+
+	var Calendar = Component('Calendar')(function Calendar(){
+		Controller.call(this);
+		
 		var dt = new Date();
 		
 		this.year 	= dt.getFullYear();
@@ -224,7 +229,7 @@ definition:function(){
 		},this);
 
 
-	}).extend(SpliceJS.Core.Controller);
+	}).extend(Controller);
 
 
 	Calendar.prototype.onDateSelected = _.Event;
@@ -244,6 +249,12 @@ definition:function(){
 		renderMonth.call(this, new Date(this.year, this.month, this.day));
 	};	
 
+
+	return {
+		
+		Calendar : Calendar
+		
+	}
 
 }
 

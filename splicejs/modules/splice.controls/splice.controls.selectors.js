@@ -1,29 +1,36 @@
 _.Module({
 
 required:[
+	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.selectors.css',
 	'splice.controls.selectors.html'
 ]
 ,
 definition:function(){	
+	
+	/* framework imports */
+	var Controller 	= this.framework.Controller
+	,	Event 		= this.framework.Event
+	,	Positioning = this.SpliceJS.UI.Positioning
+	,	Component 	= this.framework.Component;
 
-	var DropDownSelector = _.Namespace('SpliceJS.Controls').Class( function DropDownSelector(){
-		SpliceJS.Core.Controller.call(this);
+	var DropDownSelector = Component('DropDownSelector')( function DropDownSelector(){
+		Controller.call(this);
 	
 		var self = this;
 	    /*
             Subscribe to onclick instead of mousedown, because firing mousedown 
             will immediately execute event within dropDown() closing the dropdown
         */
-	    _.Event.attach(this.elements.controlContainer, 'onmousedown').subscribe(function (e) {
+	    Event.attach(this.elements.controlContainer, 'onmousedown').subscribe(function (e) {
 	        this.dropDown();
 	        e.cancel();
 		}, this);
 
-	}).extend(SpliceJS.Core.Controller)
+	}).extend(Controller)
 
 
-	DropDownSelector.prototype.onDropDown = _.Event;
+	DropDownSelector.prototype.onDropDown = Event;
 
 
 	DropDownSelector.prototype.dataIn = function(data){
@@ -49,7 +56,7 @@ definition:function(){
 		,	height = this.elements.selector.offsetHeight
 		,	top = height
 		,	s = this.elements.dropdownContainer.style
-		,	pos = SpliceJS.Ui.Positioning.absPosition(this.elements.selector)
+		,	pos = Positioning.absPosition(this.elements.selector)
 		,	self = this
 		;
 		
@@ -81,5 +88,9 @@ definition:function(){
 		this.onDropDown();
 
 	};
+
+	return {
+		DropDownSelector:DropDownSelector
+	}
 
 }});

@@ -104,7 +104,7 @@
 </tr>
 
 
-<!--
+
 <tr><td>Drop down list</td>
 <td>
 	<sjs-include type="SpliceJS.Controls.DropDownList">{
@@ -138,10 +138,18 @@
 	</div>
 </td>
 
+<td rowspan="2">Map</td>
+<td rowspan="2"> <div style="position:relative; width:400px; height:400px;">
+	<sjs-include>{
+		ref:'map',
+		type: 'SpliceJS.Controls.Map'
+	}</sjs-include>
+	</div>
+</td>
 
 </tr>
 
--->
+
 <tr><td>Dial</td>
 	<td>
 
@@ -152,15 +160,7 @@
 
 	</td>
 
-	<td>Map</td>
-	<td> <div style="position:relative; width:400px; height:400px;">
-	<sjs-include>{
-		ref:'map',
-		type: 'SpliceJS.Controls.Map'
-	}</sjs-include>
-	</div>
-
-</td>
+	
 
 </tr>
 <!--
@@ -240,7 +240,7 @@
 	
 
 </td></tr>
-
+-->
 
 <tr><td><sjs-include type="SpliceJS.Controls.DatePicker"></sjs-include></td></tr>
 
@@ -249,7 +249,7 @@
 <br><br>
 <sjs-include type="ButtonBar"></sjs-include>
 
--->
+
 
 </sjs-template>
 
@@ -266,14 +266,14 @@
 	<sjs-include type="SpliceJS.Controls.ListBox"> {
 		isScrollable:true,
 		itemTemplate:<sjs-include type="SampleListItem">{
-			onClick:_.Binding('listItemSelected').Type('UserApplications.ControlsDemoApplication')
+			onClick:_.Binding('listItemSelected').Type('ControlsDemoApplication')
 		}</sjs-include>,
-		dataIn: _.Binding('onListData').Type('UserApplications.ControlsDemoApplication')
+		dataIn: _.Binding('onListData').Type('ControlsDemoApplication')
 	}</sjs-include>
 	</div>
 </sjs-template>
 
-<sjs-template type="SampleListItem" tie="SpliceJS.Controls.ListItem">
+<sjs-template type="SampleListItem" controller="SpliceJS.Controls.ListItem">
 	<div style="border-bottom:1px solid #cecece; padding:0.5em; white-space:nowrap;">
 		<div>@name</div>
 		<div style="font-size:11px; color: #52A2E5; font-family:Arial;">@number</div>
@@ -315,5 +315,8 @@
 	<sjs-include type="SpliceJS.Controls.Button">{content:{label:'Edit'}}</sjs-include>
 	<sjs-include type="SpliceJS.Controls.Button">{content:{label:'Delete'}}</sjs-include>
 	<sjs-include type="SpliceJS.Controls.Button">{content:{label:'Save'}}</sjs-include>
-	</div<
+</div>
+</sjs-template>
+		
+		
 </sjs-template>

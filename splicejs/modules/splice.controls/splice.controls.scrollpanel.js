@@ -10,7 +10,7 @@ required:[
 
 definition:function(){
 
-	var Class = this.framework.Class;
+	var Component = this.framework.Component;
 	
 	var UIControl = this.SpliceJS.UI.UIControl;
 	var DragAndDrop = this.SpliceJS.UI.DragAndDrop;
@@ -18,7 +18,7 @@ definition:function(){
 	var isTouch 	= _.configuration.platform.IS_TOUCH_ENABLED;
 	var isMobile 	= _.configuration.platform.IS_MOBILE;
 
-	var ScrollPanel = Class(function ScrollPanel(args){
+	var ScrollPanel = Component('ScrollPanel')(function ScrollPanel(args){
 		if(!args) return;
 		
 		UIControl.call(this,args);

@@ -900,7 +900,7 @@ var _ = (function(window, document){
 				
 				template = compileTemplate.call(scope,template);
 								
-				display(new (createComponent(Controller, template, scope)));
+				display(new template());
 			}
 		});
 		
@@ -1216,10 +1216,12 @@ var _ = (function(window, document){
 		return constructor;
 	};
 	
-	function Component(templateName){
+	function Component(template_name){
 		//locate template by name
-		var template = this.templates[templateName];
+		var template = null;
+		if(template_name) template = this.templates[template_name].template;
 		
+			
 		var scope = this;		
 		return function(fn){
 			var	c = createComponent(Class(fn),template,scope); 
@@ -1605,7 +1607,7 @@ var _ = (function(window, document){
 				obj = scope.lookup(args.type);
 			} catch(ex){}
 			
-			
+			/* lone template is being included */
 			if(!obj) try {
 				obj = scope.templates[args.type];
 			} catch(ex) {}
@@ -2320,10 +2322,8 @@ var _ = (function(window, document){
 	 * @returns {HTMLElement|*} a DOM of the template (aka build version).
 	 */
 	function compileTemplate(template){
-
 		
-		var scope = this;
-
+		var scope = this; //module scope
 
 		/*
 		 * Run notations and scripts to form a 
@@ -2335,10 +2335,15 @@ var _ = (function(window, document){
 
 		//_.debug.log('Processing template scripts for module: ' );
 		//new ScriptDomRunner(template.dom).run({module:''});
-		
 		template.normalize();
 
-		return scope.templates[template.declaration.type] = template; 
+		var arg_controller = Controller;
+		if(template.declaration.controller) {
+			arg_controller = scope.lookup(template.declaration.controller);
+			if(!arg_controller) throw 'Unable to find controller type ' + template.declaration.controller; 
+		}
+
+		return scope.templates[template.declaration.type] = createComponent(arg_controller,template,scope); 
 				   
 		
 	};
@@ -2421,12 +2426,6 @@ var _ = (function(window, document){
 					obj[key] = Event.create();
 				}	
 			}	
-
-
-			/* inherit CSS scope from the template declaration */
-			if(template && template.declaration.css) {
-				obj['templateCSS'] = template.declaration.css;
-			}
 
 
 			obj.scope = scope;	
@@ -2624,7 +2623,8 @@ function prepareImports(a, path){
 				return Component.apply(scope,arguments);
 			},
 			Event : Event,
-			Controller: Controller
+			Controller: Controller,
+			Obj:Obj
 		}
 		
 		

@@ -16,7 +16,6 @@ definition:function(){
 
 	var scope = this
 	,	D3Canvas = this.SpliceJS.Controls.D3Canvas
-	,	Class = this.framework.Class
 	, 	Component = this.framework.Component;
 
 	var CHART_MAP = {

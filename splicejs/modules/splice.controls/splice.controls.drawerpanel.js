@@ -27,11 +27,13 @@ definition:function(){
 			this.elements.actuator.onclick = function(){
 				self.activateDrawer();		
 			}
-		}
-	).extend(UIControl);
+	
+			this.onDisplay.subscribe(this.display, this);
+			
+	}).extend(UIControl);
 
 
-	DrawerPanel.prototype.onDisplay = function(){
+	DrawerPanel.prototype.display = function(){
 		UIControl.prototype.onDisplay.call(this);
 
 		var openWidth = this.openWidth = this.elements.controlContainer.clientWidth * this.openTo;
