@@ -1,6 +1,7 @@
 _.Module({
 
 required:[
+	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.codeeditor.css',
 	'splice.controls.codeeditor.html'
 ],
@@ -8,9 +9,10 @@ required:[
 
 definition:function(){
 
-	var scope = this;
+	var Component = this.framework.Component
+	,	UIControl = this.SpliceJS.UI.UIControl;
 
-	var CodeEditor = _.Namespace('SpliceJS.Controls').Class(function CodeEditor(){
+	var CodeEditor = Component('CodeEditor')(function CodeEditor(){
 
 		var location  = this.file;
 		
@@ -25,7 +27,7 @@ definition:function(){
 				self.displayCode(result.text);
 			}
 		});
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
 
 
@@ -37,8 +39,6 @@ definition:function(){
 		for(var i=0; i< this.lines.length; i++){
 			this.elements.controlContainer.appendChild(this.lines[i]);
 		}
-		
-		this.applyCSSRules();
 	};
 
 
@@ -107,7 +107,12 @@ definition:function(){
 	}
 
 
-
+	return {
+		
+		CodeEditor:CodeEditor
+		
+	}
+	
 }
 
 });

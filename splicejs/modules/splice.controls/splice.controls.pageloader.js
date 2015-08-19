@@ -1,19 +1,26 @@
 _.Module({
 
 required:[
-	'splice.controls.pageloader.html',
+	{'SpliceJS.UI':'../splice.ui.js'},
+	'splice.controls.pageloader.html'
 ]
 ,
 definition:function(){
 
-	var scope = this.scope;
+	var Class = this.framework.Class
+	,	UIControl = this.SpliceJS.UI.UIControl
 
 
-	var Pageloader = _.Namespace('SpliceJS.Controls').Class(function Pageloader(){
-		SpliceJS.Controls.UIControl.call(this);
-	}).extend(SpliceJS.Controls.UIControl);
+	var PageLoader = Class(function PageLoader(){
+		UIControl.call(this);
+	}).extend(UIControl);
 
 	
+	return {
+		
+		PageLoader: PageLoader
+		
+	}
 
 }
 

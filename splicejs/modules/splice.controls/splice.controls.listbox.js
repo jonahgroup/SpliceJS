@@ -9,10 +9,8 @@ required:[
 
 definition:function(){
 
-	var scope = this;
 	
 	var Component = this.framework.Component
-	,	Obj  = this.framework.Obj
 	, 	Class = this.framework.Class
 	,	UIControl = this.SpliceJS.UI.UIControl;
 	
@@ -24,11 +22,7 @@ definition:function(){
 		if(args.isScrollable)
 			return new ScrollableListBox(args);	
 		else 
-			args['type'] = 'StretchListBox';
-
-		if(this.ref) args['ref'] = this.ref;
-			
-		//return new (Obj.call(scope,args));  
+			return new StretchListBox(args);
 
 	});
 
@@ -60,7 +54,7 @@ definition:function(){
 		}
 
 		this.reflow();
-		_.debug.log('DataItem' + item);	
+		
 	};
 
 	ScrollableListBox.prototype.reflow = function(){
@@ -68,7 +62,6 @@ definition:function(){
 	};
 
 	var StretchListBox = Component('StretchListBox')(function StretchListBox(){
-			_.debug.log('Creating StretchListBox');
 		}
 	);
 

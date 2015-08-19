@@ -133,12 +133,52 @@ definition:function(){
 			this.elements.controlContainer.checked = false;	
 		}
 	};
+	
+	
+	var TextField = Component('TextField')(function TextField(){
+		UIControl.apply(this,arguments);
+
+		var self = this;
+		
+		var f = function(){
+			if(self.dataPath) {
+				self.dataItem[self.dataPath] = this.value;
+			}
+			else {
+				self.dataItem = {value:this.value};
+			}
+			self.onData(self.dataItem);
+		};
+
+		if(this.isRealTime){
+			this.elements.controlContainer.onkeyup = f;
+		}
+		else { 
+			this.elements.controlContainer.onchange = f;
+		}
+
+	}).extend(UIControl);
+	
+	TextField.prototype.onData = Event;
+		
+	TextField.prototype.dataIn = function(dataItem){
+		UIControl.prototype.dataIn.call(this,dataItem);
+		var value = this.dataItem[this.dataPath];
+		
+		if(value) this.elements.controlContainer.value = value;
+	};
+	
+	TextField.prototype.clear = function(){
+		this.elements.controlContainer.value = '';
+	};
+
 
 	//returning exports
 	return {
 		Button:	Button,
 		CheckBox: CheckBox,
-		RadioButton: RadioButton	
+		RadioButton: RadioButton,
+		TextField: 	TextField	
 	}
 
 }

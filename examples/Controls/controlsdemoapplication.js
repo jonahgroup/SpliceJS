@@ -138,7 +138,8 @@ definition: function(){
 
 
 	return {
-		ControlsDemoApplication:ControlsDemoApplication
+		DemoApplication 	: 	ControlsDemoApplication,
+		CrazyApplication	:	scope.templates['CrazyApplication']
 	}
 }
 

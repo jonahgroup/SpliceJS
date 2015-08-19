@@ -11,6 +11,7 @@ required:[
 ,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
 ,	{'Charts':'splice.controls/splice.controls.charts.js'}
 ,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
+,	{'DataControls':'splice.controls/splice.controls.treeview.js'}
 ,	{'Panels':'splice.controls/splice.controls.drawerpanel.js'}
 ,	{'Panels':'splice.controls/splice.controls.scrollpanel.js'}	
 ,	{'Panels':'splice.controls/splice.controls.viewpanel.js'}
@@ -20,16 +21,12 @@ required:[
 ,	{'Selectors':'splice.controls/splice.controls.selectors.js'}
 ,	{'Selectors':'splice.controls/splice.controls.datepicker.js'}
 ,	{'Selectors':'splice.controls/splice.controls.dropdownlist.js'}
-/*
-,	'splice.controls/splice.controls.codeeditor.js'
+,	{'Selectors':'splice.controls/splice.controls.calendar.js'}
+,	{'Navigation':'splice.controls/splice.controls.popup.js'}
+,	{'Navigation':'splice.controls/splice.controls.pageloader.js'}
+,	{'Editors':'splice.controls/splice.controls.codeeditor.js'}
+,	{'Buttons':  'splice.controls/splice.controls.slider.js'}
 
-,	'splice.controls/splice.controls.calendar.js'
-
-,	'splice.controls/splice.controls.treeview.js'
-,	'splice.controls/splice.controls.popup.js'
-,   'splice.controls/splice.controls.pageloader.js'
-,   'splice.controls/splice.controls.slider.js'
-*/
 ]
 , 	
 definition:function(){
@@ -43,48 +40,6 @@ definition:function(){
 	, 	UIControl = this.SpliceJS.UI.UIControl
 	,	Component = this.framework.Component;
 	
-	
-	
-	var TextField = Class(function TextField(){
-		UIControl.apply(this,arguments);
-
-		var self = this;
-		
-		var f = function(){
-			if(self.dataPath) {
-				self.dataItem[self.dataPath] = this.value;
-			}
-			else {
-				self.dataItem = {value:this.value};
-			}
-			self.onData(self.dataItem);
-		};
-
-		if(this.isRealTime){
-			this.elements.controlContainer.onkeyup = f;
-		}
-		else { 
-			this.elements.controlContainer.onchange = f;
-		}
-
-	}).extend(UIControl);
-	
-	TextField.prototype.onData = Event;
-		
-	TextField.prototype.dataIn = function(dataItem){
-		UIControl.prototype.dataIn.call(this,dataItem);
-		var value = this.dataItem[this.dataPath];
-		
-		if(value) this.elements.controlContainer.value = value;
-	};
-	
-	TextField.prototype.clear = function(){
-		this.elements.controlContainer.value = '';
-	};
-
-
-	
-
 
 	/*
 	 *	Image Selector
@@ -195,13 +150,14 @@ definition:function(){
 	return {
 		/* utility controls */
 		UIControl:			scope.SpliceJS.UI.UIControl,
-		TextField:			TextField,
 		DomIterator: 		DomIterator,
 		ImageSelector:  	ImageSelector,
 		/* buttons */
 		Button:				scope.Buttons.Button,
 		CheckBox:			scope.Buttons.CheckBox,
 		RadioButton:		scope.Buttons.RadioButton,
+		TextField:			scope.Buttons.TextField,
+		Slider:				scope.Buttons.Slider,
 		/* panels */
 		PullOutPanel: 		PullOutPanel,
 		DrawerPanel:		scope.Panels.DrawerPanel,
@@ -217,13 +173,21 @@ definition:function(){
 		DropDownSelector:	scope.Selectors.DropDownSelector,
 		DropDownList:		scope.Selectors.DropDownList,		
 		DatePicker:			scope.Selectors.DatePicker,
+		Calendar:			scope.Selectors.Calendar,
 		/* data controls */
 		DataTable:			scope.DataControls.DataTable,
 		ListBox:			scope.DataControls.ListBox,
 		ListItem:			scope.DataControls.ListItem,
 		ScrollableListBox:	scope.DataControls.ScrollableListBox,
 		StretchListBox:		scope.DataControls.StretchListBox,
-		GroupedListItem:	scope.DataControls.GroupedListItem
+		GroupedListItem:	scope.DataControls.GroupedListItem,
+		TreeView:			scope.DataControls.TreeView,
+		/* Navigation */
+		Popup:				scope.Navigation.Popup,
+		PageLoader:			scope.Navigation.PageLoader,
+		/* Editors */
+		CodeEditor:			scope.Editors.CodeEditor
+		
 	}
 
 // end module definition		

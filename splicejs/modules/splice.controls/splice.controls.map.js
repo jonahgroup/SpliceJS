@@ -2,6 +2,7 @@ _.Module({
 
 
 required:[
+	{'SpliceJS.UI':'../splice.ui.js'},
 	_.home('lib/leaflet-0.7.3/leaflet.css'),
 	_.home('lib/leaflet-0.7.3/leaflet-src.js'),
 	'splice.controls.map.css',
@@ -10,13 +11,19 @@ required:[
 
 definition:function(){
 
+	var Component = this.framework.Component
+	,	UIControl = this.SpliceJS.UI.UIControl;
 	
-	var Map = this.framework.Component('Map')(function Map(){
-		}
-	);
+	var Map = Component('Map')(function Map(){
+		UIControl.call(this);
+		
+		this.onDisplay.subscribe(this.display,this);
+			
+	}).extend(UIControl);
 
 
-	Map.prototype.onDisplay = function(){
+	Map.prototype.display = function(){
+		if(!this.elements.controlContainer.parentNode) return; 
 		if(this.isInitialized) return;
 
 		var mapID = 'drogozhkin.kgb6lfoc';
@@ -26,7 +33,7 @@ definition:function(){
 		this.elements.controlContainer.id = mapContainerId;
 		
 		/*WTF why are we still using ids?*/
-		var map = L.map(mapContainerId,{ trackResize:true}).setView([43.654, -79.387], 16);
+		var map = L.map(this.elements.controlContainer,{ trackResize:true}).setView([43.654, -79.387], 16);
 		L.tileLayer('http://{s}.tiles.mapbox.com/v3/'+mapID+'/{z}/{x}/{y}.png', {
 		    attribution:' ',
 		    //attribution: 'Imagery © <a href="http://mapbox.com">Mapbox</a>',

@@ -276,7 +276,7 @@ definition:function(){
 
 	    if (!CHART_MAP[ct]) throw 'Unable to locate component class for chart:' + ct;
 
-	    var c = _.Namespace.lookup(CHART_MAP[ct]);
+	    var c =CHART_MAP[ct];
 
 	    if (!c) throw 'Unable to locate component:' + c;
 

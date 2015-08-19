@@ -1,17 +1,20 @@
 _.Module({
 
 required:[
+	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.popup.html',
 	'splice.controls.popup.css'
 ]
 ,
 definition:function(){
 
-	var scope = this.scope;
+	var Component = this.framework.Component
+	,	UIControl = this.SpliceJS.UI.UIControl
+		
 
 
-	var Popup = _.Namespace('SpliceJS.Controls').Class(function Popup(){
-		SpliceJS.Controls.UIControl.call(this);
+	var Popup = Component('Popup')(function Popup(){
+		UIControl.call(this);
 
 		this.ratio = { width: 4, height: 3 };
 
@@ -19,14 +22,12 @@ definition:function(){
 		this.onDisplay.subscribe(this.display,this);
 		this.onAttach.subscribe(this.attach, this);
 
-	}).extend(SpliceJS.Controls.UIControl);
-
+	}).extend(UIControl);
 
 
 	Popup.prototype.attach = function () {
-
-
 	}
+
 
 	Popup.prototype.display = function () {
 	    var popup = this.elements['popup'];
@@ -73,6 +74,10 @@ definition:function(){
 	    }, 1);
 	};
 	
+
+	return {
+		Popup:Popup
+	}
 
 }
 

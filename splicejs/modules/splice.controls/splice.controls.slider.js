@@ -1,16 +1,21 @@
 ﻿_.Module({
 
     required: [
+        {'SpliceJS.UI':'../splice.ui.js'},
         'splice.controls.slider.css',
         'splice.controls.slider.html'
     ]
     ,
     definition:function(){
-
-        var Slider = _.Namespace('SpliceJS.Controls').Class(function Slider() {
-            SpliceJS.Controls.UIControl.call(this);
-
-            var self = this;
+        
+        /* framework imports */
+        var Component = this.framework.Component
+        ,   UIControl = this.SpliceJS.UI.UIControl
+        ,   DragAndDrop = this.SpliceJS.UI.DragAndDrop
+        
+        
+        var Slider = Component('Slider')(function Slider() {
+            UIControl.call(this);
 
             this.onAttach.subscribe(this.attach, this);
             this.onDisplay.subscribe(this.display, this);
@@ -24,8 +29,9 @@
             _.Event.attach(this.elements.rightThumb, 'onmousedown').subscribe(function (e) {
                 startMoveThumb.call(this, e, this.elements.rightThumb);
             }, this);
-        }).extend(SpliceJS.Controls.UIControl);
+        }).extend(UIControl);
 
+        
         //override reflow
         Slider.prototype.reflow = function () {
         }
@@ -51,12 +57,12 @@
         };
 
         function startMoveThumb(e, thumb) {
-            SpliceJS.Ui.DragAndDrop.startDrag();
+            DragAndDrop.startDrag();
 
             var origin = thumb.offsetLeft;
 
             var self = this;
-            SpliceJS.Ui.DragAndDrop.ondrag = function (p, offset) {
+            DragAndDrop.ondrag = function (p, offset) {
                 moveThumb.call(self,{ mouse: p, origin:origin, offset:offset, src:thumb});
             }
         }
@@ -65,6 +71,13 @@
             args.src.style.left = (args.origin + args.mouse.x - args.offset.x) + 'px';
             this.updateRangePosition();
         }
+
+        return {
+            
+            Slider:Slider
+            
+        }
+
 
     }
 

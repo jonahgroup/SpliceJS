@@ -101,11 +101,6 @@ definition:function(){
 	UIControl.prototype.dataOut = _.Event;
 	UIControl.prototype.onDataIn = _.Event;
 
-
-	UIControl.prototype.display = function(){
-		this.onDisplay();
-	}
-
 	/**
 	 * Called by the layout manager or a parent view when container dimensions changed and
 	 * layout update is required

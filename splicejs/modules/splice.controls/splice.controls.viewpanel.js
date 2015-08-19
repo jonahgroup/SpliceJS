@@ -8,8 +8,9 @@ required:[
 
 definition:function(){
 	
-	var UIControl = this.SpliceJS.UI.UIControl;
-
+	var UIControl = this.SpliceJS.UI.UIControl
+	,	Component = this.framework.Component
+	,	overlay = this.framework.display.overlay;
 
 	/**
 	 *	
@@ -17,7 +18,7 @@ definition:function(){
 	 * Allows transitioning between views
 	 */
 
-	var ViewPanel = this.framework.Component('ViewPanel')(function ViewPanel(){
+	var ViewPanel = Component('ViewPanel')(function ViewPanel(){
 		UIControl.call(this);
 	 	
 		this.viewInstances = [];
@@ -58,7 +59,8 @@ definition:function(){
 				
 		_.Doc.$(this.elements.panel2).position({left:contSize.width});
 
-		_.Doc.$(this.panels[this.activePanelIndex]).embed(this.viewInstances[0]);
+		overlay(this.viewInstances[0],this.panels[this.activePanelIndex]);
+		
 	};
 
 

@@ -163,7 +163,7 @@
 	
 
 </tr>
-<!--
+
 	
 <tr><td>Scroll panel</td>
 	<td>	
@@ -184,7 +184,7 @@
 		<div>
 			<sjs-include type="SpliceJS.Controls.Button">{
 				content:{label:'Switch View'},
-				onClick: _.Binding.From('switchView').Type('UserApplications.ControlsDemoApplication')
+				onClick: _.Binding.From('switchView').Type('ControlsDemoApplication')
 			}</sjs-include>
 		</div>
 		<div style="position:relative; width:400px; height:200px;">
@@ -240,7 +240,7 @@
 	
 
 </td></tr>
--->
+
 
 <tr><td><sjs-include type="SpliceJS.Controls.DatePicker"></sjs-include></td></tr>
 
@@ -303,10 +303,10 @@
 </sjs-template>
 
 
-<sjs-template type="UserApplications.CrazyApplication" tie="SpliceJS.Controls.UIControl">
+<sjs-template type="CrazyApplication">
 	<table><tr>
-		<td><sjs-include type="UserApplications.ControlsDemoApplication"></sjs-include></td>
-		<td><sjs-include type="UserApplications.ControlsDemoApplication"></sjs-include></td>
+		<td><sjs-include type="ControlsDemoApplication"></sjs-include></td>
+		<td><sjs-include type="ControlsDemoApplication"></sjs-include></td>
 	</tr></table>
 </sjs-template>
 

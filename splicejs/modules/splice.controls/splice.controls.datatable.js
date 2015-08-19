@@ -12,15 +12,16 @@ required:[
 definition:function(){
 	
 	
-	var Class = this.framework.Class;
-	var Event = this.framework.Event;
+	var Class = this.framework.Class
+	,	Event = this.framework.Event
+	,	Component = this.framework.Component;
 	
 	var UIControl = this.SpliceJS.UI.UIControl; 
 	
 	/**
 	 * DataTable
 	 * */
-	var DataTable = Class(function DataTable(args){
+	var DataTable = Component('DataTable')(function DataTable(args){
 		/* call parent constructor */
 		UIControl.apply(this,arguments);
 		

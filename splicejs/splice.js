@@ -2624,7 +2624,8 @@ function prepareImports(a, path){
 			},
 			Event : Event,
 			Controller: Controller,
-			Obj:Obj
+			Obj:Obj,
+			display:display,
 		}
 		
 		

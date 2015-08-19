@@ -1,34 +1,36 @@
 _.Module({
 required:[
-		'splice.controls.treeview.css'
+		{'SpliceJS.UI':'../splice.ui.js'}
+	,	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'}		
+	,	'splice.controls.treeview.css'
 	,	'splice.controls.treeview.html'
 ]
 ,
 definition:function(){
 
 	var scope = this;
+	var Component 	= this.framework.Component
+	,	Class 		= this.framework.Class
+	,	Event 		= this.framework.Event 
+	,	UIControl 	= this.SpliceJS.UI.UIControl
 
-	var TreeView = _.Namespace('SpliceJS.Controls').Class( function TreeView(){
-		SpliceJS.Controls.UIControl.call(this);	
-
+	var TreeView = Component('TreeView')( function TreeView(){
+		UIControl.call(this);	
 		this.onDataIn.subscribe(renderTree, this);
+	}).extend(UIControl);
 
-	}).extend(SpliceJS.Controls.UIControl);
 
-
-	var Tree = scope.Tree = _.Class(function Tree(){
-		SpliceJS.Controls.UIControl.call(this);
+	var Tree = Class(function Tree(){
+		UIControl.call(this);
 
 		this.onDataIn.subscribe(function(data){
 			this.elements.treeRoot.innerHTML = data;
 			this.onTreeRefresh();
 		},this);
 
-	}).extend(SpliceJS.Controls.UIControl);
+	}).extend(UIControl);
 
-	Tree.prototype.onTreeRefresh = _.Event;
-
-
+	Tree.prototype.onTreeRefresh = Event;
 
 
 	function renderTree(data){
@@ -75,10 +77,14 @@ definition:function(){
 		}
 		
 		return str;
-		
+	}
+	
+	/* module exports */
+	return {
+		TreeView : TreeView
 	}
 
 }
-
+	
 
 });
