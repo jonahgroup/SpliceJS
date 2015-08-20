@@ -66,6 +66,10 @@ definition: function(){
 		this.currentView2 = 0;
 
 		this.onDisplay.subscribe(this.display, this);
+		
+		this.onButtonClicked.subscribe(function(args){
+			console.log(args);
+		});
 	
 	}).extend(UIControl);
 
@@ -75,7 +79,10 @@ definition: function(){
 	ControlsDemoApplication.prototype.onListData   = _.Event;
 	ControlsDemoApplication.prototype.onSampleData = _.Event;
 	ControlsDemoApplication.prototype.onChartData  = _.Event;
-	ControlsDemoApplication.prototype.onFlipViews  = _.Event; 	
+	ControlsDemoApplication.prototype.onFlipViews  = _.Event;
+	ControlsDemoApplication.prototype.onButtonClicked = _.Event.transform(function(args){
+		return 'ha';
+	}); 	
 
 	ControlsDemoApplication.prototype.buttonClicked = function(){
 		_.debug.log('Button clicked HAHA');

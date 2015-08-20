@@ -460,8 +460,6 @@ var _ = (function(window, document){
 	SpliceJS Event Model
 
 */
-	
-	var Event = function Event(){};
 
 	function mousePosition(e){
         //http://www.quirksmode.org/js/events_properties.html#position
@@ -480,7 +478,7 @@ var _ = (function(window, document){
 		}
 
 		return {x:posx,y:posy};
-	}
+	};
 
 	
 	function domEventArgs(e){
@@ -493,14 +491,21 @@ var _ = (function(window, document){
             	e.__jsj_cancelled = true;
             }
 		}
-	}
+	};
 
-	Event.create = function(object, property, cancelBubble){
 
+	function Event(fn){
+		this.transformer = fn;
+	};
+	Event.prototype.transform = function(fn){
+		return new Event(fn);
+	};
+
+	Event.prototype.attach = function(object, property, cancelBubble){
 		
-
 		var callbacks = [[]], instances = [[]];
 		var cleanup = {fn:null, instance:null };
+		var transformer = this.transformer;
 
 		var MulticastEvent = function MulticastEvent(){
 			var idx = callbacks.length-1;
@@ -524,9 +529,12 @@ var _ = (function(window, document){
 					eventBreak = true;
 					break;
 				}
-				
-				cbak[i].apply(inst[i], arguments);
-
+				//pass arguments without transformation
+				if(!transformer)
+					cbak[i].apply(inst[i], arguments);
+				else { 
+					cbak[i].call(inst[i], transformer.apply(inst[i],arguments));
+				}	
 			}
 
 			if(!eventBreak && typeof cleanup.fn === 'function') {
@@ -632,9 +640,9 @@ var _ = (function(window, document){
 				
 		
 		return MulticastEvent;
+	
 	};
-	Event.attach = Event.create;
-
+	var EventSingleton = new Event();
 /*
 
 ----------------------------------------------------------
@@ -903,15 +911,7 @@ var _ = (function(window, document){
 				display(new template());
 			}
 		});
-		
-		
-
 	};
-
-	
-
-	
-
 
 	function boot(args){
 
@@ -923,11 +923,10 @@ var _ = (function(window, document){
 		}
 
 		return boot;
-	}
+	};
 
 
 	function toPath(obj, path){
-		
 		if(!path) return obj;
 
 		if(typeof obj === 'string'){
@@ -942,13 +941,10 @@ var _ = (function(window, document){
 			}
 			return obj;
 		}
-	}
+	};
 
 	function home(obj,path){
-
-
 		if(!path) path = configuration.SPLICE_HOME;
-
 		if(!obj) return path;
 
 		if(typeof obj === 'string'){
@@ -962,7 +958,6 @@ var _ = (function(window, document){
 			}
 			return obj;
 		}
-
 	};
 	
 	
@@ -979,7 +974,7 @@ var _ = (function(window, document){
 			separator = '.';
 		}
 		return {namespace:ns, name:parts[parts.length-1]};
-	}
+	};
 	
 
 
@@ -1673,13 +1668,7 @@ var _ = (function(window, document){
 		
 	};
 
-
-	
-
-
-
 	var Controller = function Controller(){
-
 
 		this.onDisplay.subscribe(function(){
 			if(!this.children) return;
@@ -1702,12 +1691,12 @@ var _ = (function(window, document){
 
 	};
 
-	Controller.prototype.onAttach 	= Event;
-	Controller.prototype.onDisplay 	= Event;
-	Controller.prototype.onDomChanged = Event;
+	Controller.prototype.onAttach 		= EventSingleton;
+	Controller.prototype.onDisplay 		= EventSingleton;
+	Controller.prototype.onDomChanged 	= EventSingleton;
 
 
-	Controller.prototype.onReflow = Event;
+	Controller.prototype.onReflow = EventSingleton;
 	Controller.prototype.reflow = function(position,size,bubbleup){
 
 		if(bubbleup == true) {
@@ -2235,8 +2224,8 @@ var _ = (function(window, document){
 
 
 		/* Initialize events where applicable */
-		if(dest.value() === Event )  { dest.instance[dest.path] 	= Event.create(); }
-		if(source.value() === Event) { source.instance[source.path] = Event.create(); }
+		if(dest.value() === Event )  { dest.instance[dest.path] 	= Event.attach(); }
+		if(source.value() === Event) { source.instance[source.path] = Event.attach(); }
 
 
 		/* Default binding mode is FROM */
@@ -2420,9 +2409,9 @@ var _ = (function(window, document){
 				
 			*/
 			for(var key in  obj){
-				if(obj[key] == Event){
+				if( obj[key] instanceof Event){
 					logging.debug.log('Found event object');
-					obj[key] = Event.create();
+					obj[key] = obj[key].attach();
 				}	
 			}	
 
@@ -2621,7 +2610,7 @@ function prepareImports(a, path){
 			Component : function(){
 				return Component.apply(scope,arguments);
 			},
-			Event : Event,
+			Event : EventSingleton,
 			Controller: Controller,
 			Obj:Obj,
 			display:display,
@@ -2785,7 +2774,7 @@ function prepareImports(a, path){
 		Obj : Obj,
 		Binding : Binding,
     	HttpRequest : HttpRequest,	
-		Event : Event,	
+		Event : EventSingleton,	
 		Module : Module,
 		
 		

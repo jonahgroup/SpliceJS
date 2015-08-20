@@ -47,7 +47,7 @@ definition:function(){
 		this.dataRows = [];
 		this.headerRow = null;
 
-		Event.create(window, 'onresize').subscribe(function(){self.reflow();});
+		Event.attach(window, 'onresize').subscribe(function(){self.reflow();});
 		
 	}).extend(UIControl);
 	
@@ -338,10 +338,6 @@ definition:function(){
 		}
 	}).extend(UIControl);
 	
-	DataTableRow.prototype.selectRow = function(){
-		_.debug.log('select row');
-	};
-	
 	DataTableRow.prototype.onDeleteClick = function(){
 		this.onDelete(this.data);
 	};
@@ -358,8 +354,6 @@ definition:function(){
 		if(this.onHighlightValue) {
 			var highlightValue = this.onHighlightValue();
 		}
-
-
 
 		for(var key in this.contentMap){
 			var node = this.contentMap[key];

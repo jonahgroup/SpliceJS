@@ -4,17 +4,23 @@
 
 <tr><td>Button</td>
 	<td>
+
 	<sjs-include type="SpliceJS.Controls.Button">{
 		content:{label:'Close'},
 		onClick: _.Binding('buttonClicked').Parent
 	}</sjs-include>
 
-
-
 	<sjs-include type="SpliceJS.Controls.Button">{
 		content:{label:'Sample'},
 		onClick: _.Binding('buttonClicked').Parent
 	}</sjs-include>
+
+	<sjs-include type="SpliceJS.Controls.Button">{
+		content:{label:'Event Transformer'},
+		onClick: _.Binding('onButtonClicked').Parent
+	}</sjs-include>
+
+
 
 	</td>
 </tr>

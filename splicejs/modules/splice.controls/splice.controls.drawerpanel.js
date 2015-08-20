@@ -34,15 +34,9 @@ definition:function(){
 
 
 	DrawerPanel.prototype.display = function(){
-		UIControl.prototype.onDisplay.call(this);
-
 		var openWidth = this.openWidth = this.elements.controlContainer.clientWidth * this.openTo;
-		
 		this.elements.drawer.style.left = (-1 * openWidth) + 'px';
-		
-
 		this.elements.drawer.className += ' -splicejs-left-transition';
-
 	};
 
 
