@@ -127,7 +127,7 @@ definition:function(){
 				}
 				break;
 			}
-			this.dataRows[j].dataIn(data[j]);
+			this.dataRows[j].dataIn(data[j], this.data_filter);
 		}
 				
 		/* add new rows*/
@@ -141,7 +141,7 @@ definition:function(){
 				
 				this.dataRows.push(dataRow);
 				
-				dataRow.dataIn(r);
+				dataRow.dataIn(r,this.data_filter);
 				
 				this.addDomRow(dataRow.concrete.dom);
 				domModified = true;
@@ -344,16 +344,11 @@ definition:function(){
 
 	DataTableRow.prototype.onHighlightValue = function(){};
 	
-	DataTableRow.prototype.dataIn = function(data){
+	DataTableRow.prototype.dataIn = function(data, filter_value){
 		
 		var textNodes = _.Doc.selectTextNodes(this.concrete.dom);
 		this.data = data;
 		
-
-		var highlightValue = null;
-		if(this.onHighlightValue) {
-			var highlightValue = this.onHighlightValue();
-		}
 
 		for(var key in this.contentMap){
 			var node = this.contentMap[key];
@@ -361,8 +356,8 @@ definition:function(){
 			
 			var value = data[key];
 			if(node){
-				if(highlightValue) {
-					node.innerHTML = splitHighlightValue(value,highlightValue);		
+				if(filter_value) {
+					node.innerHTML = splitHighlightValue(value,filter_value);		
 				} else {
 					node.innerHTML = value;
 				}
