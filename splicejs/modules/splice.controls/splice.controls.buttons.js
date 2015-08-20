@@ -8,7 +8,8 @@ required:[
 definition:function(){
 
 	var Class = this.framework.Class;
-	var Component = this.framework.Component;
+	var Component = this.framework.Component
+	,	Event = this.framework.Event;
 	var UIControl = this.SpliceJS.UI.UIControl;
 	
 	

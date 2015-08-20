@@ -1,3 +1,4 @@
+/* global _ */
 _.Module({
 	
 required:[
@@ -11,6 +12,10 @@ required:[
 
 definition:function(){
 	
+	function _if(obj){
+		if(!obj) return {};
+		return obj;
+	}
 	
 	var Class = this.framework.Class
 	,	Event = this.framework.Event
@@ -21,16 +26,24 @@ definition:function(){
 	/**
 	 * DataTable
 	 * */
-	var DataTable = Component('DataTable')(function DataTable(args){
+	var DataTable = Class(function DataTable(args){
 		/* call parent constructor */
 		UIControl.apply(this,arguments);
 		
 		var self = this;
 
-		this.dom = this.ref.scrollPanel.ref.tableBody.elements.dataTable;
-		this.elements.dataTable = this.ref.scrollPanel.ref.tableBody.elements.dataTable;
-		this.elements.columnHeaderTable = this.ref.scrollPanel.ref.tableHeader.elements.columnHeaderTable;
+		this.dom = this.ref.tableBody.elements.dataTable;
+		this.elements.dataTable = this.ref.tableBody.elements.dataTable;
+		
+		this.elements.columnHeaderTable = null; 
+		
+		if(this.ref.tableHeader)
+			this.elements.columnHeaderTable = this.ref.tableHeader.elements.columnHeaderTable;
 
+		/* temp data buffer */	
+		this.source_data = null;	
+
+		/* temp dom data hold */	
 		this.dataRows = [];
 		this.headerRow = null;
 
@@ -39,38 +52,63 @@ definition:function(){
 	}).extend(UIControl);
 	
 	
+	
+	DataTable.prototype.filterData = function(data_filter){
+		this.data_filter = data_filter;
+		_renderTable.call(this);
+	};
+	
+	DataTable.prototype.clearFilter = function(){
+		this.data_filter = null;	
+	
+	};
 
-	/*
-	 * Updating data model
-	 * - keep count of existing rows
-	 * - keep references to individual rows
-	 * - iterate over existing rows to update row's calling dataIn on the row object
-	 * - if new rows create new rows in the table 
-	 * 
-	 * */
-	DataTable.prototype.dataIn = function(dataInput){
+	function _applyFilter(){
+		/*
+			Apply search filters
+		*/
+		if(this.data_filter){
+			
+			var filtered_data = { headers:this.source_data.headers, data:[]};
+			var source_data = this.source_data.data;
+			
+			
+			for(var i=0; i < source_data.length; i++){
+				for(var j=0; j< source_data[i].length; j++){
+					var v = source_data[i][j]; 
+					if(!v) continue;	
+					if((v+'').indexOf(this.data_filter) > -1) { 
+						filtered_data.data.push(source_data[i]);
+						break;
+					}
+				}
+			}
+			return filtered_data;
+		}
+		return this.source_data;
+	};
+
+
+	function _renderTable(){
 		
-		var data 	= dataInput.data;
-		var headers = dataInput.headers;
+		var filtered = _applyFilter.call(this);
+		
+		var data 	= filtered.data;
+		var headers = filtered.headers;
 		
 		/* add columns */
 		if(headers instanceof Array) {
-			
 			if(this.headerRow) this.headerRow.dataIn(headers);
 			else {
 				/* custom header row content */
 				if(this.headerTemplate){
 					this.headerRow = new this.headerTemplate({parent:this});
 					this.headerRow.dataIn(headers);
-					
 					this.addDomHeader(this.headerRow.concrete.dom);
 				}
 				/* standard table header row */
 				else {
-					
-					
 					this.addDefaultHeader(headers);
-					
 				}
 			}
 		}
@@ -79,23 +117,18 @@ definition:function(){
 		/* data must be an array of objects */
 		if(!(data instanceof Array)) return;
 		
-		
 		/* udpate existing rows */
 		for(var j=0; j < this.dataRows.length; j++){
 			if(!data[j]){
 				/* remove extra dataRows and table rows*/
-				
 				for(var k=this.dataRows.length-1; k>=j; k--){
-					
 					this.removeRowByIndex(k+1); //!!!!! this is because of the header row
 					this.dataRows.splice(k,1);
 				}
-				
 				break;
 			}
 			this.dataRows[j].dataIn(data[j]);
 		}
-
 				
 		/* add new rows*/
 		var domModified = false;
@@ -109,7 +142,7 @@ definition:function(){
 				this.dataRows.push(dataRow);
 				
 				dataRow.dataIn(r);
-				if(! (dataRow.concrete instanceof SpliceJS.Modular.Concrete)) throw 'DataTable: rowTemplate type is invalid must be concrete';
+				
 				this.addDomRow(dataRow.concrete.dom);
 				domModified = true;
 
@@ -121,11 +154,23 @@ definition:function(){
 			this.addBodyRow(createDefaultRow(r));
 			domModified = true;
 		}
-
 		this.onDomChanged();
-
 		this.reflow();
+	};
 
+	/*
+	 * Updating data model
+	 * - keep count of existing rows
+	 * - keep references to individual rows
+	 * - iterate over existing rows to update row's calling dataIn on the row object
+	 * - if new rows create new rows in the table 
+	 * 
+	 * */
+	DataTable.prototype.dataIn = function(dataInput){
+		
+		this.source_data = dataInput;
+		_renderTable.call(this);		
+		
 	};
 	
 	
@@ -134,10 +179,8 @@ definition:function(){
 		for(var i=0; i< r.length; i++ ){
 			row.push(document.createTextNode(r[i]));
 		}
-
-
 		return row;	
-	}
+	};
 
 
 
@@ -146,7 +189,6 @@ definition:function(){
 	};
 	
 	DataTable.prototype.clear = function(){
-		
 	};
 	
 
@@ -185,11 +227,6 @@ definition:function(){
 		this.addRowTo(tHead, headers, true);
 	};
 
-
-	
-	
-	
-	
 	DataTable.prototype.addBodyRow = function(row){
 		
 		if(!row) return;
@@ -230,8 +267,6 @@ definition:function(){
 			/* element or text nodes only */
 			if(node.nodeType === 1) row.push(node);
 		}
-
-
 		/*
 			Data table gets cloned row
 		*/
@@ -243,8 +278,6 @@ definition:function(){
 		this.addHeaderRow(this.elements.dataTable, cloned);
 	};
 
-
-
 	DataTable.prototype.reflow = function(){
 		/* user offsetWidth it included border sizes */
 		/* 
@@ -254,19 +287,21 @@ definition:function(){
 		//this.elements.columnHeaderTable.style.width = this.elements.dataTable.offsetWidth  + 'px';
 		/* measure column sizes */
 		var body = this.elements.dataTable.tHead;
-		var head = this.elements.columnHeaderTable.tHead;
-		var wrapper = this.ref.scrollPanel.ref.tableBody.elements.tableWrapper;
+		var head = _if(this.elements.columnHeaderTable).tHead;
+		var wrapper = this.ref.tableBody.elements.tableWrapper;
 
 
 		if(!body) return; //empty table no records were added
 
-		if(body.clientWidth < wrapper.clientWidth)
-			this.elements.dataTable.style.width = wrapper.clientWidth + 'px';
-
-		this.ref.scrollPanel.reflow();
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEEDS TO WORK WITH CALCULATED STYLES 
+		if(body.clientWidth < wrapper.clientWidth) {
+			this.elements.dataTable.style.width = (wrapper.clientWidth - 1)  + 'px';
+		}
+		
+		// we are using scroll panel, reflow
+		if(this.ref.scrollPanel) this.ref.scrollPanel.reflow();
+		
 		if(!body || !head) return;
-		
-		
 
 		var cells = body.rows[0].cells;
 		for(var i=0; i< cells.length; i++){
@@ -278,11 +313,7 @@ definition:function(){
 				 - style.padding.left.value 
 				 - style.padding.right.value) + 'px';
 		}
-		
 	};
-
-
-
 
 	
 	var DataTableRow =  Class(function DataTableRow(args){
@@ -355,9 +386,22 @@ definition:function(){
 	}
 
 
+	/* DataTable variants */
+	var CustomScrollDataTable = Component('CustomScrollDataTable')(DataTable);
+	var NoScrollDataTable = Component('NoScrollDataTable')(DataTable);
+	
+	var _DataTable = function _DataTable(args){
+		
+		if(args.scroll === 'no') return new NoScrollDataTable(args);
+		return new CustomScrollDataTable(args);
+		
+	};
+
+
+
 	//module exports
 	return {
-		DataTable: DataTable,
+		DataTable: _DataTable,
 		DataTableRow: DataTableRow
 	}
 

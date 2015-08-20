@@ -1,21 +1,30 @@
-<sjs-template  type="DataTable">
+<sjs-template  type="CustomScrollDataTable">
 	<div class="-splicejs-datatable-root" style="position:relative;" data-sjs-element="controlContainer">
 		<sjs-include type="SpliceJS.Controls.ScrollPanel">{
 			ref:'scrollPanel',
 			content:{
 				scrollContent:<sjs-include type="DataTableBody">{
-					ref:'tableBody'
+					ref:_.Binding('tableBody').Type('CustomScrollDataTable')
 				}</sjs-include>,
 				staticContent:<sjs-include type="DataTableHeader">{
-					ref:'tableHeader'
+					ref:_.Binding('tableHeader').Type('CustomScrollDataTable')
 				}</sjs-include>
 			}
 		}</sjs-include>
 	</div>
 </sjs-template>
 
+
+<sjs-template  type="NoScrollDataTable">
+	<div class="-splicejs-datatable-root" style="position:relative;" data-sjs-element="controlContainer">
+		<sjs-include type="DataTableBody">{ref:'tableBody'}</sjs-include>
+		<sjs-include type="DataTableHeader">{ref:'tableHeader'}</sjs-include>
+	</div>
+</sjs-template>
+
+
 <sjs-template type="DataTableHeader">
-	<div class="-splicejs-datatable-headercontainer" style="position:absolute; z-index:10;">
+	<div class="-splicejs-datatable-headercontainer" style="position:absolute; z-index:10; top:0px; left:0px;">
 		<table class="-splicejs-datatable" data-sjs-element="columnHeaderTable"></table>
 	</div>
 </sjs-template>

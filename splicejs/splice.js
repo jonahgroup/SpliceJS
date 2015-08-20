@@ -1220,18 +1220,17 @@ var _ = (function(window, document){
 		//locate template by name
 		var template = null;
 		if(template_name) template = this.templates[template_name].template;
-		
 			
 		var scope = this;		
-		return function(fn){
-			var	c = createComponent(Class(fn),template,scope); 
-			return scope[getFunctionName(fn)] = c;
-		}
-	}		
-	
 
-	
-	
+		return function(fn){
+			var component_name = template_name;
+			if(!component_name) component_name = getFunctionName(fn);
+			
+			var	c = createComponent(Class(fn),template,scope); 
+			return scope[component_name] = c;
+		}
+	};		
 	
 	function Iterator(collection){
 		this.data = collection;
