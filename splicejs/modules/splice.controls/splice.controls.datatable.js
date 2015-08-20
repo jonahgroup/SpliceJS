@@ -370,6 +370,7 @@ definition:function(){
 	DataTableRow.prototype.dataOut = Event;
 
 	function splitHighlightValue(value,hv){
+				
 		if(value == null || value == undefined) return value;
 		return value.replace(new RegExp(hv,'gi'),'<span class="-search-result-highlight">'+hv+'</span>');
 	}

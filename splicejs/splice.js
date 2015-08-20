@@ -529,11 +529,26 @@ var _ = (function(window, document){
 					eventBreak = true;
 					break;
 				}
+				
+				//invocation parameters
+				var _args = arguments;
+				var _callback = cbak[i].callback;
+				var _inst = inst[i];
+				
 				//pass arguments without transformation
-				if(!transformer)
-					cbak[i].apply(inst[i], arguments);
-				else { 
-					cbak[i].call(inst[i], transformer.apply(inst[i],arguments));
+				if(!transformer) {
+					if(cbak[i].is_async) {
+						setTimeout(function(){_callback.apply(_inst, _args);},1);
+					}
+					else 
+						_callback.apply(_inst, _args);
+				}
+				else {
+					if(cbak[i].is_async) {
+						setTimeout(function(){_callback.call(_inst, transformer.apply(_inst,_args));},1)
+					}
+					else 
+						_callback.call(_inst, transformer.apply(_inst,_args));
 				}	
 			}
 
@@ -551,7 +566,7 @@ var _ = (function(window, document){
 			"This" keyword migrates between assigments
 			important to preserve the original instance
 		*/
-		MulticastEvent.subscribe = function(callback, instance){
+		MulticastEvent.subscribe = function(callback, instance, is_async){
 			if(!callback) return;
 			if(typeof callback !== 'function') throw 'Event subscriber must be a function';
 
@@ -559,9 +574,13 @@ var _ = (function(window, document){
 
 			var idx = callbacks.length-1;
 			
-			callbacks[idx].push(callback);
+			callbacks[idx].push({callback:callback,is_async:is_async});
 			instances[idx].push(instance);
 			return this;
+		};
+		
+		MulticastEvent.subscribeAsync = function(callback,instance){
+			this.subscribe(callback,instance,true);	
 		};
 
 		MulticastEvent.unsubscribe = function(callback){

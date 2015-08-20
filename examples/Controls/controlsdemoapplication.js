@@ -65,9 +65,9 @@ definition: function(){
 		this.currentView = 0;
 		this.currentView2 = 0;
 
-		this.onDisplay.subscribe(this.display, this);
+		this.onDisplay.subscribeAsync(this.display, this);
 		
-		this.onButtonClicked.subscribe(function(args){
+		this.onButtonClicked.subscribeAsync(function(args){
 			console.log(args);
 		});
 	
