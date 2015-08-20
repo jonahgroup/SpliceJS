@@ -146,10 +146,7 @@
 
 <td rowspan="2">Map</td>
 <td rowspan="2"> <div style="position:relative; width:400px; height:400px;">
-	<sjs-include>{
-		ref:'map',
-		type: 'SpliceJS.Controls.Map'
-	}</sjs-include>
+	<sjs-include type="SpliceJS.Controls.Map" ref="map"></sjs-include>
 	</div>
 </td>
 
@@ -165,17 +162,13 @@
 	}</sjs-include>
 
 	</td>
-
-	
-
 </tr>
 
 	
 <tr><td>Scroll panel</td>
 	<td>	
 	<div style="position:relative; width:400px; height:200px;">
-	<sjs-include type="SpliceJS.Controls.ScrollPanel">{
-		ref:	'scrollPanel',
+	<sjs-include type="SpliceJS.Controls.ScrollPanel" ref="scrollPanel">{
 		content:{
 			scrollContent: <sjs-include>{type:'SampleContent'}</sjs-include>,
 			staticContent: ''
@@ -194,8 +187,7 @@
 			}</sjs-include>
 		</div>
 		<div style="position:relative; width:400px; height:200px;">
-			<sjs-include type="SpliceJS.Controls.ViewPanel">{
-				ref:'viewPanel',
+			<sjs-include type="SpliceJS.Controls.ViewPanel" ref="viewPanel">{
 				views:[	
 					{key:'map',view:<sjs-include>{type:'SpliceJS.Controls.Map'}</sjs-include>},
 					{key:'list',view:<sjs-include>{type:'LocalList'}</sjs-include>}
@@ -260,7 +252,7 @@
 </sjs-template>
 
 
-<sjs-template type="PlainButton" tie="SpliceJS.Controls.Button"> 
+<sjs-template type="PlainButton" controller="SpliceJS.Controls.Button"> 
 	<div data-sjs-element="controlContainer">
 		<div>@icon</div>
 		<div>@label</div>

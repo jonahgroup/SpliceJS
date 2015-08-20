@@ -2031,16 +2031,26 @@ var _ = (function(window, document){
 
 
 	function handle_SJS_INCLUDE(node, parent, replace){
-		var type = node.getAttribute('type'),
-			json = '';
-
+		var type_attr = node.getAttribute('type')
+		,	ref_attr = node.getAttribute('ref')
+		,	json = '';
+		if(!ref_attr) ref_attr = '';
+		if(ref_attr) { 
+			if(ref_attr.indexOf('_.') == 0)
+				ref_attr = 'ref:' + ref_attr;
+			else { 
+				ref_attr = 'ref: \'' + ref_attr + '\'';
+			}
+		}
 		var idx = node.innerHTML.indexOf('{');
 		if( idx < 0){
-			json = '_.Obj.call(scope,{type:\''+type+'\'})';
+			if(ref_attr) ref_attr = ',' + ref_attr;
+			json = '_.Obj.call(scope,{type:\''+type_attr+'\''+ ref_attr+' })';
 		}
 			
 		else {	
-			json = '_.Obj.call(scope,{type:\''+type+'\','+
+			if(ref_attr) ref_attr = ref_attr + ',';
+			json = '_.Obj.call(scope,{type:\''+type_attr+'\',' + ref_attr +
 			node.innerHTML.substring(idx+1)
 			+')'
 		}
