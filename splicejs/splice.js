@@ -567,7 +567,7 @@ var _ = (function(window, document){
 			"This" keyword migrates between assigments
 			important to preserve the original instance
 		*/
-		MulticastEvent.subscribe = function(callback, instance, is_async){
+		MulticastEvent.subscribe = function(callback, instance){
 			if(!callback) return;
 			if(typeof callback !== 'function') throw 'Event subscriber must be a function';
 
@@ -575,13 +575,22 @@ var _ = (function(window, document){
 
 			var idx = callbacks.length-1;
 			
-			callbacks[idx].push({callback:callback,is_async:is_async});
+			callbacks[idx].push({callback:callback,is_async:false});
 			instances[idx].push(instance);
 			return this;
 		};
 		
 		MulticastEvent.subscribeAsync = function(callback,instance){
-			this.subscribe(callback,instance,true);	
+			if(!callback) return;
+			if(typeof callback !== 'function') throw 'Event subscriber must be a function';
+
+			if(!instance) instance = this;
+
+			var idx = callbacks.length-1;
+			
+			callbacks[idx].push({callback:callback,is_async:true});
+			instances[idx].push(instance);
+			return this;
 		};
 
 		MulticastEvent.unsubscribe = function(callback){
@@ -792,8 +801,6 @@ var _ = (function(window, document){
 
 	Binding.Value = function(obj){
 
-		
-
 		return {
 			set : function(value, path){
 
@@ -806,7 +813,6 @@ var _ = (function(window, document){
 				if(obj) {
 					obj[nPath[nPath.length-1]] = value;
 				}
-
 			},
 
 			get : function(path){
@@ -919,18 +925,15 @@ var _ = (function(window, document){
 			LoadingWatcher.url =url;	
 		}
 		
-		
+		// boot module		
 		Module({
-			
 			required:BOOT_SOURCE,
 			definition:function(){
 				var scope = this;
-				var template = constructTemplate(mainPageHtml);
-				template.declaration = {type:'MainPage'}; 
-				
-				template = compileTemplate.call(scope,template);
-								
-				display(new template());
+				var _Template = constructTemplate(mainPageHtml);
+				_Template.declaration = {type:'MainPage'}; 
+				_Template = compileTemplate.call(scope,_Template);
+				display(new _Template());
 			}
 		});
 	};
@@ -1287,9 +1290,6 @@ var _ = (function(window, document){
 		if(!this.onitemloaded) this.onitemloaded = function(){}; //noop
 	
 	};
-	
-
-
 
 	Loader.loaders = new Array();
 	
@@ -1320,6 +1320,9 @@ var _ = (function(window, document){
 		var relativeFileName = filename; 
 		filename = absPath(filename);
 
+		//tell Splice what is loading
+		watcher.notify({name:relativeFileName, url:filename});
+
 		/*
 		 * */
 
@@ -1328,19 +1331,18 @@ var _ = (function(window, document){
 			endsWith(filename, FILE_EXTENSIONS.template) 	|| 
 			endsWith(filename, FILE_EXTENSIONS.route) )
 		if(URL_CACHE[filename] === true){
-			logging.debug.log('File ' + filename + ' is already loaded, skipping...');
-			loader.progress--; 
-			LOADER_PROGRESS.complete++;
-			loader.loadNext(watcher);
+			setTimeout(function(){
+				logging.debug.log('File ' + filename + ' is already loaded, skipping...');
+				loader.progress--; 
+				LOADER_PROGRESS.complete++;
+				loader.loadNext(watcher)
+			},1);
 			return;
 		}
 		
 		logging.debug.log('Loading: ' + filename);
 		
 		var head = document.getElementsByTagName('head')[0];
-		
-		//tell Splice what is loading
-		watcher.notify({name:relativeFileName, url:filename});
 		
 		
 		/*
@@ -1382,9 +1384,10 @@ var _ = (function(window, document){
 		 * Load javascript files
 		 * */
 		if(endsWith(filename, FILE_EXTENSIONS.javascript)) {
-			/*
+
+		
+			//document script loader			
 			var script = document.createElement('script');
-			
 			script.setAttribute("type", "text/javascript");
 			script.setAttribute("src", filename);
 			
@@ -1398,23 +1401,26 @@ var _ = (function(window, document){
 				}
 			};
 			head.appendChild(script); 
-			*/
+			
+		/*	
+		//geval script loader	
 			HttpRequest.get({
 				url: filename,
 				onok:function(response){
-					URL_CACHE[filename] = true;
+					
 					try {
 						geval(response.text);
 					} catch(ex){
 						throw ex;
 					}
+					URL_CACHE[filename] = true;
+					loader.onitemloaded();
 					loader.progress--; 
 					LOADER_PROGRESS.complete++;
 					loader.loadNext(watcher);
 				}
 			});
-			
-			
+		*/	
 			return;
 		}
 		
@@ -1513,6 +1519,7 @@ var _ = (function(window, document){
 		logging.debug.log('Nested loading...');
 		var loader = new Loader(resources, function(){
 			Loader.loaders.pop();
+			
 			if(typeof(oncomplete)  === 'function') oncomplete();
 			
 			var queuedLoader = 	peek(Loader.loaders);
@@ -1754,6 +1761,10 @@ var _ = (function(window, document){
 		
 		linkupEvents(instance);
 		
+		
+		/*	todo: supress exceptions
+		 	ignore binding error
+		 */
 		bindDeclarations(parameters, instance, scope );
 			
 		var result = fn.call(instance,parameters);
@@ -2361,7 +2372,7 @@ var _ = (function(window, document){
 			if(typeof source.value() !== 'function') 
 				throw 'Cannot establish binding between \''+ key + '\' and \'' + binding.prop + '\'. Check that properties are of types \'function\'';
 
-			dest.instance[dest.path].subscribeAsync(source.value(), source.instance);
+			dest.instance[dest.path].subscribe(source.value(), source.instance);
 
 			return;
 		}

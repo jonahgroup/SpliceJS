@@ -6,9 +6,8 @@ required:[
 	{'SpliceJS.UI':'splice.ui.js'}
 ,	'splice.controls/splice.controls.css'
 ,  	'splice.controls/splice.controls.html'
-
-,  	{'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	{'Controllers':'splice.controls/splice.controls.controllers.js'}
+,  	{'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
 ,	{'Charts':'splice.controls/splice.controls.charts.js'}
 ,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
@@ -54,20 +53,13 @@ definition:function(){
 		if(this.height) container.height = this.height;
 
 		if(this.src) this.elements.controlContainer.src = this.src;
-
 	});
 
 	ImageSelector.prototype.dataIn = function(dataItem) {
 		if(!this.dataPath) return;
 
 		this.elements.controlContainer.src = dataItem[this.dataPath];
-
 	};
-
-
-
-
-
 
 
 	var PullOutPanel = Class( function PullOutPanel(){
@@ -82,7 +74,6 @@ definition:function(){
 	PullOutPanel.prototype.open = function(){
 		this.elements.controlContainer.style.left = '0px';
 		this.onOpen();
-
 	};
 
 	PullOutPanel.prototype.close = function(){

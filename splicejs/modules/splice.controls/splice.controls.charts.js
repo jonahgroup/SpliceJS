@@ -107,16 +107,16 @@ definition:function(){
 	Chart.prototype.measureData = function(d3){
 		
 
-		this.dM.max = d3.max(_.data(this.dataItem).to(function(item){
-			return d3.max(item.data)
+		this.dM.max = d3.max(_.data(this.dataItem).to(function(k,v){
+			return d3.max(v.data)
 		}).result);
 
-		this.dM.min = d3.min(_.data(this.dataItem).to(function (item) {
-		    return d3.min(item.data);
+		this.dM.min = d3.min(_.data(this.dataItem).to(function (k,v) {
+		    return d3.min(v.data);
 		}).result);
 
-		this.dM.count = d3.max(_.data(this.dataItem).to(function(item){
-			return item.data.length;
+		this.dM.count = d3.max(_.data(this.dataItem).to(function(k,v){
+			return v.data.length;
 		}).result);
 
 

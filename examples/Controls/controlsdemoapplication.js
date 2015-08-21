@@ -41,10 +41,9 @@ definition: function(){
 
 	var sampleTableData = {
 			headers: sampleChartData.labels,
-			data: _.data(sampleChartData.datasets).to(function(item){
-				var v = _.data(item.data).to().result;
-				v.splice(0,0,item.label);
-				return v;
+			data: _.data(sampleChartData.datasets).to(function(k,v){
+				var val = _.data(v.data).to().result;
+				return val;
 			}).result,
 	}
 

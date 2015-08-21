@@ -1,11 +1,16 @@
+/* global _*/
 _.Module({
+
 required:[
 	{'SpliceJS.UI':_.home('modules/splice.ui.js')}
 ],
+
+
 definition:function(){
 
 	var Component = this.framework.Component
 	,	Controller = this.framework.Controller;
+	
 	
 	var DomIterator = Component(null)( function DomIterator(args){
 
@@ -81,8 +86,11 @@ definition:function(){
 			this.container.removeChild(this.conc[i].concrete.dom);
 			this.conc.splice(i,1);
 		}	
+	};
 
-	}
+	
+	
+	
 	return {
 		DomIterator:DomIterator
 	}	
