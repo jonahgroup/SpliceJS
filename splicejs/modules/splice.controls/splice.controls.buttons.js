@@ -1,3 +1,4 @@
+/* global _ */
 _.Module({
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
@@ -164,9 +165,12 @@ definition:function(){
 		
 	TextField.prototype.dataIn = function(dataItem){
 		UIControl.prototype.dataIn.call(this,dataItem);
-		var value = this.dataItem[this.dataPath];
+		var value = null;
+		if(this.dataPath) value = this.dataItem[this.dataPath];
+		else value = dataItem;
 		
-		if(value) this.elements.controlContainer.value = value;
+		if(value!=null && value != undefined) 
+			this.elements.controlContainer.value = value;
 	};
 	
 	TextField.prototype.clear = function(){

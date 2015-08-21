@@ -141,7 +141,7 @@ definition:function(){
 	};
 */
 
-UIControl.prototype.applyCSSRules = function(){}
+	UIControl.prototype.applyCSSRules = function(){}
 	UIControl.prototype.applyCSSRules_NOOP = function(key, override){
 		var scope = this.scope, 
 			localRules = null, 
@@ -282,8 +282,6 @@ UIControl.prototype.applyCSSRules = function(){}
 	    
 		//array of DOM elements that track drop event
 	    trackers:null,
-		
-	    
 	    
 	    startDrag:function(elementnode, event){
 	    	
@@ -295,13 +293,9 @@ UIControl.prototype.applyCSSRules = function(){}
 			var p = Positioning.mousePosition(event);
 			
 			this.offset = {x:p.x,y:p.y};
-					
-			
 			
 			document.body.onmousemove = function(event) {DragAndDrop.drag(event);	};	
 			document.body.onmouseup   = function(event) {DragAndDrop.stopdrag(event);	}; 	
-
-			
 			
 			// event.preventDefault();
 	        this.onpickup(p);
@@ -353,14 +347,31 @@ UIControl.prototype.applyCSSRules = function(){}
             element.unselectable = "off";
             element.style.MozUserSelect = "all";
             
-		},
-	        
-       
-};
+		}
+	};
+
+	/**
+	 * Global KeyListener
+	 * 
+	 */
+	var KeyListener = Class(function KeyListener(){
+		
+			Event.attach(window, 'onkeydown').subscribe(
+			function(args){
+				switch(args.keyCode){
+					case 27: this.onEsc(); break;
+					case 13: this.onEnter(); break;
+				}
+			}, this);
+	});
+
+	KeyListener.prototype.onEsc = Event;
+	KeyListener.prototype.onEnter = Event;
 
 	//module exports
 	return {
 		UIControl:	 UIControl,
+		KeyListener: KeyListener,
 		//singletons
 		Positioning: Positioning,
 		DragAndDrop: DragAndDrop

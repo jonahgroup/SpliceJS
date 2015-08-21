@@ -42,6 +42,7 @@ var _ = (function(window, document){
 		}
 	};
 
+	var geval = eval; 
 	/** 
 	 *	
 	 */
@@ -704,7 +705,9 @@ var _ = (function(window, document){
 		
 	};
 	
-	
+	/**
+	 *	@scope|Namespace - component scope 
+	 */
 	Binding.prototype.getTargetInstance = function(originInstance, scope){
 
 		switch(this.type){
@@ -1379,6 +1382,7 @@ var _ = (function(window, document){
 		 * Load javascript files
 		 * */
 		if(endsWith(filename, FILE_EXTENSIONS.javascript)) {
+			/*
 			var script = document.createElement('script');
 			
 			script.setAttribute("type", "text/javascript");
@@ -1394,6 +1398,23 @@ var _ = (function(window, document){
 				}
 			};
 			head.appendChild(script); 
+			*/
+			HttpRequest.get({
+				url: filename,
+				onok:function(response){
+					URL_CACHE[filename] = true;
+					try {
+						geval(response.text);
+					} catch(ex){
+						throw ex;
+					}
+					loader.progress--; 
+					LOADER_PROGRESS.complete++;
+					loader.loadNext(watcher);
+				}
+			});
+			
+			
 			return;
 		}
 		
@@ -1676,7 +1697,11 @@ var _ = (function(window, document){
 				invoke component constructor
 			*/
 			parameters._includer_scope = scope;
-			return new obj(parameters);	
+			
+			if(!obj.isComponent) 
+				return instantiate(obj, parameters);
+			else
+				return new obj(parameters);	
 		}
 		
 		Proxy.type 			= args.type;
@@ -1686,6 +1711,57 @@ var _ = (function(window, document){
 		return Proxy;
 		
 	};
+
+	function linkupEvents(obj){
+		for(var key in  obj){
+			if( obj[key] instanceof Event){
+				logging.debug.log('Found event object');
+				obj[key] = obj[key].attach();
+			}	
+		}				
+	};
+	
+	
+	function bindDeclarations(parameters, instance, scope){
+		if(!parameters) return;
+
+		var keys = Object.keys(parameters);
+		for(var k=0; k< keys.length; k++) {
+		
+			var key = keys[k];
+
+			if(key === 'ref') 		continue;
+			if(key === 'content') 	continue; //content is processed separately
+			
+			if(parameters[key] instanceof Binding) {
+				try {
+					resolveBinding(parameters[key], instance, key, scope);
+				} catch(ex){}
+				
+				continue;
+			}
+		
+			/* default property assignment */
+			instance[key] = parameters[key];
+		}
+	};
+
+	function instantiate(fn, parameters){
+		var instance = Object.create(fn.prototype);
+		var scope = parameters._includer_scope;
+		
+		configureHierarchy.call(scope,instance,parameters);
+		
+		linkupEvents(instance);
+		
+		bindDeclarations(parameters, instance, scope );
+			
+		var result = fn.call(instance,parameters);
+		// constructor returns override defaults
+		if(result) return result;
+		return instance;
+	};
+
 
 	var Controller = function Controller(){
 
@@ -1948,12 +2024,18 @@ var _ = (function(window, document){
 		for(var i=0; i < anchors.length; i++){
 			
 			var childId = anchors[i].getAttribute('data-sjs-child-id');
-			var proxy 	= this.children[childId];
+			var _Proxy 	= this.children[childId];
 			
 			
-			var c_instance = new proxy({parent:tieInstance, parentscope:scope});
+			var c_instance = new _Proxy({parent:tieInstance, parentscope:scope});
 			
-			var exportDom = c_instance.concrete.export();
+			/* no document structure to return */
+			if(!c_instance.concrete) {
+				anchors[i].parentNode.removeChild(anchors[i]);
+				continue;				
+			}
+			
+			var exportDom = c_instance.concrete.export();			
 			
 			/*multiple child nodes*/
 			if(exportDom instanceof Array) {
@@ -2253,8 +2335,8 @@ var _ = (function(window, document){
 
 
 		/* Initialize events where applicable */
-		if(dest.value() === Event )  { dest.instance[dest.path] 	= Event.attach(); }
-		if(source.value() === Event) { source.instance[source.path] = Event.attach(); }
+		if(dest.value() instanceof Event )  { dest.instance[dest.path] 	= Event.attach(); }
+		if(source.value() instanceof Event) { source.instance[source.path] = Event.attach(); }
 
 
 		/* Default binding mode is FROM */
@@ -2279,7 +2361,7 @@ var _ = (function(window, document){
 			if(typeof source.value() !== 'function') 
 				throw 'Cannot establish binding between \''+ key + '\' and \'' + binding.prop + '\'. Check that properties are of types \'function\'';
 
-			dest.instance[dest.path].subscribe(source.value(), source.instance);
+			dest.instance[dest.path].subscribeAsync(source.value(), source.instance);
 
 			return;
 		}
@@ -2390,21 +2472,21 @@ var _ = (function(window, document){
 		}
 
 		throw 'Invalid [ref] value, must be a string or an instance of Binding';
-	}
+	};
 
 	
 	/** 
 	 * 
-	 * @tie controller type function
+	 * @controller controller type function
 	 * 
 	 * @template template object
 	 * 
-	 * @module is a scope object where modules have been declared
+	 * @scope is a Namespace object where modules have been declared
 	 * used for resolving references to local-scoped templates
 	 * when invoked by parent, module points to the parent's context
 	 * 
 	 * */
-	function createComponent(tie, template, scope){
+	function createComponent(controller, template, scope){
 		/*
 		 * Component function is assigned to the variable of the same name
 		 * "Component" because otherwise in IE8 instanceof operation on "this"
@@ -2418,83 +2500,45 @@ var _ = (function(window, document){
 			
 			var args = args || {};
 			
-			var obj = Object.create(tie.prototype);
-			obj.constructor = tie;
+			var obj = Object.create(controller.prototype);
+			obj.constructor = controller;
 			
 			
 			obj.ref = {};
 			obj.elements = {};
 			obj.children = [];
+			obj.scope = scope;
 			
 			/* 
 			 * assign reference to a parent and 
 			 * append to children array
 			 * */
-			configureHierarchy.call(scope,obj,args);
-			
+			configureHierarchy.call(args._includer_scope,obj,args);
 
 			/*
 				Auto-creating event casters
-				
 			*/
-			for(var key in  obj){
-				if( obj[key] instanceof Event){
-					logging.debug.log('Found event object');
-					obj[key] = obj[key].attach();
-				}	
-			}	
+			linkupEvents(obj);
 
-
-			obj.scope = scope;	
-
-			
 			/*
 				Instantiate Template
 			*/
-
 			if(template)
 			obj.concrete = template.getInstance(obj, args, scope);
 
 
-
 			/*
 			 * Bind declarative parameters
-			 *
 			 */
-			var tieInstance = obj; 
-			var parameters = args;
-			if(parameters) {
+			bindDeclarations(args, obj, args._includer_scope);
 
-				var keys = Object.keys(parameters);
-				for(var k=0; k< keys.length; k++) {
-				
-					var key = keys[k];
-
-					if(key === 'ref') 		continue;
-					if(key === 'content') 	continue; //content is processed separately
-					
-					if(parameters[key] instanceof Binding) {
-						resolveBinding(parameters[key], tieInstance, key, args._includer_scope);
-						continue;
-					}
-				
-					/* default property assignment */
-					tieInstance[key] = parameters[key];
-				}
-			}
-
-
-
-			tie.apply(obj, [args]);
-
-			
-			if(obj.applyCSSRules) obj.applyCSSRules();
+			controller.apply(obj, [args]);
 
 			return obj; 
 			
 		};
 		
-		if(tie) Component.base = tie.base;
+		if(controller) Component.base = controller.base;
 		
 		/* fill for extending classes */
 		Component.call = function(_this){
@@ -2504,14 +2548,14 @@ var _ = (function(window, document){
 					args[i] = arguments[i];
 				}
 			}
-			tie.apply(_this,args);
+			controller.apply(_this,args);
 		};
 
 		Component.isComponent = true;
 		Component.template = template;
-		Component.tie = tie;
-		Component.prototype = tie.prototype;
-		Component.constructor = tie;
+		Component.tie = controller;
+		Component.prototype = controller.prototype;
+		Component.constructor = controller;
 		
 		Component.extend = function(base){
 			if(!base) throw 'Can\'t extend the undefined or null base constructor';

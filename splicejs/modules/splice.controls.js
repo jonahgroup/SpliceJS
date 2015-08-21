@@ -8,6 +8,7 @@ required:[
 ,  	'splice.controls/splice.controls.html'
 
 ,  	{'Buttons':'splice.controls/splice.controls.buttons.js'}
+,	{'Controllers':'splice.controls/splice.controls.controllers.js'}
 ,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
 ,	{'Charts':'splice.controls/splice.controls.charts.js'}
 ,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
@@ -66,62 +67,6 @@ definition:function(){
 
 
 
-	var DomIterator = Component(null)( function DomIterator(args){
-
-		this.conc = [];
-
-		this.dom = null; 
-		if(args && args.dom) this.dom = args.dom;
-
-		var self = this;
-
-		this.template = args.dom;
-		this.container = document.createElement('span');
-
-/*
-		for(var i = 0; i < 100; i++ ){
-			this.conc.push(new args.dom({parent:this}));
-			nodes.push(this.conc[i].concrete.dom);
-		}
-*/	
-		this.concrete = {
-			export:function(){
-				return self.container;
-			}
-		};
-
-		if(!args.dom) return;
-
-	}).extend(Controller);
-
-	DomIterator.prototype.dataIn = function(data){
-		var nToUpdate = Math.min(this.conc.length, data.length);
-		var nExisting = this.conc.length;
-		var nCreate = data.length - this.conc.length;
-
-		for(var i=0; i < nToUpdate; i++){
-			this.conc[i].concrete.applyContent(data[i]);
-			this.conc[i].data = data[i];		
-		}
-
-		if(nCreate > 0) //add new nodes
-		for(var i=0; i < nCreate; i++) {
-			var n = new this.template({parent:this});
-			
-			n.concrete.applyContent(data[nExisting + i]);
-			n.data = data[i];
-			this.container.appendChild(n.concrete.dom);
-			this.conc.push(n);
-		}
-
-		if(nCreate < 0) //remove existing modes
-		for(var i=this.conc.length-1; i >= nToUpdate; i--){
-			this.container.removeChild(this.conc[i].concrete.dom);
-			this.conc.splice(i,1);
-		}	
-
-	}
-
 
 
 
@@ -150,7 +95,7 @@ definition:function(){
 	return {
 		/* utility controls */
 		UIControl:			scope.SpliceJS.UI.UIControl,
-		DomIterator: 		DomIterator,
+		DomIterator: 		scope.Controllers.DomIterator,
 		ImageSelector:  	ImageSelector,
 		/* buttons */
 		Button:				scope.Buttons.Button,
@@ -176,6 +121,7 @@ definition:function(){
 		Calendar:			scope.Selectors.Calendar,
 		/* data controls */
 		DataTable:			scope.DataControls.DataTable,
+		DataTableRow:		scope.DataControls.DataTableRow,
 		ListBox:			scope.DataControls.ListBox,
 		ListItem:			scope.DataControls.ListItem,
 		ScrollableListBox:	scope.DataControls.ScrollableListBox,

@@ -68,10 +68,7 @@ _.data = (function(){
 		if(this instanceof Object){
 			var keys = Object.keys(this);
 			for(var i=0; i<keys.length; i++){
-				callback({
-					property: keys[i],
-					value:this[keys[i]]
-				});
+				callback( keys[i],this[keys[i]]);
 			}	
 		}
 		return data(this);
@@ -183,7 +180,7 @@ _.data = (function(){
 			if(this.hasOwnProperty(keys[i])){
 				var value = this[keys[i]];	
 				if(typeof onitem === 'function')
-					value = onitem(value, keys[i]);
+					value = onitem(keys[i],value);
 				
 				if(value == null || value == undefined) continue;
 				result.push(value);
