@@ -1,0 +1,62 @@
+.-splicejs-datatable-root {
+	width:100%; height:100%;
+	
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+	font-size:12px;
+}
+
+.-splicejs-datatable-root .-splicejs-datatable-headercontainer {
+	background-color: #fefefe;
+}
+
+.-splicejs-datatable-root .-splicejs-datatable th {
+	padding: 10px;
+    background-color: #274239;
+    color: #fefefe;
+	font-size:0.9em;
+}
+
+.-splicejs-datatable-root .-splicejs-scrollpanel .static  {
+	height:50px;
+}
+.-splicejs-datatable-root .-splicejs-datatable {
+	border-collapse:  collapse;
+}
+
+
+.-splicejs-datatable-root .-splicejs-datatable td {
+	
+	border:1px solid #cecece;
+	padding-left:1em; padding-right: 1em;
+}
+
+.-splicejs-datatable-root .-search-result-highlight {
+	background-color:#222222;
+	color:#FFF92D;
+}
+
+
+.-splicejs-datatable-root .-splicejs-datatable tbody tr:hover {
+	background-color:#eaeaea;
+	
+}
+
+span.-drilldown {
+	border:1px solid rgba(255,255,255,0);
+	border-radius: 5px;
+	padding:1px; padding-left:3px; padding-right:3px;
+	cursor:pointer;
+}
+
+
+span.-drilldown:hover {
+	background-color:#222222;
+	color:#fefefe;
+	border:1px solid #222222;
+}
+
+.-splicejs-button {
+	padding:5px;
+	padding-left:7px; padding-right:7px;
+	
+}

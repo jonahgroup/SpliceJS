@@ -1,0 +1,52 @@
+
+<!-- sample application template -->
+<sjs-template type="Sample">
+<div style="position:absolute; top:0px; left:0px; height:100%; width:100%;">
+	
+	<!-- our search input -->
+	<div style="padding-top:0.5em; padding-bottom:0.5em;"><span style="padding-left:10px; font-size:10px; font-family:Arial;">Search:</span>
+		<sjs-include type="SpliceJS.Controls.TextField">{
+			onData:_.Binding('onFilterData').Parent,
+			dataIn:_.Binding('onClearFilter').Parent,
+			isRealTime: true 
+		}</sjs-include>
+	
+		<sjs-include type="SpliceJS.Controls.Button" ref="searchButton">
+			{
+				isHidden:true,
+				animate:true,
+				content:{label:'Clear'}
+			}
+		</sjs-include>
+	</div>
+	
+	<!-- our data table-->
+	<sjs-include type="SpliceJS.Controls.DataTable" ref="dataTable">
+		{
+			dataIn:_.Binding('onSampleData').Parent,
+			scroll:'no',
+			filterData:_.Binding('onFilterData').Parent,
+			itemTemplate:<sjs-include type="SampleRow"></sjs-include>
+		}
+	</sjs-include>
+</div>
+
+	<sjs-include type="SpliceJS.UI.KeyListener">
+		{
+			onEsc:_.Binding('onClearFilter').Parent
+		}
+	</sjs-include>
+</sjs-template>
+
+
+<!-- data table row template -->
+<sjs-template type="SampleRow" controller="SpliceJS.Controls.DataTableRow">
+	<div><span class="-drilldown">@0</span></div>
+	<sjs-include type="SpliceJS.Controls.DomIterator">
+		{
+			sequential:8,offset:1,
+			contentTemplate:'@',
+			dom:<div>@i</div>
+		}
+	</sjs-include>
+</sjs-template>

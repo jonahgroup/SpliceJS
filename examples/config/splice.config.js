@@ -5,7 +5,7 @@ var SPLICE_HOME = '../splicejs';
  * When set to "true" preloader will not be shown
  * */
 var SPLICE_SUPPRESS_PRELOADER = false;
-
+var SPLICE_IS_DEBUG = true;
 
 /*
 	Plaform configuration flag
