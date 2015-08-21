@@ -71,6 +71,7 @@ definition:function(){
 	};
 	
 	UIControl.prototype.show = function(){
+		if(!this.isHidden) return;
 		if(this.animate) {
 			this.elements.controlContainer.style.opacity = 0;
 		}

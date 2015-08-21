@@ -8,7 +8,10 @@ _.data = (function(){
 
 		this.data = data;
 		
-		this.pageSize = pageSize;
+		this.pageSize = pageSize || 2 ;
+		
+		
+		
 		this.currentPage = -1;
 		
 		this.maxPage = Math.floor(this.data.length / pageSize) + 
@@ -218,7 +221,13 @@ _.data = (function(){
 
 	function first(){
 		if(! (this instanceof Array) ) return null;
-		return this[0];
+		return data(this[0]);
+	};
+
+
+	function nth(n){
+		if(!(this instanceof Array)) return null;
+		return data(this[n]);	
 	};
 
 	function data(d){
@@ -227,8 +236,9 @@ _.data = (function(){
 			foreach		:function(callback){return forEach.call(d,callback);},
 			filter		:function(callback){return filter.call(d,callback);},
 			group		:function(callback,gfn){return groupBy.call(d,callback,gfn);},
-			first		:function(callback){return first.call(d)},
-			page        :function(size,start) { return new Paginator(d, size, start); },
+			first		:function(callback){return first.call(d);},
+			nth			:function(callback){return nth.call(d);},		
+			page        :function(size,start) { return new Paginator(d, size, start);},
 			frame       :function(size,move){return new Frame(size,move);},
 			sort		:function(callback){return sort.call(d,callback);},
 			result  	:d

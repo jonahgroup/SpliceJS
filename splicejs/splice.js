@@ -35,7 +35,8 @@ var _ = (function(window, document){
 	var configuration = {
 		APPLICATION_HOME: 				getPath(window.location.href).path, 
 		SPLICE_HOME:         			window.SPLICE_HOME,
-		ONLOAD_DISP_SHORT_FILENAME: 	window.SPLICE_ONLOAD_DISP_SHORT_FILENAME, 
+		ONLOAD_DISP_SHORT_FILENAME: 	window.SPLICE_ONLOAD_DISP_SHORT_FILENAME,
+		IS_DEBUG_ENABLED:				window.SPLICE_IS_DEBUG, 
 		platform: {	
 			IS_MOBILE: 			window.SPLICE_PLATFORM_IS_MOBILE,
 			IS_TOUCH_ENABLED: 	window.SPLICE_PLATFORM_IS_TOUCH_ENABLED
@@ -1385,7 +1386,8 @@ var _ = (function(window, document){
 		 * */
 		if(endsWith(filename, FILE_EXTENSIONS.javascript)) {
 
-		/*
+		
+			if(configuration.IS_DEBUG_ENABLED) {
 			//document script loader			
 			var script = document.createElement('script');
 			script.setAttribute("type", "text/javascript");
@@ -1401,7 +1403,8 @@ var _ = (function(window, document){
 				}
 			};
 			head.appendChild(script); 
-		*/	
+			return;
+			}
 		/*	
 		
 		//geval script loader	
@@ -1425,6 +1428,7 @@ var _ = (function(window, document){
 		
 		
 		//function script loader
+			if(!configuration.IS_DEBUG_ENABLED){
 			HttpRequest.get({
 				url: filename,
 				onok:function(response){
@@ -1441,12 +1445,8 @@ var _ = (function(window, document){
 					loader.loadNext(watcher);
 				}
 			});
-		
-		
-		
-		
-		
 			return;
+			}
 		}
 		
 		/*
@@ -2722,7 +2722,7 @@ function prepareImports(a, path){
 			Event : EventSingleton,
 			Controller: Controller,
 			Obj:Obj,
-			display:display,
+			display:display
 		}
 		
 		
