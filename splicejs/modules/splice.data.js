@@ -1,57 +1,76 @@
 _.data = (function(){
 
-
-
 	/*
-
-		Iterator 
-
-	*/
-
-
-
-
-	/*
-
 		Paginator
-
 	*/
 
-	var Paginator = function Paginator(data, pageSize){
+	var Paginator = function Paginator(data, pageSize, startPage){
 
 		this.data = data;
-	
+		
 		this.pageSize = pageSize;
-		this.currentPage = 0;
-
+		this.currentPage = -1;
+		
+		this.maxPage = Math.floor(this.data.length / pageSize) + 
+			( (this.data.length % pageSize) / (this.data.length % pageSize)) ;
+		
+		this.minPage = -1;
+				
+		if(startPage > 0) this.currentPage = startPage-1;
+		
+		this.next();
 	};
 
+	
+	function _page(){
+		this.current = [];
+		
+		if(this.currentPage > this.maxPage) {
+			this.currentPage = this.maxPage;
+			return this;
+		}
 
+		if(this.currentPage < this.minPage) {
+			this.currentPage = this.minPage;
+			return this;
+		}
 
+		for(var i=0; i<this.pageSize; i++){
+			var idx = this.currentPage * this.pageSize + i;
+			
+			// boundary check
+			if(idx > this.data.length-1) {
+				break;
+			}
+			if(idx < 0) {
+				break;
+			}	
+			
+			this.current.push(this.data[idx]);
+		}
+		return this;
+	};
+	
 	Paginator.prototype = {
-
 		hasNext : function(){
 			/* compare next page idex to last element's index */
 			if( (this.currentPage + 1) * this.pageSize > (this.data.length-1) ) return false;
-
 			return true;
 		}
 		,
-		next 	: function(){
-			var subset = [];
-
-			for(var i=0; i<this.pageSize; i++){
-
-				var idx = this.currentPage * this.pageSize + i;
-				if(idx > this.data.length-1) break;
-
-				subset.push(this.data[idx]);
-			}
-
+		next : function(){
 			this.currentPage++;
-
-			return subset;
-		}  	 
+			return _page.call(this);
+		}
+		,
+		prev : function(){
+			this.currentPage--;
+			return _page.call(this);
+		},
+		to:function(pageNumber){
+			this.currentPage = pageNumber;
+			return _page.call(this);
+		}
 	};
 
 
@@ -109,15 +128,10 @@ _.data = (function(){
 
 		//map iterator
 		if(this instanceof Object){
-
-
-
 			return data(groupings);
 		}	
 
-
 		return data(this);
-		
 	};
 
 
@@ -150,31 +164,18 @@ _.data = (function(){
 			}
 			return data(result);
 		}
-	}
+	};
 
 
-	function toArray(onitem){
-
-		var result = [];
-
-		if(typeof this == 'number' || (this instanceof Number)){
-			var n = +this; 
-			for(var i=0; i < n; i++){
-
-				var value = i;
-
-				if(typeof onitem === 'function')
-					value = onitem(value, i);	
-
-				if(value == null || value == undefined) continue;
-				result.push(value);
-			}
-			return data(result);
-		}
-
-		var keys = Object.keys(this);
-		if(!keys) return result;
-		if(keys.length < 1) return result;
+	/**
+	 *	Array transformation function 
+	 */
+	function _objectToArray(onitem){
+		var result = []
+		, keys = Object.keys(this);
+		
+		if(!keys) return data(result);
+		if(keys.length < 1) return data(result);
 		
 		for(var i=0; i<keys.length; i++){
 			if(this.hasOwnProperty(keys[i])){
@@ -189,7 +190,28 @@ _.data = (function(){
 		return data(result);
 	};
 
+	/**
+	 *	Array transformation function 
+	 */
+	function _numberToArray(onitem){
+		var n = +this
+		,	result = []; 
+		
+		for(var i=0; i < n; i++){
+			var value = i;
 
+			if(typeof onitem === 'function')
+				value = onitem(i,value);	
+
+			if(value == null || value == undefined) continue;
+			result.push(value);
+		}
+		return data(result);
+	};	
+	
+	
+	
+	
 	function sort(){
 
 	};
@@ -199,17 +221,28 @@ _.data = (function(){
 		return this[0];
 	};
 
-	function data(dataObj){
-		return {
-			foreach		:function(callback){return forEach.call(dataObj,callback);},
-			filter		:function(callback){return filter.call(dataObj,callback);},
-			group		:function(callback,gfn){return groupBy.call(dataObj,callback,gfn);},
-			first		:function(callback){return first.call(dataObj)},
-			to 	        :function(callback){return toArray.call(dataObj,callback);},
-			page        :function (size) { return new Paginator(dataObj, size); },
+	function data(d){
+		
+		var _export  = {
+			foreach		:function(callback){return forEach.call(d,callback);},
+			filter		:function(callback){return filter.call(d,callback);},
+			group		:function(callback,gfn){return groupBy.call(d,callback,gfn);},
+			first		:function(callback){return first.call(d)},
+			page        :function(size,start) { return new Paginator(d, size, start); },
 			frame       :function(size,move){return new Frame(size,move);},
-			result  :dataObj
+			sort		:function(callback){return sort.call(d,callback);},
+			result  	:d
+		};
+
+		// multiplex "to" function
+		if(typeof d === 'number' || (d instanceof Number)){
+			_export.to = function(callback){return _numberToArray.call(d,callback);}; 
+		} else if(typeof d === 'object' || d instanceof Array) {
+			_export.to = function(callback){return _objectToArray.call(d,callback);};
 		}
+		
+		
+		return _export;
 	};
 	return data;
 })();

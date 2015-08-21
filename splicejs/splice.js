@@ -1385,7 +1385,7 @@ var _ = (function(window, document){
 		 * */
 		if(endsWith(filename, FILE_EXTENSIONS.javascript)) {
 
-		
+		/*
 			//document script loader			
 			var script = document.createElement('script');
 			script.setAttribute("type", "text/javascript");
@@ -1401,8 +1401,9 @@ var _ = (function(window, document){
 				}
 			};
 			head.appendChild(script); 
-			
+		*/	
 		/*	
+		
 		//geval script loader	
 			HttpRequest.get({
 				url: filename,
@@ -1421,6 +1422,30 @@ var _ = (function(window, document){
 				}
 			});
 		*/	
+		
+		
+		//function script loader
+			HttpRequest.get({
+				url: filename,
+				onok:function(response){
+					
+					try {
+						(new Function(response.text))();
+					} catch(ex){
+						throw ex;
+					}
+					URL_CACHE[filename] = true;
+					loader.onitemloaded();
+					loader.progress--; 
+					LOADER_PROGRESS.complete++;
+					loader.loadNext(watcher);
+				}
+			});
+		
+		
+		
+		
+		
 			return;
 		}
 		
