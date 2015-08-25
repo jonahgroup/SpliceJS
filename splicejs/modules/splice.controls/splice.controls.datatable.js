@@ -40,6 +40,14 @@ definition:function(){
 		if(this.ref.tableHeader)
 			this.elements.columnHeaderTable = this.ref.tableHeader.elements.columnHeaderTable;
 
+		/*	
+			table type determines scrolling layout
+			and header configuration
+		*/	
+		if(!this.tableType)
+			this.tableType = 'default';
+		
+			
 		/* temp data buffer */	
 		this.source_data = null;	
 
@@ -48,6 +56,11 @@ definition:function(){
 		this.headerRow = null;
 
 		Event.attach(window, 'onresize').subscribe(function(){self.reflow();});
+		if(this.elements.defaultScroller){
+			Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
+				this.elements.headPositioner.style.left = (0 - eargs.source.scrollLeft) + 'px'; 
+			},this);
+		}
 		
 	}).extend(UIControl);
 	
@@ -255,8 +268,10 @@ definition:function(){
 			row.push(document.createTextNode(headers[i]));
 			cloned.push(document.createTextNode(headers[i]));
 		}
-
+		
 		this.addHeaderRow(this.elements.columnHeaderTable, row);
+		if(this.tableType == 'default') return;
+		
 		this.addHeaderRow(this.elements.dataTable, cloned);
 	};
 
@@ -286,9 +301,14 @@ definition:function(){
 		*/
 		//this.elements.columnHeaderTable.style.width = this.elements.dataTable.offsetWidth  + 'px';
 		/* measure column sizes */
-		var body = this.elements.dataTable.tHead;
+		
+		var body = this.elements.dataTable.tHead; 
+		if(this.tableType == 'default')
+			body = this.elements.dataTable.tBodies[0];
+		
 		var head = _if(this.elements.columnHeaderTable).tHead;
 		var wrapper = this.ref.tableBody.elements.tableWrapper;
+
 
 
 		if(!body) return; //empty table no records were added
@@ -303,11 +323,19 @@ definition:function(){
 		
 		if(!body || !head) return;
 
+		
+		if(this.elements.defaultScroller){
+			var borderCorrection = 1;
+			this.elements.defaultScroller.style.top = (head.clientHeight + borderCorrection) + 'px';
+		}
+
 		var cells = body.rows[0].cells;
 		for(var i=0; i< cells.length; i++){
-			
 			var cellWidth = cells[i].clientWidth;
+			
 			var style = _.Doc.style(cells[i]);
+			head.rows[0].cells[i].style.paddingLeft = style.padding.left.value + 'px';
+			head.rows[0].cells[i].style.paddingRight = style.padding.right.value + 'px';
 
 			head.rows[0].cells[i].style.minWidth = (cellWidth 
 				 - style.padding.left.value 
@@ -382,11 +410,16 @@ definition:function(){
 	/* DataTable variants */
 	var CustomScrollDataTable = Component('CustomScrollDataTable')(DataTable);
 	var NoScrollDataTable = Component('NoScrollDataTable')(DataTable);
+	var DefaultScrollDataTable = Component('DefaultScrollDataTable')(DataTable);
 	
 	var _DataTable = function _DataTable(args){
 		
 		if(args.scroll === 'no') return new NoScrollDataTable(args);
-		return new CustomScrollDataTable(args);
+		
+		if(args.scroll === 'custom') return new CustomScrollDataTable(args); 
+		
+		return new DefaultScrollDataTable(args);
+		
 		
 	};
 

@@ -1,3 +1,17 @@
+<sjs-template  type="DefaultScrollDataTable">
+	<div class="-splicejs-datatable-root" style="position:absolute; left:0px; top:0px; right:0px; bottom:0px; overflow:hidden;" data-sjs-element="controlContainer">
+		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:hidden;">
+		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:auto;" data-sjs-element="defaultScroller">
+			<sjs-include type="DataTableBody" ref="tableBody"></sjs-include>
+		</div>
+		<div style="position:absolute; top:0px;left:0px;" data-sjs-element="headPositioner" >
+			<sjs-include type="DataTableHeader" ref="tableHeader"></sjs-include>
+		</div>
+		</div>
+	</div>
+</sjs-template>
+
+
 <sjs-template  type="CustomScrollDataTable">
 	<div class="-splicejs-datatable-root" style="position:relative;" data-sjs-element="controlContainer">
 		<sjs-include type="SpliceJS.Controls.ScrollPanel">{

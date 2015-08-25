@@ -1,7 +1,7 @@
 
 <!-- sample application template -->
 <sjs-template type="Sample">
-<div style="position:absolute; top:0px; left:0px; height:100%; width:100%;">
+<div style="position:absolute; left:0px; top:0px; right:0px; bottom:0px;">
 	
 	<!-- our search input -->
 	<div style="padding-top:0.5em; padding-bottom:0.5em;"><span style="padding-left:10px; font-size:10px; font-family:Arial;">Search:</span>
@@ -21,14 +21,15 @@
 	</div>
 	
 	<!-- our data table-->
+	<div style="position:absolute; width:100%; top:2.8em; bottom:0px;">
 	<sjs-include type="SpliceJS.Controls.DataTable" ref="dataTable">
 		{
 			dataIn:_.Binding('onSampleData').Parent,
-			scroll:'no',
 			filterData:_.Binding('onFilterData').Parent,
 			itemTemplate:<sjs-include type="SampleRow"></sjs-include>
 		}
 	</sjs-include>
+	</div>
 </div>
 
 	<sjs-include type="SpliceJS.UI.KeyListener">
