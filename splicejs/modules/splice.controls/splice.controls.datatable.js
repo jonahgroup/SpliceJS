@@ -17,6 +17,8 @@ definition:function(){
 		return obj;
 	}
 	
+	
+	// import dependenciess
 	var Class = this.framework.Class
 	,	Event = this.framework.Event
 	,	Component = this.framework.Component;
@@ -54,13 +56,9 @@ definition:function(){
 		/* temp dom data hold */	
 		this.dataRows = [];
 		this.headerRow = null;
+		
+		_initializeTable.call(this);
 
-		Event.attach(window, 'onresize').subscribe(function(){self.reflow();});
-		if(this.elements.defaultScroller){
-			Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
-				this.elements.headPositioner.style.left = (0 - eargs.source.scrollLeft) + 'px'; 
-			},this);
-		}
 		
 	}).extend(UIControl);
 	
@@ -72,9 +70,46 @@ definition:function(){
 	};
 	
 	DataTable.prototype.clearFilter = function(){
-		this.data_filter = null;	
-	
+		this.data_filter = null;
+		_renderTable.call(this);	
 	};
+	
+
+	/*
+	 * Updating data model
+	 * - keep count of existing rows
+	 * - keep references to individual rows
+	 * - iterate over existing rows to update row's calling dataIn on the row object
+	 * - if new rows create new rows in the table 
+	 * 
+	 * */
+	DataTable.prototype.dataIn = function(dataInput){
+		
+		this.source_data = dataInput;
+		_renderTable.call(this);		
+		
+	};
+
+
+
+	DataTable.prototype.onScroll = _.Event;
+
+
+
+
+	function _initializeTable(){
+		
+		Event.attach(window, 'onresize').subscribe(function(){self.reflow();});
+		
+		if(this.elements.defaultScroller){
+			Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
+				this.elements.headPositioner.style.left = (0 - eargs.source.scrollLeft) + 'px'; 
+				this.onScroll();
+			},this);
+		}
+	};
+
+
 
 	function _applyFilter(){
 		/*
@@ -84,7 +119,6 @@ definition:function(){
 			
 			var filtered_data = { headers:this.source_data.headers, data:[]};
 			var source_data = this.source_data.data;
-			
 			
 			for(var i=0; i < source_data.length; i++){
 				for(var j=0; j< source_data[i].length; j++){
@@ -149,8 +183,8 @@ definition:function(){
 			var r = data[i];
 			
 			/* insert templated row */
-			if(this.itemTemplate) {
-				var dataRow = new this.itemTemplate({parent:this});
+			if(this.rowTemplate) {
+				var dataRow = new this.rowTemplate({parent:this});
 				
 				this.dataRows.push(dataRow);
 				
@@ -158,9 +192,6 @@ definition:function(){
 				
 				this.addDomRow(dataRow.concrete.dom);
 				domModified = true;
-
-				dataRow.onDisplay();
-
 				continue;
 			}
 			
@@ -171,20 +202,6 @@ definition:function(){
 		this.reflow();
 	};
 
-	/*
-	 * Updating data model
-	 * - keep count of existing rows
-	 * - keep references to individual rows
-	 * - iterate over existing rows to update row's calling dataIn on the row object
-	 * - if new rows create new rows in the table 
-	 * 
-	 * */
-	DataTable.prototype.dataIn = function(dataInput){
-		
-		this.source_data = dataInput;
-		_renderTable.call(this);		
-		
-	};
 	
 	
 	function createDefaultRow(r){
@@ -206,9 +223,9 @@ definition:function(){
 	
 
 	
-	DataTable.prototype.addRowTo = function(destination, row,isHeader){
+	function _addRowTo(target, row,isHeader){
 		
-		var newrow =  destination.insertRow();
+		var newrow =  target.insertRow();
 
 		for(var i=0; i < row.length; i++ ){
 		    var cell = null;
@@ -237,7 +254,7 @@ definition:function(){
 		
 		var tHead = dom.createTHead();
 		
-		this.addRowTo(tHead, headers, true);
+		_addRowTo(tHead, headers, true);
 	};
 
 	DataTable.prototype.addBodyRow = function(row){
@@ -248,7 +265,7 @@ definition:function(){
 		var tBody = this.dom.tBodies[0]; 
 		if(!tBody) tBody = this.dom.createTBody();
 		
-		this.addRowTo(tBody,row);
+		_addRowTo(tBody,row);
 	};
 
 	DataTable.prototype.addDomRow = function(dom){
@@ -343,9 +360,19 @@ definition:function(){
 		}
 	};
 
-	
+
+
+
+
+
+
+
+
+	/** 
+	* Controller class to represent data row 
+	*/	
 	var DataTableRow =  Class(function DataTableRow(args){
-		UIControl.call(this);
+		
 		/* 
 		 * process content placeholders before they are 
 		 * pulled by parent control
@@ -364,7 +391,7 @@ definition:function(){
 			textNodes[i].parentNode.replaceChild(span,textNodes[i]);
 			this.contentMap[key] = span;
 		}
-	}).extend(UIControl);
+	});
 	
 	DataTableRow.prototype.onDeleteClick = function(){
 		this.onDelete(this.data);
@@ -374,9 +401,7 @@ definition:function(){
 	
 	DataTableRow.prototype.dataIn = function(data, filter_value){
 		
-		var textNodes = _.Doc.selectTextNodes(this.concrete.dom);
 		this.data = data;
-		
 
 		for(var key in this.contentMap){
 			var node = this.contentMap[key];
@@ -407,11 +432,16 @@ definition:function(){
 	}
 
 
+
+
+
+
 	/* DataTable variants */
 	var CustomScrollDataTable = Component('CustomScrollDataTable')(DataTable);
 	var NoScrollDataTable = Component('NoScrollDataTable')(DataTable);
 	var DefaultScrollDataTable = Component('DefaultScrollDataTable')(DataTable);
 	
+	/* data table variat decoder */
 	var _DataTable = function _DataTable(args){
 		
 		if(args.scroll === 'no') return new NoScrollDataTable(args);
@@ -419,8 +449,6 @@ definition:function(){
 		if(args.scroll === 'custom') return new CustomScrollDataTable(args); 
 		
 		return new DefaultScrollDataTable(args);
-		
-		
 	};
 
 

@@ -22,11 +22,11 @@
 	
 	<!-- our data table-->
 	<div style="position:absolute; width:100%; top:2.8em; bottom:0px;">
-	<sjs-include type="SpliceJS.Controls.DataTable" ref="dataTable">
+	<sjs-include  type="SpliceJS.Controls.DataTable" ref="dataTable" class="sample-table">
 		{
 			dataIn:_.Binding('onSampleData').Parent,
 			filterData:_.Binding('onFilterData').Parent,
-			itemTemplate:<sjs-include type="SampleRow"></sjs-include>
+			rowTemplate:<sjs-include type="SampleRow"></sjs-include>
 		}
 	</sjs-include>
 	</div>
