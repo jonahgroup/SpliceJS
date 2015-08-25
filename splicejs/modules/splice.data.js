@@ -77,6 +77,14 @@ _.data = (function(){
 	};
 
 
+	var Frame = function(size, step){
+		
+	};
+
+	Frame.prototype.next = function(){};
+	Frame.prototype.prev = function(){};
+
+
 	function forEach(callback){
 		
 		// array iterator
@@ -212,7 +220,15 @@ _.data = (function(){
 		return data(result);
 	};	
 	
-	
+	function _contArrays(target, source){
+		if(!target) return;
+		if(!(source instanceof Array)) return;
+		
+		for(var i=0; i<source.length; i++){
+			target.push(source[i]);
+		}
+		return target;	
+	};
 	
 	
 	function sort(){
@@ -229,6 +245,25 @@ _.data = (function(){
 		if(!(this instanceof Array)) return null;
 		return data(this[n]);	
 	};
+	
+	function size(){
+		if(this instanceof Array) return this.length;	
+	};
+	
+	function add(source){
+		if(!source) return data(this);
+		
+		if(this instanceof Array && source instanceof Array ){
+			return data(_contArrays(this,source));
+		}
+		
+		if(this instanceof Array){
+			return data(this.push(source));
+		}	
+		
+		return data(this);
+	};
+
 
 	function data(d){
 		
@@ -241,6 +276,8 @@ _.data = (function(){
 			page        :function(size,start) { return new Paginator(d, size, start);},
 			frame       :function(size,move){return new Frame(size,move);},
 			sort		:function(callback){return sort.call(d,callback);},
+			size		:function(callback){return size.call(d,callback);},
+			add			:function(toadd){return add.call(d,toadd);},
 			result  	:d
 		};
 
