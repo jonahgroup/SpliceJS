@@ -38,10 +38,7 @@ definition:function(){
 			this.prevDisplayState = this.elements.controlContainer.style.display; 
 			this.elements.controlContainer.style.display = 'none';
 		}
-
-		/* attach style to the controlContainer */
-		if(args && args.style)
-			this.elements.controlContainer.className += ' ' + args.style; 
+		
 		this.dataItem = null;
 
 		var self = this;

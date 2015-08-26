@@ -1,6 +1,6 @@
 <!-- Uses native scrolling functionality and maintians static header -->
 <sjs-template  type="DefaultScrollDataTable">
-	<div class="-sjs-datatable-root" style="position:absolute; left:0px; top:0px; right:0px; bottom:0px; overflow:hidden;" sjs-element="controlContainer">
+	<div class="-sjs-datatable-root" style="position:absolute; left:0px; top:0px; right:0px; bottom:0px; overflow:hidden;" sjs-element="root">
 		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:hidden;">
 		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:auto;" sjs-element="defaultScroller">
 			<sjs-include type="DataTableBody" ref="tableBody"></sjs-include>
@@ -15,7 +15,7 @@
 
 <!-- DataTable template to features custom scrolling implementation -->
 <sjs-template  type="CustomScrollDataTable">
-	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="controlContainer">
+	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="root">
 		<sjs-include type="SpliceJS.Controls.ScrollPanel">{
 			ref:'scrollPanel',
 			content:{
@@ -31,17 +31,19 @@
 
 <!-- Does not use view-port scrolling, layout is managed by the including container -->
 <sjs-template  type="NoScrollDataTable">
-	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="controlContainer">
+	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="root">
 		<sjs-include type="DataTableBody" ref="tableBody"></sjs-include>
 		<sjs-include type="DataTableHeader" ref="tableHeader"></sjs-include>
 	</div>
 </sjs-template>
 
 
+
+
 <!-- header template -->
 <sjs-template type="DataTableHeader">
 	<div class="-sjs-datatable-headercontainer" style="position:absolute; z-index:10; top:0px; left:0px;">
-		<table class="-splicejs-datatable" sjs-element="columnHeaderTable"></table>
+		<table class="-sjs-datatable" sjs-element="columnHeaderTable"></table>
 	</div>
 </sjs-template>
 

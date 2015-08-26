@@ -2,18 +2,18 @@ body {
 	overflow: hidden;
 }
 
-.sample-table.-splicejs-datatable-root {
+.sample-table.-sjs-datatable-root {
 	width:100%; height:100%;
 	
 	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 	font-size:12px;
 }
 
-.sample-table.-splicejs-datatable-root .-splicejs-datatable-headercontainer {
+.sample-table.-sjs-datatable-root .-sjs-datatable-headercontainer {
 	background-color: #fefefe;
 }
 
-.sample-table.-splicejs-datatable-root .-splicejs-datatable th {
+.sample-table.-sjs-datatable-root .-sjs-datatable th {
 	padding: 10px;
     background-color: #274239;
     color: #fefefe;
@@ -21,27 +21,27 @@ body {
 	border: 1px solid #37564C;
 }
 
-.sample-table.-splicejs-datatable-root .-splicejs-scrollpanel .static  {
+.sample-table.-sjs-datatable-root .-sjs-scrollpanel .static  {
 	height:50px;
 }
-.sample-table.-splicejs-datatable-root .-splicejs-datatable {
+.sample-table.-sjs-datatable-root .-sjs-datatable {
 	border-collapse:  collapse;
 }
 
 
-.sample-table.-splicejs-datatable-root .-splicejs-datatable td {
+.sample-table.-sjs-datatable-root .-sjs-datatable td {
 	
 	border:1px solid #cecece;
 	padding-left:1em; padding-right: 1em;
 }
 
-.sample-table.-splicejs-datatable-root .-search-result-highlight {
+.sample-table.-sjs-datatable-root .-search-result-highlight {
 	background-color:#222222;
 	color:#FFF92D;
 }
 
 
-.sample-table.-splicejs-datatable-root .-splicejs-datatable tbody tr:hover {
+.sample-table.-sjs-datatable-root .-sjs-datatable tbody tr:hover {
 	background-color:#eaeaea;
 	
 }
@@ -60,7 +60,7 @@ span.-drilldown:hover {
 	border:1px solid #222222;
 }
 
-.-splicejs-button {
+.-sjs-button {
 	padding:5px;
 	padding-left:7px; padding-right:7px;
 	

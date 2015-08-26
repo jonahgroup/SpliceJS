@@ -2037,7 +2037,10 @@ var _ = (function(window, document){
 		}
 		
 		//apply style
-		
+		if(rootElement){
+			if(parameters && parameters.class)
+				rootElement.className = parameters.class + ' ' + rootElement.className; 
+		}
 	
 	   /*
 		* Handle content declaration
@@ -2151,46 +2154,57 @@ var _ = (function(window, document){
 		return templates;
 	};
 
-	var RESERVED_ATTRIBUTES = ["type", "ref", "styleClass", "width", "height"];
 
+	function startsWith(s,v){
+		if(s.startsWith) return s.startsWith(v);	
+		if(s.indexOf(v) == 0) return true;
+		
+		return false;
+	};
+
+
+	var RESERVED_ATTRIBUTES = ["type", "ref", "class", "width", "height", "layout"];
+
+	function collectAttributes(node, filter){
+		if(!node) return null;
+		
+		var attributes = node.attributes;
+		if(!attributes) return '';
+	
+		var result = ''
+		,	separator = '';
+		
+		for(var i=0; i<attributes.length; i++){
+			var attr = attributes[i];
+			if(startsWith(attr.value,'_.Binding(')){
+				result = result + separator + attr.name + ':' + attr.value;	
+				separator = ', ';
+				continue;	
+			}
+			
+			if(RESERVED_ATTRIBUTES.indexOf(attr.name) < 0) continue;
+			
+			result = result + separator + attr.name + ':\'' + attr.value + '\''; 
+			separator = ', ';
+		}
+		return result;
+	};
 
 	function handle_SJS_INCLUDE(node, parent, replace){
-		var type_attr 	= node.getAttribute('type')
-		,	ref_attr 	= node.getAttribute('ref')
-		,	class_attr 	= node.getAttribute('class')
+		
+		var attributes = collectAttributes(node,RESERVED_ATTRIBUTES)
 		,	json = '';
-		
-		if(!ref_attr) ref_attr = '';
-		if(ref_attr) { 
-			if(ref_attr.indexOf('_.') == 0)
-				ref_attr = 'ref:' + ref_attr;
-			else { 
-				ref_attr = 'ref: \'' + ref_attr + '\'';
-			}
-		}
-		
-		if(class_attr){
-			class_attr = 'styleClass: \''+ class_attr + '\'';
-		}
-		else {
-			class_attr = '';
-		}
-		
-		
+				
 		//empty configuration of the include tag
 		var idx = node.innerHTML.indexOf('{');
 		if( idx < 0){
-			if(ref_attr) 	ref_attr = ',' + ref_attr;
-			if(class_attr) 	class_attr = ',' + class_attr;
-			
-			json = '_.Obj.call(scope,{type:\''+type_attr+'\''+ ref_attr + class_attr + ' })';
+			json = '_.Obj.call(scope,{'+ attributes +'})';
 		}
 			
 		else {	
-			if(ref_attr) ref_attr = ref_attr + ',';
-			if(class_attr) 	class_attr = class_attr + ',';
+			if(attributes) attributes = attributes + ',';
 			
-			json = '_.Obj.call(scope,{type:\''+type_attr+'\',' + ref_attr + class_attr +
+			json = '_.Obj.call(scope,{' + attributes +
 			node.innerHTML.substring(idx+1)
 			+')'
 		}
