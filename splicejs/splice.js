@@ -1764,7 +1764,7 @@ var _ = (function(window, document){
 
 			if(key === 'ref') 		continue;
 			if(key === 'content') 	continue; //content is processed separately
-			
+						
 			if(parameters[key] instanceof Binding) {
 				try {
 					resolveBinding(parameters[key], instance, key, scope);
@@ -2163,7 +2163,7 @@ var _ = (function(window, document){
 	};
 
 
-	var RESERVED_ATTRIBUTES = ["type", "ref", "class", "width", "height", "layout"];
+	var RESERVED_ATTRIBUTES = ["type", "ref", "singleton", "class", "width", "height", "layout"];
 
 	function collectAttributes(node, filter){
 		if(!node) return null;
@@ -2572,6 +2572,14 @@ var _ = (function(window, document){
 			
 			var args = args || {};
 			
+			if(args._includer_scope) { 
+				var idof = args._includer_scope.singletons.constructors.indexOf(this.constructor.component);
+				if(idof >=0) { 
+					var inst =  args._includer_scope.singletons.instances[idof];
+					return inst;
+				}
+			}
+			
 			var obj = Object.create(controller.prototype);
 			obj.constructor = controller;
 			
@@ -2580,6 +2588,7 @@ var _ = (function(window, document){
 			obj.elements = {};
 			obj.children = [];
 			obj.scope = scope;
+						
 			
 			/* 
 			 * assign reference to a parent and 
@@ -2592,6 +2601,13 @@ var _ = (function(window, document){
 			*/
 			linkupEvents(obj);
 
+			
+			/*
+			 * Bind declarative parameters
+			 */
+			bindDeclarations(args, obj, args._includer_scope);
+			
+			
 			/*
 				Instantiate Template
 			*/
@@ -2599,12 +2615,13 @@ var _ = (function(window, document){
 			obj.concrete = template.getInstance(obj, args, scope);
 
 
-			/*
-			 * Bind declarative parameters
-			 */
-			bindDeclarations(args, obj, args._includer_scope);
-
 			controller.apply(obj, [args]);
+
+			if(args.singleton) {
+				args._includer_scope.singletons.constructors.push(this.constructor.component);
+				args._includer_scope.singletons.instances.push(obj);
+			}
+
 
 			return obj; 
 			
@@ -2628,6 +2645,7 @@ var _ = (function(window, document){
 		Component.tie = controller;
 		Component.prototype = controller.prototype;
 		Component.constructor = controller;
+		Component.constructor.component = Component;
 		
 		Component.extend = function(base){
 			if(!base) throw 'Can\'t extend the undefined or null base constructor';
@@ -2745,7 +2763,8 @@ function prepareImports(a, path){
 	 */
 	function Module(moduleDefinition){
 	    var scope = new Namespace(path); //our module scope
-		
+		scope.singletons = {constructors:[], instances:[]};
+			
 		scope.framework = {
 			Class : function(fn){
 				var nm = getFunctionName(fn);

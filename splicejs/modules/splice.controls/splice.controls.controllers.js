@@ -29,16 +29,19 @@ definition:function(){
 		var contentTemplate = this.contentTemplate;
 		if(!contentTemplate) contentTemplate = '';
 
-		if(this.sequential != null && this.sequential != undefined) {
-		
-			for(var i = 0; i < this.sequential; i++ ){
+		if(this.to != null && this.to != undefined) {
+			var frm = this.from?this.from:0
+			,	seq = 0;
+			
+			
+			for(var i = frm; i < this.to; i++ ){
 				
 				this.conc.push(new args.dom({
 					parent:this, 
-					content:{i:(contentTemplate+(i+this.offset))}
+					content:{i:(contentTemplate+(i))}
 				}));
 				
-				this.nodes.push(this.conc[i].concrete.dom);
+				this.nodes.push(this.conc[seq++].concrete.dom);
 			}
 			this.concrete = {
 				export:function(){
@@ -87,9 +90,6 @@ definition:function(){
 			this.conc.splice(i,1);
 		}	
 	};
-
-	
-	
 	
 	return {
 		DomIterator:DomIterator

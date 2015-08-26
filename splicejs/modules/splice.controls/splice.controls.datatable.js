@@ -94,7 +94,7 @@ definition:function(){
 
 	function _initializeTable(){
 		
-		Event.attach(window, 'onresize').subscribe(function(){self.reflow();});
+		Event.attach(window, 'onresize').subscribe(function(){this.reflow();},this);
 		
 		if(this.elements.defaultScroller){
 			Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
@@ -135,8 +135,9 @@ definition:function(){
 		
 		var filtered = _applyFilter.call(this);
 		
-		var data 	= filtered.data;
-		var headers = filtered.headers;
+		var data 	= filtered.data
+		, 	headers = filtered.headers
+		,	columnCount = filtered.headers.length;
 		
 		/* add columns */
 		if(headers instanceof Array) {
@@ -179,7 +180,7 @@ definition:function(){
 			
 			/* insert templated row */
 			if(this.rowTemplate) {
-				var dataRow = new this.rowTemplate({parent:this});
+				var dataRow = new this.rowTemplate({parent:this,columnCount:columnCount});
 				
 				this.dataRows.push(dataRow);
 				
@@ -367,6 +368,8 @@ definition:function(){
 	* Controller class to represent data row 
 	*/	
 	var DataTableRow =  Class(function DataTableRow(args){
+		
+		if(args.columnCount) this.columnCount = args.columnCount;
 		
 		/* 
 		 * process content placeholders before they are 

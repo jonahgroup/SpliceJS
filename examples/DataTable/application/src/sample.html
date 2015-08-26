@@ -48,7 +48,8 @@
 	<div><span class="-drilldown">@0</span></div>
 	<sjs-include type="SpliceJS.Controls.DomIterator">
 		{
-			sequential:8,offset:1,
+			from: 1,
+			to:_.Binding('columnCount').Parent,
 			contentTemplate:'@',
 			dom:<div>@i</div>
 		}
