@@ -192,7 +192,7 @@ _.data = (function(){
 			if(this.hasOwnProperty(keys[i])){
 				var value = this[keys[i]];	
 				if(typeof onitem === 'function')
-					value = onitem(keys[i],value);
+					value = onitem(keys[i],value,i);
 				
 				if(value == null || value == undefined) continue;
 				result.push(value);
@@ -212,7 +212,7 @@ _.data = (function(){
 			var value = i;
 
 			if(typeof onitem === 'function')
-				value = onitem(i,value);	
+				value = onitem(i,value,i);	
 
 			if(value == null || value == undefined) continue;
 			result.push(value);
