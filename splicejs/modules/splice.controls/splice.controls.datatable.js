@@ -5,6 +5,7 @@ required:[
 	
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
+	{'Doc': _.home('modules/splice.document.js')},
 	'splice.controls.css',
 	'splice.controls.datatable.css',
 	'splice.controls.datatable.html'
@@ -17,11 +18,11 @@ definition:function(){
 		return obj;
 	}
 	
-	
 	// import dependenciess
 	var Class = this.framework.Class
 	,	Event = this.framework.Event
-	,	Component = this.framework.Component;
+	,	Component = this.framework.Component
+	,	Doc = this.Doc;
 	
 	var UIControl = this.SpliceJS.UI.UIControl; 
 	
@@ -59,9 +60,7 @@ definition:function(){
 		
 		_initializeTable.call(this);
 
-		
 	}).extend(UIControl);
-	
 	
 	
 	DataTable.prototype.filterData = function(data_filter){
@@ -90,11 +89,7 @@ definition:function(){
 		
 	};
 
-
-
-	DataTable.prototype.onScroll = _.Event;
-
-
+	DataTable.prototype.onScroll = Event;
 
 
 	function _initializeTable(){
@@ -350,7 +345,7 @@ definition:function(){
 		for(var i=0; i< cells.length; i++){
 			var cellWidth = cells[i].clientWidth;
 			
-			var style = _.Doc.style(cells[i]);
+			var style = Doc.style(cells[i]);
 			head.rows[0].cells[i].style.paddingLeft = style.padding.left.value + 'px';
 			head.rows[0].cells[i].style.paddingRight = style.padding.right.value + 'px';
 
@@ -377,7 +372,7 @@ definition:function(){
 		 * process content placeholders before they are 
 		 * pulled by parent control
 		 * */
-		var textNodes = _.Doc.selectTextNodes(this.concrete.dom);
+		var textNodes = Doc.select.textNodes(this.concrete.dom);
 		this.contentMap = [];
 		
 		for(var i=0; i<textNodes.length; i++){
@@ -433,22 +428,14 @@ definition:function(){
 
 
 
-
-
-
-	/* DataTable variants */
-	var CustomScrollDataTable = Component('CustomScrollDataTable')(DataTable);
-	var NoScrollDataTable = Component('NoScrollDataTable')(DataTable);
-	var DefaultScrollDataTable = Component('DefaultScrollDataTable')(DataTable);
+	
 	
 	/* data table variat decoder */
 	var _DataTable = function _DataTable(args){
-		
-		if(args.scroll === 'no') return new NoScrollDataTable(args);
-		
-		if(args.scroll === 'custom') return new CustomScrollDataTable(args); 
-		
-		return new DefaultScrollDataTable(args);
+	
+		if(args.scroll === 'no') 	 return new (Component('NoScrollDataTable')(DataTable))(args);
+		if(args.scroll === 'custom') return new (Component('CustomScrollDataTable')(DataTable))(args); 
+									 return new (Component('DefaultScrollDataTable')(DataTable))(args);
 	};
 
 
