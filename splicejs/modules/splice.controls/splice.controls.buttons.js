@@ -8,10 +8,10 @@ required:[
 ,
 definition:function(){
 
-	var Class = this.framework.Class;
-	var Component = this.framework.Component
-	,	Event = this.framework.Event;
-	var UIControl = this.SpliceJS.UI.UIControl;
+	var Class = this.framework.Class
+	, 	Component = this.framework.Component
+	,	Event = this.framework.Event
+	,	UIControl = this.SpliceJS.UI.UIControl;
 	
 	
 		
@@ -21,7 +21,7 @@ definition:function(){
 		UIControl.apply(this,arguments);
 			
 		var self = this;
-		this.elements.controlContainer.onclick = function(){
+		this.elements.root.onclick = function(){
 			if(self.isDisabled == true) return;
 			self.onClick(self.dataItem);
 
@@ -37,24 +37,24 @@ definition:function(){
 		if(!content) return;
 		
 		if(content['label']){
-			this.elements.controlContainer.value = content['label']; 
+			this.elements.root.value = content['label']; 
 		} else {
-			this.elements.controlContainer.value = 'button';
+			this.elements.root.value = 'button';
 		}
 	};
 
 	Button.prototype.setLabel = function(label){
-		this.elements.controlContainer.value = label;
+		this.elements.root.value = label;
 	};
 	
 	Button.prototype.enable = function(){
-		this.elements.controlContainer.className = '-splicejs-button';
+		this.elements.root.className = '-splicejs-button';
 		this.isDisabled = false;
 		this.onDomChanged();
 	};
 	
 	Button.prototype.disable = function(){
-		this.elements.controlContainer.className = '-splicejs-button-disabled';
+		this.elements.root.className = '-splicejs-button-disabled';
 		this.isDisabled = true;
 		this.onDomChanged();
 	}
@@ -107,7 +107,7 @@ definition:function(){
 		var self = this;
 		this.elements.controlContainer.onclick = function(){
 
-			if(self.elements.controlContainer.checked) {
+			if(self.elements.root.checked) {
 				if(self.dataPath)
 				self.dataItem[self.dataPath] = true
 			} else {
@@ -124,15 +124,15 @@ definition:function(){
 		UIControl.prototype.dataIn.call(this,dataItem);
 
 		if(!this.dataPath) {
-			this.elements.controlContainer.checked = false;
+			this.elements.root.checked = false;
 			return;
 		}
 
 		if(this.dataItem[this.dataPath] === true) {
-			this.elements.controlContainer.checked = true;
+			this.elements.root.checked = true;
 		}
 		else {
-			this.elements.controlContainer.checked = false;	
+			this.elements.root.checked = false;	
 		}
 	};
 	
@@ -142,21 +142,25 @@ definition:function(){
 
 		var self = this;
 		
-		var f = function(){
-			if(self.dataPath) {
-				self.dataItem[self.dataPath] = this.value;
+		var f = function(args){
+			if(this.dataPath) {
+				this.dataItem[self.dataPath] = args.source.value;
 			}
 			else {
-				self.dataItem = {value:this.value};
+				this.dataItem = {value:args.source.value};
 			}
-			self.onData(self.dataItem);
+			
+			this.onData(this.dataItem);
 		};
-
+		
+		this.onKeyUp  = Event.attach(this.elements.root,'onkeyup');
+		this.onChange = Event.attach(this.elements.root,'onchange');
+		
 		if(this.isRealTime){
-			this.elements.controlContainer.onkeyup = f;
+			this.onKeyUp.subscribe(f, this);
 		}
 		else { 
-			this.elements.controlContainer.onchange = f;
+			this.onChange.subscribe(f, this);
 		}
 
 	}).extend(UIControl);
@@ -170,11 +174,11 @@ definition:function(){
 		else value = dataItem;
 		
 		if(value!=null && value != undefined) 
-			this.elements.controlContainer.value = value;
+			this.elements.root.value = value;
 	};
 	
 	TextField.prototype.clear = function(){
-		this.elements.controlContainer.value = '';
+		this.elements.root.value = '';
 	};
 
 

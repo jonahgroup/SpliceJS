@@ -14,8 +14,10 @@ _.Module({
 	definition:function(){
 		
 		var Component 	= this.framework.Component
+		,	Class 		= this.framework.Class
 		,	Event 		= this.framework.Event
-		,	UIControl 	= this.SpliceJS.UI.UIControl;
+		,	UIControl 	= this.SpliceJS.UI.UIControl
+		,	TextField	= this.SpliceJS.Controls.TextField;
 		
 		
 		// move extend to the top
@@ -26,33 +28,18 @@ _.Module({
 			
 			function SampleController(){
 				
+				this.currentPage = 1;
+				
 				this.onDisplay.subscribeAsync(function(){
 					var self= this;
 					_.HttpRequest.get({
 						url:_.absPath('DataTable/application/src/data/dataApr-2-2015.json'),
 						onok:function(data){
-							var sampleData = JSON.parse(data.text);
+							var sourceData = JSON.parse(data.text);
 							
-							var columns = sampleData.cols;
-							var data = sampleData.data;
-							/*
-							_.data(sampleData.data[0]).foreach(function(k,v){
-								columns.push(k.toUpperCase());
-							});
-							
-							var data = _.data(sampleData.data).to(function(k,v){
-								return _.data(v).to(function(k,v){
-									if(v == null || v == undefined) return 'NULL';
-									if(typeof v == 'object') return v.toString();
-									return v;
-								}).result
-							}).page(100).next().current;
-							*/
-							
-							
-							var tableData = {data : data,	headers : columns /*sampleData.cols*/}
-							
-							self.onSampleData(tableData);	
+							self.columns = sourceData.cols;
+							self.data = sourceData.data;
+							notifyData.call(self);
 						}
 					});
 				}, this);	
@@ -65,11 +52,12 @@ _.Module({
 				this.onFilterData.subscribe(function(){
 					this.ref.searchButton.show();
 				},this);
-				
 			}
 		).extend(UIControl);
 		
 		SampleComponent.prototype.onSampleData  = Event;
+		SampleComponent.prototype.onNextPage 	= Event;
+		SampleComponent.prototype.onPrevPage 	= Event;
 		SampleComponent.prototype.onFilterData  = Event.transform(function(args){
 			return args.value;
 		}); //having event argument transformer
@@ -78,6 +66,29 @@ _.Module({
 		SampleComponent.prototype.onClearFilter = Event.transform(function(){
 			return '';	
 		});
+		
+		function notifyData(){
+			var cols = this.columns;
+			var data = this.data;
+			this.onSampleData({data : data,	headers : cols });	
+		}
+		
+		
+		SampleComponent.prototype.selectPageStyle = function(args){
+			if(args == this.currentPage )
+				return 'selected';
+			return null;	
+		};
+		
+		
+		Class(function SearchTextField(){
+			TextField.call(this);
+			//event filter?
+			this.onKeyUp.argumentFilter = function(args){
+				if(args.e.keyCode == 27) return false;
+				return true;
+			};
+		}).extend(TextField);
 		
 		
 		return {

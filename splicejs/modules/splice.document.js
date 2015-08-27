@@ -149,6 +149,14 @@ definition:function(){
 	};
 
 
+	function screenWidth(){
+		return window.screen.width;
+	}
+
+	function screenHeight(){
+		return window.screen.height;
+	}
+
 	return {
 		style:style,
 		select:{
@@ -158,7 +166,12 @@ definition:function(){
 			elementNodes:	selectElementNodes,
 			unknownNodes:	selectUnknownNodes,
 			commentNodes:	selectComments
-		}
+		},
+		screen:{
+			width		:screenWidth,
+			height		:screenHeight
+		},
+		window:{}
 	}
 
 }});

@@ -32,8 +32,6 @@ definition:function(){
 	var DataTable = Class(function DataTable(args){
 		/* call parent constructor */
 		UIControl.apply(this,arguments);
-		
-		var self = this;
 
 		this.dom = this.ref.tableBody.elements.dataTable;
 		this.elements.dataTable = this.ref.tableBody.elements.dataTable;
@@ -58,6 +56,9 @@ definition:function(){
 		this.dataRows = [];
 		this.headerRow = null;
 		
+		this.pageCurrent = 0;
+		if(!this.pageSize) this.pageSize = 25;
+		
 		_initializeTable.call(this);
 
 	}).extend(UIControl);
@@ -65,7 +66,8 @@ definition:function(){
 	
 	DataTable.prototype.filterData = function(data_filter){
 		this.data_filter = data_filter;
-		_renderTable.call(this);
+		_applyFilter.call(this);
+		_renderTable.call(this,this.ready_data);
 	};
 	
 	DataTable.prototype.clearFilter = function(){
@@ -73,6 +75,20 @@ definition:function(){
 		_renderTable.call(this);	
 	};
 	
+	DataTable.prototype.pageNext = function(){
+		this.pageCurrent++;	
+		_renderTable.call(this);
+	};
+
+	DataTable.prototype.pagePrev = function(){
+		this.pageCurrent--;
+		if(this.pageCurrent < 1) this.pageCurrent = 0;
+		_renderTable.call(this);	
+	};
+
+	DataTable.prototype.pageTo = function(page){
+		this.pageCurrent = page;	
+	};
 
 	/*
 	 * Updating data model
@@ -84,12 +100,21 @@ definition:function(){
 	 * */
 	DataTable.prototype.dataIn = function(dataInput){
 		
-		this.source_data = dataInput;
-		_renderTable.call(this);		
+		this.source_data = dataInput; 
+		
+		this.ready_data = { headers: dataInput.headers };
+		this.ready_data.data =_.data(dataInput.data).page(this.pageSize);
+
+		_renderTable.call(this,this.ready_data);		
 		
 	};
 
+	/*
+		Datatable events
+	*/
+
 	DataTable.prototype.onScroll = Event;
+	DataTable.prototype.onPage 	 = Event;
 
 
 	function _initializeTable(){
@@ -110,34 +135,34 @@ definition:function(){
 		/*
 			Apply search filters
 		*/
-		if(this.data_filter){
+		if(!this.data_filter) return;
 			
-			var filtered_data = { headers:this.source_data.headers, data:[]};
-			var source_data = this.source_data.data;
-			
-			for(var i=0; i < source_data.length; i++){
-				for(var j=0; j< source_data[i].length; j++){
-					var v = source_data[i][j]; 
-					if(!v) continue;	
-					if((v+'').indexOf(this.data_filter) > -1) { 
-						filtered_data.data.push(source_data[i]);
-						break;
-					}
+		
+		var filtered_data = [];
+		var source_data = this.source_data.data;
+		
+		for(var i=0; i < source_data.length; i++){
+			for(var j=0; j< source_data[i].length; j++){
+				var v = source_data[i][j]; 
+				if(!v) continue;	
+				if((v+'').indexOf(this.data_filter) > -1) { 
+					filtered_data.push(source_data[i]);
+					break;
 				}
 			}
-			return filtered_data;
 		}
-		return this.source_data;
+
+		this.currentPage = 0;
+		this.ready_data.data =_.data(filtered_data).page(this.pageSize);
+			
 	};
 
 
 	function _renderTable(){
 		
-		var filtered = _applyFilter.call(this);
-		
-		var data 	= filtered.data
-		, 	headers = filtered.headers
-		,	columnCount = filtered.headers.length;
+		var data 	= this.ready_data.data.to(this.pageCurrent).current
+		, 	headers = this.ready_data.headers
+		,	columnCount = this.ready_data.headers.length;
 		
 		/* add columns */
 		if(headers instanceof Array) {
@@ -165,7 +190,7 @@ definition:function(){
 			if(!data[j]){
 				/* remove extra dataRows and table rows*/
 				for(var k=this.dataRows.length-1; k>=j; k--){
-					this.removeRowByIndex(k+1); //!!!!! this is because of the header row
+					this.removeRowByIndex(k); //!!!!! this is because of the header row
 					this.dataRows.splice(k,1);
 				}
 				break;
@@ -343,16 +368,27 @@ definition:function(){
 		}
 
 		var cells = body.rows[0].cells;
+		var heads = head.rows[0].cells;
 		for(var i=0; i< cells.length; i++){
-			var cellWidth = cells[i].clientWidth;
+			var cell_width = cells[i].clientWidth;
+			var cell_width_head = heads[i].clientWidth;
 			
+			var hstyle = Doc.style(head.rows[0].cells[i]);
 			var style = Doc.style(cells[i]);
-			head.rows[0].cells[i].style.paddingLeft = style.padding.left.value + 'px';
-			head.rows[0].cells[i].style.paddingRight = style.padding.right.value + 'px';
+			
+			
+			// data cells are smaller than header cells
+			if(cell_width < cell_width_head){
+				cells[i].style.minWidth = (cell_width_head 
+					- style.padding.left.value 
+				 	- style.padding.right.value) + 'px';
+				
+				continue;
+			}
 
-			head.rows[0].cells[i].style.minWidth = (cellWidth 
-				 - style.padding.left.value 
-				 - style.padding.right.value) + 'px';
+			head.rows[0].cells[i].style.minWidth = (cell_width 
+				 - hstyle.padding.left.value 
+				 - hstyle.padding.right.value) + 'px';
 		}
 	};
 

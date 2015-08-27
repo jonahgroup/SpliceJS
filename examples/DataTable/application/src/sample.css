@@ -65,3 +65,26 @@ span.-drilldown:hover {
 	padding-left:7px; padding-right:7px;
 	
 }
+
+
+.-sjs-paginator .page {
+	border: 1px solid #cecece;
+	color:black;
+    font-size: 0.8em;
+ 	padding:9px;
+	cursor:pointer;
+	margin-right:5px;
+	padding-top:5px;
+	padding-bottom:5px;
+}
+.-sjs-paginator .page:hover {
+	background-color:black;
+	border: 1px solid black;
+	color:white;
+}
+
+.-sjs-paginator .selected .page {
+	background-color:black;
+	border: 1px solid black;
+	color:white;
+} 

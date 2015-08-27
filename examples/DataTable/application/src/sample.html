@@ -5,7 +5,7 @@
 	
 	<!-- our search input -->
 	<div style="padding-top:0.5em; padding-bottom:0.5em;"><span style="padding-left:10px; font-size:10px; font-family:Arial;">Search:</span>
-		<sjs-include type="SpliceJS.Controls.TextField">{
+		<sjs-include type="SpliceJS.Controls.TextField" controller="SearchTextField">{
 			onData:_.Binding('onFilterData').Parent,
 			dataIn:_.Binding('onClearFilter').Parent,
 			isRealTime: true 
@@ -18,6 +18,20 @@
 				content:{label:'Clear'}
 			}
 		</sjs-include>
+		
+		<div style="float:right; margin-top:4px;">
+			<div class="-sjs-paginator">
+			<sjs-include type="SpliceJS.Controls.DomIterator">
+				{
+					from:1, to:10,
+					onStyleSelect: _.Binding('selectPageStyle').Parent, 
+					dom:<div style="display:inline;"><span class="page">@i</span></div>
+				}
+			</sjs-include>
+				
+			</div>
+		</div>
+		
 	</div>
 	
 	<!-- our data table-->
@@ -29,6 +43,8 @@
 		{
 			dataIn:_.Binding('onSampleData').Parent,
 			filterData:_.Binding('onFilterData').Parent,
+			pageNext: _.Binding('onNextPage').Parent,
+			pagePrev:_.Binding('onPrevPage').Parent,
 			rowTemplate:<sjs-include type="SampleRow"></sjs-include>
 		}
 	</sjs-include>
@@ -37,7 +53,9 @@
 
 	<sjs-include type="SpliceJS.UI.KeyListener">
 		{
-			onEsc:_.Binding('onClearFilter').Parent
+			onEsc:_.Binding('onClearFilter').Parent,
+			onRight:_.Binding('onNextPage').Parent,
+			onLeft: _.Binding('onPrevPage').Parent,
 		}
 	</sjs-include>
 </sjs-template>

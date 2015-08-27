@@ -520,8 +520,14 @@ var _ = (function(window, document){
 			*/
 			var cbak = callbacks[idx]
 			,	inst = instances[idx]
-			,	eventBreak = false;
-
+			,	eventBreak = false
+			,	callback_result = null;
+			
+			
+			// nothing to do here, callback array is empty
+			if(!cbak || cbak.length <=0 ) return;
+			
+			
 			for(var i=0; i < cbak.length; i++) {
 				/*check if event was cancelled and stop handing */
 				if(arguments.length > 0 && arguments[0])
@@ -536,6 +542,10 @@ var _ = (function(window, document){
 				var _args = arguments;
 				var _callback = cbak[i].callback;
 				var _inst = inst[i];
+
+				if(MulticastEvent.argumentFilter) {
+					if(!MulticastEvent.argumentFilter.apply(_inst, _args)) return;
+				}			
 				
 				//pass arguments without transformation
 				if(!transformer) {
@@ -543,14 +553,14 @@ var _ = (function(window, document){
 						setTimeout(function(){_callback.apply(_inst, _args);},1);
 					}
 					else 
-						_callback.apply(_inst, _args);
+						callback_result = _callback.apply(_inst, _args);
 				}
 				else {
 					if(cbak[i].is_async) {
 						setTimeout(function(){_callback.call(_inst, transformer.apply(_inst,_args));},1)
 					}
 					else 
-						_callback.call(_inst, transformer.apply(_inst,_args));
+						callback_result = _callback.call(_inst, transformer.apply(_inst,_args));
 				}	
 			}
 
@@ -560,6 +570,7 @@ var _ = (function(window, document){
 				cleanup.instance = null;
 			}
 			
+			return callback_result;
 		}
 
 		MulticastEvent.SPLICE_JS_EVENT = true; 
@@ -623,6 +634,13 @@ var _ = (function(window, document){
 			cleanup.fn 		 = callback;
 			cleanup.instance = instance;
 			return this;
+		};
+		
+		MulticastEvent.purge = function(){
+			for(var i=0; i<callbacks.length; i++) {
+				callbacks.splice(0,1);
+				instances.splice(0,1);
+			}
 		};
 
 
@@ -1688,16 +1706,16 @@ var _ = (function(window, document){
 			} catch(ex) {}
 
 			
-			var tieOverride = null;
+			var overrideController = null;
 
 			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
 			
 
 			/* locate tie, if override was specified */
-			if(args.tie) {
-				tieOverride = scope[args.tie] || Namespace.lookup(args.tie);
-				if(!tieOverride) throw 'Tie type cannot be found';
+			if(args.controller) {
+				overrideController = scope[args.controller] || Namespace.lookup(args.controller);
+				if(!overrideController) throw 'Tie type cannot be found';
 			}
 
 			/* copy args*/
@@ -1721,8 +1739,8 @@ var _ = (function(window, document){
 			
 			
 			/* create new component*/
-			if(typeof tieOverride === 'function') {
-				obj = createComponent(tieOverride, obj.template, scope);
+			if(typeof overrideController === 'function') {
+				obj = createComponent(overrideController, obj.template, scope);
 			}
 
 			/*
@@ -2163,7 +2181,7 @@ var _ = (function(window, document){
 	};
 
 
-	var RESERVED_ATTRIBUTES = ["type", "ref", "singleton", "class", "width", "height", "layout"];
+	var RESERVED_ATTRIBUTES = ["type", "ref", "singleton", "class", "width", "height", "layout", "controller"];
 
 	function collectAttributes(node, filter){
 		if(!node) return null;

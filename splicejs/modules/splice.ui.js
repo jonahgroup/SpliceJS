@@ -35,8 +35,8 @@ definition:function(){
 		Controller.call(this);
 		
 		if(this.isHidden) {
-			this.prevDisplayState = this.elements.controlContainer.style.display; 
-			this.elements.controlContainer.style.display = 'none';
+			this.prevDisplayState = this.elements.root.style.display; 
+			this.elements.root.style.display = 'none';
 		}
 		
 		this.dataItem = null;
@@ -54,15 +54,15 @@ definition:function(){
 		
 		if(this.isHidden) return;
 
-		this.prevDisplayState = this.elements.controlContainer.style.display; 
+		this.prevDisplayState = this.elements.root.style.display; 
 		
 		if(this.animate){
-			_.Animate(this.elements.controlContainer).opacity(100, 0, 300,function(){
-				self.elements.controlContainer.style.display = 'none';
+			_.Animate(this.elements.root).opacity(100, 0, 300,function(){
+				self.elements.root.style.display = 'none';
 			});
 		}
 		else {
-			this.elements.controlContainer.style.display = 'none';
+			this.elements.root.style.display = 'none';
 		}
 		this.isHidden = true;
 	};
@@ -70,15 +70,15 @@ definition:function(){
 	UIControl.prototype.show = function(){
 		if(!this.isHidden) return;
 		if(this.animate) {
-			this.elements.controlContainer.style.opacity = 0;
+			this.elements.root.style.opacity = 0;
 		}
 		
 		if(!this.prevDisplayState) this.prevDisplayState = 'inline';
 		
-		this.elements.controlContainer.style.display = this.prevDisplayState;
+		this.elements.root.style.display = this.prevDisplayState;
 		
 		if(this.animate) {
-			_.Animate(this.elements.controlContainer).opacity(0, 100, 300);
+			_.Animate(this.elements.root).opacity(0, 100, 300);
 		}
 		this.isHidden = false;
 	};
@@ -357,14 +357,22 @@ definition:function(){
 			Event.attach(window, 'onkeydown').subscribe(
 			function(args){
 				switch(args.keyCode){
-					case 27: this.onEsc(); break;
-					case 13: this.onEnter(); break;
+					case 27: this.onEsc(); 		break;
+					case 13: this.onEnter(); 	break;
+					case 37: this.onLeft(); 	break;
+					case 38: this.onUp();		break;
+					case 39: this.onRight(); 	break;
+					case 40: this.onDown();		break;
 				}
 			}, this);
 	});
 
-	KeyListener.prototype.onEsc = Event;
-	KeyListener.prototype.onEnter = Event;
+	KeyListener.prototype.onEsc 	= Event;
+	KeyListener.prototype.onEnter	= Event;
+	KeyListener.prototype.onRight 	= Event;
+	KeyListener.prototype.onLeft	= Event;
+	KeyListener.prototype.onUp 		= Event;
+	KeyListener.prototype.onDown 	= Event; 
 
 	//module exports
 	return {

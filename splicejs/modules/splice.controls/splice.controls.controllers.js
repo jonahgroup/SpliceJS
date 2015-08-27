@@ -9,7 +9,8 @@ required:[
 definition:function(){
 
 	var Component = this.framework.Component
-	,	Controller = this.framework.Controller;
+	,	Controller = this.framework.Controller
+	,	Event = this.framework.Event;
 	
 	
 	var DomIterator = Component(null)( function DomIterator(args){
@@ -40,6 +41,11 @@ definition:function(){
 					parent:this, 
 					content:{i:(contentTemplate+(i))}
 				}));
+				
+				var style = this.onStyleSelect(i);
+				if(style) {
+					this.conc[seq].concrete.dom.className = style;
+				}
 				
 				this.nodes.push(this.conc[seq++].concrete.dom);
 			}
@@ -90,6 +96,14 @@ definition:function(){
 			this.conc.splice(i,1);
 		}	
 	};
+	
+	DomIterator.prototype.onStyleSelect = Event;
+	
+	
+	function constructItem(){
+		
+	}
+	
 	
 	return {
 		DomIterator:DomIterator
