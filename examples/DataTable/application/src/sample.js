@@ -18,6 +18,7 @@ sjs({
 		,	Event 		= this.framework.Event
 		,	HttpRequest = this.framework.HttpRequest
 		,	absPath 	= this.framework.absPath 
+		,	mixin 		= this.framework.mixin
 		,	UIControl 	= this.SpliceJS.UI.UIControl
 		,	TextField	= this.SpliceJS.Controls.TextField;
 
@@ -57,30 +58,32 @@ sjs({
 			}
 		).extend(UIControl);
 		
-		SampleComponent.prototype.onSampleData  = Event;
-		SampleComponent.prototype.onNextPage 	= Event;
-		SampleComponent.prototype.onPrevPage 	= Event;
-		SampleComponent.prototype.onFilterData  = Event.transform(function(args){
-			return args.value;
-		}); //having event argument transformer
 		
+		mixin(SampleComponent.prototype, {
 		
-		SampleComponent.prototype.onClearFilter = Event.transform(function(){
-			return '';	
+			onSampleData  	: Event,
+			onNextPage 		: Event,
+			onPrevPage 		: Event,
+			onFilterData  	: Event.transform(function(args){
+								return args.value;
+							  }), //having event argument transformer
+			onClearFilter 	: Event.transform(function(){
+								return '';	
+							  }),
+		
+			selectPageStyle : function(args){
+				if(args == this.currentPage ) return 'selected';
+				return null;	
+			}
+
 		});
+		
 		
 		function notifyData(){
 			var cols = this.columns;
 			var data = this.data;
 			this.onSampleData({data : data,	headers : cols });	
 		}
-		
-		
-		SampleComponent.prototype.selectPageStyle = function(args){
-			if(args == this.currentPage )
-				return 'selected';
-			return null;	
-		};
 		
 		
 		Class(function SearchTextField(){
