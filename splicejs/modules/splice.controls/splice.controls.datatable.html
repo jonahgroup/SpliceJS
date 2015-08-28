@@ -3,10 +3,10 @@
 	<div class="-sjs-datatable-root" style="position:absolute; left:0px; top:0px; right:0px; bottom:0px; overflow:hidden;" sjs-element="root">
 		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:hidden;">
 		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:auto;" sjs-element="defaultScroller">
-			<sjs-include type="DataTableBody" ref="tableBody"></sjs-include>
+			<sjs-include type="DataTableBody" ref="body"></sjs-include>
 		</div>
 		<div style="position:absolute; top:0px;left:0px;" sjs-element="headPositioner" >
-			<sjs-include type="DataTableHeader" ref="tableHeader"></sjs-include>
+			<sjs-include type="DataTableHeader" ref="head"></sjs-include>
 		</div>
 		</div>
 	</div>
@@ -20,9 +20,9 @@
 			ref:'scrollPanel',
 			content:{
 				scrollContent:<sjs-include 	type="DataTableBody"		
-											ref="_.Binding('tableBody').Type('CustomScrollDataTable')"></sjs-include>,
+											ref="_.Binding('body').Type('CustomScrollDataTable')"></sjs-include>,
 				staticContent:<sjs-include 	type="DataTableHeader" 	
-											ref="_.Binding('tableHeader').Type('CustomScrollDataTable')"></sjs-include>
+											ref="_.Binding('head').Type('CustomScrollDataTable')"></sjs-include>
 			}
 		}</sjs-include>
 	</div>
@@ -32,8 +32,7 @@
 <!-- Does not use view-port scrolling, layout is managed by the including container -->
 <sjs-template  type="NoScrollDataTable">
 	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="root">
-		<sjs-include type="DataTableBody" ref="tableBody"></sjs-include>
-		<sjs-include type="DataTableHeader" ref="tableHeader"></sjs-include>
+		<sjs-include type="DataTableBody" ref="body,head"></sjs-include>
 	</div>
 </sjs-template>
 
@@ -43,14 +42,14 @@
 <!-- header template -->
 <sjs-template type="DataTableHeader">
 	<div class="-sjs-datatable-headercontainer" style="position:absolute; z-index:10; top:0px; left:0px;">
-		<table class="-sjs-datatable" sjs-element="columnHeaderTable"></table>
+		<table class="-sjs-datatable" sjs-element="table"></table>
 	</div>
 </sjs-template>
 
 <!-- body template -->
 <sjs-template type="DataTableBody">
 	<div class="-sjs-datatable-bodycontainer" style="position:relative;" sjs-element="tableWrapper">
-		<table class="-sjs-datatable" sjs-element="dataTable"></table>
+		<table class="-sjs-datatable" sjs-element="table"></table>
 	</div>
 </sjs-template>
 

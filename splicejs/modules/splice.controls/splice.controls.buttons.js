@@ -1,5 +1,5 @@
 /* global _ */
-_.Module({
+sjs({
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.buttons.css',
@@ -31,7 +31,7 @@ definition:function(){
 		
 	}).extend(UIControl);
 
-	Button.prototype.onClick = _.Event;
+	Button.prototype.onClick = Event;
 
 	Button.prototype.handleContent = function(content){
 		if(!content) return;

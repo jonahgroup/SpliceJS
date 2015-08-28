@@ -1,19 +1,20 @@
-_.Module({
+sjs({
 
 required:[
-	{'SpliceJS.UI':_.home('modules/splice.ui.js')},
+	{'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
 	'splice.controls.gridlayout.css',
 	'splice.controls.gridlayout.html'
-
 ],
 
 definition:function(){
 	var scope = this
-	,	Component = this.framework.Component;
+	,	Component = this.framework.Component
+	,	Event = this.framework.Event
+	,	debug = this.framework.debug
+	,	Obj = this.framework.Obj;
 
 	var UIControl = this.SpliceJS.UI.UIControl
 	,	DragAndDrop = this.SpliceJS.UI.DragAndDrop;
-
 
 	var Grid = function(rows,columns){
 		this.rows 		= rows;
@@ -80,21 +81,21 @@ definition:function(){
 		//attach events to drive resizing of the cell container
 		var self = this;
 
-		_.Event.attach(this.elements.leftEdge,'onmousedown').subscribe(
+		Event.attach(this.elements.leftEdge,'onmousedown').subscribe(
 			function(e){self.onStartResize(e,left);}
 		);
 
-		_.Event.attach(this.elements.topEdge,'onmousedown').subscribe(
+		Event.attach(this.elements.topEdge,'onmousedown').subscribe(
 			function(e){self.onStartResize(e,top);}
 		);
 			
 
-		_.Event.attach(this.elements.rightEdge,'onmousedown').subscribe(
+		Event.attach(this.elements.rightEdge,'onmousedown').subscribe(
 			function(e){self.onStartResize(e,right);}
 		);
 
 
-		_.Event.attach(this.elements.bottomEdge,'onmousedown').subscribe(
+		Event.attach(this.elements.bottomEdge,'onmousedown').subscribe(
 			function(e){self.onStartResize(e,bottom);}
 		);
 
@@ -106,18 +107,18 @@ definition:function(){
 	}).extend(UIControl);
 
 
-	CellContainer.prototype.onStartMove   =	_.Event;
-	CellContainer.prototype.onMove 	  	  = _.Event;
-	CellContainer.prototype.onEndMove 	  = _.Event;
+	CellContainer.prototype.onStartMove   =	Event;
+	CellContainer.prototype.onMove 	  	  = Event;
+	CellContainer.prototype.onEndMove 	  = Event;
 
 
-	CellContainer.prototype.onStartResize = _.Event;
-	CellContainer.prototype.onResize 	  =	_.Event;
-	CellContainer.prototype.onEndResize   =	_.Event;
+	CellContainer.prototype.onStartResize = Event;
+	CellContainer.prototype.onResize 	  =	Event;
+	CellContainer.prototype.onEndResize   =	Event;
 
 
 	CellContainer.prototype.startResize = function(e,direction){
-		_.debug.log('Resizing in ' + direction + ' direction');
+		debug.log('Resizing in ' + direction + ' direction');
 		DragAndDrop.startDrag();
 
 		var self = this;
@@ -160,7 +161,7 @@ definition:function(){
 		if(!this.grid)			this.grid = {columns:2, rows:2};
 		this.grid = new Grid(this.grid.rows, this.grid.columns);
 
-		_.Event.attach(window,'onresize').subscribe(function(){
+		Event.attach(window,'onresize').subscribe(function(){
 			this.reflow();}
 		,this);
 
@@ -194,7 +195,7 @@ definition:function(){
 	/* private */
 	function addCell(content, row, col, rowSpan, colSpan){
 
-		var _CellContainer = _.Obj.call(scope,
+		var _CellContainer = Obj.call(scope,
 		{	type:'CellContainer',
 			row:row, 
 			col:col, 
@@ -298,7 +299,7 @@ definition:function(){
 
 		this.reflow(cell.index);
 
-		_.debug.log('row:' + args.row + ' col:' + args.col)
+		debug.log('row:' + args.row + ' col:' + args.col)
 	};
 
 	GridLayout.prototype.reflow = function(cellIndex){

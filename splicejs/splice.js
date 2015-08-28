@@ -29,7 +29,7 @@ SOFTWARE.
 */
 
 
-var _ = (function(window, document){
+var sjs = (function(window, document){
 	"use strict";
 
 	var configuration = {
@@ -344,24 +344,119 @@ var _ = (function(window, document){
 
 	function close(controller) {
 	    controller.concrete.dom.parentNode.removeChild(controller.concrete.dom);
-	}
+	};
 
 	function isHTMLElement(object){
 		if(!object) return false;
 		if(object.tagName && object.tagName != '') return true;
 		return false;
 	};
-
-
-	function required(typeName){
-		return function(callback){
-			core.include([typeName],callback);
-		}
+	
+	function isSpace(c){
+		if(	c === ' ' 	|| 
+			c === '\n'	||
+			c === '\r'  ||	
+			c === '\t') return true;
 	};
 
+	function isAlphaNum(c){
+		if(!c) return false;
+		var code = c.charCodeAt();
+		if(	(code >= 48 && code <= 57)	||	/*0-9*/ 
+			(code >= 65 && code <= 90 ) || 	/*A-Z*/
+			(code >= 97 && code <= 122) 	/*a-z*/ )	
+		return true;
+		return false;
+	};
+
+/**
+ * 	
+ * 	URL analyzer
+ *	
+ */
+function Tokenizer(input){
+	mixin(this, { 
+		input: input,	i : 0,	c : input[0]
+	});
+};
+
+Tokenizer.prototype = {
+	consume : function(){
+		if(this.input.length <= this.i) return null;
+		var cons = this.c;
+		this.c = this.input[++this.i];
+		return cons;
+	},
+
+	nextToken : function(){
+		
+		var c = this.c;
+		if(isAlphaNum(c)) {
+			return this.identifier();
+		}
+		return this.consume();
+	},
+
+	identifier:function(){
+		var result = '';
+		while(isAlphaNum(this.c)){
+			result += this.consume();
+		}		
+		return result;
+	}
+};
+function HomeVariable(){ this.name = 'sjshome';}
+function Variable(name){ 
+	if(name == 'sjshome') return new HomeVariable();
+	if(!(this instanceof Variable)) return new Variable(name);
+	this.name = name; 
+}
+function variableValue(name){
+	if(name == 'sjshome') return configuration.SPLICE_HOME;
+	return '';
+}
+
+function UrlAnalyzer(url){
+	if(!(this instanceof UrlAnalyzer)) return new UrlAnalyzer(url);
+	var t = new Tokenizer(url)
+	,	token = null;
+	
+	this.parts = [];
+	
+	while(token = t.nextToken()){
+		if(token == '{') {
+			this.parts.push(Variable(t.nextToken()));
+			t.nextToken(); //closing bracket
+			continue;
+		}			
+		this.parts.push(token);
+	}
+};
+
+UrlAnalyzer.prototype = {
+	url:function(){
+		var url = '';
+		
+		for(var i=0; i < this.parts.length; i++){
+			var part = this.parts[i];
+			
+			if( part instanceof Variable || 
+				part instanceof HomeVariable ){
+				url += variableValue(part.name);				
+			} else {
+				url += part;
+			}	
+		}
+		return url;
+	},
+	
+	isHome:function(){
+		return this.parts[0] instanceof HomeVariable;
+	}
+		
+};
 
 /*
-
 ----------------------------------------------------------
 	
 	Http Request
@@ -2342,9 +2437,9 @@ var _ = (function(window, document){
 			var node = nodes[i]
 			,	parent = node.parentNode
 			,	json = convertToProxyJson.call(scope,node, node.tagName)
-			, 	fn = new Function("var scope = this; var window = document = null; return " + json)
+			, 	fn = new Function("var _ = arguments[0]; var scope = this; var window = document = null; return " + json)
 			 	
-			var result = fn.call(scope);
+			var result = fn.call(scope,sjs());
 
 			if(typeof result !==  'function'){				
 				result = Obj.call(scope,result);
@@ -2726,50 +2821,52 @@ var PATH_MAP = {
 
 };
 
-/*
-
-	@path is a relative path to SPLICE_HOME
-	@a is a dependency list of file names
-*/
-function prepareImports(a, path){
-	if(!a) return {namespaces:null, filenames:null};
-
-	var namespaces = [] , filenames = [],  p = '';
+	/*
 	
-	for(var i=0; i<a.length; i++){
-		//this is a namespaced dependency
-		if(typeof a[i] === 'object' && !a[i].ishome) {
-			for(var key in a[i]){
-				if(a[i].hasOwnProperty(key)) {
-					
-					
-					if(a[i][key].ishome) {
-						p = a[i][key].path;
-					}
-					else {
-						p = toPath(a[i][key],path);
-					}
-					
-					namespaces.push({ns:key,path:p});
-					filenames.push(p);
-					break;
-				}	
-			}
-		} else {
+		@path is a relative path to SPLICE_HOME
+		@a is a dependency list of file names
+	*/
+	function prepareImports(a, path){
+		if(!a) return {namespaces:null, filenames:null};
+	
+		var namespaces = [] , filenames = [],  p = '';
+		
+		for(var i=0; i<a.length; i++){
 			
-			
-			if(a[i].ishome) {
-				p = a[i].path;
+			var ua = null;
+			//this is a namespaced dependency
+			if(typeof a[i] === 'object') {
+				for(var key in a[i]){
+					if(a[i].hasOwnProperty(key)) {
+						ua = UrlAnalyzer(a[i][key]);			
+												
+						if(ua.isHome()) {
+							p = ua.url();
+						}
+						else {
+							p = toPath(ua.url(),path);
+						}
+						
+						namespaces.push({ns:key,path:p});
+						filenames.push(p);
+						break;
+					}	
+				}
+			} else {
+				ua = UrlAnalyzer(a[i]);
+				
+				if(ua.isHome()) {
+					p = ua.url();
+				}
+				else {
+					p = toPath(ua.url(),path);
+				}
+				
+				filenames.push(p);
 			}
-			else {
-				p = toPath(a[i],path);
-			}
-			
-			filenames.push(p);
 		}
-	}
-	return {namespaces:namespaces, filenames:filenames};
-};
+		return {namespaces:namespaces, filenames:filenames};
+	};
 
 	/**
 	 * Builds module and compiles late(s) from module definition. 
@@ -2780,10 +2877,11 @@ function prepareImports(a, path){
 	 * @param moduleDefinition
 	 */
 	function Module(moduleDefinition){
+	
 	    var scope = new Namespace(path); //our module scope
 		scope.singletons = {constructors:[], instances:[]};
 			
-		scope.framework = {
+		scope.framework = mixin(sjs(),{
 			Class : function(fn){
 				var nm = getFunctionName(fn);
 				scope[nm] = Class(fn);
@@ -2791,12 +2889,8 @@ function prepareImports(a, path){
 			},
 			Component : function(){
 				return Component.apply(scope,arguments);
-			},
-			Event : EventSingleton,
-			Controller: Controller,
-			Obj:Obj,
-			display:display
-		}
+			}
+		});
 		
 		
 		
@@ -2899,18 +2993,23 @@ function prepareImports(a, path){
 			 * 
 			 * */
 			compileTemplates(scope);
-
-			
 			
 			if(typeof definition === 'function') {
 				var _exports = definition.call(scope,scope); 
 				PATH_MAP[url] = _exports;	
 			}
-			
-			
 		},collectTemplates);
 	};
 
+
+	function mixin(target, source){
+		for(var key in source ){
+			if(source.hasOwnProperty(key)) {
+				target[key] = source[key];
+			}	
+		}
+		return target;
+	};
 
 /*
 
@@ -2920,50 +3019,75 @@ function prepareImports(a, path){
 
 */
 	var consoleLog = console.log.bind(console); 
-
-	return {
+	
+	
+	function sjs(m) { 
+		if(m && typeof m.definition === 'function' ){
+			return Module(m);	
+		};
 		
-		debug:{
-			log : consoleLog,
-			info: logging.info,
-			enable:function(){
-				this.log = consoleLog;
-				logging.debug.log = consoleLog;
-			},
-			disable:function(){
-				this.log  = function(){}	
+		if(typeof m  === 'string'){
+				
+			var keys = Object.keys(PATH_MAP);
+			for(var i=0; i < keys.length; i++){
+				var key = keys[i];
+				if(key.endsWith(m)) return PATH_MAP[key];  					
 			}
-		},
+			return function(callback){
+				//async module loader here				
+			};
+		};
 		
-		configuration : configuration,
+		return mixin(Object.create(null), {
 		
-		boot : boot,
-		toPath : toPath,
-		home : home,
+			debug:{
+				log : consoleLog,
+				info: logging.info,
+				enable:function(){
+					this.log = consoleLog;
+					logging.debug.log = consoleLog;
+				},
+				disable:function(){
+					this.log  = function(){}	
+				}
+			},
+			
+			configuration : configuration,
+			
+			boot : boot,
+			toPath : toPath,
+			home : home,
+			
+			absPath : absPath,
+			getPath : getPath,
+			display : display,
+			close : close,
+			endswith:endsWith,
+			mixin: mixin,
+			'module':Module,
+			
+			include : includeWithTemplate,
+			getFunctionName:getFunctionName,
 		
-		absPath : absPath,
-		getPath : getPath,
-		display : display,
-		close : close,
-    	required : required,
+			Namespace: Namespace,
+			Class : Class,
+			Controller : Controller,
+			Obj : Obj,
+			Binding : Binding,
+			HttpRequest : HttpRequest,	
+			Event : EventSingleton,	
+			Module : Module,
+			Tokenizer:Tokenizer,
+			UrlAnalyzer:UrlAnalyzer,
+			
+			PATH_MAP : PATH_MAP
+		
+	});
+}
 	
-		include : includeWithTemplate,
-		getFunctionName:getFunctionName,
 	
-		Namespace: Namespace,
-		Class : Class,
-		Controller : Controller,
-		Obj : Obj,
-		Binding : Binding,
-    	HttpRequest : HttpRequest,	
-		Event : EventSingleton,	
-		Module : Module,
-		
-		
-		PATH_MAP : PATH_MAP
-		
-	}
 	//core.debug = debug;
+	return sjs
 
 })(window,document);
 

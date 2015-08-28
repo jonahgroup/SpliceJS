@@ -1,12 +1,12 @@
 /* global _sjs */
 /* global SpliceJS */
-_.Module({
+sjs({
 	
 	required:[
-		{'SpliceJS.UI':_.home('modules/splice.ui.js')},
-		{'SpliceJS.Controls':_.home('modules/splice.controls/splice.controls.buttons.js')},
-		{'SpliceJS.Controls':_.home('modules/splice.controls/splice.controls.datatable.js')},
-		{'SpliceJS.Controls':_.home('modules/splice.controls/splice.controls.controllers.js')},
+		{'SpliceJS.UI': 	  '{sjshome}/modules/splice.ui.js'},
+		{'SpliceJS.Controls': '{sjshome}/modules/splice.controls/splice.controls.buttons.js'},
+		{'SpliceJS.Controls': '{sjshome}/modules/splice.controls/splice.controls.datatable.js'},
+		{'SpliceJS.Controls': '{sjshome}/modules/splice.controls/splice.controls.controllers.js'},
 		
 		'sample.css',
 		'sample.html'
@@ -16,9 +16,11 @@ _.Module({
 		var Component 	= this.framework.Component
 		,	Class 		= this.framework.Class
 		,	Event 		= this.framework.Event
+		,	HttpRequest = this.framework.HttpRequest
+		,	absPath 	= this.framework.absPath 
 		,	UIControl 	= this.SpliceJS.UI.UIControl
 		,	TextField	= this.SpliceJS.Controls.TextField;
-		
+
 		
 		// move extend to the top
 		// present with sematically correct naming
@@ -32,8 +34,8 @@ _.Module({
 				
 				this.onDisplay.subscribeAsync(function(){
 					var self= this;
-					_.HttpRequest.get({
-						url:_.absPath('DataTable/application/src/data/dataApr-2-2015.json'),
+					HttpRequest.get({
+						url: absPath('DataTable/application/src/data/dataApr-2-2015.json'),
 						onok:function(data){
 							var sourceData = JSON.parse(data.text);
 							

@@ -1,10 +1,10 @@
-_.Module({
+sjs({
 
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
-	_.home('lib/leaflet-0.7.3/leaflet.css'),
-	_.home('lib/leaflet-0.7.3/leaflet-src.js'),
+	'{sjshome}/lib/leaflet-0.7.3/leaflet.css',
+	'{sjshome}/lib/leaflet-0.7.3/leaflet-src.js',
 	'splice.controls.map.css',
 	'splice.controls.map.html',
 ],

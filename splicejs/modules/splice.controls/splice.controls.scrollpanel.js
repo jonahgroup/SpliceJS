@@ -1,22 +1,21 @@
-_.Module({
-
+sjs({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
-	
-	_.configuration.platform.IS_MOBILE?'splice.controls.scrollpanel-mobile.css':'splice.controls.scrollpanel.css',
+	'splice.controls.scrollpanel.css',
 	'splice.controls.scrollpanel.html'
 ],
 
 definition:function(){
 
-	var Component = this.framework.Component;
+	var Component = this.framework.Component
+	,	configuration = this.framework.configuration;
 	
 	var UIControl = this.SpliceJS.UI.UIControl;
 	var DragAndDrop = this.SpliceJS.UI.DragAndDrop;
 
-	var isTouch 	= _.configuration.platform.IS_TOUCH_ENABLED;
-	var isMobile 	= _.configuration.platform.IS_MOBILE;
+	var isTouch 	= configuration.platform.IS_TOUCH_ENABLED;
+	var isMobile 	= configuration.platform.IS_MOBILE;
 
 	var ScrollPanel = Component('ScrollPanel')(function ScrollPanel(args){
 		if(!args) return;

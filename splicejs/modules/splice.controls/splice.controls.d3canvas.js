@@ -1,9 +1,9 @@
 /* global d3 */
-_.Module({
+sjs({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
-	_.home('lib/d3-3.5.5/d3.min.js'),
+	'{sjshome}/lib/d3-3.5.5/d3.min.js',
 	'splice.controls.d3canvas.html'
 ],
 

@@ -1,8 +1,8 @@
-_.Module({
+sjs({
 
 required:[
 
-	_.home('modules/splice.data.js'),
+	{'Data':'{sjshome}/modules/splice.data.js'},
 	{'SpliceJS.Controls' : 'splice.controls.d3canvas.js'},
 	{'Charts' : 'charts/splice.controls.charts.dial.js'},
 	{'Charts' : 'charts/splice.controls.charts.barchart.js'},

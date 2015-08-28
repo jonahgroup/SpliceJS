@@ -1,4 +1,4 @@
-_.Module({
+sjs({
 definition:function(){
 
 	function getValueUnit(value){
@@ -148,6 +148,26 @@ definition:function(){
 		}
 	};
 
+	function dom(element){
+		return {
+			append: function(child){
+				element.appendChild(child.element);
+				return dom(element);
+			},
+			size:	function(){
+				return element.childNodes.length;
+			},
+			element:element
+		}	
+	};
+
+	function create(name){
+		return dom(document.createElement(name));	
+	};
+
+	dom.text = function(value){
+		return dom(document.createTextNode(value));	
+	};
 
 	function screenWidth(){
 		return window.screen.width;
@@ -171,7 +191,10 @@ definition:function(){
 			width		:screenWidth,
 			height		:screenHeight
 		},
-		window:{}
+		window:{},
+		create:create,
+		dom:dom,
+		
 	}
 
 }});

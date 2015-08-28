@@ -1,7 +1,8 @@
-_.Module({
+sjs({
 	
 required:[
-	{'SpliceJS.Controls':_.home('modules/splice.controls.js')},
+	{'SpliceJS.Controls': '{sjshome}/modules/splice.controls.js'},
+	{'Data': '{sjshome}/modules/splice.data.js'},
 	 'controlsdemoapplication.css',
 	 'controlsdemoapplication.html',
 		
@@ -12,10 +13,12 @@ definition: function(){
 
 	var Component = this.framework.Component
 	,	Class = this.framework.Class
-	,	scope = this;
+	,	Event = this.framework.Event
+	,	debug = this.framework.debug
+	,	scope = this
+	,	data  = this.Data.data;
 
 	var UIControl = this.SpliceJS.Controls.UIControl;
-
 
 
 	var sampleChartData = {
@@ -41,8 +44,8 @@ definition: function(){
 
 	var sampleTableData = {
 			headers: sampleChartData.labels,
-			data: _.data(sampleChartData.datasets).to(function(k,v){
-				var val = _.data(v.data).to().result;
+			data: data(sampleChartData.datasets).to(function(k,v){
+				var val = data(v.data).to().result;
 				return val;
 			}).result,
 	}
@@ -75,16 +78,16 @@ definition: function(){
 
 
 
-	ControlsDemoApplication.prototype.onListData   = _.Event;
-	ControlsDemoApplication.prototype.onSampleData = _.Event;
-	ControlsDemoApplication.prototype.onChartData  = _.Event;
-	ControlsDemoApplication.prototype.onFlipViews  = _.Event;
-	ControlsDemoApplication.prototype.onButtonClicked = _.Event.transform(function(args){
+	ControlsDemoApplication.prototype.onListData   = Event;
+	ControlsDemoApplication.prototype.onSampleData = Event;
+	ControlsDemoApplication.prototype.onChartData  = Event;
+	ControlsDemoApplication.prototype.onFlipViews  = Event;
+	ControlsDemoApplication.prototype.onButtonClicked = Event.transform(function(args){
 		return 'ha';
 	}); 	
 
 	ControlsDemoApplication.prototype.buttonClicked = function(){
-		_.debug.log('Button clicked HAHA');
+		debug.log('Button clicked HAHA');
 	}
 
 
@@ -139,7 +142,7 @@ definition: function(){
 
 
 	ControlsDemoApplication.prototype.listItemSelected = function(item){
-		_.debug.log(item);
+		debug.log(item);
 	};
 
 

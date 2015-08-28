@@ -1,17 +1,19 @@
 /* global _ */
-_.Module({
+sjs({
 	
 required:[
 	
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
-	{'Doc': _.home('modules/splice.document.js')},
+	{'Doc':  '{sjshome}/modules/splice.document.js'},
+	{'Data': '{sjshome}/modules/splice.data.js'},
 	'splice.controls.css',
 	'splice.controls.datatable.css',
 	'splice.controls.datatable.html'
 ],
 
 definition:function(){
+	"use strict";
 	
 	function _if(obj){
 		if(!obj) return {};
@@ -22,7 +24,12 @@ definition:function(){
 	var Class = this.framework.Class
 	,	Event = this.framework.Event
 	,	Component = this.framework.Component
-	,	Doc = this.Doc;
+	,	mixin = this.framework.mixin
+	,	Doc = this.Doc 
+	,	create = this.Doc.create
+	,	dom = this.Doc.dom
+	,	data = this.Data.data;
+
 	
 	var UIControl = this.SpliceJS.UI.UIControl; 
 	
@@ -33,57 +40,54 @@ definition:function(){
 		/* call parent constructor */
 		UIControl.apply(this,arguments);
 
-		this.dom = this.ref.tableBody.elements.dataTable;
-		this.elements.dataTable = this.ref.tableBody.elements.dataTable;
-		
-		this.elements.columnHeaderTable = null; 
-		
-		if(this.ref.tableHeader)
-			this.elements.columnHeaderTable = this.ref.tableHeader.elements.columnHeaderTable;
+		//get body and header tables, they may be one and same table
+		this.bodyTable = this.ref.body.elements.table;
+		this.headTable = this.ref.head.elements.table;
 
 		/*	
 			table type determines scrolling layout
 			and header configuration
 		*/	
-		if(!this.tableType)
-			this.tableType = 'default';
+		if(!this.tableType)	this.tableType = 'default';
 		
-			
-		/* temp data buffer */	
-		this.source_data = null;	
 
-		/* temp dom data hold */	
-		this.dataRows = [];
-		this.headerRow = null;
-		
-		this.pageCurrent = 0;
-		if(!this.pageSize) this.pageSize = 25;
-		
-		_initializeTable.call(this);
+		mixin(this, {
+			
+			source_data:null,
+			dataRows : [],
+			headerRow : null,
+			pageCurrent:0,
+			pageSize: this.pageSize?this.pageSize:100,
+			bodyRowTemplate: this.rowTemplate  ? this.rowTemplate:  DefaultRow,
+			headRowTemplate: this.headTemplate ? this.headTemplate: DefaultRow
+			
+		});
+				
+		initializeTable.call(this);
 
 	}).extend(UIControl);
 	
 	
 	DataTable.prototype.filterData = function(data_filter){
 		this.data_filter = data_filter;
-		_applyFilter.call(this);
-		_renderTable.call(this,this.ready_data);
+		applyFilter.call(this);
+		renderTable.call(this,this.ready_data);
 	};
 	
 	DataTable.prototype.clearFilter = function(){
 		this.data_filter = null;
-		_renderTable.call(this);	
+		renderTable.call(this);	
 	};
 	
 	DataTable.prototype.pageNext = function(){
 		this.pageCurrent++;	
-		_renderTable.call(this);
+		renderTable.call(this);
 	};
 
 	DataTable.prototype.pagePrev = function(){
 		this.pageCurrent--;
 		if(this.pageCurrent < 1) this.pageCurrent = 0;
-		_renderTable.call(this);	
+		renderTable.call(this);	
 	};
 
 	DataTable.prototype.pageTo = function(page){
@@ -103,9 +107,9 @@ definition:function(){
 		this.source_data = dataInput; 
 		
 		this.ready_data = { headers: dataInput.headers };
-		this.ready_data.data =_.data(dataInput.data).page(this.pageSize);
+		this.ready_data.data = data(dataInput.data).page(this.pageSize);
 
-		_renderTable.call(this,this.ready_data);		
+		renderTable.call(this,this.ready_data);		
 		
 	};
 
@@ -117,7 +121,11 @@ definition:function(){
 	DataTable.prototype.onPage 	 = Event;
 
 
-	function _initializeTable(){
+
+	/**
+	 *	'private' calls 
+	 */
+	function initializeTable(){
 		
 		Event.attach(window, 'onresize').subscribe(function(){this.reflow();},this);
 		
@@ -127,11 +135,20 @@ definition:function(){
 				this.onScroll();
 			},this);
 		}
+	
+		this.onHeadClick = Event.attach(this.headTable,'onmousedown');
+		this.onBodyClick = Event.attach(this.bodyTable,'onmousedown');
+		
+		
+		this.onHeadClick.subscribe(function(args){
+			console.log(args);
+		},this);
+	
 	};
 
 
 
-	function _applyFilter(){
+	function applyFilter(){
 		/*
 			Apply search filters
 		*/
@@ -153,72 +170,30 @@ definition:function(){
 		}
 
 		this.currentPage = 0;
-		this.ready_data.data =_.data(filtered_data).page(this.pageSize);
+		this.ready_data.data = data(filtered_data).page(this.pageSize);
 			
 	};
 
 
-	function _renderTable(){
+	function renderTable(){
 		
 		var data 	= this.ready_data.data.to(this.pageCurrent).current
 		, 	headers = this.ready_data.headers
 		,	columnCount = this.ready_data.headers.length;
 		
 		/* add columns */
-		if(headers instanceof Array) {
-			if(this.headerRow) this.headerRow.dataIn(headers);
-			else {
-				/* custom header row content */
-				if(this.headerTemplate){
-					this.headerRow = new this.headerTemplate({parent:this});
-					this.headerRow.dataIn(headers);
-					this.addDomHeader(this.headerRow.concrete.dom);
-				}
-				/* standard table header row */
-				else {
-					this.addDefaultHeader(headers);
-				}
-			}
-		}
+		if(!this.headRow) {
+			this.headRow = new this.headRowTemplate({parent:this}); 
+		}  
+		
+		this.headRow.dataIn(headers);
+		addHeadRow(this.headTable, this.headRow.getNodes());
 		
 		
-		/* data must be an array of objects */
-		if(!(data instanceof Array)) return;
+		addBodyRow()
 		
 		/* udpate existing rows */
-		for(var j=0; j < this.dataRows.length; j++){
-			if(!data[j]){
-				/* remove extra dataRows and table rows*/
-				for(var k=this.dataRows.length-1; k>=j; k--){
-					this.removeRowByIndex(k); //!!!!! this is because of the header row
-					this.dataRows.splice(k,1);
-				}
-				break;
-			}
-			this.dataRows[j].dataIn(data[j], this.data_filter);
-		}
-				
-		/* add new rows*/
-		var domModified = false;
-		for(var i=j; i<data.length; i++){
-			var r = data[i];
-			
-			/* insert templated row */
-			if(this.rowTemplate) {
-				var dataRow = new this.rowTemplate({parent:this,columnCount:columnCount});
-				
-				this.dataRows.push(dataRow);
-				
-				dataRow.dataIn(r,this.data_filter);
-				
-				this.addDomRow(dataRow.concrete.dom);
-				domModified = true;
-				continue;
-			}
-			
-			this.addBodyRow(createDefaultRow(r));
-			domModified = true;
-		}
+
 		this.onDomChanged();
 		this.reflow();
 	};
@@ -235,16 +210,35 @@ definition:function(){
 
 
 
-	DataTable.prototype.removeRowByIndex = function(rowIndex){
+	function removeRowByIndex(rowIndex){
 		this.dom.deleteRow(rowIndex);
 	};
+
+
+
+	function addHeadRow(target,nodes) {
+				
+		/* get or create tHead of a target table */
+		var thead = target.tHead;
+		if(!thead) { 
+			thead = target.createTHead();
+			thead.insertRow();
+		}		
+		
+		var row = dom(thead.rows[0]);
 	
-	DataTable.prototype.clear = function(){
+		/*add new th cells*/
+		for(var i= row.size(); i<nodes.length; i++){
+			row.append(create('th').append(nodes[i]));
+		}
+	
 	};
 	
-
+	function addBodyRow(){
+		
+	};
 	
-	function _addRowTo(target, row,isHeader){
+	function addRowTo(target, row,isHeader){
 		
 		var newrow =  target.insertRow();
 
@@ -299,18 +293,15 @@ definition:function(){
 		this.addBodyRow(row);
 	};
 
-	DataTable.prototype.addDefaultHeader = function(headers){
+	function addDefaultHeader(headers){
 		var row = [], cloned = [];
 
-		for(var i=0; i<headers.length; i++){
+		for(var i=0; i < headers.length; i++){
 			row.push(document.createTextNode(headers[i]));
 			cloned.push(document.createTextNode(headers[i]));
 		}
 		
 		this.addHeaderRow(this.elements.columnHeaderTable, row);
-		if(this.tableType == 'default') return;
-		
-		this.addHeaderRow(this.elements.dataTable, cloned);
 	};
 
 	DataTable.prototype.addDomHeader = function(dom){
@@ -394,10 +385,24 @@ definition:function(){
 
 
 
+	/**
+	 *	Used when row template is not specified 
+	 */
+	var DefaultRow = function DefaultRow(){
+		this.nodes = [];	
+	};
+	
 
-
-
-
+	DefaultRow.prototype.dataIn = function(data){
+		if(!data) return;
+		for(var i=0; i < data.length; i++){
+			this.nodes.push(dom.text(data[i]));
+		}
+	};
+	
+	DefaultRow.prototype.getNodes = function(){
+		return this.nodes;
+	};
 
 
 	/** 
@@ -452,6 +457,10 @@ definition:function(){
 		}
 		
 		this.dataOut(this.data);
+	};
+	
+	DataTableRow.prototype.getNodes = function(){
+		
 	};
 	
 	DataTableRow.prototype.dataOut = Event;

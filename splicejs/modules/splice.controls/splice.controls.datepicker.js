@@ -1,8 +1,8 @@
-_.Module({
+sjs({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'}
-,	_.home('modules/splice.text.js')
+,	'{sjshome}/modules/splice.text.js'
 ,	{'SpliceJS.Controls':'splice.controls.calendar.js'}
 ,	{'SpliceJS.Controls':'splice.controls.selectors.js'}
 ,	'splice.controls.datepicker.html'

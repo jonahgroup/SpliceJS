@@ -1,4 +1,4 @@
-_.Module({
+sjs({
 
 
 definition:function(){

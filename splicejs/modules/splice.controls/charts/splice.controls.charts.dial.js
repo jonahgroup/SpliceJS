@@ -1,5 +1,5 @@
 /* global JSPositioning */
-_.Module({
+sjs({
 	
 required:[
 	

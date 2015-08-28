@@ -1,8 +1,8 @@
 /* global _*/
-_.Module({
+sjs({
 
 required:[
-	{'SpliceJS.UI':_.home('modules/splice.ui.js')}
+	{'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'}
 ],
 
 

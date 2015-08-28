@@ -1,5 +1,5 @@
-/* global _ */
-_.Module({
+/* global sjs */
+sjs({
 
 definition:function(){
 

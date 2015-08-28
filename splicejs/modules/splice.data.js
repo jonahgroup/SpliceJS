@@ -1,31 +1,30 @@
-_.data = (function(){
-
+sjs({
+definition:function(){
 	/*
-		Paginator
+			Paginator
 	*/
-
 	var Paginator = function Paginator(data, pageSize, startPage){
 
 		this.data = data;
-		
+
 		this.pageSize = pageSize || 2 ;
-		
+
 		this.currentPage = -1;
-		
-		this.maxPage = Math.floor(this.data.length / pageSize) + 
+
+		this.maxPage = Math.floor(this.data.length / pageSize) +
 			( (this.data.length % pageSize) / (this.data.length % pageSize)) ;
-		
+
 		this.minPage = -1;
-				
+
 		if(startPage > 0) this.currentPage = startPage-1;
-		
+
 		this.next();
 	};
 
-	
+
 	function _page(){
 		this.current = [];
-		
+
 		if(this.currentPage > this.maxPage) {
 			this.currentPage = this.maxPage;
 			return this;
@@ -38,20 +37,20 @@ _.data = (function(){
 
 		for(var i=0; i<this.pageSize; i++){
 			var idx = this.currentPage * this.pageSize + i;
-			
+
 			// boundary check
 			if(idx > this.data.length-1) {
 				break;
 			}
 			if(idx < 0) {
 				break;
-			}	
-			
+			}
+
 			this.current.push(this.data[idx]);
 		}
 		return this;
 	};
-	
+
 	Paginator.prototype = {
 		hasNext : function(){
 			/* compare next page idex to last element's index */
@@ -73,21 +72,57 @@ _.data = (function(){
 			return _page.call(this);
 		},
 		pages:function(){
-			return this.maxPage; 
+			return this.maxPage;
 		}
 	};
 
 
-	var Frame = function(size, step){
-		
-	};
+		var Frame = function(data, size, step){
+		  if (size == undefined) throw 'The frame size is required';
 
-	Frame.prototype.next = function(){};
-	Frame.prototype.prev = function(){};
+		  this.data = data;
+		  this.size = size;
+		  this.step = step || Math.ceil(this.data.length * 0.2);
+
+		  this.cursor = (-1)*this.step;
+
+		  if (this.step > this.size)
+		    throw 'The step should not exceed the size of the frame';
+		};
+
+		Frame.prototype.next = function () {
+		  if (this.hasMore()){
+		      this.cursor+=this.step;
+		  }
+
+		  return _frame.call(this);
+		};
+
+		Frame.prototype.hasMore = function(){
+		  return this.cursor + this.size <= this.data.length + this.step;
+		}
+
+		Frame.prototype.prev = function () {
+		  if (this.cursor >= 0)
+		    this.cursor-=this.step;
+
+		  return _frame.call(this);
+		};
+
+		var _frame = function(){
+		  if (this.cursor < 0 || !this.hasMore()) return [];
+
+		  var cursor = Math.min(this.cursor, this.data.length - this.size);
+		  return this.data.slice( cursor , Math.min(cursor + this.size, this.data.length) );
+		}
+
+		Frame.prototype.current = function(){
+		   return _frame.call(this);
+		};
 
 
 	function forEach(callback){
-		
+
 		// array iterator
 		if(this instanceof Array){
 			for(var i=0; i<this.length; i++){
@@ -100,7 +135,7 @@ _.data = (function(){
 			var keys = Object.keys(this);
 			for(var i=0; i<keys.length; i++){
 				callback( keys[i],this[keys[i]]);
-			}	
+			}
 		}
 		return data(this);
 	};
@@ -108,19 +143,19 @@ _.data = (function(){
 
 	function groupBy(grouping, groupingFunction){
 		var groupings = {};
-		
+
 		//array iterator
 		if(this instanceof Array){
 			for(var i=0; i<this.length; i++){
-				
+
 				var groupkey = typeof grouping === 'function' ? grouping(this[i],groupings) : null;
-				if(!groupkey) groupkey = 'default';			
+				if(!groupkey) groupkey = 'default';
 
 				var value = groupings[groupkey];
 				if(!value) {
-					if(typeof groupingFunction === 'function' && groupkey !== 'default') 
+					if(typeof groupingFunction === 'function' && groupkey !== 'default')
 						groupings[groupkey] = null;
-					else 
+					else
 						groupings[groupkey] = [];
 				}
 
@@ -129,11 +164,11 @@ _.data = (function(){
 					groupings[groupkey] = groupingFunction(this[i], groupings[groupkey]);
 
 				} else {
-					
+
 					groupings[groupkey].push(this[i]);
 				}
-			}	
-		
+			}
+
 			return data(groupings);
 		}
 
@@ -141,14 +176,14 @@ _.data = (function(){
 		//map iterator
 		if(this instanceof Object){
 			return data(groupings);
-		}	
+		}
 
 		return data(this);
 	};
 
 
 	function filter(condition){
-		
+
 		//array iterator
 		if(this instanceof Array){
 			var result = [];
@@ -180,21 +215,21 @@ _.data = (function(){
 
 
 	/**
-	 *	Array transformation function 
+	 *	Array transformation function
 	 */
 	function _objectToArray(onitem){
 		var result = []
 		, keys = Object.keys(this);
-		
+
 		if(!keys) return data(result);
 		if(keys.length < 1) return data(result);
-		
+
 		for(var i=0; i<keys.length; i++){
 			if(this.hasOwnProperty(keys[i])){
-				var value = this[keys[i]];	
+				var value = this[keys[i]];
 				if(typeof onitem === 'function')
 					value = onitem(keys[i],value,i);
-				
+
 				if(value == null || value == undefined) continue;
 				result.push(value);
 			}
@@ -203,37 +238,44 @@ _.data = (function(){
 	};
 
 	/**
-	 *	Array transformation function 
+	 *	Array transformation function
 	 */
 	function _numberToArray(onitem){
 		var n = +this
-		,	result = []; 
-		
+		,	result = [];
+
 		for(var i=0; i < n; i++){
 			var value = i;
 
 			if(typeof onitem === 'function')
-				value = onitem(i,value,i);	
+				value = onitem(i,value,i);
 
 			if(value == null || value == undefined) continue;
 			result.push(value);
 		}
 		return data(result);
-	};	
-	
+	};
+
 	function _contArrays(target, source){
 		if(!target) return;
 		if(!(source instanceof Array)) return;
-		
+
 		for(var i=0; i<source.length; i++){
 			target.push(source[i]);
 		}
-		return target;	
+		return target;
 	};
-	
-	
-	function sort(){
 
+	/**
+	 * @key - 
+	 * @compare - 
+	 */
+	function sort(compare){
+		//soring array
+		if(this instanceof Array){
+			return data(this.sort(compare));	
+		}	
+		return data(this);
 	};
 
 	function first(){
@@ -244,55 +286,63 @@ _.data = (function(){
 
 	function nth(n){
 		if(!(this instanceof Array)) return null;
-		return data(this[n]);	
+		return data(this[n]);
 	};
-	
+
 	function size(){
-		if(this instanceof Array) return this.length;	
+		if(this instanceof Array) return this.length;
 	};
-	
+
 	function add(source){
 		if(!source) return data(this);
-		
+
 		if(this instanceof Array && source instanceof Array ){
 			return data(_contArrays(this,source));
 		}
-		
+
 		if(this instanceof Array){
 			return data(this.push(source));
-		}	
-		
+		}
+
 		return data(this);
 	};
 
+	function join(callback){
+		
+	};
 
 	function data(d){
-		
+
 		var _export  = {
 			foreach		:function(callback){return forEach.call(d,callback);},
 			filter		:function(callback){return filter.call(d,callback);},
 			group		:function(callback,gfn){return groupBy.call(d,callback,gfn);},
 			first		:function(callback){return first.call(d);},
-			nth			:function(callback){return nth.call(d);},		
+			nth			:function(callback){return nth.call(d);},
 			page        :function(size,start) { return new Paginator(d, size, start);},
-			frame       :function(size,move){return new Frame(size,move);},
+			frame       :function(size,move){return new Frame(d,size,move);},
 			sort		:function(callback){return sort.call(d,callback);},
 			size		:function(callback){return size.call(d,callback);},
 			add			:function(toadd){return add.call(d,toadd);},
+			join		:function(dataset) { return {
+				where:function(callback){
+					
+				}
+			};},
+			
 			result  	:d
 		};
 
 		// multiplex "to" function
 		if(typeof d === 'number' || (d instanceof Number)){
-			_export.to = function(callback){return _numberToArray.call(d,callback);}; 
+			_export.to = function(callback){return _numberToArray.call(d,callback);};
 		} else if(typeof d === 'object' || d instanceof Array) {
 			_export.to = function(callback){return _objectToArray.call(d,callback);};
 		}
-		
-		
+
+
 		return _export;
 	};
-	return data;
-})();
-
-
+	
+	return { data:data};
+}});

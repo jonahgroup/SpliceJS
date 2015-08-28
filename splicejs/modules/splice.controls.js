@@ -1,5 +1,5 @@
 /* global _ */
-_.Module({
+sjs({
 
 required:[	
 			

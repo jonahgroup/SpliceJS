@@ -1,5 +1,5 @@
-/*blobal _ */
-_.Module({
+/*blobal sjs */
+sjs({
 
 definition:function(){
 
@@ -96,8 +96,8 @@ definition:function(){
 		this.onDataIn(this.dataItem);
 	};
 	
-	UIControl.prototype.dataOut = _.Event;
-	UIControl.prototype.onDataIn = _.Event;
+	UIControl.prototype.dataOut = Event;
+	UIControl.prototype.onDataIn = Event;
 
 	/**
 	 * Called by the layout manager or a parent view when container dimensions changed and

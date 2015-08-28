@@ -1,4 +1,4 @@
-_.Module({
+sjs({
 required:[
 	'splice.controls.calendar.html',
 	'splice.controls.calendar.css'
@@ -198,7 +198,7 @@ definition:function(){
 
 	var Controller = this.framework.Controller
 	,	Component = this.framework.Component
-
+	,	Event = this.framework.Event;
 
 	var Calendar = Component('Calendar')(function Calendar(){
 		Controller.call(this);
@@ -215,16 +215,16 @@ definition:function(){
 
 		var self = this;
 
-		_.Event.attach(this.elements.grid, 'onmousedown', true).subscribe(function(e){
+		Event.attach(this.elements.grid, 'onmousedown', true).subscribe(function(e){
 		    this.selectedDate = e.source.__sjs__date
 		    this.onDateSelected(this.selectedDate);
 		},this);
 
-		_.Event.attach(this.elements.previous, 'onmousedown', true).subscribe(function(e){
+		Event.attach(this.elements.previous, 'onmousedown', true).subscribe(function(e){
 			this.previousMonth();
 		},this);
 
-		_.Event.attach(this.elements.next, 'onmousedown', true).subscribe(function(e){
+		Event.attach(this.elements.next, 'onmousedown', true).subscribe(function(e){
 			this.nextMonth();
 		},this);
 
@@ -232,7 +232,7 @@ definition:function(){
 	}).extend(Controller);
 
 
-	Calendar.prototype.onDateSelected = _.Event;
+	Calendar.prototype.onDateSelected = Event;
 
 
 	Calendar.prototype.previousMonth = function(){

@@ -6,19 +6,13 @@
 <script src="../splicejs/splice.js"></script>
 
 <script>
-	_.debug.enable();
+	sjs().debug.enable();
 	
-	_.boot(_.home([	
-		
-	    'modules/splice.typextension.js',
-	    'modules/splice.animation.js',
-      	'modules/splice.document.js',
-      	'modules/splice.network.js',
-        'modules/splice.text.js',
-        'modules/splice.data.js',
-        'modules/splice.controls.js'
-
-    ]))([
+	sjs().boot([	
+	   
+      	'{sjshome}/modules/splice.document.js',
+        '{sjshome}/modules/splice.data.js',
+        '{sjshome}/modules/splice.controls.js',
 
 		'resources/fontfaces.css',
         'Main/examples.js',
