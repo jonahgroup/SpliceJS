@@ -1,8 +1,9 @@
-sjs({
-definition:function(){
+_.data = (function(){
+
 	/*
-			Paginator
+		Paginator
 	*/
+
 	var Paginator = function Paginator(data, pageSize, startPage){
 
 		this.data = data;
@@ -266,16 +267,9 @@ definition:function(){
 		return target;
 	};
 
-	/**
-	 * @key - 
-	 * @compare - 
-	 */
-	function sort(compare){
-		//soring array
-		if(this instanceof Array){
-			return data(this.sort(compare));	
-		}	
-		return data(this);
+
+	function sort(){
+
 	};
 
 	function first(){
@@ -307,9 +301,6 @@ definition:function(){
 		return data(this);
 	};
 
-	function join(callback){
-		
-	};
 
 	function data(d){
 
@@ -320,16 +311,10 @@ definition:function(){
 			first		:function(callback){return first.call(d);},
 			nth			:function(callback){return nth.call(d);},
 			page        :function(size,start) { return new Paginator(d, size, start);},
-			frame       :function(size,move){return new Frame(d,size,move);},
+			frame       :function(size,move){return new Frame(size,move);},
 			sort		:function(callback){return sort.call(d,callback);},
 			size		:function(callback){return size.call(d,callback);},
 			add			:function(toadd){return add.call(d,toadd);},
-			join		:function(dataset) { return {
-				where:function(callback){
-					
-				}
-			};},
-			
 			result  	:d
 		};
 
@@ -343,6 +328,5 @@ definition:function(){
 
 		return _export;
 	};
-	
-	return { data:data};
-}});
+	return data;
+})();
