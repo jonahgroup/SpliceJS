@@ -1,4 +1,5 @@
-_.data = (function(){
+sjs({
+definition:function(){
 
 	/*
 		Paginator
@@ -311,7 +312,7 @@ _.data = (function(){
 			first		:function(callback){return first.call(d);},
 			nth			:function(callback){return nth.call(d);},
 			page        :function(size,start) { return new Paginator(d, size, start);},
-			frame       :function(size,move){return new Frame(size,move);},
+			frame       :function(size,move){return new Frame(d,size,move);},
 			sort		:function(callback){return sort.call(d,callback);},
 			size		:function(callback){return size.call(d,callback);},
 			add			:function(toadd){return add.call(d,toadd);},
@@ -328,5 +329,6 @@ _.data = (function(){
 
 		return _export;
 	};
-	return data;
-})();
+	return {data:data};
+}
+});
