@@ -375,6 +375,7 @@ var sjs = (function(window, document){
  *	
  */
 function Tokenizer(input){
+	if(!(this instanceof Tokenizer) ) return new Tokenizer(input);
 	mixin(this, { 
 		input: input,	i : 0,	c : input[0]
 	});
