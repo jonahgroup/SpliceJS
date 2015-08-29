@@ -1,5 +1,6 @@
 	
-var Formatter = (function(){
+sjs({
+definition:function(){
 
 var STRINGBODY = 0
 , 	FORMAT = 1
@@ -425,18 +426,16 @@ function format(){
 	}
 
 	return result;
-}
+};
 
-return format;
 
-})();
 
-	/**
-	 * Text manupulation wrapper function	
-	 * @text parameter primitive type object String, Number	
-	 * @return object supporting text manipulation API
-	 */
-_.Text = function(text){
+/**
+	* Text manupulation wrapper function	
+	* @text parameter primitive type object String, Number	
+	* @return object supporting text manipulation API
+	*/
+var Text = function(text){
 	if( typeof text !=='string') return null;
 
 	return {
@@ -529,4 +528,23 @@ _.Text = function(text){
 	};
 };
 
-_.Text.format = Formatter;
+
+
+
+
+return {
+	format:format,
+	Text:Text
+}
+
+}});
+
+
+
+
+
+
+
+
+
+

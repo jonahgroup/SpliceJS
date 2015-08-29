@@ -1,12 +1,16 @@
-(function(){
-    "use strict";
+sjs({
 
+definition:function(){
+    "use strict";
+	var HttpRequest = this.framework.HttpRequest
+	,	debug = this.framework.debug;
 	
-    _.Remote = Object.create(null);
+    var Remote = Object.create(null);
+	
 
     //arguemnt array of remote calls - array of strings, 
     //or an object to receive remote call declarations
-	_.RemoteCalls = function (obj) {
+	var RemoteCalls = function (obj) {
 
 	    var fn = function (calls) {
 
@@ -41,7 +45,7 @@
 	                    if (!SPLICE_REMOTE_ENDPOINT) //perform a stronger check for a valid URL syntax
 	                        throw 'Remote end-point is not configured';
 
-	                    _.HttpRequest.post({
+	                    HttpRequest.post({
 	                        /* TODO: server end point URL, turn into a configurable property */
 	                        url: SPLICE_REMOTE_ENDPOINT,
 
@@ -107,10 +111,14 @@
         else 
 		    json = '{"request":{"Call":"' + methodName + '","Parameters":' + JSON.stringify(args) + '}}';
 
-		_.debug.log(json);
+		debug.log(json);
 		
 		return json;
 	};
 
-	
-})();
+	return {
+		RemoteCalls: RemoteCalls
+	}	
+
+}
+});

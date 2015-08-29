@@ -1,16 +1,20 @@
 /*blobal sjs */
 sjs({
-
+required:[
+	{'Animation':'{sjshome}/modules/splice.animation.js'}
+],
 definition:function(){
 
 	//enable strict mode
 	"use strict"; 
 	
 	// importing framework features makes our code less verbose
-	var Class = this.framework.Class;
-	var Controller = this.framework.Controller;
-	var Event = this.framework.Event;
-
+	var Class = this.framework.Class
+	, 	Controller = this.framework.Controller
+	, 	Event = this.framework.Event
+	,	debug = this.framework.debug;
+	
+	var Animate = this.Animation.Animate;
 
 	/**
 	 * HTML Element decorator
@@ -57,7 +61,7 @@ definition:function(){
 		this.prevDisplayState = this.elements.root.style.display; 
 		
 		if(this.animate){
-			_.Animate(this.elements.root).opacity(100, 0, 300,function(){
+			Animate(this.elements.root).opacity(100, 0, 300,function(){
 				self.elements.root.style.display = 'none';
 			});
 		}
@@ -78,13 +82,13 @@ definition:function(){
 		this.elements.root.style.display = this.prevDisplayState;
 		
 		if(this.animate) {
-			_.Animate(this.elements.root).opacity(0, 100, 300);
+			Animate(this.elements.root).opacity(0, 100, 300);
 		}
 		this.isHidden = false;
 	};
 	
 	UIControl.prototype.changeState = function(args){
-		_.debug.log('Changing button\'s state');
+		debug.log('Changing button\'s state');
 		if(args && args.isHidden)
 			this.hide();
 		else 

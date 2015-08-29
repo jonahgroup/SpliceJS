@@ -149,6 +149,7 @@ definition:function(){
 	};
 
 	function dom(element){
+		if(!element) return null;
 		return {
 			append: function(child){
 				element.appendChild(child.element);
@@ -157,17 +158,31 @@ definition:function(){
 			size:	function(){
 				return element.childNodes.length;
 			},
+			value:function(newvalue){
+				//test node
+				if(element.nodeType == 3) element.nodeValue = newvalue;
+				return dom(element);
+			},
+			prop:function(prop,value){
+				if(value == null || value == undefined) return element[prop];
+				element[prop] = value;
+				return dom(element);		
+			},
 			element:element
 		}	
-	};
-
-	function create(name){
-		return dom(document.createElement(name));	
 	};
 
 	dom.text = function(value){
 		return dom(document.createTextNode(value));	
 	};
+
+	
+
+	function create(name){
+		return dom(document.createElement(name));	
+	};
+
+
 
 	function screenWidth(){
 		return window.screen.width;

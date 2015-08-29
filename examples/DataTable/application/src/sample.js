@@ -7,7 +7,7 @@ sjs({
 		{'SpliceJS.Controls': '{sjshome}/modules/splice.controls/splice.controls.buttons.js'},
 		{'SpliceJS.Controls': '{sjshome}/modules/splice.controls/splice.controls.datatable.js'},
 		{'SpliceJS.Controls': '{sjshome}/modules/splice.controls/splice.controls.controllers.js'},
-		
+		{'Data':'{sjshome}/modules/splice.data.js'},
 		'sample.css',
 		'sample.html'
 	],

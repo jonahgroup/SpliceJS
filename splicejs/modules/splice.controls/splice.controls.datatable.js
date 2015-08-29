@@ -58,7 +58,7 @@ definition:function(){
 			headerRow : null,
 			pageCurrent:0,
 			pageSize: this.pageSize?this.pageSize:100,
-			bodyRowTemplate: this.rowTemplate  ? this.rowTemplate:  DefaultRow,
+			bodyRowTemplate: /*this.rowTemplate  ? this.rowTemplate:*/  DefaultRow,
 			headRowTemplate: this.headTemplate ? this.headTemplate: DefaultRow
 			
 		});
@@ -141,7 +141,9 @@ definition:function(){
 		
 		
 		this.onHeadClick.subscribe(function(args){
-			console.log(args);
+			
+			var colindex = dom(args.source).prop('-sjs-col-index');
+			
 		},this);
 	
 	};
@@ -181,38 +183,56 @@ definition:function(){
 		, 	headers = this.ready_data.headers
 		,	columnCount = this.ready_data.headers.length;
 		
+		/*check and create table body */
+		if(!this.bodyTable.tBodies[0]) {
+			this.bodyTable.createTBody();
+		} 
+		
+		
+		
 		/* add columns */
 		if(!this.headRow) {
-			this.headRow = new this.headRowTemplate({parent:this}); 
+			this.headRow = new this.headRowTemplate({parent:this,columnCount}); 
 		}  
 		
 		this.headRow.dataIn(headers);
 		addHeadRow(this.headTable, this.headRow.getNodes());
 		
+		var data_row = '';
+		//update existing rows
+		for(var i=0; i < this.dataRows.length && i < data.length; i++) {
+			data_row = this.dataRows[i];
+			data_row.dataIn(data[i]);	
+			addBodyRow(this.bodyTable, data_row.getNodes(), i);
+		}
 		
-		addBodyRow()
+		/* create new rows*/
+		for(var j=this.dataRows.length; j < data.length; j++ ){
+			data_row = new this.bodyRowTemplate({parent:this, columnCount});
+			this.dataRows.push(data_row);
+			data_row.dataIn(data[j]);
+			addBodyRow(this.bodyTable, data_row.getNodes(), j);
+		}
 		
-		/* udpate existing rows */
+		truncateRows(this.bodyTable, data.length);	
 
-		this.onDomChanged();
 		this.reflow();
 	};
 
 	
-	
-	function createDefaultRow(r){
-		var row = [];
-		for(var i=0; i< r.length; i++ ){
-			row.push(document.createTextNode(r[i]));
-		}
-		return row;	
+
+	function truncateRows(target,length){
+		var tbody = target.tBodies[0];
+		
+		var d = tbody.rows.length - length;
+		
+		while(d > 0){
+			target.deleteRow(length);
+			d--;
+		}	
 	};
 
 
-
-	function removeRowByIndex(rowIndex){
-		this.dom.deleteRow(rowIndex);
-	};
 
 
 
@@ -229,98 +249,23 @@ definition:function(){
 	
 		/*add new th cells*/
 		for(var i= row.size(); i<nodes.length; i++){
-			row.append(create('th').append(nodes[i]));
+			row.append(create('th').prop('-sjs-col-index',i).append(nodes[i]));
 		}
-	
-	};
-	
-	function addBodyRow(){
-		
 	};
 	
-	function addRowTo(target, row,isHeader){
+	function addBodyRow(target,nodes,index){
+		var tbody = target.tBodies[0]	
+		, 	row = dom(tbody.rows[index]);
+
+		if(!row) row = dom(tbody.insertRow());
 		
-		var newrow =  target.insertRow();
-
-		for(var i=0; i < row.length; i++ ){
-		    var cell = null;
-
-		    if (isHeader) {
-		        cell = document.createElement('th');
-		        newrow.appendChild(cell);
-		    }
-		    else {
-		        cell = newrow.insertCell();
-		    }
-						
-			if(typeof(row[i]) == 'object')
-				cell.appendChild(row[i]);
-			else {
-				cell.appendChild(document.createTextNode(row[i]));
-			}
+		/*add new td cells*/
+		for(var i= row.size(); i < nodes.length; i++){
+			row.append(create('td').append(nodes[i]));
 		}
 	};
+	
 
-	DataTable.prototype.addHeaderRow = function(dom,headers){
-
-		if(!headers) 	return;
-		if(!dom)		return;
-		if(dom.tHead) dom.deleteTHead();
-		
-		var tHead = dom.createTHead();
-		
-		_addRowTo(tHead, headers, true);
-	};
-
-	DataTable.prototype.addBodyRow = function(row){
-		
-		if(!row) return;
-		if(!(row instanceof Array)) throw 'Argument must be of type Array';
-		
-		var tBody = this.dom.tBodies[0]; 
-		if(!tBody) tBody = this.dom.createTBody();
-		
-		_addRowTo(tBody,row);
-	};
-
-	DataTable.prototype.addDomRow = function(dom){
-		var row = [];	
-		for(var i=0; i< dom.childNodes.length; i++){
-			var node = dom.childNodes[i];
-			/* element nodes only */
-			if(node.nodeType === 1) row.push(node);
-		}
-		this.addBodyRow(row);
-	};
-
-	function addDefaultHeader(headers){
-		var row = [], cloned = [];
-
-		for(var i=0; i < headers.length; i++){
-			row.push(document.createTextNode(headers[i]));
-			cloned.push(document.createTextNode(headers[i]));
-		}
-		
-		this.addHeaderRow(this.elements.columnHeaderTable, row);
-	};
-
-	DataTable.prototype.addDomHeader = function(dom){
-		var row = [];	
-		for(var i=0; i< dom.childNodes.length; i++){
-			var node = dom.childNodes[i];
-			/* element or text nodes only */
-			if(node.nodeType === 1) row.push(node);
-		}
-		/*
-			Data table gets cloned row
-		*/
-		var cloned = [];
-		for(var i=0; i<row.length; i++){
-			cloned[i] = row[i].cloneNode(true);
-		}
-		this.addHeaderRow(this.elements.columnHeaderTable, row);
-		this.addHeaderRow(this.elements.dataTable, cloned);
-	};
 
 	DataTable.prototype.reflow = function(){
 		/* user offsetWidth it included border sizes */
@@ -331,20 +276,16 @@ definition:function(){
 		//this.elements.columnHeaderTable.style.width = this.elements.dataTable.offsetWidth  + 'px';
 		/* measure column sizes */
 		
-		var body = this.elements.dataTable.tHead; 
-		if(this.tableType == 'default')
-			body = this.elements.dataTable.tBodies[0];
-		
-		var head = _if(this.elements.columnHeaderTable).tHead;
-		var wrapper = this.ref.tableBody.elements.tableWrapper;
-
-
+		var	body = this.bodyTable.tBodies[0];
+		var head = this.headTable.tHead;
+				      
+		var wrapper = this.ref.body.elements.tableWrapper;
 
 		if(!body) return; //empty table no records were added
 
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEEDS TO WORK WITH CALCULATED STYLES 
 		if(body.clientWidth < wrapper.clientWidth) {
-			this.elements.dataTable.style.width = (wrapper.clientWidth - 1)  + 'px';
+			this.bodyTable.style.width = (wrapper.clientWidth - 1)  + 'px';
 		}
 		
 		// we are using scroll panel, reflow
@@ -395,7 +336,14 @@ definition:function(){
 
 	DefaultRow.prototype.dataIn = function(data){
 		if(!data) return;
-		for(var i=0; i < data.length; i++){
+		
+		//update existing values
+		for(var j = 0; j < this.nodes.length; j++ ){
+			this.nodes[j].value(data[j]);
+		}
+		
+		//add new nodes
+		for(var i = this.nodes.length; i < data.length; i++){
 			this.nodes.push(dom.text(data[i]));
 		}
 	};
