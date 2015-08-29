@@ -28,8 +28,8 @@ definition:function(){
 	,	Doc = this.Doc 
 	,	create = this.Doc.create
 	,	dom = this.Doc.dom
-	,	data = this.Data.data;
-
+	,	data = this.Data.data
+	,	scope = this;
 	
 	var UIControl = this.SpliceJS.UI.UIControl; 
 	
@@ -55,11 +55,13 @@ definition:function(){
 			
 			source_data:null,
 			dataRows : [],
+			headCells:[],
 			headerRow : null,
 			pageCurrent:0,
 			pageSize: this.pageSize?this.pageSize:100,
 			bodyRowTemplate: /*this.rowTemplate  ? this.rowTemplate:*/  DefaultRow,
-			headRowTemplate: this.headTemplate ? this.headTemplate: DefaultRow
+			headRowTemplate: this.headTemplate ? this.headTemplate: DefaultRow,
+			headCellTemplate: scope.templates['HeadCell']
 			
 		});
 				
@@ -142,6 +144,7 @@ definition:function(){
 		
 		this.onHeadClick.subscribe(function(args){
 			
+			//this is a sorting request
 			var colindex = dom(args.source).prop('-sjs-col-index');
 			
 		},this);
@@ -190,12 +193,19 @@ definition:function(){
 		
 		
 		
-		/* add columns */
+		/* add columns based on the template */
 		if(!this.headRow) {
 			this.headRow = new this.headRowTemplate({parent:this,columnCount}); 
 		}  
-		
+		//update create header row template nodes		
 		this.headRow.dataIn(headers);
+		
+		/*  wrap nodes into header cells, 
+		 *	to give us sorting controls and options triggers 
+		 */ 
+		updateHeadCells.call(this, this.headRow.getNodes()); 
+		 
+		// add nodes to the table head
 		addHeadRow(this.headTable, this.headRow.getNodes());
 		
 		var data_row = '';
@@ -219,6 +229,16 @@ definition:function(){
 		this.reflow();
 	};
 
+	
+	function updateHeadCells(nodes){
+		
+		for(var i = this.headCells.length; i < nodes.length; i++){
+			//no parent dependency here
+			var cell = new this.headCellTemplate();	
+			this.headCells.push(cell);
+			dom(cell.elements.content).append(nodes[i]);
+		} 	
+	};
 	
 
 	function truncateRows(target,length){

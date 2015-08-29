@@ -1,3 +1,4 @@
+/* global sjs */
 sjs({
 definition:function(){
 
