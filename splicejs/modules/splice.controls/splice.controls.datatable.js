@@ -203,10 +203,10 @@ definition:function(){
 		/*  wrap nodes into header cells, 
 		 *	to give us sorting controls and options triggers 
 		 */ 
-		updateHeadCells.call(this, this.headRow.getNodes()); 
+		var nodes = updateHeadCells.call(this, this.headRow.getNodes()); 
 		 
 		// add nodes to the table head
-		addHeadRow(this.headTable, this.headRow.getNodes());
+		addHeadRow(this.headTable, nodes);
 		
 		var data_row = '';
 		//update existing rows
@@ -229,7 +229,7 @@ definition:function(){
 		this.reflow();
 	};
 
-	
+	//returns a get of nodes
 	function updateHeadCells(nodes){
 		
 		for(var i = this.headCells.length; i < nodes.length; i++){
@@ -238,6 +238,11 @@ definition:function(){
 			this.headCells.push(cell);
 			dom(cell.elements.content).append(nodes[i]);
 		} 	
+		var nodes = [];
+		for(var j=0; j<this.headCells.length; j++){
+			nodes.push(dom(this.headCells[j].concrete.dom));			
+		}
+		return nodes;
 	};
 	
 

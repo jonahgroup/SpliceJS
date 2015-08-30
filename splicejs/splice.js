@@ -362,7 +362,8 @@ var sjs = (function(window, document){
 	function isAlphaNum(c){
 		if(!c) return false;
 		var code = c.charCodeAt();
-		if(	(code >= 48 && code <= 57)	||	/*0-9*/ 
+		if(	c === '_' ||
+			(code >= 48 && code <= 57)	||	/*0-9*/ 
 			(code >= 65 && code <= 90 ) || 	/*A-Z*/
 			(code >= 97 && code <= 122) 	/*a-z*/ )	
 		return true;
