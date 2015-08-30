@@ -14,12 +14,17 @@ body {
 }
 
 .sample-table.-sjs-datatable-root .-sjs-datatable th {
-	padding: 10px;
+
     background-color: #274239;
     color: #fefefe;
 	font-size:0.9em;
 	border: 1px solid #37564C;
 }
+.sample-table.-sjs-datatable-root .-sjs-datatable th:hover {
+    background-color: #222222;
+}
+
+
 
 .sample-table.-sjs-datatable-root .-sjs-scrollpanel .static  {
 	height:50px;

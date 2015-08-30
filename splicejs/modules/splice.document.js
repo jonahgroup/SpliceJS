@@ -168,6 +168,20 @@ definition:function(){
 				element[prop] = value;
 				return dom(element);		
 			},
+			block:function(){
+				element.style.display='block';
+				return dom(element);
+			},
+			parent:function(sel){
+					sel = sel.toUpperCase();
+				var	node = element;
+				
+				while(node){
+					if(node.nodeName === sel) return dom(node);
+					node = node.parentNode;
+				}
+				return dom(null);
+			},
 			element:element
 		}	
 	};

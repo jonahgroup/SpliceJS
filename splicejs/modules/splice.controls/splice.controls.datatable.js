@@ -145,8 +145,9 @@ definition:function(){
 		this.onHeadClick.subscribe(function(args){
 			
 			//this is a sorting request
-			var colindex = dom(args.source).prop('-sjs-col-index');
 			
+			var colindex = dom(args.source).parent('th').prop('-sjs-col-index');
+			dom(this.headCells[colindex].elements.sortTrigger).block();
 		},this);
 	
 	};
