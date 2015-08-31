@@ -25,10 +25,13 @@ definition:function(){
 	,	Event = this.framework.Event
 	,	Component = this.framework.Component
 	,	mixin = this.framework.mixin
+	,	debug = this.framework.debug
 	,	Doc = this.Doc 
 	,	create = this.Doc.create
 	,	dom = this.Doc.dom
 	,	data = this.Data.data
+	,	compare = this.Data.compare.default
+	,	DataStep = this.Data.DataStep
 	,	scope = this;
 	
 	var UIControl = this.SpliceJS.UI.UIControl; 
@@ -44,6 +47,8 @@ definition:function(){
 		this.bodyTable = this.ref.body.elements.table;
 		this.headTable = this.ref.head.elements.table;
 
+		this.sortTrigger = new scope.templates['SortTrigger']();
+
 		/*	
 			table type determines scrolling layout
 			and header configuration
@@ -52,27 +57,54 @@ definition:function(){
 		
 
 		mixin(this, {
-			
-			source_data:null,
 			dataRows : [],
-			headCells:[],
+			headCells:[], 	//holds sorting and filtering config
 			headerRow : null,
 			pageCurrent:0,
 			pageSize: this.pageSize?this.pageSize:100,
 			bodyRowTemplate: /*this.rowTemplate  ? this.rowTemplate:*/  DefaultRow,
 			headRowTemplate: this.headTemplate ? this.headTemplate: DefaultRow,
 			headCellTemplate: scope.templates['HeadCell']
-			
 		});
+
+		var self = this;
+		//data steps
+		var dataSteps =  {
+			source: new DataStep(function(d){return d;},true),
+			
+			filter: new DataStep((function(data){
+				return applyFilter.call(this,data, this.dataFilter)
+			}).bind(this)),
+			
+			page:	new DataStep(function(data){
+				return applyPage.call(self,data)
+			}),
+			sort:	new DataStep(function(data){
+				if(self.sortCell == undefined || self.sortCell == null )
+					return data;
+				return applySort(data,self.sortCell.index, self.sortCell.sortOrder);
+			}),
+			render:	new DataStep(function(data){
+				return data;
+			})
+		};
+		
+		//build data pipeline
+		dataSteps.source.add(dataSteps.filter);
+		dataSteps.filter.add(dataSteps.page);
+		dataSteps.page.add(dataSteps.sort);
+		dataSteps.sort.add(dataSteps.render);
+				
+		this.dataSteps = dataSteps;
 				
 		initializeTable.call(this);
 
 	}).extend(UIControl);
 	
 	
-	DataTable.prototype.filterData = function(data_filter){
-		this.data_filter = data_filter;
-		applyFilter.call(this);
+	DataTable.prototype.filterData = function(dataFilter){
+		this.dataFilter = dataFilter;
+		this.dataSteps.filter.run();
 		renderTable.call(this,this.ready_data);
 	};
 	
@@ -82,13 +114,15 @@ definition:function(){
 	};
 	
 	DataTable.prototype.pageNext = function(){
-		this.pageCurrent++;	
+		this.pageCurrent++;
+		this.dataSteps.page.run();
 		renderTable.call(this);
 	};
 
 	DataTable.prototype.pagePrev = function(){
 		this.pageCurrent--;
 		if(this.pageCurrent < 1) this.pageCurrent = 0;
+		this.dataSteps.page.run();
 		renderTable.call(this);	
 	};
 
@@ -105,24 +139,21 @@ definition:function(){
 	 * 
 	 * */
 	DataTable.prototype.dataIn = function(dataInput){
-		
-		this.source_data = dataInput; 
-		
-		this.ready_data = { headers: dataInput.headers };
-		this.ready_data.data = data(dataInput.data).page(this.pageSize);
-
-		renderTable.call(this,this.ready_data);		
-		
+		this.dataSteps.source.setdata(dataInput);
+		this.dataSteps.source.run();		
+		renderTable.call(this);		
 	};
 
-	/*
+		/*
 		Datatable events
 	*/
 
-	DataTable.prototype.onScroll = Event;
-	DataTable.prototype.onPage 	 = Event;
+	DataTable.prototype.onScroll 		= Event;
+	DataTable.prototype.onPage 	 		= Event;
+	DataTable.prototype.onRowSelected 	= Event;
 
 
+	
 
 	/**
 	 *	'private' calls 
@@ -141,58 +172,125 @@ definition:function(){
 		this.onHeadClick = Event.attach(this.headTable,'onmousedown');
 		this.onBodyClick = Event.attach(this.bodyTable,'onmousedown');
 		
-		
-		this.onHeadClick.subscribe(function(args){
-			
-			//this is a sorting request
-			
-			var colindex = dom(args.source).parent('th').prop('-sjs-col-index');
-			dom(this.headCells[colindex].elements.sortTrigger).block();
-		},this);
-	
+		this.onHeadClick.subscribe(handlerHeadClick,this);
+		this.onBodyClick.subscribe(handlerBodyClick,this);
 	};
 
 
+	function handlerHeadClick(args){
+		//this is a sorting request
+		var th = dom(args.source).parent('th')
+		, 	colindex = th.prop('-sjs-col-index')
+		,	headCell = this.headCells[colindex];
+		
+		this.sortCell = headCell;
+		
+		if( headCell.elements.filterTrigger   !== args.source && 
+			headCell.elements.filterIndicator !== args.source ){
+			sortTable.call(this,headCell);
+		} else {
+			pickFilter.call(this,headCell);
+		}
+	};
 
-	function applyFilter(){
-		/*
-			Apply search filters
-		*/
-		if(!this.data_filter) return;
-			
+
+	function sortComparator(columnIndex, order){
+		return function(a,b){
+			return order * compare(a[columnIndex], b[columnIndex]);	
+		}
+	};
+
+	function applyFilter(source, filter){
+
+		if(!filter) { 
+			return source;
+		}
 		
 		var filtered_data = [];
-		var source_data = this.source_data.data;
+		var source_data = source.data;
+		var headers = source.headers; 
 		
 		for(var i=0; i < source_data.length; i++){
 			for(var j=0; j< source_data[i].length; j++){
 				var v = source_data[i][j]; 
 				if(!v) continue;	
-				if((v+'').indexOf(this.data_filter) > -1) { 
+				if((v+'').indexOf(filter) > -1) { 
 					filtered_data.push(source_data[i]);
 					break;
 				}
 			}
 		}
+		return {data:filtered_data, headers:headers};
+	};
+	
+	function applyPage(source){
+		
+		var headers = source.headers;
+		var records = source.data;
+		
+		return {
+			headers:headers, 
+			data:data(records).page(this.pageSize).to(this.pageCurrent).current,
+		};
+	};
+	
+	//this is in place sorting
+	function applySort(source,columnIndex,order){
+		
+		var headers = source.headers;
+		var records = source.data;
+		
+		data(records).sort(sortComparator(columnIndex, order)).asc();				
+		return {	headers: headers, 
+					data:records, 
+		};
+	};
+	
+	function sortTable(headCell){
+		//set initial sort order to ascending
+		if(headCell.sortOrder == undefined){
+			headCell.sortOrder = 1; //asc
+		}
+		
+		
+		headCell.sortOrder = -1 * headCell.sortOrder;
+		var className = headCell.sortOrder == 1?'up':'down';
+		
+		dom(headCell.elements.root).append(dom(this.sortTrigger.concrete.dom));
+		dom(this.sortTrigger.concrete.dom).class.remove('up down').add(className);
 
-		this.currentPage = 0;
-		this.ready_data.data = data(filtered_data).page(this.pageSize);
-			
+		this.dataSteps.sort.run();
+		renderTable.call(this);
+	};
+	
+	function applyDataPipeline(){
+		applyFilter.call(this,this.dataSources.original);	
+		applyPage.call(this,this.dataSources.filter);
+		applySort.call(this,this.dataSources.page);
+		this.dataSources.render = this.dataSources.sort;
+	};
+
+
+	function pickFilter(headCell){
+		debug.log('picking filters');
+	};
+
+	function handlerBodyClick(args){
+		
 	};
 
 
 	function renderTable(){
 		
-		var data 	= this.ready_data.data.to(this.pageCurrent).current
-		, 	headers = this.ready_data.headers
-		,	columnCount = this.ready_data.headers.length;
+		var data 	= this.dataSteps.render.data.data
+		, 	headers = this.dataSteps.render.data.headers;
+		
+		var columnCount = headers.length;
 		
 		/*check and create table body */
 		if(!this.bodyTable.tBodies[0]) {
 			this.bodyTable.createTBody();
 		} 
-		
-		
 		
 		/* add columns based on the template */
 		if(!this.headRow) {
@@ -236,6 +334,7 @@ definition:function(){
 		for(var i = this.headCells.length; i < nodes.length; i++){
 			//no parent dependency here
 			var cell = new this.headCellTemplate();	
+				cell.index = i;
 			this.headCells.push(cell);
 			dom(cell.elements.content).append(nodes[i]);
 		} 	
@@ -302,8 +401,9 @@ definition:function(){
 		//this.elements.columnHeaderTable.style.width = this.elements.dataTable.offsetWidth  + 'px';
 		/* measure column sizes */
 		
-		var	body = this.bodyTable.tBodies[0];
-		var head = this.headTable.tHead;
+		
+		var	body = this.bodyTable.tBodies[0]
+		,	head = this.headTable.tHead;
 				      
 		var wrapper = this.ref.body.elements.tableWrapper;
 
@@ -312,6 +412,7 @@ definition:function(){
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEEDS TO WORK WITH CALCULATED STYLES 
 		if(body.clientWidth < wrapper.clientWidth) {
 			this.bodyTable.style.width = (wrapper.clientWidth - 1)  + 'px';
+			//this.headTable.style.width = (wrapper.clientWidth - 1)  + 'px';
 		}
 		
 		// we are using scroll panel, reflow

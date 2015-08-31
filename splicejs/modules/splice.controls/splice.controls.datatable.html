@@ -57,8 +57,10 @@
 <sjs-template type="HeadCell">
 	<div sjs-element="root" style="position:relative;">
 		<div class="content" sjs-element="content"></div>
-		<div class="sort-trigger down" sjs-element="sortTrigger" style="display:none;"></div>
-		<div class="filter-trigger" sjs-element=""><div></div></div>
+		<div class="filter-trigger" sjs-element="filterTrigger"><div sjs-element="filterIndicator"></div></div>
 	</div>
 </sjs-template>
 
+<sjs-template type="SortTrigger">
+	<div class="sort-trigger up" sjs-element="sortTrigger"></div>
+</sjs-template>

@@ -27,6 +27,7 @@
 	padding:10px;	
 	padding-right:28px;
 	padding-left:28px;
+    cursor:pointer;
 }
 
 
@@ -41,7 +42,24 @@
     top: 50%;
     margin-top: -2px;
     right: -15px;
+    transition: transform 0.2s ease-out;
 }
+
+
+.-sjs-datatable .sort-trigger.up {
+	position: absolute;
+    width: 0px;
+    height: 0px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #cecece;
+    top: 50%;
+    margin-top: -2px;
+    right: -15px;
+    transform:rotate(180deg);
+    transition: transform 0.2s ease-out;
+}
+
 
 .-sjs-datatable .filter-trigger {
 	width: 10px;

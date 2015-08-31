@@ -1,5 +1,8 @@
+/* global sjs */
 sjs({
 definition:function(){
+
+	var Tokenizer = this.framework.Tokenizer;
 
 	function getValueUnit(value){
 		if(!value) return null;
@@ -147,6 +150,61 @@ definition:function(){
 			if(n.nodeType != 3) return n;
 		}
 	};
+	
+	function ClassTokenizer(input){
+		var tokenizer = new Tokenizer(input)
+		,	token = null;
+		var classes = Object.create(null)
+		,	acc = '';
+		while(token = tokenizer.nextToken()){
+			if(Tokenizer.isSpace(token)) {
+				classes[acc] = 1;
+				acc = '';
+				continue;
+			}
+			acc += token;		
+		}
+		if(acc != '') classes[acc] = 1;
+		return classes;
+	}
+	
+	
+	function addClass(element, className){
+		var current = ClassTokenizer(element.className)
+		,	toAdd = ClassTokenizer(className)
+		,	clean = element.className;
+		
+		for(var key in toAdd ){
+			if(key in current) continue;
+			clean += ' ' + key;
+		}
+		
+		element.className = clean;
+	};
+	
+	function removeClass(element, className){
+		var current = ClassTokenizer(element.className)
+		,	toRemove = ClassTokenizer(className)
+		,	clean = '';
+		for(var key in current){
+			if(key in toRemove) continue;
+			clean += ' ' + key;
+		}
+		element.className = clean;
+	};
+	
+	function classOp(element){
+		return { 
+			remove: function(toRemove){
+				removeClass(element,toRemove)
+				return classOp(element);
+			},
+			add:function(toAdd){
+				addClass(element,toAdd);
+				return classOp(element); 
+			}
+		}
+	};
 
 	function dom(element){
 		if(!element) return null;
@@ -182,6 +240,8 @@ definition:function(){
 				}
 				return dom(null);
 			},
+			"class":classOp(element),
+			
 			element:element
 		}	
 	};

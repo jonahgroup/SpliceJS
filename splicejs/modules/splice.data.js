@@ -2,6 +2,40 @@
 sjs({
 definition:function(){
 
+	var mixin = this.framework.mixin;
+
+	var DataStep = function DataStep(dowork, issource){
+		mixin(this,{
+			input : null,
+			next : [],
+			data : null,
+			issource: issource
+			}
+		);
+		this.dowork = dowork;
+	};
+	DataStep.prototype = {
+		run:function(args){
+			var in_data = null;
+			if(this.issource) in_data = this.data;
+			else 
+				in_data = this.input.data;
+				
+			this.data = this.dowork(in_data, args);
+			for(var i=0; i< this.next.length; i++){
+				this.next[i].run();
+			}
+		},
+		add:function(step){
+			this.next.push(step);	
+			step.input = this;
+		},
+		setdata:function(data){
+			this.data = data;
+		}
+	};
+
+
 	/*
 		Paginator
 	*/
@@ -269,10 +303,39 @@ definition:function(){
 		return target;
 	};
 
-
-	function sort(){
-
+	
+	function defaultComparator(a,b) {
+		var aa = +a
+		,	bb = +b; 
+		
+		aa = Number.isNaN(aa)?a:aa;
+		bb = Number.isNaN(bb)?b:bb;
+		
+		if(aa < bb) return -1;
+		if(aa > bb) return 1;
+		return 0;	
 	};
+	
+
+	function sort(callback){
+		//may only sort arrays
+		
+		if(!callback) callback = defaultComparator;
+		
+		var target = this;	
+		return {
+			asc:function(){
+				target.sort(callback);
+				return data(target);					
+			},
+			desc:function(){
+				target.sort(function(a,b) {return -1 * callback(a,b);});
+				return data(target);
+			}			
+		};
+	};
+
+
 
 	function first(){
 		if(! (this instanceof Array) ) return null;
@@ -330,6 +393,10 @@ definition:function(){
 
 		return _export;
 	};
-	return {data:data};
+	return {
+		data : data,
+		DataStep : DataStep,
+		compare:{'default':defaultComparator}
+	};
 }
 });

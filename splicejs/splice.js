@@ -352,23 +352,7 @@ var sjs = (function(window, document){
 		return false;
 	};
 	
-	function isSpace(c){
-		if(	c === ' ' 	|| 
-			c === '\n'	||
-			c === '\r'  ||	
-			c === '\t') return true;
-	};
 
-	function isAlphaNum(c){
-		if(!c) return false;
-		var code = c.charCodeAt();
-		if(	c === '_' ||
-			(code >= 48 && code <= 57)	||	/*0-9*/ 
-			(code >= 65 && code <= 90 ) || 	/*A-Z*/
-			(code >= 97 && code <= 122) 	/*a-z*/ )	
-		return true;
-		return false;
-	};
 
 /**
  * 	
@@ -382,6 +366,26 @@ function Tokenizer(input){
 	});
 };
 
+
+Tokenizer.isSpace = function(c){
+		if(	c === ' ' 	|| 
+			c === '\n'	||
+			c === '\r'  ||	
+			c === '\t') return true;
+};
+
+Tokenizer.isAlphaNum = function(c){
+		if(!c) return false;
+		var code = c.charCodeAt();
+		if(	c === '_' ||
+			(code >= 48 && code <= 57)	||	/*0-9*/ 
+			(code >= 65 && code <= 90 ) || 	/*A-Z*/
+			(code >= 97 && code <= 122) 	/*a-z*/ )	
+		return true;
+		return false;
+};
+
+
 Tokenizer.prototype = {
 	consume : function(){
 		if(this.input.length <= this.i) return null;
@@ -393,7 +397,7 @@ Tokenizer.prototype = {
 	nextToken : function(){
 		
 		var c = this.c;
-		if(isAlphaNum(c)) {
+		if(Tokenizer.isAlphaNum(c)) {
 			return this.identifier();
 		}
 		return this.consume();
@@ -401,7 +405,7 @@ Tokenizer.prototype = {
 
 	identifier:function(){
 		var result = '';
-		while(isAlphaNum(this.c)){
+		while(Tokenizer.isAlphaNum(this.c)){
 			result += this.consume();
 		}		
 		return result;
