@@ -214,6 +214,11 @@ definition:function(){
 				element.appendChild(child.element);
 				return dom(element);
 			},
+			replace:function(child){
+				element.innerHTML = '';
+				element.appendChild(child.element);
+				return dom(element);	
+			},
 			size:	function(){
 				return element.childNodes.length;
 			},

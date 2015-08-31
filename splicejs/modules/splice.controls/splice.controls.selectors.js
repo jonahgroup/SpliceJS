@@ -77,7 +77,7 @@ definition:function(){
 		//append drop down to the document root
 		document.body.appendChild(dropDownContainer.concrete.dom);
 		
-		dom(dropDownContainer.concrete.dom).append(dom(this.dropDownItemInst.concrete.dom));
+		dom(dropDownContainer.concrete.dom).replace(dom(this.dropDownItemInst.concrete.dom));
 
 		//cs.padding.top.value + cs.padding.bottom.value
 

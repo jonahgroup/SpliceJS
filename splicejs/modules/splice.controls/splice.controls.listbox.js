@@ -38,6 +38,7 @@ definition:function(){
 
 	ScrollableListBox.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
+		this.contentClient.concrete.dom.innerHTML = '';
 
 		var item = null;
 		
