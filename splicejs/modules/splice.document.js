@@ -202,7 +202,8 @@ definition:function(){
 			add:function(toAdd){
 				addClass(element,toAdd);
 				return classOp(element); 
-			}
+			},
+			element:element
 		}
 	};
 

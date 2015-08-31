@@ -29,6 +29,7 @@ definition:function(){
 		add:function(step){
 			this.next.push(step);	
 			step.input = this;
+			return step;
 		},
 		setdata:function(data){
 			this.data = data;

@@ -2,6 +2,7 @@ sjs({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
+	{'Doc':'{sjshome}/modules/splice.document.js'},
 	'splice.controls.scrollpanel.css',
 	'splice.controls.scrollpanel.html'
 ],
@@ -9,7 +10,9 @@ required:[
 definition:function(){
 
 	var Component = this.framework.Component
-	,	configuration = this.framework.configuration;
+	,	configuration = this.framework.configuration
+	,	select = this.Doc.select
+	,	create = this.Doc.create;
 	
 	var UIControl = this.SpliceJS.UI.UIControl;
 	var DragAndDrop = this.SpliceJS.UI.DragAndDrop;
@@ -65,7 +68,7 @@ definition:function(){
 
 	ScrollPanel.prototype.onTouchEnd = function(e){
 		this.currentScrollTop = this.client.scrollTop; 
-
+/*
 		var self = this;
 		new _.StoryBoard([
 		new _.Animation(this.currentScrollTop,  this.currentScrollTop+20*-1*this.endMagnitude, 1000, _.Animation.easeOut, 
@@ -77,7 +80,7 @@ definition:function(){
 				self.endMagnitude = 0;			
 			})
 		]).animate();
-
+*/
 	};
 
 
@@ -149,7 +152,7 @@ definition:function(){
 		var client = this.elements.scrollClient;
 		var staticContainer = this.elements.staticContainer;
 		
-		var content = _.Doc.firstNonText(client);
+		var content = select.firstNonText(client);
 
 		var size  = {width:client.clientWidth, height:client.clientHeight};
 		var cSize = {width:	Math.max(content.clientWidth,content.scrollWidth, content.offsetWidth), 
@@ -164,12 +167,12 @@ definition:function(){
 		 * create new ones if not
 		 * */
 		if(!thumb.vertical) {
-			thumb.vertical = _.Doc.element({element:'div',cssclass:'-scroll-bar-thumb-vertical'});
+			thumb.vertical = create('div').class.add('-scroll-bar-thumb-vertical').element;
 			parent._scroll_bar_vertical = thumb.vertical;
 		}
 		
 		if(!thumb.horizontal) {
-			thumb.horizontal = _.Doc.element({element:'div',cssclass:'-scroll-bar-thumb-horizontal'});
+			thumb.horizontal = create('div').class.add('-scroll-bar-thumb-horizontal').element;
 			parent._scroll_bar_horizontal = thumb.horizontal;
 		}
 		

@@ -1944,6 +1944,8 @@ UrlAnalyzer.prototype = {
 	Controller.prototype.onAttach 		= EventSingleton;
 	Controller.prototype.onDisplay 		= EventSingleton;
 	Controller.prototype.onDomChanged 	= EventSingleton;
+	Controller.prototype.onData 		= EventSingleton;
+	
 
 
 	Controller.prototype.onReflow = EventSingleton;
@@ -2148,7 +2150,13 @@ UrlAnalyzer.prototype = {
 			if(i > -1) element = elements[i];
 			
 			var ref = element.getAttribute('sjs-element'); 
-			if(ref) tieInstance.elements[ref] = element; 	
+			if(ref) {
+				//allow multiple element references to a single element
+				var parts = ref.split(' ');
+				for(var p=0; p<parts.length; p++ ) {
+					tieInstance.elements[parts[p]] = element;
+				}
+			} 	
 		
 			if(ref == 'root'){
 				rootElement = element;

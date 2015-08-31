@@ -60,7 +60,7 @@
     transition: transform 0.2s ease-out;
 }
 
-
+/*hover over style */
 .-sjs-datatable .filter-trigger {
 	width: 10px;
     height: 10px;
@@ -88,3 +88,68 @@
     margin-top: -2.5px;
     border-radius: 100%;
 }
+
+/*drop down open style */
+.-sjs-datatable .filter-trigger.-sjs-dropdown-open {
+	width: 10px;
+    height: 10px;
+    position: absolute;
+    border: 2px solid #cecece;
+    top: -1px;
+    border-radius: 100%;
+	left:-20px;
+	display:block;
+}
+
+.-sjs-datatable thead .filter-trigger.-sjs-dropdown-open div {
+	
+	position: absolute;
+    width: 6px;
+    height: 6px;
+    background-color: #cecece;
+    top: 50%;
+    left: 50%;
+    margin-left: -3.5px;
+    margin-top: -2.5px;
+    border-radius: 100%;
+}
+
+.filter-control {
+    position:relative;
+    width: 400px;
+    height: 300px;
+    background-color: #2B2B2B;
+    color: #cecece;
+    font-size:0.8em;
+    
+}
+
+.filter-control .filter-body {
+    
+    position: absolute;
+    top:0px;
+    bottom: 53px;
+    left: 0px;
+    right: 0px;
+}
+
+.filter-control .footer {
+    
+    position: absolute;
+    bottom: 12px;
+    left: 0px;
+    right: 0px;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 14px;
+    border-top: 1px solid #4A4A4A;
+}
+
+.filterlist-item {
+    padding-left:5px;
+    cursor:default;
+}
+.filterlist-item:hover {
+    background-color:#222222;
+} 
+

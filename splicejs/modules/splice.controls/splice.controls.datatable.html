@@ -57,10 +57,54 @@
 <sjs-template type="HeadCell">
 	<div sjs-element="root" style="position:relative;">
 		<div class="content" sjs-element="content"></div>
-		<div class="filter-trigger" sjs-element="filterTrigger"><div sjs-element="filterIndicator"></div></div>
+		<sjs-include type="FilterTrigger"> 
+			{
+				onDropDown:_.Binding('filterDropDownOpen').Type('DataTable'),
+				dataIn:_.Binding('onData').Parent,
+				dropDownItem:<sjs-include type="FilterList" singleton="parent">
+						{dataIn:_.Binding('onFilterList').Type('DataTable')}
+					</sjs-include>
+			}
+		</sjs-include>
 	</div>
 </sjs-template>
 
+<!-- Sort trigger to represent up/down arrows -->
 <sjs-template type="SortTrigger">
 	<div class="sort-trigger up" sjs-element="sortTrigger"></div>
 </sjs-template>
+
+<!-- Filter Trigger, attached dropw down behavior -->
+<sjs-template type="FilterTrigger" controller="SpliceJS.Controls.DropDownController">
+	<div class="filter-trigger" sjs-element="root selector filterTrigger"><div sjs-element="filterIndicator"></div></div>
+</sjs-template>
+
+<!-- Filter list, display a list of available filtering options -->
+<sjs-template type="FilterList">
+	<div class="filter-control">
+		<div class="filter-body">
+			<sjs-include type="SpliceJS.Controls.ListBox">
+				{
+					isScrollable:true,
+					dataIn:_.Binding('onData').Parent,
+					itemTemplate:<sjs-include type="FilterListItem"></sjs-include>
+				}
+			</sjs-include>
+		</div>
+		<div class="footer">
+			<div style="float:right;">
+			<sjs-include type="SpliceJS.Controls.Button">{content:{label:'Ok'}}</sjs-include>
+			<sjs-include type="SpliceJS.Controls.Button">{content:{label:'Cancel'}}</sjs-include>
+			<div>
+		</div>
+		
+	</div>
+</sjs-template>
+
+<sjs-template type="FilterListItem" controller="SpliceJS.Controls.ListItem">
+	<div class="filterlist-item"><div style="display:inline;"><input type="checkbox"></div>
+		 <div style="display:inline;">@key</div>
+		 <div style="display:inline;">@size</div>
+	</div>
+</sjs-template>
+

@@ -4,7 +4,10 @@ sjs({
 required:[
 	
 	{'SpliceJS.UI':'../splice.ui.js'},
+	{'SpliceJS.Controls':'splice.controls.buttons.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
+	{'SpliceJS.Controls':'splice.controls.selectors.js'},
+	{'SpliceJS.Controls':'splice.controls.listbox.js'},
 	{'Doc':  '{sjshome}/modules/splice.document.js'},
 	{'Data': '{sjshome}/modules/splice.data.js'},
 	'splice.controls.css',
@@ -90,10 +93,7 @@ definition:function(){
 		};
 		
 		//build data pipeline
-		dataSteps.source.add(dataSteps.filter);
-		dataSteps.filter.add(dataSteps.page);
-		dataSteps.page.add(dataSteps.sort);
-		dataSteps.sort.add(dataSteps.render);
+		dataSteps.source.add(dataSteps.filter).add(dataSteps.page).add(dataSteps.sort).add(dataSteps.render);
 				
 		this.dataSteps = dataSteps;
 				
@@ -144,15 +144,38 @@ definition:function(){
 		renderTable.call(this);		
 	};
 
-		/*
+	
+	
+	DataTable.prototype.filterDropDownOpen = function(args){
+		
+		var groups = data(this.dataSteps.filter.data.data).group(
+				function(item){return item[args];}).to(
+					function(k,v,i){
+						return {key:k, size:v.length};
+					}
+				).result;
+		
+		this.onFilterList(groups);
+		debug.log('data filter openeed');	
+	};
+	
+	/*
 		Datatable events
 	*/
 
 	DataTable.prototype.onScroll 		= Event;
 	DataTable.prototype.onPage 	 		= Event;
 	DataTable.prototype.onRowSelected 	= Event;
+	DataTable.prototype.onFilterList 	= Event;
 
 
+	function generateGroupingFunc(index){
+		return function(item){
+			return item[index];
+		}	
+	}
+	
+	
 	
 
 	/**
@@ -160,15 +183,16 @@ definition:function(){
 	 */
 	function initializeTable(){
 		
+		//horizontal header scrolling		
+        if(this.elements.defaultScroller){
+            Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
+                this.elements.headPositioner.style.left = (0 - eargs.source.scrollLeft) + 'px'; 
+                this.onScroll();
+            },this);
+        }
+		
 		Event.attach(window, 'onresize').subscribe(function(){this.reflow();},this);
 		
-		if(this.elements.defaultScroller){
-			Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
-				this.elements.headPositioner.style.left = (0 - eargs.source.scrollLeft) + 'px'; 
-				this.onScroll();
-			},this);
-		}
-	
 		this.onHeadClick = Event.attach(this.headTable,'onmousedown');
 		this.onBodyClick = Event.attach(this.bodyTable,'onmousedown');
 		
@@ -333,8 +357,9 @@ definition:function(){
 		
 		for(var i = this.headCells.length; i < nodes.length; i++){
 			//no parent dependency here
-			var cell = new this.headCellTemplate();	
+			var cell = new this.headCellTemplate({parent:this});	
 				cell.index = i;
+				cell.onData(cell.index);
 			this.headCells.push(cell);
 			dom(cell.elements.content).append(nodes[i]);
 		} 	
@@ -452,6 +477,16 @@ definition:function(){
 	};
 
 
+	var FilterList = Component('FilterList')(function FilterListController(){
+		
+	});
+	
+	
+	FilterList.prototype.dataIn = function(data){
+			this.onData(data);
+	};
+
+	FilterList.prototype.onData = Event;
 
 	/**
 	 *	Used when row template is not specified 

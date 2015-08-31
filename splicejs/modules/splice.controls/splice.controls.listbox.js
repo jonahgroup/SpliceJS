@@ -12,7 +12,8 @@ definition:function(){
 	
 	var Component = this.framework.Component
 	, 	Class = this.framework.Class
-	,	UIControl = this.SpliceJS.UI.UIControl;
+	,	UIControl = this.SpliceJS.UI.UIControl
+	,	debug = this.framework.debug;
 	
 
 	var ListBox = Class(function ListBox(args){
@@ -28,7 +29,7 @@ definition:function(){
 
 
 	var ScrollableListBox = Component('ScrollableListBox')(function ScrollableListBox(){
-			_.debug.log('Creating ScrollableListBox');
+			debug.log('Creating ScrollableListBox');
 
 			this.scrollPanel 	= this.ref.scrollPanel;
 			this.contentClient 	= this.ref.scrollPanel.ref.contentClient;	 
@@ -99,7 +100,7 @@ definition:function(){
 		if(!this.groupInstance) { 
 			if(this.groupTemplate) { 
 				this.groupInstance = new this.groupTemplate({parent:this}); 
-				_.Doc.$(this.elements.controlContainer).embed(this.groupInstance);
+				Doc.$(this.elements.root).embed(this.groupInstance);
 			}
 		}
 
@@ -112,7 +113,7 @@ definition:function(){
 				var item = new this.groupItemTemplate({parent:this});
 				item.dataIn(dataItem.children[i]);
 				this.itemInstances.push(item);
-				this.elements.controlContainer.appendChild(item.concrete.dom);	
+				this.elements.root.appendChild(item.concrete.dom);	
 			}}
 		}
 
