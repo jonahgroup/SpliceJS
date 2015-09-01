@@ -2638,6 +2638,7 @@ UrlAnalyzer.prototype = {
 		var arg_controller = Controller;
 		if(template.declaration.controller) {
 			arg_controller = scope.lookup(template.declaration.controller);
+			if(arg_controller.tie) arg_controller = arg_controller.tie;
 			if(!arg_controller) throw 'Unable to find controller type ' + template.declaration.controller; 
 		}
 

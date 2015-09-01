@@ -57,7 +57,7 @@
 <sjs-template type="HeadCell">
 	<div sjs-element="root" style="position:relative;">
 		<div class="content" sjs-element="content"></div>
-		<sjs-include type="FilterTrigger"> 
+		<sjs-include type="FilterTrigger" ref="filterTrigger"> 
 			{
 				onDropDown:_.Binding('filterDropDownOpen').Type('DataTable'),
 				dataIn:_.Binding('onData').Parent,
@@ -74,9 +74,11 @@
 	<div class="sort-trigger up" sjs-element="sortTrigger"></div>
 </sjs-template>
 
-<!-- Filter Trigger, attached dropw down behavior -->
+<!-- Filter Trigger, with attached drop-down behavior -->
 <sjs-template type="FilterTrigger" controller="SpliceJS.Controls.DropDownController">
-	<div class="filter-trigger" sjs-element="root selector filterTrigger"><div sjs-element="filterIndicator"></div></div>
+	<div class="filter-trigger" sjs-element="root selector filterTrigger">
+		<div class="icon"><div sjs-element="filterIndicator"></div></div>
+	</div>
 </sjs-template>
 
 <!-- Filter list, display a list of available filtering options -->
@@ -93,18 +95,25 @@
 		</div>
 		<div class="footer">
 			<div style="float:right;">
-			<sjs-include type="SpliceJS.Controls.Button">{content:{label:'Ok'}}</sjs-include>
-			<sjs-include type="SpliceJS.Controls.Button">{content:{label:'Cancel'}}</sjs-include>
+			<sjs-include type="SpliceJS.Controls.Button">{
+				content:{label:'Ok'},
+				onClick:_.Binding('createFilter').Parent
+			}</sjs-include>
+			<sjs-include type="SpliceJS.Controls.Button">
+				{
+					content:{label:'Cancel'},
+					onClick:_.Binding('close').Type('SpliceJS.Controls.DropDownController')
+				}</sjs-include>
 			<div>
 		</div>
 		
 	</div>
 </sjs-template>
 
+<!-- Filter List Item -->
 <sjs-template type="FilterListItem" controller="SpliceJS.Controls.ListItem">
 	<div class="filterlist-item"><div style="display:inline;"><input type="checkbox"></div>
 		 <div style="display:inline;">@key</div>
-		 <div style="display:inline;">@size</div>
+		 <div style="display:inline; float:right; margin-right:28px;">@size</div>
 	</div>
 </sjs-template>
-

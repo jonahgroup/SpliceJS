@@ -45,7 +45,7 @@ definition:function(){
 	 *	Image Selector
      *
 	 * */
-	var ImageSelector = Class(function ImageSelector(){
+	var ImageSelector = Component('ImageSelector')(function ImageSelector(){
 		
 		var container = this.elements.controlContainer;
 
@@ -62,7 +62,7 @@ definition:function(){
 	};
 
 
-	var PullOutPanel = Class( function PullOutPanel(){
+	var PullOutPanel = Component('PullOutPanel')( function PullOutPanel(){
 		UIControl.call(this);
 	}).extend(UIControl);
 
@@ -72,12 +72,12 @@ definition:function(){
 
 
 	PullOutPanel.prototype.open = function(){
-		this.elements.controlContainer.style.left = '0px';
+		this.elements.root.style.left = '0px';
 		this.onOpen();
 	};
 
 	PullOutPanel.prototype.close = function(){
-		this.elements.controlContainer.style.left = '-500px';
+		this.elements.root.style.left = '-500px';
 		this.onClose();
 	};
 

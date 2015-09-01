@@ -18,7 +18,8 @@ definition:function(){
 	,	dom = this.Doc.dom;
 	
 	//static single instance
-	var dropDownContainer = new (this.templates['DropDownContainer'])();
+	var dropDownContainer = new (this.templates['DropDownContainer'])()
+	,	selectorElement = null;
 
 	var DropDownController = Class(function DropDownController(args){
 		Controller.call(this);
@@ -32,6 +33,13 @@ definition:function(){
 	        this.dropDown();
 	        e.cancel();
 		}, this);
+		
+		/*
+			Prevent closing the dropdown when dropdown container body is clicked
+		*/
+		Event.attach(dropDownContainer.concrete.dom,'onmousedown').subscribe(function(e){
+			e.cancel();
+		});
 
 		this.dropDownItem = this.dropDownItem;
 
@@ -48,15 +56,15 @@ definition:function(){
 
 
 	DropDownController.prototype.close = function () {
-	    this.onModalClose();
+	    hide();
 	};
 
 
 	function hide() {
 	    dropDownContainer.concrete.dom.style.display = 'none';
 	    document.body.removeChild(dropDownContainer.concrete.dom);
-	    dom(this.elements.selector).class.remove('-sjs-dropdown-open');
-	}
+		dom(selectorElement).class.remove('-sjs-dropdown-open');
+	};
 
 	DropDownController.prototype.dropDown = function(){
 		
@@ -68,12 +76,19 @@ definition:function(){
 		,	self = this
 		;
 		
+		//release previous selector if any
+		if(selectorElement){
+			dom(selectorElement).class.remove('-sjs-dropdown-open');
+		}
+		
+		
 		if(!this.dropDownItemInst && this.dropDownItem) { 
 			this.dropDownItemInst = new this.dropDownItem({parent:this});
 		}
 		
 		dom(this.elements.selector).class.add('-sjs-dropdown-open');
-
+		selectorElement = this.elements.selector;
+		
 		//append drop down to the document root
 		document.body.appendChild(dropDownContainer.concrete.dom);
 		

@@ -23,7 +23,7 @@ definition:function(){
 		return obj;
 	}
 	
-	// import dependenciess
+	// import dependencies
 	var Class = this.framework.Class
 	,	Event = this.framework.Event
 	,	Component = this.framework.Component
@@ -33,6 +33,7 @@ definition:function(){
 	,	create = this.Doc.create
 	,	dom = this.Doc.dom
 	,	data = this.Data.data
+	,	fdata = this.Data.data
 	,	compare = this.Data.compare.default
 	,	DataStep = this.Data.DataStep
 	,	scope = this;
@@ -167,16 +168,7 @@ definition:function(){
 	DataTable.prototype.onPage 	 		= Event;
 	DataTable.prototype.onRowSelected 	= Event;
 	DataTable.prototype.onFilterList 	= Event;
-
-
-	function generateGroupingFunc(index){
-		return function(item){
-			return item[index];
-		}	
-	}
-	
-	
-	
+	DataTable.prototype.onCellStyle 	= Event;
 
 	/**
 	 *	'private' calls 
@@ -306,6 +298,7 @@ definition:function(){
 
 	function renderTable(){
 		
+		
 		var data 	= this.dataSteps.render.data.data
 		, 	headers = this.dataSteps.render.data.headers;
 		
@@ -338,15 +331,28 @@ definition:function(){
 			data_row.dataIn(data[i]);	
 			addBodyRow(this.bodyTable, data_row.getNodes(), i);
 		}
+
 		
 		/* create new rows*/
+		/*
 		for(var j=this.dataRows.length; j < data.length; j++ ){
 			data_row = new this.bodyRowTemplate({parent:this, columnCount});
 			this.dataRows.push(data_row);
 			data_row.dataIn(data[j]);
 			addBodyRow(this.bodyTable, data_row.getNodes(), j);
 		}
+		*/
 		
+		fdata( data.length - this.dataRows.length ).asyncloop((function(j){
+			j = j + this.dataRows.length;
+			data_row = new this.bodyRowTemplate({parent:this, columnCount});
+			this.dataRows.push(data_row);
+			data_row.dataIn(data[j]);
+			addBodyRow(this.bodyTable, data_row.getNodes(), j);
+		
+		}).bind(this),70)();
+		
+		/* remove extra rows */
 		truncateRows(this.bodyTable, data.length);	
 
 		this.reflow();
@@ -484,6 +490,10 @@ definition:function(){
 	
 	FilterList.prototype.dataIn = function(data){
 			this.onData(data);
+	};
+	
+	FilterList.prototype.createFilter = function(){
+		
 	};
 
 	FilterList.prototype.onData = Event;

@@ -36,7 +36,6 @@ definition:function(){
 		}
 	};
 
-
 	/*
 		Paginator
 	*/
@@ -367,6 +366,38 @@ definition:function(){
 		return data(this);
 	};
 
+	function asyncIterator(d, callback,pageSize, oncomplete, oninterrupt){
+		var page_size = 20
+		,	length = 0;
+		
+		if(typeof d === 'number') length = d;
+		if(d instanceof Array ) length = d.length; 
+		
+		if(pageSize) page_size = pageSize;
+		
+		var	pages = Math.floor(length / page_size) + ( (length % page_size) / (length % page_size ))		
+		,	count = {p:0};
+		
+		var fn = function(){
+			if(count.p >=  pages) { 
+				if(typeof oncomplete === 'function' ) oncomplete();
+				return;
+			}
+			var start = page_size * count.p
+			,	end  = start + page_size; 
+			for(var i = start; 
+					i < end && i < length; 
+					i++ ) {
+				callback(i)
+			}
+			count.p++;
+			if(typeof oninterrupt === 'function') oninterrupt();
+			setTimeout(fn,1);
+		}
+		
+		fn();
+	};
+
 
 	function data(d){
 
@@ -381,6 +412,9 @@ definition:function(){
 			sort		:function(callback){return sort.call(d,callback);},
 			size		:function(callback){return size.call(d,callback);},
 			add			:function(toadd){return add.call(d,toadd);},
+			asyncloop	:function(callback, pageSize){return function(oncomplete, onint){
+							return asyncIterator(d, callback, pageSize, oncomplete, onint);}
+						},
 			result  	:d
 		};
 
@@ -390,7 +424,6 @@ definition:function(){
 		} else if(typeof d === 'object' || d instanceof Array) {
 			_export.to = function(callback){return _objectToArray.call(d,callback);};
 		}
-
 
 		return _export;
 	};
