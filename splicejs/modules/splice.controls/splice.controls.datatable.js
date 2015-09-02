@@ -1,4 +1,4 @@
-/* global _ */
+/* global sjs */
 sjs({
 	
 required:[

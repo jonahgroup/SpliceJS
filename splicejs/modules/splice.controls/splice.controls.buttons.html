@@ -14,3 +14,25 @@
 	<input class="-sjs-textfield" type="text" sjs-element="root"/>
 </sjs-template>
 
+
+
+
+<!-- 
+	Creates component named Button using controller ButtonController
+	and exports it from the declaring module  	
+-->
+<sjs-component sjs-type="Button" sjs-controller="ButtonController" sjs-export>
+	<input class="-sjs-button" sjs-element="root"  type = "button" value="@label"/>
+</sjs-component>
+
+
+<!-- 
+	Creates component named Button using default controller "Controller"
+	and maintains it module's scope only  	
+-->
+<sjs-component sjs-type="Button">
+	<input class="-sjs-button" sjs-element="root"  type = "button" value="@label"/>
+</sjs-component>
+
+
+

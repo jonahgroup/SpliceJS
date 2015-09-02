@@ -1026,11 +1026,6 @@ UrlAnalyzer.prototype = {
 
 */
 
-
-	/*
-	 * loader initializers
-	 * */
-	
 	window.onload = function(){
 		var start  = window.performance.now();
 		
@@ -1052,7 +1047,7 @@ UrlAnalyzer.prototype = {
 			definition:function(){
 				var scope = this;
 				var _Template = constructTemplate(mainPageHtml);
-				_Template.type('MainPage'); 
+				_Template.type = 'MainPage'; 
 				_Template = compileTemplate.call(scope,_Template);
 				display(new _Template());
 				
@@ -1997,7 +1992,7 @@ UrlAnalyzer.prototype = {
 	Concrete.prototype.applyContent = function(content, suspendNotify){
 		
 		var deepClone = this.dom;
-		var tieInstance = this.tieInstance;
+		var controllerInstance = this.controllerInstance;
 
 		
 		if(!this.contentMap) {
@@ -2026,7 +2021,7 @@ UrlAnalyzer.prototype = {
 			var newNode = null;
 
 			if(typeof obj === 'function') {
-				var contentInstance = new obj({parent:tieInstance});
+				var contentInstance = new obj({parent:controllerInstance});
 				if(contentInstance.concrete) {
 					
 					newNode = contentInstance.concrete.export();
@@ -2073,8 +2068,15 @@ UrlAnalyzer.prototype = {
 
 	
 	function Template(dom){
+		if(!dom) throw 'Template constructor argument must be a DOM element';
 		this.dom = dom;
 		this.dom.normalize();
+		
+		/* template attributes */
+		this.type = dom.getAttribute('type');
+		this.controller = dom.getAttribute('controller');
+				
+		
 		/*
 		 * Object references to child templates
 		 * child DOM tree have already been merged with parent
@@ -2089,25 +2091,8 @@ UrlAnalyzer.prototype = {
 		return this.children.length-1;
 	};
 	
-	Template.prototype.setBinding = function(target){
-		this.dom._binding = target;
-		target._binding = this.dom;
-	};
 	
-	Template.prototype.getBinding = function(){
-		return this.dom._binding;
-	};
-
-	Template.prototype.controller = function(){
-		var controller = this.dom.attributes['controller']; 
-		if(controller) return controller.value;
-		return null;	
-	};
 	
-	Template.prototype.type = function(value){
-		if(value != null) this.dom.attributes['type'] = {value:value}; 
-		return this.dom.attributes['type'].value;
-	};
 	
 	Template.prototype.normalize  = function(){
 
@@ -2139,7 +2124,7 @@ UrlAnalyzer.prototype = {
 	/**
 	 * @tieInstance - instance of a tie class that is associated with the template
 	 * */
-	Template.prototype.getInstance = function(tieInstance, parameters, scope){
+	Template.prototype.getInstance = function(controllerInstance, parameters, scope){
 		
 		var build = this.dom;
 		
@@ -2148,9 +2133,9 @@ UrlAnalyzer.prototype = {
 
 		 
 		var instance = new Concrete(deepClone);
-		instance.tieInstance = tieInstance;
+		instance.controllerInstance = controllerInstance;
 		
-		instance.dom['-sjs-component'] = tieInstance.constructor;
+		instance.dom['-sjs-component'] = controllerInstance.constructor;
 		
 		/* process dom references */
 		var elements = deepClone.querySelectorAll('[sjs-element]');
@@ -2158,7 +2143,7 @@ UrlAnalyzer.prototype = {
 		var element = deepClone
 		,	rootElement = null;
 		
-		if(tieInstance)
+		if(controllerInstance)
 		for(var i=-1; i< elements.length; i++){			
 			if(i > -1) element = elements[i];
 			
@@ -2167,7 +2152,7 @@ UrlAnalyzer.prototype = {
 				//allow multiple element references to a single element
 				var parts = ref.split(' ');
 				for(var p=0; p<parts.length; p++ ) {
-					tieInstance.elements[parts[p]] = element;
+					controllerInstance.elements[parts[p]] = element;
 				}
 			} 	
 		
@@ -2190,8 +2175,8 @@ UrlAnalyzer.prototype = {
 		instance.applyContent(parameters.content, true);
 
 
-		if(typeof tieInstance.handleContent === 'function'){
-			tieInstance.handleContent(parameters.content);
+		if(typeof controllerInstance.handleContent === 'function'){
+			controllerInstance.handleContent(parameters.content);
 		}
 
 
@@ -2212,7 +2197,7 @@ UrlAnalyzer.prototype = {
 			var _Proxy 	= this.children[childId];
 			
 			
-			var c_instance = new _Proxy({parent:tieInstance, parentscope:scope});
+			var c_instance = new _Proxy({parent:controllerInstance, parentscope:scope});
 			
 			/* no document structure to return */
 			if(!c_instance.concrete) {
@@ -2247,58 +2232,6 @@ UrlAnalyzer.prototype = {
 	};
 
 
-	var perf = {total:0};
-	function extractTemplates1(fileSource){
-		var start  = window.performance.now();
-		
-		var scope = this;
-
-		//var regex = /<!--\s+@(template|selector)\s*:\s*({.*})\s+-->/igm; 	//script start RE
-		var regex = 	/<sjs-template(\s*.*\s*)>([\s\S]+?)<\/sjs-template>/igm;
-		var attrRegex = /(\S+)="(\S+?)"/igm;
-
-		var match = null;
-		
-		var lastMatch = null;
-		var templates = new Array();
-
-		//match a single template at a time
-		while( match = regex.exec( fileSource ) ){
-			
-			
-			var attr = match[1];
-			var body = match[2];
-			
-
-			//convert attributes to object respresentation
-			var attrMatch = null;	
-			var attributes = {};
-
-			while(attrMatch = attrRegex.exec(attr)){
-
-				var prop 	= attrMatch[1];
-				var value 	= attrMatch[2];
-
-				attributes[prop] = value;
-			}
-								
-			templates.push({
-				src:applyPath.call(scope,body),
-				spec:attributes 
-					/* 
-					 * attributes are parameters specified in the @template declaration
-					 * in the form or JSON literal, it is evaluated as is
-					 * hence must be of the correct JSON syntax
-					 *  */
-			});
-		}
-		var end = window.performance.now();
-		perf.total += (end-start);
-		console.log('template collection performance ' +  perf.total) ;
-		return templates;
-	};
-
-
 	var container = document.createElement('span');
 	function extractTemplates(fileSource){
 		//var start  = window.performance.now();
@@ -2311,7 +2244,7 @@ UrlAnalyzer.prototype = {
 		for(var i=0; i<nodes.length; i++){
 			var node = nodes[i];
 			this.templates[node.attributes['type'].value] = new Template(node);
-			this.templates.length = i;
+			this.templates.length = i + 1;
 		}
 
 		//var end = window.performance.now();
@@ -2418,9 +2351,10 @@ UrlAnalyzer.prototype = {
 			run template compiler
 		*/
 		var sjs_node = document.createElement('sjs-template');
+		
 		sjs_node.appendChild(node);
 		var template = new Template(sjs_node);
-		template.type(_type);
+		template.type = _type;
 		 
 
 		if(parent.tagName == 'SJS-ELEMENT'){
@@ -2669,16 +2603,14 @@ UrlAnalyzer.prototype = {
 		//template.normalize();
 
 		var controller = Controller
-		,	temp_controller = template.controller();
+		,	temp_controller = template.controller;
 		if(temp_controller) {
 			controller = scope.lookup(temp_controller);
-			if(controller.tie) controller = controller.tie;
+			if(controller.controller) controller = controller.controller;
 			if(!controller) throw 'Unable to find controller type ' + template.declaration.controller; 
 		}
 
-		return scope.templates[template.type()] = createComponent(controller,template,scope); 
-				   
-		
+		return scope.templates[template.type] = createComponent(controller,template,scope); 
 	};
 		
 
@@ -2804,7 +2736,7 @@ UrlAnalyzer.prototype = {
 
 		Component.isComponent = true;
 		Component.template = template;
-		Component.tie = controller;
+		Component.controller = controller;
 		Component.prototype = controller.prototype;
 		Component.constructor = controller;
 		Component.constructor.component = Component;
@@ -2814,16 +2746,11 @@ UrlAnalyzer.prototype = {
 			if(typeof(base) !== 'function') throw 'Base must be a constructor function';
 					
 			
-			this.tie.prototype = Object.create(base.prototype);
+			this.controller.prototype = Object.create(base.prototype);
 			/* retain inheritance chain */
-			this.tie.base = this.tie.prototype.constructor;			
-			this.tie.prototype.constructor = this;
-			this.prototype = this.tie.prototype;
-			/*
-			this.prototype.super = function(){
-				base.apply(this,arguments);
-			}
-			*/
+			this.controller.base = this.controller.prototype.constructor;			
+			this.controller.prototype.constructor = this;
+			this.prototype = this.controller.prototype;
 			
 			return this;
 		};
