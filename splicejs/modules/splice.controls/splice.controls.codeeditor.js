@@ -37,7 +37,7 @@ definition:function(){
 		this.lines = generateLines.call(this,code);
 
 		for(var i=0; i< this.lines.length; i++){
-			this.elements.controlContainer.appendChild(this.lines[i]);
+			this.elements.root.appendChild(this.lines[i]);
 		}
 	};
 

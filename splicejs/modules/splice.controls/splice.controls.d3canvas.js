@@ -39,7 +39,7 @@ definition:function(){
 	var D3Canvas = Component('D3Canvas')(function D3Canvas(){
 		UIControl.call(this);
 		
-		this.d3 = new D3(this.elements.controlContainer);
+		this.d3 = new D3(this.elements.root);
 
 		var self = this;
 

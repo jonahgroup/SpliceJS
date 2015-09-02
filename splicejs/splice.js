@@ -1945,8 +1945,6 @@ UrlAnalyzer.prototype = {
 	Controller.prototype.onDisplay 		= EventSingleton;
 	Controller.prototype.onDomChanged 	= EventSingleton;
 	Controller.prototype.onData 		= EventSingleton;
-	
-
 
 	Controller.prototype.onReflow = EventSingleton;
 	Controller.prototype.reflow = function(position,size,bubbleup){
@@ -2343,9 +2341,13 @@ UrlAnalyzer.prototype = {
 	}
 
 	function handle_SJS_ELEMENT(node, parent, replace){
-		var type = node.getAttribute('type');
-
+		var type = node.getAttribute('type')
+		,	attributes = collectAttributes(node,RESERVED_ATTRIBUTES);
+			
+		if(attributes) attributes = attributes + ', '
+			
 		var json = '_.Obj.call(scope,{'+
+			attributes + 
 			node.innerHTML.substring(node.innerHTML.indexOf('{')+1)
 			+')'
 		
@@ -2357,7 +2359,7 @@ UrlAnalyzer.prototype = {
 
 	function handle_INLINE_HTML(node, parent, replace){
 		var scope = this;
-
+		
 		var type = scope.getNextTemplateName(),
 			json = '';
 

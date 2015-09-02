@@ -23,17 +23,17 @@ definition:function(){
 
 
 	Map.prototype.display = function(){
-		if(!this.elements.controlContainer.parentNode) return; 
+		if(!this.elements.root.parentNode) return; 
 		if(this.isInitialized) return;
 
 		var mapID = 'drogozhkin.kgb6lfoc';
 		var mapContainerId = 'map'+Math.round(1000*Math.random());
 		
 
-		this.elements.controlContainer.id = mapContainerId;
+		this.elements.root.id = mapContainerId;
 		
 		/*WTF why are we still using ids?*/
-		var map = L.map(this.elements.controlContainer,{ trackResize:true}).setView([43.654, -79.387], 16);
+		var map = L.map(this.elements.root,{ trackResize:true}).setView([43.654, -79.387], 16);
 		L.tileLayer('http://{s}.tiles.mapbox.com/v3/'+mapID+'/{z}/{x}/{y}.png', {
 		    attribution:' ',
 		    //attribution: 'Imagery © <a href="http://mapbox.com">Mapbox</a>',

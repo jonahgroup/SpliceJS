@@ -34,7 +34,7 @@ definition:function(){
 
 
 	DrawerPanel.prototype.display = function(){
-		var openWidth = this.openWidth = this.elements.controlContainer.clientWidth * this.openTo;
+		var openWidth = this.openWidth = this.elements.root.clientWidth * this.openTo;
 		this.elements.drawer.style.left = (-1 * openWidth) + 'px';
 		this.elements.drawer.className += ' -splicejs-left-transition';
 	};
@@ -47,7 +47,7 @@ definition:function(){
 
 		this.elements.drawer.style.width = this.openWidth + 'px';
 	
-		var width = this.elements.controlContainer.clientWidth;
+		var width = this.elements.root.clientWidth;
 
 		var actuatorIconSize = {
 			width: 	this.elements.actuatorIcon.clientWidth,

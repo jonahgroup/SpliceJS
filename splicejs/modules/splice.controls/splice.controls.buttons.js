@@ -105,7 +105,7 @@ definition:function(){
 		UIControl.apply(this,arguments);
 	
 		var self = this;
-		this.elements.controlContainer.onclick = function(){
+		this.elements.root.onclick = function(){
 
 			if(self.elements.root.checked) {
 				if(self.dataPath)

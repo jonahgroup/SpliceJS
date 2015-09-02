@@ -343,6 +343,7 @@ definition:function(){
 		}
 		*/
 		
+		
 		fdata( data.length - this.dataRows.length ).asyncloop((function(j){
 			j = j + this.dataRows.length;
 			data_row = new this.bodyRowTemplate({parent:this, columnCount});
@@ -351,6 +352,7 @@ definition:function(){
 			addBodyRow(this.bodyTable, data_row.getNodes(), j);
 		
 		}).bind(this),70)();
+		
 		
 		/* remove extra rows */
 		truncateRows(this.bodyTable, data.length);	

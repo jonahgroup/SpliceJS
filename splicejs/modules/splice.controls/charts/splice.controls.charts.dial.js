@@ -11,7 +11,7 @@ definition:function(){
 
 	var Dial = Class(function Dial(){
 	
-	    this.dom = this.canvas = this.elements.controlContainer;
+	    this.dom = this.canvas = this.elements.root;
 		var canvas = this.canvas;
 	    
 	    var scale = this.scale ? this.scale : 1;

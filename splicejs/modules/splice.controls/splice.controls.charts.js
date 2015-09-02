@@ -74,8 +74,8 @@ definition:function(){
 			of the outermost container
 		*/
 
-		if(!this.width) this.width = this.elements.controlContainer.clientWidth;
-		if(!this.height) this.height = this.elements.controlContainer.clientHeight;
+		if(!this.width) this.width = this.elements.root.clientWidth;
+		if(!this.height) this.height = this.elements.root.clientHeight;
 
 
 		this.reflow(this.width, this.height);
@@ -87,13 +87,13 @@ definition:function(){
 	Chart.prototype.reflow = function(width, height){
 		
 
-		this.width = this.elements.controlContainer.clientWidth;
-		this.height = this.elements.controlContainer.clientHeight;
+		this.width = this.elements.root.clientWidth;
+		this.height = this.elements.root.clientHeight;
 
 		if(this.width <= 0) return;
 		if(this.height <= 0) return;
 
-		//var s = this.elements.controlContainer.style;		
+		//var s = this.elements.root.style;		
 		
 		////s.width = width + 'px';
 		//s.height = height + 'px';

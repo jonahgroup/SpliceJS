@@ -47,18 +47,18 @@ definition:function(){
 	 * */
 	var ImageSelector = Component('ImageSelector')(function ImageSelector(){
 		
-		var container = this.elements.controlContainer;
+		var container = this.elements.root;
 
 		if(this.width) 	container.width = this.width;
 		if(this.height) container.height = this.height;
 
-		if(this.src) this.elements.controlContainer.src = this.src;
+		if(this.src) this.elements.root.src = this.src;
 	});
 
 	ImageSelector.prototype.dataIn = function(dataItem) {
 		if(!this.dataPath) return;
 
-		this.elements.controlContainer.src = dataItem[this.dataPath];
+		this.elements.root.src = dataItem[this.dataPath];
 	};
 
 

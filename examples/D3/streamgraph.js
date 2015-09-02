@@ -13,7 +13,7 @@ definition:function(){
 		SpliceJS.Controls.D3Canvas.call(this);
 
 		var self = this;
-		this.elements.controlContainer.onclick = function(){
+		this.elements.root.onclick = function(){
 			self.onClick();
 		}
 

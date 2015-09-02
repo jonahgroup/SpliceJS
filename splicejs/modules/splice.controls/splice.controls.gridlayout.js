@@ -214,7 +214,7 @@ definition:function(){
 		,this);
 
 		this.layoutCells.push(cell);
-		this.elements.controlContainer.appendChild(cell.concrete.dom);
+		this.elements.root.appendChild(cell.concrete.dom);
 		cell.onAttach();
 		cell.onDisplay();
 	};
@@ -307,7 +307,7 @@ definition:function(){
 		var margin 		 = this.margin;
 		var outer_margin = this.outerMargin;
 
-		var DOM = this.elements.controlContainer;
+		var DOM = this.elements.root;
 		
 
 		var grid = this.grid; 
@@ -368,7 +368,7 @@ definition:function(){
 		var margin 		 = this.margin;
 		var outer_margin = this.outerMargin;
 		
-		var DOM = this.elements.controlContainer;		
+		var DOM = this.elements.root;		
 		
 		var offset = scope.SpliceJS.UI.Positioning.absPosition(DOM);
 

@@ -51,7 +51,7 @@ definition:function(){
 		/*
 			size client panels
 		*/
-		var contSize = _.Doc.$(this.elements.controlContainer).size();
+		var contSize = _.Doc.$(this.elements.root).size();
 			
 		
 		_.Doc.$(this.elements.panel1).size(contSize);
@@ -66,7 +66,7 @@ definition:function(){
 
 	ViewPanel.prototype.switchView = function(viewIndex){
 
-		var contSize = _.Doc.$(this.elements.controlContainer).size(),
+		var contSize = _.Doc.$(this.elements.root).size(),
 
 			activePanel = this.panels[this.activePanelIndex],
 			offscrPanel = this.panels[1-this.activePanelIndex],
