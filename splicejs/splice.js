@@ -1032,6 +1032,7 @@ UrlAnalyzer.prototype = {
 	 * */
 	
 	window.onload = function(){
+		var start  = window.performance.now();
 		
 		var mainPageHtml = document.body.innerHTML;
 		document.body.innerHTML = '';
@@ -1051,9 +1052,12 @@ UrlAnalyzer.prototype = {
 			definition:function(){
 				var scope = this;
 				var _Template = constructTemplate(mainPageHtml);
-				_Template.declaration = {type:'MainPage'}; 
+				_Template.type('MainPage'); 
 				_Template = compileTemplate.call(scope,_Template);
 				display(new _Template());
+				
+				var end  = window.performance.now();
+				console.log('Load complete: ' + (end-start) + 'ms');
 			}
 		});
 	};
@@ -1809,7 +1813,8 @@ UrlAnalyzer.prototype = {
 			
 			var overrideController = null;
 
-			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
+			if(!obj) 
+				throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
 			
 
@@ -2069,7 +2074,6 @@ UrlAnalyzer.prototype = {
 	
 	function Template(dom){
 		this.dom = dom;
-		dom._template = this;
 		/*
 		 * Object references to child templates
 		 * child DOM tree have already been merged with parent
@@ -2093,6 +2097,16 @@ UrlAnalyzer.prototype = {
 		return this.dom._binding;
 	};
 
+	Template.prototype.controller = function(){
+		var controller = this.dom.attributes['controller']; 
+		if(controller) return controller.value;
+		return null;	
+	};
+	
+	Template.prototype.type = function(value){
+		if(value != null) this.dom.attributes['type'] = {value:value}; 
+		return this.dom.attributes['type'].value;
+	};
 	
 	Template.prototype.normalize  = function(){
 
@@ -2232,8 +2246,9 @@ UrlAnalyzer.prototype = {
 	};
 
 
-
-	function extractTemplates(fileSource){
+	var perf = {total:0};
+	function extractTemplates1(fileSource){
+		var start  = window.performance.now();
 		
 		var scope = this;
 
@@ -2276,8 +2291,34 @@ UrlAnalyzer.prototype = {
 					 *  */
 			});
 		}
+		var end = window.performance.now();
+		perf.total += (end-start);
+		console.log('template collection performance ' +  perf.total) ;
 		return templates;
 	};
+
+
+	var container = document.createElement('span');
+	function extractTemplates(fileSource){
+		var start  = window.performance.now();
+		
+		this.templates = [];
+		
+		container.innerHTML = fileSource;
+		
+		var nodes = container.querySelectorAll('sjs-template');
+		for(var i=0; i<nodes.length; i++){
+			var node = nodes[i];
+			this.templates[node.attributes['type'].value] = new Template(node);
+			this.templates.length = i;
+		}
+
+		var end = window.performance.now();
+		perf.total += (end-start);
+		console.log('template collection performance step: ' +  (end-start) + ' total: ' + perf.total) ;
+		return this.templates;
+	};
+
 
 
 	function startsWith(s,v){
@@ -2360,13 +2401,13 @@ UrlAnalyzer.prototype = {
 	function handle_INLINE_HTML(node, parent, replace){
 		var scope = this;
 		
-		var type = scope.getNextTemplateName(),
+		var _type = scope.getNextTemplateName(),
 			json = '';
 
 		if(parent.tagName == 'SJS-ELEMENT')
-			json = 'null, type:\'' + type + '\''; 			
+			json = 'null, type:\'' + _type + '\''; 			
 		else
-			json = '_.Obj.call(scope,{type:\''+ type + '\'})';
+			json = '_.Obj.call(scope,{type:\''+ _type + '\'})';
 
 		if(replace === true)
 			node.parentNode.replaceChild(document.createTextNode(json),node);
@@ -2375,19 +2416,17 @@ UrlAnalyzer.prototype = {
 			build new template and store within scope 
 			run template compiler
 		*/
-		var wrapper = document.createElement('span');
-		wrapper.appendChild(node);
-		var template = new Template(wrapper);
-		//template.normalize(); -- broken
-
+		var sjs_node = document.createElement('sjs-template');
+		sjs_node.appendChild(node);
+		var template = new Template(sjs_node);
+		template.type(_type);
+		 
 
 		if(parent.tagName == 'SJS-ELEMENT'){
-			template.declaration = {type:type, tie:'SpliceJS.Controls.UIElement'};
+			sjs_node.attributes['controller'] = 'Controller';
+			//template.declaration = {type:_type, tie:'SpliceJS.Controls.UIElement'};
 		}
-		else {
-			template.declaration = {type:type};
-		}
-
+		
 		compileTemplate.call(scope, template);
 
 		return json
@@ -2579,7 +2618,7 @@ UrlAnalyzer.prototype = {
 
 	function constructTemplate(html){
 	
-		var wrapper = document.createElement('span');
+		var wrapper = document.createElement('sjs-element');
 		wrapper.innerHTML = html;
 
 		return new Template(wrapper);
@@ -2591,21 +2630,12 @@ UrlAnalyzer.prototype = {
 	 * 
 	 * */
 	function compileTemplates(scope){
-		var templateSource = scope.templates;
-		var keys = Object.keys(templateSource);
+		if(scope.templates.length < 1) return; //no templates in this module
+		
+		var keys = Object.keys(scope.templates);
 		
 		for(var i=0; i< keys.length; i++) {
-			var key = keys[i];
-			if(!templateSource[key]) continue;
-
-
-			var declaration = templateSource[key];
-
-			var template = constructTemplate(declaration.src);
-
-			/* copy template declaration attributes */		
-			template.declaration = declaration.spec;
-
+			var template = scope.templates[keys[i]];
 			compileTemplate.call(scope,template);
 		}
 	};
@@ -2635,16 +2665,17 @@ UrlAnalyzer.prototype = {
 
 		//_.debug.log('Processing template scripts for module: ' );
 		//new ScriptDomRunner(template.dom).run({module:''});
-		template.normalize();
+		//template.normalize();
 
-		var arg_controller = Controller;
-		if(template.declaration.controller) {
-			arg_controller = scope.lookup(template.declaration.controller);
-			if(arg_controller.tie) arg_controller = arg_controller.tie;
-			if(!arg_controller) throw 'Unable to find controller type ' + template.declaration.controller; 
+		var controller = Controller
+		,	temp_controller = template.controller();
+		if(temp_controller) {
+			controller = scope.lookup(temp_controller);
+			if(controller.tie) controller = controller.tie;
+			if(!controller) throw 'Unable to find controller type ' + template.declaration.controller; 
 		}
 
-		return scope.templates[template.declaration.type] = createComponent(arg_controller,template,scope); 
+		return scope.templates[template.type()] = createComponent(controller,template,scope); 
 				   
 		
 	};
@@ -2819,7 +2850,7 @@ UrlAnalyzer.prototype = {
 			var arg = arguments[0];
 			if(!arg) return;
 			if(arg.ext !== FILE_EXTENSIONS.template) return;
-			
+			console.log('loading ' + LoadingWatcher.name);
 			var t = extractTemplates.call(scope,arg.data);
 			if(!t) return;
 			
@@ -2920,7 +2951,7 @@ var PATH_MAP = {
 		var required 	= imp.filenames;
 		var definition  = moduleDefinition.definition;
 
-		var cssIsLocal = moduleDefinition.cssIsLocal;
+
 	
 		/* required collection is always an Array */
 		required = required instanceof Array ? required : null;
@@ -2932,7 +2963,7 @@ var PATH_MAP = {
 		logging.debug.log(path);
 
 		var templateDefinitions = new Array();
-		var cssRules = [];
+	
 		
 		/*
 		 * Handler to receive template file sources
@@ -2949,16 +2980,8 @@ var PATH_MAP = {
 			if(!template) return;
 
 			if(template.ext == FILE_EXTENSIONS.template) {
-				var t = extractTemplates.call(scope,template.data);
-				
-				for(var i=0; i< t.length; i++){
-					templateDefinitions[t[i].spec.type] = t[i];
-				}
-			}
-
-			//css is configured for local loading
-			if(template.ext == FILE_EXTENSIONS.style && cssIsLocal == true){
-				cssRules.push(template.data);
+				console.log('loading ' + template.filename);
+				extractTemplates.call(scope,template.data);
 			}
 		};
 						
@@ -3002,9 +3025,6 @@ var PATH_MAP = {
 					ns.place(x);
 				}
 			}
-
-
-			scope.templates = templateDefinitions;
 				/* 
 			 * Templates are compiled after module has been defined
 			 * 
