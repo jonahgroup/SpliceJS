@@ -2074,6 +2074,7 @@ UrlAnalyzer.prototype = {
 	
 	function Template(dom){
 		this.dom = dom;
+		this.dom.normalize();
 		/*
 		 * Object references to child templates
 		 * child DOM tree have already been merged with parent
