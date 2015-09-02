@@ -2300,7 +2300,7 @@ UrlAnalyzer.prototype = {
 
 	var container = document.createElement('span');
 	function extractTemplates(fileSource){
-		var start  = window.performance.now();
+		//var start  = window.performance.now();
 		
 		this.templates = [];
 		
@@ -2313,9 +2313,9 @@ UrlAnalyzer.prototype = {
 			this.templates.length = i;
 		}
 
-		var end = window.performance.now();
-		perf.total += (end-start);
-		console.log('template collection performance step: ' +  (end-start) + ' total: ' + perf.total) ;
+		//var end = window.performance.now();
+		//perf.total += (end-start);
+		//console.log('template collection performance step: ' +  (end-start) + ' total: ' + perf.total) ;
 		return this.templates;
 	};
 
@@ -2980,7 +2980,7 @@ var PATH_MAP = {
 			if(!template) return;
 
 			if(template.ext == FILE_EXTENSIONS.template) {
-				console.log('loading ' + template.filename);
+				
 				extractTemplates.call(scope,template.data);
 			}
 		};
