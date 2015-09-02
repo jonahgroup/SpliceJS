@@ -1032,7 +1032,7 @@ UrlAnalyzer.prototype = {
 	 * */
 	
 	window.onload = function(){
-		
+		var start  = window.performance.now();
 		var mainPageHtml = document.body.innerHTML;
 		document.body.innerHTML = '';
 			
@@ -1054,6 +1054,8 @@ UrlAnalyzer.prototype = {
 				_Template.declaration = {type:'MainPage'}; 
 				_Template = compileTemplate.call(scope,_Template);
 				display(new _Template());
+				var end = window.performance.now();
+				console.log('Loaded in: ' + (end- start) + 'ms');
 			}
 		});
 	};
