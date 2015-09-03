@@ -72,15 +72,11 @@ var sjs = (function(window, document){
 		window.console = {log:function(){}}; 
 	}
 
-
 	var logging = {
 		
 		debug : {log:function(){}},
 		info  : console
 	}; 
-	
-	
-
 
 /*
 	
@@ -89,8 +85,6 @@ var sjs = (function(window, document){
 	Utility Functions
 
 */
-
-
 	/*
 	 * No support for bind
 	 * use closure to emulate
@@ -1302,74 +1296,32 @@ UrlAnalyzer.prototype = {
 	/**
 	 * pseudo class wrapper
 	 * */
-	var Class = function Class(constructor){
-		
-		if(!constructor) throw 'constructor function may not be empty';
-		if(typeof(constructor) !== 'function' ) throw 'Constructor must be a function';
-		
-		/* 
-		 * Class is being declaired within a namespace
-		 * Attached constructor to a namespace instance
-		 * */
-		if(this && this.namespace){
-			var constructorName = getFunctionName(constructor); 
+	var Class = function Class(_class){
+		if(!_class) throw 'constructor function may not be empty';
+		if(typeof(_class) !== 'function' ) throw 'Constructor must be a function';
+		return _class;
+	};
 
-			/*
-			 * Definition already exists, throw na error
-			 * */
-			if(this.namespace[constructorName]) throw constructorName + ' is already defined, please check namespace and definition name';
-			
-			this.namespace[constructorName] = constructor;
-			NAMESPACE_INDEX[this.idx] = constructor;
-		}
-		
-		/*
-		 * Any class is a descendant of the Object 
-		 * */
-		constructor.base = Object;
-		
-		
-		/* *
-		 * Prototype extension shorthand, 
-		 * created on a supplied constructor Object
-		 */
-		constructor.extend = function(base){
-			
-			if(!base) throw 'Can\'t extend the undefined or null base constructor';
-			if(typeof(base) !== 'function') throw 'Base must be a constructor function';
-					
-			
-			this.prototype = Object.create(base.prototype);
-			/* retain inheritance chain */
-			this.base = this.prototype.constructor;			
-			this.prototype.constructor = this;
-			/*
-			this.prototype.super = function(){
-				base.apply(this,arguments);
-			}
-			*/
-			return this;
-			
-		};
-		
-		return constructor;
+	function _super(inst,b,args){
+		if(!b) return;
+		_super(inst,b.base,args);
+		console.log('Calling super');
+		b.apply(inst,args);
 	};
 	
-	function Component(template_name){
-		//locate template by name
-		var template = null;
-		if(template_name) template = this.templates[template_name].template;
-			
-		var scope = this;		
-
-		return function(fn){
-			var component_name = template_name;
-			if(!component_name) component_name = getFunctionName(fn);
-			
-			var	c = createComponent(Class(fn),template,scope); 
-			return scope[component_name] = c;
+	Class.extend = function(base){
+		return function(_class){
+			_class.prototype = Object.create(base.prototype);
+			_class.prototype.constructor = _class;
+			_class.base = base.prototype.constructor;
+			_class.prototype.super = function(){
+				this.super = function(){};
+				_super(this,_class.base, arguments);	
+			};
+			return _class;
 		}
-	};		
+	}; 
+	
 	
 	function Iterator(collection){
 		this.data = collection;
@@ -2073,9 +2025,15 @@ UrlAnalyzer.prototype = {
 		this.dom.normalize();
 		
 		/* template attributes */
-		this.type = dom.getAttribute('type');
-		this.controller = dom.getAttribute('controller');
-				
+		this.type = dom.getAttribute('sjs-type');
+		this.controller = dom.getAttribute('sjs-controller');
+		
+		//export attribute exists
+		if(this.dom.attributes['sjs-export']) {
+			var exp = dom.getAttribute('sjs-export').value;
+			if(!exp) this.export = this.type;
+			else this.export = exp;
+		}		
 		
 		/*
 		 * Object references to child templates
@@ -2237,13 +2195,14 @@ UrlAnalyzer.prototype = {
 		//var start  = window.performance.now();
 		
 		this.templates = [];
+		this.exports = []; //component exports
 		
 		container.innerHTML = fileSource;
 		
 		var nodes = container.querySelectorAll('sjs-template');
 		for(var i=0; i<nodes.length; i++){
 			var node = nodes[i];
-			this.templates[node.attributes['type'].value] = new Template(node);
+			this.templates[node.attributes['sjs-type'].value] = new Template(node);
 			this.templates.length = i + 1;
 		}
 
@@ -2595,22 +2554,17 @@ UrlAnalyzer.prototype = {
 		 * final template DOM
 		 * */
 		logging.debug.log('Processing template notations for module: ');		
-		//AnnotationRunner.call(scope,template);
+
 		resolveCustomElements.call(scope,template);
-
-		//_.debug.log('Processing template scripts for module: ' );
-		//new ScriptDomRunner(template.dom).run({module:''});
-		//template.normalize();
-
-		var controller = Controller
-		,	temp_controller = template.controller;
-		if(temp_controller) {
-			controller = scope.lookup(temp_controller);
-			if(controller.controller) controller = controller.controller;
-			if(!controller) throw 'Unable to find controller type ' + template.declaration.controller; 
-		}
-
-		return scope.templates[template.type] = createComponent(controller,template,scope); 
+		
+		var component = createComponent(template.controller,template,this);
+		this.templates[template.type] = component;
+		
+		if(template.export) {
+			this.exports[template.export] = component; 	
+		}  
+		return component;
+	
 	};
 		
 
@@ -2651,8 +2605,11 @@ UrlAnalyzer.prototype = {
 	 * used for resolving references to local-scoped templates
 	 * when invoked by parent, module points to the parent's context
 	 * 
+	 * components are not extendable
+	 * only controllers are
+	 * 
 	 * */
-	function createComponent(controller, template, scope){
+	function createComponent(_controller, template, scope){
 		/*
 		 * Component function is assigned to the variable of the same name
 		 * "Component" because otherwise in IE8 instanceof operation on "this"
@@ -2664,7 +2621,12 @@ UrlAnalyzer.prototype = {
 			
 			if(!(this instanceof Component)) throw 'Component function must be invoked with [new] keyword';
 			
-			var args = args || {};
+			/* lookup controller */
+			var controller =  _controller?scope.lookup(_controller):null;
+			/* assign default */
+			if(!controller) controller = Controller; 
+			
+			args = args || {};
 			
 			if(args._includer_scope) { 
 				var idof = args._includer_scope.singletons.constructors.indexOf(this.constructor.component);
@@ -2720,41 +2682,7 @@ UrlAnalyzer.prototype = {
 			return obj; 
 			
 		};
-		
-		if(controller) Component.base = controller.base;
-		
-		/* fill for extending classes */
-		Component.call = function(_this){
-			var args = [];
-			if(arguments.length > 1) {
-				for(var i=1; i<arguments.length; i++){
-					args[i] = arguments[i];
-				}
-			}
-			controller.apply(_this,args);
-		};
 
-		Component.isComponent = true;
-		Component.template = template;
-		Component.controller = controller;
-		Component.prototype = controller.prototype;
-		Component.constructor = controller;
-		Component.constructor.component = Component;
-		
-		Component.extend = function(base){
-			if(!base) throw 'Can\'t extend the undefined or null base constructor';
-			if(typeof(base) !== 'function') throw 'Base must be a constructor function';
-					
-			
-			this.controller.prototype = Object.create(base.prototype);
-			/* retain inheritance chain */
-			this.controller.base = this.controller.prototype.constructor;			
-			this.controller.prototype.constructor = this;
-			this.prototype = this.controller.prototype;
-			
-			return this;
-		};
-		
 		return Component;
 	}; 
 	
@@ -2844,6 +2772,7 @@ var PATH_MAP = {
 		return {namespaces:namespaces, filenames:filenames};
 	};
 
+	
 	/**
 	 * Builds module and compiles late(s) from module definition. 
 	 * The templates will be compiled recursively, 
@@ -2856,16 +2785,22 @@ var PATH_MAP = {
 	
 	    var scope = new Namespace(path); //our module scope
 		scope.singletons = {constructors:[], instances:[]};
-			
-		scope.framework = mixin(sjs(),{
-			Class : function(fn){
+		
+		var proxyClass = function(fn){
 				var nm = getFunctionName(fn);
 				scope[nm] = Class(fn);
 				return scope[nm];
-			},
-			Component : function(){
-				return Component.apply(scope,arguments);
+		};
+		proxyClass.extend = function(base){
+			return function(fn){
+				var nm = getFunctionName(fn);
+				scope[nm] = Class.extend(base)(fn);
+				return scope[nm];
 			}
+		};
+			
+		scope.framework = mixin(sjs(),{
+			Class : proxyClass
 		});
 		
 		
@@ -2883,16 +2818,8 @@ var PATH_MAP = {
 	
 		/* required collection is always an Array */
 		required = required instanceof Array ? required : null;
-		
-		
-
-		
 			
 		logging.debug.log(path);
-
-		var templateDefinitions = new Array();
-	
-		
 		/*
 		 * Handler to receive template file sources
 		 * each file may container any number of templates
@@ -2925,21 +2852,7 @@ var PATH_MAP = {
 		 * Load dependencies
 		 * */
 		 include(required, function(){	
-			
-			/*
-			 * Define a module
-			 * and create template scope 
-			 * for template compilation
-			 *
-			 * Some modules may be simple dependency aggregators 
-			 * in which case definition function is not available 
-			 * */
 
-			 /*
-
-				Scope object will contain dependency imports
-			 */
-			
 			/*
 				Inject Scope Dependencies
 			 */
@@ -2961,7 +2874,7 @@ var PATH_MAP = {
 			
 			if(typeof definition === 'function') {
 				var _exports = definition.call(scope,scope); 
-				PATH_MAP[url] = _exports;	
+				PATH_MAP[url] = mixin(_exports,scope.exports);
 			}
 		},collectTemplates);
 	};

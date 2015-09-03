@@ -19,12 +19,12 @@ definition:function(){
 	/**
 	 * HTML Element decorator
 	 */
-	var UIElement = Class(function UIElement(args){
+	var UIElement = Class.extend(Controller)(function UIElement(args){
 		var self = this;
 		this.concrete.dom.onclick = function(){
 			self.onClick(self);
 		}
-	}).extend(Controller);
+	});
 
 	UIElement.prototype.onClick = Event;
 
@@ -34,9 +34,9 @@ definition:function(){
 	/**
 	 * Base UIControl class
 	 */
-	var UIControl = Class(function UIControl(args){
+	var UIControl = Class.extend(Controller)(function UIControl(args){
 		
-		Controller.call(this);
+		this.super(args);
 		
 		if(this.isHidden) {
 			this.prevDisplayState = this.elements.root.style.display; 
@@ -51,7 +51,7 @@ definition:function(){
 			self.applyCSSRules();
 		});
 
-	}).extend(Controller);
+	});
 	
 	UIControl.prototype.hide = function(){
 		var self = this;

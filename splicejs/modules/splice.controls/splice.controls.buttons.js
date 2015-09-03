@@ -9,16 +9,13 @@ required:[
 definition:function(){
 
 	var Class = this.framework.Class
-	, 	Component = this.framework.Component
 	,	Event = this.framework.Event
+	,	debug = this.framework.debug
 	,	UIControl = this.SpliceJS.UI.UIControl;
 	
-	
+	var Button = Class.extend(UIControl)(function ButtonController(args){
 		
-	
-	var Button = Component('Button')(function Button(args){
-		
-		UIControl.apply(this,arguments);
+		this.super(arguments);
 			
 		var self = this;
 		this.elements.root.onclick = function(){
@@ -29,7 +26,7 @@ definition:function(){
 		
 		if(this.isDisabled) this.disable();
 		
-	}).extend(UIControl);
+	});
 
 	Button.prototype.onClick = Event;
 
@@ -65,13 +62,13 @@ definition:function(){
 	 * 
 	 * Check box
 	 * */
-	var CheckBox = Component('CheckBox')(function CheckBox(args){
-		UIControl.apply(this,arguments);
+	var CheckBox = Class.extend(UIControl)(function CheckBoxController(args){
+		this.super(arguments);
 
 		var self = this;
 		
 		this.concrete.dom.onclick = function(){
-			_.debug.log('I am check box');
+			debug.log('I am check box');
 			var isChecked = self.concrete.dom.checked; 
 			if(self.dataItem) {
 				self.dataItem[self.dataPath] = isChecked;
@@ -80,8 +77,7 @@ definition:function(){
 			if(self.dataOut) 	self.dataOut(self.dataItem);
 			if(self.onCheck)	self.onCheck(isChecked);
 		};
-	
-	}).extend(UIControl);
+	});
 
 	
 	CheckBox.prototype.dataIn = function(dataItem){
@@ -101,8 +97,8 @@ definition:function(){
 	/**
 	 * RadioButton
 	 * */
-	var RadioButton = Component('RadioButton')(function RadioButton(args){
-		UIControl.apply(this,arguments);
+	var RadioButton = Class.extend(UIControl)(function RadioButtonController(args){
+		this.super(arguments);
 	
 		var self = this;
 		this.elements.root.onclick = function(){
@@ -117,7 +113,7 @@ definition:function(){
 			self.dataOut(self.dataItem);
 		}
 	
-	}).extend(UIControl);
+	});
 	
 	
 	RadioButton.prototype.dataIn = function(dataItem){
@@ -137,8 +133,8 @@ definition:function(){
 	};
 	
 	
-	var TextField = Component('TextField')(function TextField(){
-		UIControl.apply(this,arguments);
+	var TextField = Class.extend(UIControl)(function TextFieldController(){
+		this.super(arguments);
 
 		var self = this;
 		
@@ -163,7 +159,7 @@ definition:function(){
 			this.onChange.subscribe(f, this);
 		}
 
-	}).extend(UIControl);
+	});
 	
 	TextField.prototype.onData = Event;
 		
@@ -184,10 +180,12 @@ definition:function(){
 
 	//returning exports
 	return {
-		Button:	Button,
-		CheckBox: CheckBox,
-		RadioButton: RadioButton,
-		TextField: 	TextField	
+		Controllers:{
+			Button:		 Button,
+			CheckBox: 	 CheckBox,
+			RadioButton: RadioButton,
+			TextField: 	 TextField	
+		}
 	}
 
 }
