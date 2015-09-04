@@ -2646,6 +2646,7 @@ UrlAnalyzer.prototype = {
 			var controller =  _controller?scope.lookup(_controller):null;
 			/* assign default */
 			if(!controller) controller = Controller; 
+			if(controller.isComponent) controller = controller.controller();
 			
 			args = args || {};
 			
@@ -2699,53 +2700,25 @@ UrlAnalyzer.prototype = {
 				args._includer_scope.singletons.instances.push(obj);
 			}
 
-
 			return obj; 
 			
 		};
+		
+		Component.controller = function(){
+			/* lookup controller */
+			var controller =  _controller?scope.lookup(_controller):null;
+			/* assign default */
+			if(!controller) controller = Controller; 
+			if(controller.isComponent) controller = controller.controller();
+			return controller;
+		};
+		
+		Component.isComponent = true;
 
 		return Component;
 	}; 
-	
-
-
-	
-	/*
-	 * Alter include behavior to understand templates
-	 * */
-/*	
-	function includeWithTemplate(resources, oncomplete, onitemloaded){
-		
-		var handler = function(){
-
-			var path = getPath(LoadingWatcher.name).path;
-			var scope = new Scope(path);
-
-			if(typeof onitemloaded === 'function')
-			onitemloaded.apply(this,arguments);
-			
-			var arg = arguments[0];
-			if(!arg) return;
-			if(arg.ext !== FILE_EXTENSIONS.template) return;
-			console.log('loading ' + LoadingWatcher.name);
-			var t = extractTemplates.call(scope,arg.data);
-			if(!t) return;
-			
-			var templates = {};
-			for(var i=0; i< t.length; i++){
-				templates[t[i].spec.type] = t[i];
-			}
-			scope.templates = templates;
-			compileTemplates(scope);
-		}
-		include.call(_,resources, oncomplete,handler);
-	};
-*/	
-
-
 
 	/*
-	
 		@path is a relative path to SPLICE_HOME
 		@a is a dependency list of file names
 	*/
@@ -2813,7 +2786,9 @@ UrlAnalyzer.prototype = {
 		proxyClass.extend = function(base){
 			return function(fn){
 				var nm = getFunctionName(fn);
-				scope[nm] = Class.extend(base)(fn);
+				var _base = base;
+				if(base.isComponent) _base = base.controller(); 
+				scope[nm] = Class.extend(_base)(fn);
 				return scope[nm];
 			}
 		};

@@ -10,16 +10,15 @@ required:[
 ],
 
 definition:function(){
-
-	var Component = this.framework.Component
-	,	UIControl = this.SpliceJS.UI.UIControl;
+	var scope = this.scope
+	, 	Class = this.Class;
 	
-	var Map = Component('Map')(function Map(){
-		UIControl.call(this);
-		
+	var	UIControl = scope.SpliceJS.UI.UIControl;
+	
+	var Map = Class.extend(UIControl)(function MapController(){
+		this.super();
 		this.onDisplay.subscribe(this.display,this);
-			
-	}).extend(UIControl);
+	});
 
 
 	Map.prototype.display = function(){
@@ -44,11 +43,8 @@ definition:function(){
 
 	};
 
-
-	return {
-		
-		Map:Map
-	}
+	//any class exports go here
+	return {};
 
 }
 });

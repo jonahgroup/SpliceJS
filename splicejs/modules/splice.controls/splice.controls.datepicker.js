@@ -2,7 +2,7 @@ sjs({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'}
-,	'{sjshome}/modules/splice.text.js'
+,	{'Text':'{sjshome}/modules/splice.text.js'}
 ,	{'SpliceJS.Controls':'splice.controls.calendar.js'}
 ,	{'SpliceJS.Controls':'splice.controls.selectors.js'}
 ,	'splice.controls.datepicker.html'
@@ -11,12 +11,13 @@ required:[
 
 definition:function(){
 
-	var Component = this.framework.Component
-	,	Event = this.framework.Event;
+	var scope = this.scope
+	,	Class = this.Class
+	,	Event = this.Event;
 	
-	var UIControl = this.SpliceJS.UI.UIControl;
+	var UIControl = scope.SpliceJS.UI.UIControl;
 
-	var DatePicker = Component('DatePicker')(function DatePicker(){
+	var DatePicker = Class.extend(UIControl)(function DatePickerController(){
 		UIControl.call(this);
 		
 		var date = new Date();
@@ -30,7 +31,7 @@ definition:function(){
 		    this.setDate(date);
 		}, this);
 
-	}).extend(UIControl);
+	});
 
 
 	
@@ -63,9 +64,7 @@ definition:function(){
 	DatePicker.prototype.onData 		= Event;
 
 
-	return {
-		DatePicker: DatePicker
-	}
+	return {};
 }
 
 });

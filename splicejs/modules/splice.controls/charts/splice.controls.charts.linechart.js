@@ -3,7 +3,7 @@ sjs({
 
 definition:function(){
 
-	var Class = this.framework.Class;
+	var Class = this.Class;
 
 	var LineChart = Class(function LineChart(){
 

@@ -9,8 +9,10 @@ required:[
 
 definition:function(){
 
-	var Component = this.framework.Component
-	, 	UIControl = this.SpliceJS.UI.UIControl;
+	var Class = this.Class
+	,	scope = this.scope;
+	
+	var UIControl = scope.SpliceJS.UI.UIControl;
 
 	var _d3 = this.d3 = d3;
 
@@ -36,22 +38,22 @@ definition:function(){
 	};
 
 
-	var D3Canvas = Component('D3Canvas')(function D3Canvas(){
-		UIControl.call(this);
+	var D3CanvasController = Class.extend(UIControl)(function D3CanvasController(){
+		this.super();
 		
 		this.d3 = new D3(this.elements.root);
-
-		var self = this;
 
 		this.onDisplay.subscribe(function(){
 			this.render(this.d3);
 		},this);
 
-	}).extend(UIControl);
+	});
 	
 	d3 = null;
 	return {
-		D3Canvas:D3Canvas
+		
+		D3CanvasController:D3CanvasController
+		
 	}
 }
 

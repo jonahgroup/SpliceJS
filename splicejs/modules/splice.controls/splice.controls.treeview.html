@@ -1,10 +1,10 @@
-<sjs-template type="TreeView">
+<sjs-component sjs-type="TreeView" sjs-export>
 	<div class="-splicejs-treeview" sjs-element="root">
 		<sjs-include type="SpliceJS.Controls.ScrollPanel">
 		{
 			content:{
 			staticContent:'',
-			scrollContent:<sjs-include type="Tree">{
+			scrollContent:<sjs-include sjs-type="Tree">{
 					ref:_.Binding('tree').Type('SpliceJS.Controls.TreeView'),
 					onTreeRefresh:_.Binding('reflow').Parent
 				}</sjs-include>		
@@ -12,17 +12,17 @@
 		}
 		</sjs-include>
 	</div>
-</sjs-template>
+</sjs-component>
 
-<sjs-template type="Tree">
-	<ul class="-splicejs-tree-root" data-sjs-element="treeRoot">@children</ul>
-</sjs-template>
+<sjs-component sjs-type="Tree" sjs-export>
+	<ul class="-splicejs-tree-root" sjs-element="treeRoot">@children</ul>
+</sjs-component>
 
 
-<sjs-template type="TreeViewRoot">
-	<li>@content<ul class="-splicejs-tree-root" data-sjs-element="treeRoot">@children</ul></li>		
-</sjs-template>
+<sjs-component sjs-type="TreeViewRoot" sjs-export>
+	<li>@content<ul class="-splicejs-tree-root" sjs-element="treeRoot">@children</ul></li>		
+</sjs-component>
 
-<sjs-template type="TreeViewItem">
+<sjs-component sjs-type="TreeViewItem" sjs-export>
 	<li class="-splicejs-tree-item">@content</li>
-</sjs-template>
+</sjs-component>

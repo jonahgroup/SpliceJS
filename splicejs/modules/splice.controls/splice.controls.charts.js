@@ -14,13 +14,14 @@ required:[
 
 definition:function(){
 
-	var scope = this
-	,	D3Canvas = this.SpliceJS.Controls.D3Canvas
-	, 	Component = this.framework.Component;
+	var Class = this.Class
+	,	scope = this.scope;
+	
+	var	D3Canvas = scope.SpliceJS.Controls.D3Canvas;
 
 	var CHART_MAP = {
-		Bar:  this.Charts.BarChart,
-		Line: this.Charts.LineChart
+		Bar:  scope.Charts.BarChart,
+		Line: scope.Charts.LineChart
 	};
 
 
@@ -29,7 +30,7 @@ definition:function(){
 	};
 
 	
-	var Chart = Component('Chart')(function Chart(){
+	var Chart = Class.extend(D3Canvas)(function ChartController(){
 		D3Canvas.call(this);	//call parent constructor
 
 		var self = this
@@ -52,7 +53,7 @@ definition:function(){
 		//subscribe to onAttach event, update chat dimensions
 		this.onAttach.subscribe(this.attach, this);
 
-	}).extend(D3Canvas);
+	});
 
 
 	Chart.prototype.attach = function(){
@@ -287,8 +288,8 @@ definition:function(){
 
 	return {
 		
-		Chart: 	Chart,
-		Dial:	Component('Dial')(scope.Charts.Dial)
+		ChartController: 	Chart,
+		Dial:	(scope.Charts.Dial)
 	}
 }
 

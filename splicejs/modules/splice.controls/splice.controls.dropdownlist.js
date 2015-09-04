@@ -9,23 +9,21 @@ sjs({
 	
 	definition:function(){
 		
-		var Component = this.framework.Component
-		,	UIControl = this.SpliceJS.UI.UIControl;
+		var scope = this.scope
+		,	Class = this.Class;
+		
+		var	UIControl = scope.SpliceJS.UI.UIControl;
 		
 		/**
 	 * Drop down list
 	 * */
-	var DropDownList = Component('DropDownList')(function DropDownList(args){
-		UIControl.call(this);
+	Class.extend(UIControl)(function DropDownListController(args){
+		this.super();
 		this.dom = this.concrete.dom;
-	}).extend(UIControl); 
+	});
 
 
 	/* module exports */	
-	return {
-		
-		DropDownList: DropDownList
-			
-	}	
+	return {};	
 		
 }});

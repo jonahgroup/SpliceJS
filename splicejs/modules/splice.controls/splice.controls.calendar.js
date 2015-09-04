@@ -196,12 +196,11 @@ definition:function(){
 
 
 
-	var Controller = this.framework.Controller
-	,	Component = this.framework.Component
-	,	Event = this.framework.Event;
+	var Class = this.Class
+	,	Event = this.Event;
 
-	var Calendar = Component('Calendar')(function Calendar(){
-		Controller.call(this);
+	var Calendar = Class.extend(this.Controller)(function CalendarController(){
+		this.super();
 		
 		var dt = new Date();
 		
@@ -228,8 +227,7 @@ definition:function(){
 			this.nextMonth();
 		},this);
 
-
-	}).extend(Controller);
+	});
 
 
 	Calendar.prototype.onDateSelected = Event;
@@ -249,12 +247,7 @@ definition:function(){
 		renderMonth.call(this, new Date(this.year, this.month, this.day));
 	};	
 
-
-	return {
-		
-		Calendar : Calendar
-		
-	}
+	return {}
 
 }
 

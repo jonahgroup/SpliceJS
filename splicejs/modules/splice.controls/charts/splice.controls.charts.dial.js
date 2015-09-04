@@ -7,7 +7,7 @@ required:[
 
 definition:function(){
 	
-	var Class = this.framework.Class;
+	var Class = this.Class;
 
 	var Dial = Class(function Dial(){
 	

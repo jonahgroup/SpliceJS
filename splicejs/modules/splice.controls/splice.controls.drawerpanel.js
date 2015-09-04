@@ -10,14 +10,15 @@ required:[
 
 definition:function(){
 
-	var scope = this
-	,	Component = this.framework.Component
-	,	UIControl = this.SpliceJS.UI.UIControl;
+	var scope = this.scope
+	,	Class = this.Class;
+	
+	var	UIControl = scope.SpliceJS.UI.UIControl;
 
 	/* DrawerPanel*/
 
-	var DrawerPanel = Component('DrawerPanel')(function DrawerPanel(){
-			UIControl.call(this);
+	var DrawerPanel = Class.extend(UIControl)(function DrawerPanelController(){
+			this.super();
 			
 			this.isOpen = false;
 
@@ -30,7 +31,7 @@ definition:function(){
 	
 			this.onDisplay.subscribe(this.display, this);
 			
-	}).extend(UIControl);
+	});
 
 
 	DrawerPanel.prototype.display = function(){
@@ -107,7 +108,7 @@ definition:function(){
 	};
 
 	return {
-		DrawerPanel : DrawerPanel
+		
 	}
 
 }

@@ -8,27 +8,27 @@ required:[
 ,
 definition:function(){
 
-	var scope = this;
-	var Component 	= this.framework.Component
-	,	Class 		= this.framework.Class
-	,	Event 		= this.framework.Event 
-	,	UIControl 	= this.SpliceJS.UI.UIControl
+	var scope = this.scope
+	,	Class 		= this.Class
+	,	Event 		= this.Event;
+	 
+	var	UIControl 	= scope.SpliceJS.UI.UIControl;
 
-	var TreeView = Component('TreeView')( function TreeView(){
-		UIControl.call(this);	
+	var TreeView = Class.extend(UIControl)( function TreeViewController(){
+		this.super();	
 		this.onDataIn.subscribe(renderTree, this);
-	}).extend(UIControl);
+	});
 
 
-	var Tree = Class(function Tree(){
-		UIControl.call(this);
-
+	var Tree = Class.extend(UIControl)(function Tree(){
+		this.super();
+		
 		this.onDataIn.subscribe(function(data){
 			this.elements.treeRoot.innerHTML = data;
 			this.onTreeRefresh();
 		},this);
 
-	}).extend(UIControl);
+	});
 
 	Tree.prototype.onTreeRefresh = Event;
 
@@ -79,11 +79,8 @@ definition:function(){
 		return str;
 	}
 	
-	/* module exports */
-	return {
-		TreeView : TreeView
-	}
-
+	//applicable class exports
+	return {};
 }
 	
 

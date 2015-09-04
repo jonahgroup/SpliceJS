@@ -8,18 +8,19 @@ required:[
 
 definition:function(){
 	
-	var UIControl = this.SpliceJS.UI.UIControl
-	,	Component = this.framework.Component
-	,	overlay = this.framework.display.overlay;
-
+	var scope = this.scope
+	,	overlay = this.display.overlay
+	,	Class = this.Class;
+	var UIControl = scope.SpliceJS.UI.UIControl
+	
 	/**
 	 *	
 	 * ViewPanel
 	 * Allows transitioning between views
 	 */
 
-	var ViewPanel = Component('ViewPanel')(function ViewPanel(){
-		UIControl.call(this);
+	var ViewPanel = Class.extend(UIControl)(function ViewPanelController(){
+		this.super();
 	 	
 		this.viewInstances = [];
 
@@ -42,7 +43,7 @@ definition:function(){
 	 		self.display();
 	 	});
 
-	}).extend(UIControl);
+	});
 
 
 
@@ -105,11 +106,7 @@ definition:function(){
 
 	};
 
-	return {
-		
-		ViewPanel : ViewPanel
-		
-	}
+	return {}
 
 }
 

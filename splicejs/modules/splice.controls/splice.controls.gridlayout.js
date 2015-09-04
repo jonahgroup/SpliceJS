@@ -7,14 +7,14 @@ required:[
 ],
 
 definition:function(){
-	var scope = this
-	,	Component = this.framework.Component
-	,	Event = this.framework.Event
-	,	debug = this.framework.debug
-	,	Obj = this.framework.Obj;
+	var scope = this.scope
+	,	Class = this.Class
+	,	Event = this.Event
+	,	debug = this.debug
+	,	Obj = this.Obj;
 
-	var UIControl = this.SpliceJS.UI.UIControl
-	,	DragAndDrop = this.SpliceJS.UI.DragAndDrop;
+	var UIControl = scope.SpliceJS.UI.UIControl
+	,	DragAndDrop = scope.SpliceJS.UI.DragAndDrop;
 
 	var Grid = function(rows,columns){
 		this.rows 		= rows;
@@ -60,8 +60,6 @@ definition:function(){
 		}
 	};
 
-
-
 	var left 	= 1
 	,	top 	= 2
 	,	right 	= 3
@@ -69,14 +67,13 @@ definition:function(){
 	,	move 	= 5;
 
 
-
 	/* 
 	*	
 	*	Cell container class 
 	*
 	*/
-	var CellContainer = Component('CellContainer')(function CellContainer(){
-		UIControl.call(this);
+	var CellContainer = Class.extend(UIControl)(function CellContainerController(){
+		this.super();
 
 		//attach events to drive resizing of the cell container
 		var self = this;
@@ -104,7 +101,7 @@ definition:function(){
 		this.onEndResize.subscribe(this.endResize, this);
 		this.onStartMove.subscribe(this.startMove,this);
 
-	}).extend(UIControl);
+	});
 
 
 	CellContainer.prototype.onStartMove   =	Event;
@@ -149,7 +146,7 @@ definition:function(){
 	*	Grid Layout implementation
 	*
 	*/
-	var GridLayout = Component('GridLayout')(function GridLayout(){
+	var GridLayout = Class.extend(UIControl)(function GridLayoutController(){
 
 		UIControl.call(this);
 
@@ -172,7 +169,7 @@ definition:function(){
 		this.onDisplay.subscribe(function(){
 			self.display();
 		});
-	}).extend(UIControl);
+	});
 
 
 	GridLayout.prototype.display = function(){
@@ -397,11 +394,7 @@ definition:function(){
 	};
 
 
-	return  {
-		
-		GridLayout: GridLayout
-		
-	}
+	return  {}
 
 
 }
