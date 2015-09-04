@@ -8,12 +8,13 @@ required:[
 
 definition:function(){
 
-	var Component = this.framework.Component
-	,	Controller = this.framework.Controller
-	,	Event = this.framework.Event;
+	var Class = this.Class
+	,	Controller = this.Controller
+	,	Event = this.Event;
 	
 	
-	var DomIterator = Component(null)( function DomIterator(args){
+	var DomIterator = Class.extend(Controller)(function DomIterator(args){
+		this.super();
 
 		this.conc = [];
 
@@ -66,7 +67,7 @@ definition:function(){
 
 		if(!args.dom) return;
 
-	}).extend(Controller);
+	});
 
 	DomIterator.prototype.dataIn = function(data){
 		if(this.sequential) return;

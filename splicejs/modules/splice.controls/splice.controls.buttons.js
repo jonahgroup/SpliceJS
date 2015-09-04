@@ -8,10 +8,10 @@ required:[
 ,
 definition:function(){
 
-	var Class = this.framework.Class
-	,	Event = this.framework.Event
-	,	debug = this.framework.debug
-	,	UIControl = this.SpliceJS.UI.UIControl;
+	var Class = this.Class
+	,	Event = this.Event
+	,	debug = this.debug
+	,	UIControl = this.scope.SpliceJS.UI.UIControl;
 	
 	var Button = Class.extend(UIControl)(function ButtonController(args){
 		

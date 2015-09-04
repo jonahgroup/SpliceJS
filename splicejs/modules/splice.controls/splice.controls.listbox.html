@@ -1,24 +1,24 @@
-<sjs-template type="StretchListBox">
+<sjs-component sjs-type="StretchListBox" sjs-export>
 	<div class="-splicejs-list-box" sjs-element="root"></div>
-</sjs-template>
+</sjs-component>
 
-<sjs-template type="ScrollableListBox">
+<sjs-component sjs-type="ScrollableListBox" sjs-export>
 	<div class="-splicejs-list-box" sjs-element="root">
-		<sjs-include type="SpliceJS.Controls.ScrollPanel">{
+		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">{
 			ref:'scrollPanel',
 			content:{
-				scrollContent:<sjs-include type="ContentClient">{ref:'contentClient'}</sjs-include>,
+				scrollContent:<sjs-include sjs-type="ContentClient" sjs-ref="contentClient"></sjs-include>,
 				staticContent:''
 			}
 		}</sjs-include>
 	</div>
-</sjs-template>
+</sjs-component>
 
 
-<sjs-template type="ContentClient">
+<sjs-component sjs-type="ContentClient">
 	<div sjs-element="root"></div>
-</sjs-template>
+</sjs-component>
 
-<sjs-template type="GroupedListItem">
+<sjs-component sjs-type="GroupedListItem">
 	<div class="-splicejs-list-grouped-listitem" sjs-element="root"></div>
-</sjs-template>	
+</sjs-component>	

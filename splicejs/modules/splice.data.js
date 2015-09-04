@@ -2,7 +2,7 @@
 sjs({
 definition:function(){
 
-	var mixin = this.framework.mixin;
+	var mixin = this.mixin;
 
 	var DataStep = function DataStep(dowork, issource){
 		mixin(this,{

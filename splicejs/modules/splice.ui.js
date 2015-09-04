@@ -9,12 +9,13 @@ definition:function(){
 	"use strict"; 
 	
 	// importing framework features makes our code less verbose
-	var Class = this.framework.Class
-	, 	Controller = this.framework.Controller
-	, 	Event = this.framework.Event
-	,	debug = this.framework.debug;
+	var Class = this.Class
+	, 	Event = this.Event
+	,	debug = this.debug
+	, 	Controller = this.Controller
+	,	scope = this.scope;
 	
-	var Animate = this.Animation.Animate;
+	var Animate = scope.Animation.Animate;
 
 	/**
 	 * HTML Element decorator
@@ -27,9 +28,6 @@ definition:function(){
 	});
 
 	UIElement.prototype.onClick = Event;
-
-
-
 
 	/**
 	 * Base UIControl class

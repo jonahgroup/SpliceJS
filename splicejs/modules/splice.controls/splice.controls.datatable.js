@@ -24,28 +24,27 @@ definition:function(){
 	}
 	
 	// import dependencies
-	var Class = this.framework.Class
-	,	Event = this.framework.Event
-	,	Component = this.framework.Component
-	,	mixin = this.framework.mixin
-	,	debug = this.framework.debug
-	,	Doc = this.Doc 
-	,	create = this.Doc.create
-	,	dom = this.Doc.dom
-	,	data = this.Data.data
-	,	fdata = this.Data.data
-	,	compare = this.Data.compare.default
-	,	DataStep = this.Data.DataStep
-	,	scope = this;
+	var Class = this.Class
+	,	Event = this.Event
+	,	mixin = this.mixin
+	,	debug = this.debug
+	,	scope = this.scope;
 	
-	var UIControl = this.SpliceJS.UI.UIControl; 
+	var	Doc 		= scope.Doc 
+	,	create 		= scope.Doc.create
+	,	dom 		= scope.Doc.dom
+	,	data 		= scope.Data.data
+	,	fdata 		= scope.Data.data
+	,	compare 	= scope.Data.compare.default
+	,	DataStep 	= scope.Data.DataStep
+	, 	UIControl 	= scope.SpliceJS.UI.UIControl; 
 	
 	/**
 	 * DataTable
 	 * */
-	var DataTable = Class(function DataTable(args){
+	var DataTable = Class.extend(UIControl)(function DataTable(args){
 		/* call parent constructor */
-		UIControl.apply(this,arguments);
+		this.super(arguments);
 
 		//get body and header tables, they may be one and same table
 		this.bodyTable = this.ref.body.elements.table;
@@ -100,7 +99,7 @@ definition:function(){
 				
 		initializeTable.call(this);
 
-	}).extend(UIControl);
+	});
 	
 	
 	DataTable.prototype.filterData = function(dataFilter){
@@ -485,7 +484,7 @@ definition:function(){
 	};
 
 
-	var FilterList = Component('FilterList')(function FilterListController(){
+	var FilterList = Class(function FilterListController(){
 		
 	});
 	

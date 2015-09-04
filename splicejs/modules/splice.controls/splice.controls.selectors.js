@@ -10,19 +10,21 @@ required:[
 definition:function(){	
 	
 	/* framework imports */
-	var Controller 	= this.framework.Controller
-	,	Event 		= this.framework.Event
-	,	Class 		= this.framework.Class
-	,	Positioning = this.SpliceJS.UI.Positioning
-	,	Component 	= this.framework.Component
-	,	dom = this.Doc.dom;
+	var Controller 	= this.Controller
+	,	Event 		= this.Event
+	,	Class 		= this.Class
+	,	scope 		= this.scope;
+	
+	/* dependency imports */
+	var	Positioning = scope.SpliceJS.UI.Positioning
+	,	dom = scope.Doc.dom;
 	
 	//static single instance
-	var dropDownContainer = new (this.templates['DropDownContainer'])()
+	var dropDownContainer = new (this.scope.templates['DropDownContainer'])()
 	,	selectorElement = null;
 
-	var DropDownController = Class(function DropDownController(args){
-		Controller.call(this);
+	var DropDownController = Class.extend(Controller)(function DropDownController(args){
+		this.super();
 	
 		var self = this;
 	    /*
@@ -43,7 +45,7 @@ definition:function(){
 
 		this.dropDownItem = this.dropDownItem;
 
-	}).extend(Controller)
+	});
 
 
 	DropDownController.prototype.onDropDown = Event;
@@ -118,8 +120,9 @@ definition:function(){
 	};
 
 	return {
-		DropDownSelector:Component('DropDownSelector')(DropDownController),
-		DropDownController: DropDownController
+		controllers: {
+			DropDownController: DropDownController	
+		}
 	}
 
 }});

@@ -9,21 +9,21 @@ required:[
 
 definition:function(){
 
-	var Component = this.framework.Component
-	,	configuration = this.framework.configuration
-	,	select = this.Doc.select
-	,	create = this.Doc.create;
+	var Class 		= this.Class
+	, 	isTouch 	= this.config.platform.IS_TOUCH_ENABLED
+	, 	isMobile 	= this.config.platform.IS_MOBILE;
 	
-	var UIControl = this.SpliceJS.UI.UIControl;
-	var DragAndDrop = this.SpliceJS.UI.DragAndDrop;
+	var	select = this.scope.Doc.select
+	,	create = this.scope.Doc.create
+	, 	UIControl 	= this.scope.SpliceJS.UI.UIControl
+	, 	DragAndDrop = this.scope.SpliceJS.UI.DragAndDrop;
 
-	var isTouch 	= configuration.platform.IS_TOUCH_ENABLED;
-	var isMobile 	= configuration.platform.IS_MOBILE;
+	
 
-	var ScrollPanel = Component('ScrollPanel')(function ScrollPanel(args){
+	var ScrollPanel = Class.extend(UIControl)(function ScrollPanel(args){
 		if(!args) return;
 		
-		UIControl.call(this,args);
+		this.super(args);
 		
 		this.horizontalDisable = this.isDisableHorizontal;
 		this.domRoot = this.concrete.dom;
@@ -51,7 +51,7 @@ definition:function(){
 			self.display();
 		});
 
-	}).extend(UIControl);
+	});
 	
 
 	ScrollPanel.prototype.display = function(){
@@ -326,7 +326,9 @@ definition:function(){
 
 	//module exports
 	return {
-		ScrollPanel:ScrollPanel
+		controllers : {
+			ScrollPanel:ScrollPanel	
+		}
 	}
 
 }});

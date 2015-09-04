@@ -2,7 +2,7 @@
 sjs({
 definition:function(){
 
-	var Tokenizer = this.framework.Tokenizer;
+	var Tokenizer = this.Tokenizer;
 
 	function getValueUnit(value){
 		if(!value) return null;

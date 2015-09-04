@@ -10,10 +10,13 @@ required:[
 definition:function(){
 
 	
-	var Component = this.framework.Component
-	, 	Class = this.framework.Class
-	,	UIControl = this.SpliceJS.UI.UIControl
-	,	debug = this.framework.debug;
+	var Class = this.Class
+	,	debug = this.debug
+	,	scope = this.scope
+	, 	components = this.scope.components;
+	
+	var	UIControl = this.scope.SpliceJS.UI.UIControl
+
 	
 
 	var ListBox = Class(function ListBox(args){
@@ -21,20 +24,19 @@ definition:function(){
 		if(!args) args = [];
 
 		if(args.isScrollable)
-			return new ScrollableListBox(args);	
+			return new components.ScrollableListBox(args);	
 		else 
-			return new StretchListBox(args);
-
+			return new components.StretchListBox(args);
 	});
 
 
-	var ScrollableListBox = Component('ScrollableListBox')(function ScrollableListBox(){
-			debug.log('Creating ScrollableListBox');
-
+	var ScrollableListBox = Class.extend(UIControl)(function ScrollableListBox(){
+			this.super();
+			
 			this.scrollPanel 	= this.ref.scrollPanel;
 			this.contentClient 	= this.ref.scrollPanel.ref.contentClient;	 
 		}
-	).extend(UIControl);
+	);
 
 	ScrollableListBox.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
@@ -63,13 +65,11 @@ definition:function(){
 		this.ref.scrollPanel.reflow();
 	};
 
-	var StretchListBox = Component('StretchListBox')(function StretchListBox(){
-		}
-	);
+	var StretchListBox = Class(function StretchListBox(){});
 
 
-	var ListItem = Class(function ListItem(args){
-		UIControl.call(this,args);
+	var ListItem = Class.extend(UIControl)(function ListItem(args){
+		this.super(args);
 	
 		var self = this;
 		this.concrete.dom.onclick = function(){
@@ -77,7 +77,7 @@ definition:function(){
 				self.onClick(self.dataItem);
 		};
 
-	}).extend(UIControl);
+	});
 
 
 	ListItem.prototype.dataIn = function(dataItem){
@@ -123,10 +123,12 @@ definition:function(){
 	//exporting objects
 	return {
 		ListBox:			ListBox,
-		ScrollableListBox:	ScrollableListBox,
-		StretchListBox:		StretchListBox,
-		ListItem:			ListItem,
-		GroupedListItem:	GroupedListItem
+		controllers: {
+			ScrollableListBox:	ScrollableListBox,
+			StretchListBox:		StretchListBox,
+			ListItem:			ListItem,
+			GroupedListItem:	GroupedListItem
+		}
 	}
 
 }

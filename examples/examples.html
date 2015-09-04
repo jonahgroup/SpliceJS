@@ -16,16 +16,21 @@
         '{sjshome}/modules/splice.text.js',
         
         '{sjshome}/modules/splice.ui.js',
-        '{sjshome}/modules/splice.controls/splice.controls.buttons.js',
+        '{sjshome}/modules/splice.controls/splice.controls.buttons.js',	
         
-        //'{sjshome}/modules/splice.controls.js',
-
-		'resources/fontfaces.css'
+        '{sjshome}/modules/splice.controls.js',
+		'resources/fontfaces.css',
       //  'Main/examples.js',
        // {'UserApplications':'Controls/controlsdemoapplication.js'},
        // {'UserApplications':'DataTable/application/src/sample.js'}
          
     ]);
+    
+    
+    sjs().onReady(function(){    
+        this.load(['Tests/tests.js'])
+    }); 
+    
 			
 </script>
 

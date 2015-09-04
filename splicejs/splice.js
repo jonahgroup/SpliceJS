@@ -52,9 +52,11 @@ var sjs = (function(window, document){
 	/** 
 	  	Bootloading files
 	*/
-	var BOOT_SOURCE = [];
-	var LOADER_PROGRESS = {total:0, complete:0};
-
+	var BOOT_SOURCE = []
+	,	READY = {}
+	, 	LOADER_PROGRESS = {total:0, complete:0}
+	,	MODULE_MAP = new Object(null);
+	
 	var FILE_EXTENSIONS = {
 		javascript: '.js', 
 		template: 	'.html',
@@ -73,7 +75,6 @@ var sjs = (function(window, document){
 	}
 
 	var logging = {
-		
 		debug : {log:function(){}},
 		info  : console
 	}; 
@@ -1019,7 +1020,9 @@ UrlAnalyzer.prototype = {
 	Implementation
 
 */
-
+	
+	function onReady(fn){	READY.callback = fn; };
+	
 	window.onload = function(){
 		var start  = window.performance.now();
 		
@@ -1034,6 +1037,19 @@ UrlAnalyzer.prototype = {
 			LoadingWatcher.name = name.name;
 			LoadingWatcher.url =url;	
 		}
+		
+		//user specified on ready handler, run it and return
+		if(typeof READY.callback === 'function'){
+			Module({
+				required:BOOT_SOURCE,
+				definition:function(){
+					removePreloader();
+					READY.callback.call(this);
+				}	
+			});
+			return;	
+		}
+		
 		
 		// boot module		
 		Module({
@@ -1305,7 +1321,7 @@ UrlAnalyzer.prototype = {
 	function _super(inst,b,args){
 		if(!b) return;
 		_super(inst,b.base,args);
-		console.log('Calling super');
+		//console.log('Calling super');
 		b.apply(inst,args);
 	};
 	
@@ -1314,10 +1330,15 @@ UrlAnalyzer.prototype = {
 			_class.prototype = Object.create(base.prototype);
 			_class.prototype.constructor = _class;
 			_class.base = base.prototype.constructor;
+			var superMethods = mixin({},base.prototype);
+			
 			_class.prototype.super = function(){
-				this.super = function(){};
+				this.super = mixin(function(){},superMethods);
 				_super(this,_class.base, arguments);	
+				
 			};
+			mixin(_class.prototype.super,superMethods);
+			
 			return _class;
 		}
 	}; 
@@ -2195,11 +2216,11 @@ UrlAnalyzer.prototype = {
 		//var start  = window.performance.now();
 		
 		this.templates = [];
-		this.exports = []; //component exports
+		this.components = []; //component exports
 		
 		container.innerHTML = fileSource;
 		
-		var nodes = container.querySelectorAll('sjs-template');
+		var nodes = container.querySelectorAll('sjs-component');
 		for(var i=0; i<nodes.length; i++){
 			var node = nodes[i];
 			this.templates[node.attributes['sjs-type'].value] = new Template(node);
@@ -2561,7 +2582,7 @@ UrlAnalyzer.prototype = {
 		this.templates[template.type] = component;
 		
 		if(template.export) {
-			this.exports[template.export] = component; 	
+			this.components[template.export] = component; 	
 		}  
 		return component;
 	
@@ -2692,7 +2713,7 @@ UrlAnalyzer.prototype = {
 	/*
 	 * Alter include behavior to understand templates
 	 * */
-	
+/*	
 	function includeWithTemplate(resources, oncomplete, onitemloaded){
 		
 		var handler = function(){
@@ -2719,11 +2740,9 @@ UrlAnalyzer.prototype = {
 		}
 		include.call(_,resources, oncomplete,handler);
 	};
-	
+*/	
 
-var PATH_MAP = {
 
-};
 
 	/*
 	
@@ -2784,7 +2803,7 @@ var PATH_MAP = {
 	function Module(moduleDefinition){
 	
 	    var scope = new Namespace(path); //our module scope
-		scope.singletons = {constructors:[], instances:[]};
+			scope.singletons = {constructors:[], instances:[]};
 		
 		var proxyClass = function(fn){
 				var nm = getFunctionName(fn);
@@ -2799,10 +2818,11 @@ var PATH_MAP = {
 			}
 		};
 			
-		scope.framework = mixin(sjs(),{
+		var _sjs = mixin(sjs(),{
 			Class : proxyClass
 		});
 		
+		_sjs.scope = scope;
 		
 		
 		//use absolute URL there is no reason not to
@@ -2829,13 +2849,9 @@ var PATH_MAP = {
 		 * Template compiler is called on module instance 
 		 * */
 		var collectTemplates = function(template){
-			/* template is a template file as loaded
-			 * extract template information
-			 * */
 			if(!template) return;
 
 			if(template.ext == FILE_EXTENSIONS.template) {
-				
 				extractTemplates.call(scope,template.data);
 			}
 		};
@@ -2844,7 +2860,7 @@ var PATH_MAP = {
 		 * Module has no required includes
 		 * */
 		if(!required || required.length < 1) {
-			PATH_MAP[url] = definition.call(scope,scope); 
+			MODULE_MAP[url] = definition.call(_sjs,_sjs); 
 			return;
 		}
 		
@@ -2860,7 +2876,7 @@ var PATH_MAP = {
 				for(var i=0; i<imp.namespaces.length; i++){
 					var ns = imp.namespaces[i];
 					//looking up exports
-					var x = PATH_MAP[absPath(ns.path)];
+					var x = MODULE_MAP[absPath(ns.path)];
 					if(!x) continue;
 					ns = getNamespace.call(scope,ns.ns,true,false);
 					ns.place(x);
@@ -2873,8 +2889,8 @@ var PATH_MAP = {
 			compileTemplates(scope);
 			
 			if(typeof definition === 'function') {
-				var _exports = definition.call(scope,scope); 
-				PATH_MAP[url] = mixin(_exports,scope.exports);
+				var _exports = definition.call(_sjs,_sjs); 
+				MODULE_MAP[url] = mixin(_exports,scope.components);
 			}
 		},collectTemplates);
 	};
@@ -2889,6 +2905,12 @@ var PATH_MAP = {
 		return target;
 	};
 
+
+	function listModules(){
+		return MODULE_MAP;	
+	};
+
+
 /*
 
 --------------------------------------
@@ -2900,16 +2922,23 @@ var PATH_MAP = {
 	
 	
 	function sjs(m) { 
-		if(m && typeof m.definition === 'function' ){
+		//free module definition
+		if(typeof m === 'function'){
+			return Module({definition:m});
+		}
+		
+		//dependent module definition
+		if( typeof m === 'object' && typeof m.definition === 'function'){
 			return Module(m);	
 		};
 		
+		//lookup module
 		if(typeof m  === 'string'){
 				
-			var keys = Object.keys(PATH_MAP);
+			var keys = Object.keys(MODULE_MAP);
 			for(var i=0; i < keys.length; i++){
 				var key = keys[i];
-				if(key.endsWith(m)) return PATH_MAP[key];  					
+				if(key.endsWith(m)) return MODULE_MAP[key];  					
 			}
 			return function(callback){
 				//async module loader here				
@@ -2930,7 +2959,7 @@ var PATH_MAP = {
 				}
 			},
 			
-			configuration : configuration,
+			config : configuration,
 			
 			boot : boot,
 			toPath : toPath,
@@ -2942,9 +2971,9 @@ var PATH_MAP = {
 			close : close,
 			endswith:endsWith,
 			mixin: mixin,
-			'module':Module,
-			
-			include : includeWithTemplate,
+						
+			load	: include,		
+			include : include,
 			getFunctionName:getFunctionName,
 		
 			Namespace: Namespace,
@@ -2954,11 +2983,13 @@ var PATH_MAP = {
 			Binding : Binding,
 			HttpRequest : HttpRequest,	
 			Event : EventSingleton,	
-			Module : Module,
+			
 			Tokenizer:Tokenizer,
 			UrlAnalyzer:UrlAnalyzer,
 			
-			PATH_MAP : PATH_MAP
+			onReady:onReady,
+			
+			modules: listModules
 		
 	});
 }

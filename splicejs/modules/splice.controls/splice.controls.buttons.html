@@ -2,27 +2,29 @@
 	Creates component named Button using controller ButtonController
 	and exports it from the declaring module  	
 -->
-<sjs-template sjs-type="Button" sjs-controller="ButtonController" sjs-export>
+<sjs-component sjs-type="Button" sjs-controller="ButtonController" sjs-export>
 	<input class="-sjs-button" sjs-element="root"  type = "button" value="@label"/>
-</sjs-template>
+</sjs-component>
 
 <!-- 
 	Creates component named CheckBox using controller CheckBoxController
 	and exports it from the declaring module  	
 -->
-<sjs-template sjs-type="CheckBox" sjs-controller="CheckBoxController" sjs-export>
+<sjs-component sjs-type="CheckBox" sjs-controller="CheckBoxController" sjs-export>
 	<input type="checkbox" sjs-element="root">
-</sjs-template>
+</sjs-component>
 
-
-<sjs-template sjs-type="RadioButton" sjs-controller="RadioButtonController" sjs-export>
+<!-- 
+	Exports RadioButton using RadioButtonController  	
+-->
+<sjs-component sjs-type="RadioButton" sjs-controller="RadioButtonController" sjs-export="SuperRadioButton">
 	<input type="radio" sjs-element="root">
-</sjs-template>
+</sjs-component>
 
 
-<sjs-template sjs-type="TextField" sjs-controller="TextFieldController" sjs-export>
+<sjs-component sjs-type="TextField" sjs-controller="TextFieldController" sjs-export>
 	<input class="-sjs-textfield" type="text" sjs-element="root"/>
-</sjs-template>
+</sjs-component>
 
 
 

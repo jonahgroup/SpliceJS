@@ -5,11 +5,11 @@ definition:function(){
     "use strict";
 
 	//configuration constants
-	var	SPLICE_REMOTE_ENDPOINT = this.framework.configuration.SPLICE_REMOTE_ENDPOINT
-	,	SPLICE_REMOTE_CALL_ADAPTER = this.framework.configuration.SPLICE_REMOTE_CALL_ADAPTER;
+	var	SPLICE_REMOTE_ENDPOINT = this.config.SPLICE_REMOTE_ENDPOINT
+	,	SPLICE_REMOTE_CALL_ADAPTER = this.config.SPLICE_REMOTE_CALL_ADAPTER;
 	
-	var HttpRequest = this.framework.HttpRequest
-	,	debug = this.framework.debug;
+	var HttpRequest = this.HttpRequest
+	,	debug = this.debug;
 	
     var Remote = Object.create(null);
 	
