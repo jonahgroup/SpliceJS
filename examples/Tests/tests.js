@@ -11,6 +11,7 @@ sjs(function(){
 	
 	var A  = Class(function A(){
 		this.name = 'this is a'; 	
+		console.log('A constructor');
 	});
 	
 	A.prototype.getName = function(){
@@ -20,16 +21,16 @@ sjs(function(){
 
 	var B = Class.extend(A)(function B(){
 		this.super();
+		console.log('B constructor');
 	});
 	
 	B.prototype.getName = function(){
 		this.super.getName();
 		console.log('B:getName');
-			
 	};
 
 	var C = Class.extend(B)(function C(){
-		//this.super();				
+		this.super();				
 	});	
 	
 	C.prototype.getName = function(){

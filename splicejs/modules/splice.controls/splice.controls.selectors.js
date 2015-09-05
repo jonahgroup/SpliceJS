@@ -10,9 +10,9 @@ required:[
 definition:function(){	
 	
 	/* framework imports */
-	var Controller 	= this.Controller
-	,	Event 		= this.Event
-	,	Class 		= this.Class
+	var Controller 	= this.sjs.Controller
+	,	Event 		= this.sjs.Event
+	,	Class 		= this.sjs.Class
 	,	scope 		= this.scope;
 	
 	/* dependency imports */

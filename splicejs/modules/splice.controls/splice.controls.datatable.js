@@ -24,10 +24,10 @@ definition:function(){
 	}
 	
 	// import dependencies
-	var Class = this.Class
-	,	Event = this.Event
-	,	mixin = this.mixin
-	,	debug = this.debug
+	var Class = this.sjs.Class
+	,	Event = this.sjs.Event
+	,	mixin = this.sjs.mixin
+	,	debug = this.sjs.debug
 	,	scope = this.scope;
 	
 	var	Doc 		= scope.Doc 
@@ -42,7 +42,7 @@ definition:function(){
 	/**
 	 * DataTable
 	 * */
-	var DataTable = Class.extend(UIControl)(function DataTable(args){
+	var DataTable = Class.extend(UIControl)(function DataTableController(args){
 		/* call parent constructor */
 		this.super(arguments);
 
@@ -600,7 +600,7 @@ definition:function(){
 	
 	
 	/* data table variat decoder */
-	var _DataTable = function _DataTable(args){
+	var DataTableFactory = function DataTableFactory(args){
 	
 		if(args.scroll === 'no') 	 return new (Component('NoScrollDataTable')(DataTable))(args);
 		if(args.scroll === 'custom') return new (Component('CustomScrollDataTable')(DataTable))(args); 
@@ -611,7 +611,7 @@ definition:function(){
 
 	//module exports
 	return {
-		DataTable: _DataTable,
+		DataTable: DataTableFactory,
 		DataTableRow: DataTableRow
 	}
 

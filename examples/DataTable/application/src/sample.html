@@ -1,11 +1,11 @@
 
 <!-- sample application template -->
-<sjs-template type="Sample">
+<sjs-component sjs-type="Sample" sjs-controller="SampleController" sjs-export>
 <div style="position:absolute; left:0px; top:0px; right:0px; bottom:0px;">
 	
 	<!-- our search input -->
 	<div style="padding-top:0.5em; padding-bottom:0.5em;"><span style="padding-left:10px; font-size:10px; font-family:Arial;">Search:</span>
-		<sjs-include type="SpliceJS.Controls.TextField" controller="SearchTextField">{
+		<sjs-include sjs-type="SpliceJS.Controls.TextField" sjs-controller="SearchTextField">{
 			onData:_.Binding('onFilterData').Parent,
 			dataIn:_.Binding('onClearFilter').Parent,
 			isRealTime: true 
@@ -59,11 +59,11 @@
 			onLeft: _.Binding('onPrevPage').Parent,
 		}
 	</sjs-include>
-</sjs-template>
+</sjs-component>
 
 
 <!-- data table row template -->
-<sjs-template type="SampleRow" controller="SpliceJS.Controls.DataTableRow">
+<sjs-component sjs-type="SampleRow" controller="SpliceJS.Controls.DataTableRow">
 	<div><span class="-drilldown">@0</span></div>
 	<sjs-include type="SpliceJS.Controls.DomIterator">
 		{
@@ -73,4 +73,4 @@
 			dom:<div>@i</div>
 		}
 	</sjs-include>
-</sjs-template>
+</sjs-component>

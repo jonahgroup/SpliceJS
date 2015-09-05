@@ -354,11 +354,17 @@ var sjs = (function(window, document){
  * 	URL analyzer
  *	
  */
-function Tokenizer(input){
-	if(!(this instanceof Tokenizer) ) return new Tokenizer(input);
+function Tokenizer(input, alphanum, space){
+	if(!(this instanceof Tokenizer) ) return new Tokenizer(input, alphanum, space);
 	mixin(this, { 
 		input: input,	i : 0,	c : input[0]
 	});
+	
+	this.alphanum = Tokenizer.isAlphaNum;
+	if(alphanum) this.alphanum = alphanum;
+	
+	this.space = Tokenizer.isSpace;
+	if(space) this.space = space;
 };
 
 
@@ -392,7 +398,7 @@ Tokenizer.prototype = {
 	nextToken : function(){
 		
 		var c = this.c;
-		if(Tokenizer.isAlphaNum(c)) {
+		if(this.alphanum(c)) {
 			return this.identifier();
 		}
 		return this.consume();
@@ -400,7 +406,7 @@ Tokenizer.prototype = {
 
 	identifier:function(){
 		var result = '';
-		while(Tokenizer.isAlphaNum(this.c)){
+		while(this.alphanum(this.c)){
 			result += this.consume();
 		}		
 		return result;
@@ -1055,7 +1061,7 @@ UrlAnalyzer.prototype = {
 		Module({
 			required:BOOT_SOURCE,
 			definition:function(){
-				var scope = this;
+				var scope = this.scope;
 				var _Template = constructTemplate(mainPageHtml);
 				_Template.type = 'MainPage'; 
 				_Template = compileTemplate.call(scope,_Template);
@@ -1178,12 +1184,7 @@ UrlAnalyzer.prototype = {
 	 
 	 
 	function Namespace(path){
-		
-		if(!(this instanceof Namespace) ){
-			return _Namespace(path);			
-		}
-			
-		
+	
 		this._path = path;
 		this.templates = [];
 		this.path = path;
@@ -1206,8 +1207,7 @@ UrlAnalyzer.prototype = {
 			
 			place:function(obj){
 				for(var key in obj){
-					if(!obj.hasOwnProperty) continue;
-					
+					if(!Object.prototype.hasOwnProperty.call(obj,key)) continue;
 					this[key] = obj[key];
 				}	
 			},
@@ -1784,13 +1784,7 @@ UrlAnalyzer.prototype = {
 			if(!obj) 
 				throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
-			
 
-			/* locate tie, if override was specified */
-			if(args.controller) {
-				overrideController = scope[args.controller] || Namespace.lookup(args.controller);
-				if(!overrideController) throw 'Tie type cannot be found';
-			}
 
 			/* copy args*/
 			var parameters = {};
@@ -1812,9 +1806,12 @@ UrlAnalyzer.prototype = {
 			} 
 			
 			
-			/* create new component*/
-			if(typeof overrideController === 'function') {
-				obj = createComponent(overrideController, obj.template, scope);
+			/**  
+			*	create new in-place component
+			* 	using template and an override controller
+			*/
+			if(args.controller) {
+				obj = createComponent(args.controller, obj.template, scope);
 			}
 
 			/*
@@ -1892,6 +1889,8 @@ UrlAnalyzer.prototype = {
 
 
 	var Controller = function Controller(){
+		
+		this.children = [];
 
 		this.onDisplay.subscribe(function(){
 			if(!this.children) return;
@@ -2242,6 +2241,32 @@ UrlAnalyzer.prototype = {
 		return false;
 	};
 
+	function capitalize(s){
+		return s[0].toUpperCase() + s.substring(1);
+	}
+
+	/**
+	 *	Converts arbitrary string to a property name 
+	 */
+	function propertyName(name){
+		var fn = function(c){
+			if (c== '_') return false; 
+			return Tokenizer.isAlphaNum(c); 
+		};
+		
+		var t = Tokenizer(name,fn);
+		
+		var	result = ''
+		,	token = '';
+		var iscap = false;
+		
+		while(token = t.nextToken()){
+			if(!fn(token)) continue;
+			result = result + (iscap?capitalize(token):token);	
+			iscap = true;
+		}
+		return result;		
+	};
 
 	var RESERVED_ATTRIBUTES = ["type", "ref", "singleton", "class", "width", "height", "layout", "controller"];
 
@@ -2255,9 +2280,11 @@ UrlAnalyzer.prototype = {
 		,	separator = '';
 		
 		for(var i=0; i<attributes.length; i++){
-			var attr = attributes[i];
+			var attr = attributes[i]
+			,	name = propertyName(attr.name);
+			
 			if(startsWith(attr.value,'_.Binding(')){
-				result = result + separator + attr.name + ':' + attr.value;	
+				result = result + separator + name + ':' + attr.value;	
 				separator = ', ';
 				continue;	
 			}
@@ -2797,7 +2824,7 @@ UrlAnalyzer.prototype = {
 			Class : proxyClass
 		});
 		
-		_sjs.scope = scope;
+		
 		
 		
 		//use absolute URL there is no reason not to
@@ -2864,7 +2891,8 @@ UrlAnalyzer.prototype = {
 			compileTemplates(scope);
 			
 			if(typeof definition === 'function') {
-				var _exports = definition.call(_sjs,_sjs); 
+				var _exports = definition.call({'sjs':_sjs,'scope':scope}); 
+				if(!_exports) _exports = Object.create(null);
 				MODULE_MAP[url] = mixin(_exports,scope.components);
 			}
 		},collectTemplates);
@@ -2940,6 +2968,7 @@ UrlAnalyzer.prototype = {
 			toPath : toPath,
 			home : home,
 			
+			propname: propertyName,
 			absPath : absPath,
 			getPath : getPath,
 			display : display,

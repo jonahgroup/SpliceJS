@@ -8,10 +8,11 @@ required:[
 ],
 
 definition:function(){
+	var sjs = this.sjs;
 
-	var Class 		= this.Class
-	, 	isTouch 	= this.config.platform.IS_TOUCH_ENABLED
-	, 	isMobile 	= this.config.platform.IS_MOBILE;
+	var Class 		= this.sjs.Class
+	, 	isTouch 	= this.sjs.config.platform.IS_TOUCH_ENABLED
+	, 	isMobile 	= this.sjs.config.platform.IS_MOBILE;
 	
 	var	select = this.scope.Doc.select
 	,	create = this.scope.Doc.create

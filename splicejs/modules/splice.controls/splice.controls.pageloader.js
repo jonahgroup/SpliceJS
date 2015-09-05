@@ -7,20 +7,15 @@ required:[
 ,
 definition:function(){
 
-	var Class = this.framework.Class
-	,	UIControl = this.SpliceJS.UI.UIControl
-
-
-	var PageLoader = Class(function PageLoader(){
-		UIControl.call(this);
-	}).extend(UIControl);
-
+	var scope = this.scope
+	,	Class = this.Class;
 	
-	return {
-		
-		PageLoader: PageLoader
-		
-	}
+	var	UIControl = scope.SpliceJS.UI.UIControl;
+
+
+	Class.extend(UIControl)(function PageLoaderController(){
+		this.super();
+	});
 
 }
 

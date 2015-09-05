@@ -8,12 +8,12 @@ required:[
 ,
 definition:function(){
 
-	var Component = this.framework.Component
-	,	UIControl = this.SpliceJS.UI.UIControl
+	var scope = this.scope
+	,	Class = this.Class;
 		
+	var	UIControl = scope.SpliceJS.UI.UIControl
 
-
-	var Popup = Component('Popup')(function Popup(){
+	var Popup = Class.extend(UIControl)(function PopupController(){
 		UIControl.call(this);
 
 		this.ratio = { width: 4, height: 3 };
@@ -22,7 +22,7 @@ definition:function(){
 		this.onDisplay.subscribe(this.display,this);
 		this.onAttach.subscribe(this.attach, this);
 
-	}).extend(UIControl);
+	});
 
 
 	Popup.prototype.attach = function () {
@@ -75,9 +75,7 @@ definition:function(){
 	};
 	
 
-	return {
-		Popup:Popup
-	}
+	
 
 }
 

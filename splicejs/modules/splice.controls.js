@@ -31,21 +31,21 @@ required:[
 , 	
 definition:function(){
 	"use strict";
-	var scope = this;
+	var scope = this.scope;
 
 	/* imports */
-	var Class = this.framework.Class
-	, 	Event = this.framework.Event
-	,	Controller = this.framework.Controller
-	, 	UIControl = this.SpliceJS.UI.UIControl
-	,	Component = this.framework.Component;
+	var Class = this.Class
+	, 	Event = this.Event
+	,	Controller = this.Controller;
+	
+	var UIControl = scope.SpliceJS.UI.UIControl;
 	
 
 	/*
 	 *	Image Selector
      *
 	 * */
-	var ImageSelector = Component('ImageSelector')(function ImageSelector(){
+	var ImageSelector = Class(function ImageSelector(){
 		
 		var container = this.elements.root;
 
@@ -62,9 +62,9 @@ definition:function(){
 	};
 
 
-	var PullOutPanel = Component('PullOutPanel')( function PullOutPanel(){
-		UIControl.call(this);
-	}).extend(UIControl);
+	var PullOutPanel = Class.extend(UIControl)( function PullOutPanel(){
+		this.super();
+	});
 
 
 	PullOutPanel.prototype.onOpen  = Event;

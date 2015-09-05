@@ -9,27 +9,27 @@ required:[
 
 definition:function(){
 
-	var Component = this.framework.Component
-	,	UIControl = this.SpliceJS.UI.UIControl;
+	var scope = this.scope
+	,	Class = this.Class
+	,	HttpRequest = this.HttpRequest;
+	
+	var	UIControl = scope.SpliceJS.UI.UIControl;
 
-	var CodeEditor = Component('CodeEditor')(function CodeEditor(){
-
+	var CodeEditor = Class.extend(UIControl)(function CodeEditorController(){
+		this.super();
 		var location  = this.file;
 		
 		var self = this;
 
 		this.lines = [];
 
-
-		_.HttpRequest.get({
+		HttpRequest.get({
 			url:location,
 			onok:function(result){ 
 				self.displayCode(result.text);
 			}
 		});
-	}).extend(UIControl);
-
-
+	});
 
 	CodeEditor.prototype.displayCode = function(code){
 
@@ -40,9 +40,6 @@ definition:function(){
 			this.elements.root.appendChild(this.lines[i]);
 		}
 	};
-
-
-
 
 
 	function applyTabulation(code, target){
@@ -64,8 +61,7 @@ definition:function(){
 	}
 	
 	function generateLines(code){
-		_.debugEnable();
-
+		
 		var lines = [];
 
 		var classNames = ['even', 'odd' ];
@@ -100,19 +96,10 @@ definition:function(){
 			accumulator = '';
 			i--;
 		}
-	
-
 
 		return lines;
 	}
 
-
-	return {
-		
-		CodeEditor:CodeEditor
-		
-	}
-	
 }
 
 });

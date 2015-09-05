@@ -10,9 +10,8 @@ required:[
 definition:function(){
 
 	
-	var Class = this.Class
-	,	debug = this.debug
-	,	scope = this.scope
+	var Class = this.sjs.Class
+	,	debug = this.sjs.debug
 	, 	components = this.scope.components;
 	
 	var	UIControl = this.scope.SpliceJS.UI.UIControl
@@ -122,13 +121,8 @@ definition:function(){
 
 	//exporting objects
 	return {
-		ListBox:			ListBox,
-		controllers: {
-			ScrollableListBox:	ScrollableListBox,
-			StretchListBox:		StretchListBox,
-			ListItem:			ListItem,
-			GroupedListItem:	GroupedListItem
-		}
+		ListItem:	ListItem,		
+		ListBox: ListBox
 	}
 
 }

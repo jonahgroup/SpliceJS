@@ -13,21 +13,22 @@ sjs({
 	],
 	definition:function(){
 		
-		var Component 	= this.framework.Component
-		,	Class 		= this.framework.Class
-		,	Event 		= this.framework.Event
-		,	HttpRequest = this.framework.HttpRequest
-		,	absPath 	= this.framework.absPath 
-		,	mixin 		= this.framework.mixin
-		,	UIControl 	= this.SpliceJS.UI.UIControl
-		,	TextField	= this.SpliceJS.Controls.TextField;
+		var scope = this.scope;
+		
+		var Class 		= this.Class
+		,	Event 		= this.Event
+		,	HttpRequest = this.HttpRequest
+		,	absPath 	= this.absPath 
+		,	mixin 		= this.mixin
+		,	UIControl 	= scope.SpliceJS.UI.UIControl
+		,	TextField	= scope.SpliceJS.Controls.TextField;
 
 		
 		// move extend to the top
 		// present with sematically correct naming
 		// crash detection and recovery
 		// what does react do?
-		var SampleComponent = Component('Sample')(			
+		var SampleController = Class.extend(UIControl)(			
 			
 			function SampleController(){
 				
@@ -56,10 +57,10 @@ sjs({
 					this.ref.searchButton.show();
 				},this);
 			}
-		).extend(UIControl);
+		);
 		
 		
-		mixin(SampleComponent.prototype, {
+		mixin(SampleController.prototype, {
 		
 			onSampleData  	: Event,
 			onNextPage 		: Event,
@@ -86,18 +87,13 @@ sjs({
 		}
 		
 		
-		Class(function SearchTextField(){
-			TextField.call(this);
+		Class.extend(TextField)(function SearchTextField(){
+			this.super();
 			//event filter?
 			this.onKeyUp.argumentFilter = function(args){
 				if(args.e.keyCode == 27) return false;
 				return true;
 			};
-		}).extend(TextField);
-		
-		
-		return {
-			Sample:SampleComponent
-		}
+		});
 	}
 });

@@ -9,7 +9,7 @@ required:[
 
 definition:function(){
 
-	var Class = this.Class
+	var Class = this.sjs.Class
 	,	scope = this.scope;
 	
 	var UIControl = scope.SpliceJS.UI.UIControl;

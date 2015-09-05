@@ -8,11 +8,13 @@ required:[
 ,
 definition:function(){
 
-	var Class = this.Class
-	,	Event = this.Event
-	,	debug = this.debug
-	,	UIControl = this.scope.SpliceJS.UI.UIControl;
+	var scope = this.scope
+	, 	Class = this.sjs.Class
+	,	Event = this.sjs.Event
+	,	debug = this.sjs.debug;
 	
+	var	UIControl = scope.SpliceJS.UI.UIControl;
+
 	var Button = Class.extend(UIControl)(function ButtonController(args){
 		
 		this.super(arguments);
@@ -179,14 +181,6 @@ definition:function(){
 
 
 	//returning exports
-	return {
-		Controllers:{
-			Button:		 Button,
-			CheckBox: 	 CheckBox,
-			RadioButton: RadioButton,
-			TextField: 	 TextField	
-		}
-	}
 
 }
 

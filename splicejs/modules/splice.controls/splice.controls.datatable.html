@@ -1,5 +1,5 @@
 <!-- Uses native scrolling functionality and maintians static header -->
-<sjs-template  type="DefaultScrollDataTable">
+<sjs-component  sjs-type="DefaultScrollDataTable" sjs-controller="DataTableController">
 	<div class="-sjs-datatable-root" style="position:absolute; left:0px; top:0px; right:0px; bottom:0px; overflow:hidden;" sjs-element="root">
 		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:hidden;">
 		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:auto;" sjs-element="defaultScroller">
@@ -10,51 +10,53 @@
 		</div>
 		</div>
 	</div>
-</sjs-template>
+</sjs-component>
+
+
 
 
 <!-- DataTable template to features custom scrolling implementation -->
-<sjs-template  type="CustomScrollDataTable">
+<sjs-component  sjs-type="CustomScrollDataTable" sjs-controller="DataTableController">
 	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="root">
-		<sjs-include type="SpliceJS.Controls.ScrollPanel">{
+		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">{
 			ref:'scrollPanel',
 			content:{
-				scrollContent:<sjs-include 	type="DataTableBody"		
-											ref="_.Binding('body').Type('CustomScrollDataTable')"></sjs-include>,
-				staticContent:<sjs-include 	type="DataTableHeader" 	
-											ref="_.Binding('head').Type('CustomScrollDataTable')"></sjs-include>
+				scrollContent:<sjs-include  sjs-type="DataTableBody"		
+											sjs-ref="_.Binding('body').Type('CustomScrollDataTable')"></sjs-include>,
+				staticContent:<sjs-include 	sjs-type="DataTableHeader" 	
+											sjs-ref="_.Binding('head').Type('CustomScrollDataTable')"></sjs-include>
 			}
 		}</sjs-include>
 	</div>
-</sjs-template>
+</sjs-component>
 
 
 <!-- Does not use view-port scrolling, layout is managed by the including container -->
-<sjs-template  type="NoScrollDataTable">
+<sjs-component  sjs-type="NoScrollDataTable" sjs-controller="DataTableController">
 	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="root">
 		<sjs-include type="DataTableBody" ref="body,head"></sjs-include>
 	</div>
-</sjs-template>
+</sjs-component>
 
 
 
 
 <!-- header template -->
-<sjs-template type="DataTableHeader">
+<sjs-component sjs-type="DataTableHeader">
 	<div class="-sjs-datatable-headercontainer" style="position:absolute; z-index:10; top:0px; left:0px;">
 		<table class="-sjs-datatable" sjs-element="table"></table>
 	</div>
-</sjs-template>
+</sjs-component>
 
 <!-- body template -->
-<sjs-template type="DataTableBody">
+<sjs-component sjs-type="DataTableBody">
 	<div class="-sjs-datatable-bodycontainer" style="position:relative;" sjs-element="tableWrapper">
 		<table class="-sjs-datatable" sjs-element="table"></table>
 	</div>
-</sjs-template>
+</sjs-component>
 
 <!-- head cell template -->
-<sjs-template type="HeadCell">
+<sjs-component sjs-type="HeadCell">
 	<div sjs-element="root" style="position:relative;">
 		<div class="content" sjs-element="content"></div>
 		<sjs-include type="FilterTrigger" ref="filterTrigger"> 
@@ -67,22 +69,22 @@
 			}
 		</sjs-include>
 	</div>
-</sjs-template>
+</sjs-component>
 
 <!-- Sort trigger to represent up/down arrows -->
-<sjs-template type="SortTrigger">
+<sjs-component sjs-type="SortTrigger">
 	<div class="sort-trigger up" sjs-element="sortTrigger"></div>
-</sjs-template>
+</sjs-component>
 
 <!-- Filter Trigger, with attached drop-down behavior -->
-<sjs-template type="FilterTrigger" controller="SpliceJS.Controls.DropDownController">
+<sjs-component sjs-type="FilterTrigger" controller="SpliceJS.Controls.DropDownController">
 	<div class="filter-trigger" sjs-element="root selector filterTrigger">
 		<div class="icon"><div sjs-element="filterIndicator"></div></div>
 	</div>
-</sjs-template>
+</sjs-component>
 
 <!-- Filter list, display a list of available filtering options -->
-<sjs-template type="FilterList">
+<sjs-component sjs-type="FilterList">
 	<div class="filter-control">
 		<div class="filter-body">
 			<sjs-include type="SpliceJS.Controls.ListBox">
@@ -108,12 +110,12 @@
 		</div>
 		
 	</div>
-</sjs-template>
+</sjs-component>
 
 <!-- Filter List Item -->
-<sjs-template type="FilterListItem" controller="SpliceJS.Controls.ListItem">
+<sjs-component sjs-type="FilterListItem" controller="SpliceJS.Controls.ListItem">
 	<div class="filterlist-item"><div style="display:inline;"><input type="checkbox"></div>
 		 <div style="display:inline;">@key</div>
 		 <div style="display:inline; float:right; margin-right:28px;">@size</div>
 	</div>
-</sjs-template>
+</sjs-component>

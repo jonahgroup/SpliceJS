@@ -9,10 +9,10 @@ definition:function(){
 	"use strict"; 
 	
 	// importing framework features makes our code less verbose
-	var Class = this.Class
-	, 	Event = this.Event
-	,	debug = this.debug
-	, 	Controller = this.Controller
+	var Class = this.sjs.Class
+	, 	Event = this.sjs.Event
+	,	debug = this.sjs.debug
+	, 	Controller = this.sjs.Controller
 	,	scope = this.scope;
 	
 	var Animate = scope.Animation.Animate;

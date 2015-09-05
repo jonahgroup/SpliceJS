@@ -7,10 +7,11 @@ required:[
 
 
 definition:function(){
+	var sjs = this.sjs;
 
-	var Class = this.Class
-	,	Controller = this.Controller
-	,	Event = this.Event;
+	var Class = sjs.Class
+	,	Controller = sjs.Controller
+	,	Event = sjs.Event;
 	
 	
 	var DomIterator = Class.extend(Controller)(function DomIterator(args){

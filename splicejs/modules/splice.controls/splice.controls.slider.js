@@ -9,12 +9,14 @@
     definition:function(){
         
         /* framework imports */
-        var Component = this.framework.Component
-        ,   UIControl = this.SpliceJS.UI.UIControl
-        ,   DragAndDrop = this.SpliceJS.UI.DragAndDrop
+        var scope = this.scope
+        ,   Class = this.Class;
+        
+        var UIControl = scope.SpliceJS.UI.UIControl
+        ,   DragAndDrop = scope.SpliceJS.UI.DragAndDrop;
         
         
-        var Slider = Component('Slider')(function Slider() {
+        var Slider = Class.extend(UIControl)(function SliderController() {
             UIControl.call(this);
 
             this.onAttach.subscribe(this.attach, this);
@@ -29,7 +31,7 @@
             _.Event.attach(this.elements.rightThumb, 'onmousedown').subscribe(function (e) {
                 startMoveThumb.call(this, e, this.elements.rightThumb);
             }, this);
-        }).extend(UIControl);
+        });
 
         
         //override reflow
@@ -71,13 +73,6 @@
             args.src.style.left = (args.origin + args.mouse.x - args.offset.x) + 'px';
             this.updateRangePosition();
         }
-
-        return {
-            
-            Slider:Slider
-            
-        }
-
 
     }
 
