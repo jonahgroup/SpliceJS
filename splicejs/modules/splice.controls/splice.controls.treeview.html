@@ -5,8 +5,8 @@
 			content:{
 			staticContent:'',
 			scrollContent:<sjs-include sjs-type="Tree">{
-					ref:_.Binding('tree').Type('SpliceJS.Controls.TreeView'),
-					onTreeRefresh:_.Binding('reflow').Parent
+					ref: binding('tree').type('SpliceJS.Controls.TreeView'),
+					onTreeRefresh: binding('reflow').parent
 				}</sjs-include>		
 			}
 		}

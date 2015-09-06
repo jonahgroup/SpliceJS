@@ -8,10 +8,10 @@ required:[
 
 definition:function(){
 	var scope = this.scope
-	,	Class = this.Class
-	,	Event = this.Event
-	,	debug = this.debug
-	,	Obj = this.Obj;
+	,	Class = this.sjs.Class
+	,	Event = this.sjs.Event
+	,	debug = this.sjs.debug
+	,	Obj = this.sjs.Obj;
 
 	var UIControl = scope.SpliceJS.UI.UIControl
 	,	DragAndDrop = scope.SpliceJS.UI.DragAndDrop;

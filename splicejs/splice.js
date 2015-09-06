@@ -792,7 +792,7 @@ UrlAnalyzer.prototype = {
 		return MulticastEvent;
 	
 	};
-	var EventSingleton = new Event();
+	var EventSingleton = new Event(null);
 /*
 
 ----------------------------------------------------------
@@ -811,28 +811,39 @@ UrlAnalyzer.prototype = {
 		/* Look for properties within a root of the parent chain */
 		,	TYPE 		 : 5
 		/* Indicates type lookup lookup */
-	}
+	};
+	var BINDING_DIRECTIONS = {
+			FROM : 1,
+		/* Left assignment */
+			TO: 2,
+		/* 
+			determine binding based on the type of objects 
+			use right assignment by default
+		*/	
+			AUTO: 3
+	};
+
+	function Binding(propName, bindingType){
+		this.prop = propName;
+		this.type = bindingType;
+		this.direction = BINDING_DIRECTIONS.AUTO;
+	}	
+	
 	
 	/* 
 	 * !!! Bidirectional bindings are not allowed, use event-based data contract instead 
 	 * */
-	var Binding = function Binding(propName,type,dir){
-		if(!(this instanceof Binding)) return {
-			Self:   		new Binding(propName,	Binding.SELF,   		Binding.Direction.AUTO),
-			Parent: 		new Binding(propName,	Binding.PARENT, 		Binding.Direction.AUTO),
-			FirstParent: 	new Binding(propName,	Binding.FIRST_PARENT, 	Binding.Direction.AUTO),
-			Root:			new Binding(propName,	Binding.ROOT, 			Binding.Direction.AUTO),
-			Type:			function(type){
+	var binding = function binding(propName,type,dir){
+		 return {
+			self:   		new Binding(propName,	BINDING_TYPES.SELF),
+			parent: 		new Binding(propName,	BINDING_TYPES.PARENT),
+			root:			new Binding(propName,	BINDING_TYPES.ROOT),
+			"type":			function(type){
 							var b = 
-							new Binding(propName, 	Binding.TYPE, 			Binding.Direction.AUTO); 
+							new Binding(propName, 	BINDING_TYPES.TYPE); 
 							b.vartype = type;
 							return b;}
 		}
-		
-		this.prop = propName;
-		this.type = type;
-		this.direction = dir;
-		
 	};
 	
 	/**
@@ -873,36 +884,6 @@ UrlAnalyzer.prototype = {
 
 
 	
-	
-	Binding.From = function(propName){
-		return {
-			Self:   		new Binding(propName,	Binding.SELF,   Binding.Direction.FROM),
-			Parent: 		new Binding(propName,	Binding.PARENT, Binding.Direction.FROM),
-			FirstParent: 	new Binding(propName,	Binding.FIRST_PARENT, Binding.Direction.FROM),
-			Root:			new Binding(propName,	Binding.ROOT, Binding.Direction.FROM),
-			Type:			function(type){
-							var b = 
-							new Binding(propName, 	Binding.TYPE, Binding.Direction.FROM); 
-							b.vartype = type;
-							return b;}
-		}
-	};
-	
-	Binding.To = function(propName){
-		return {
-			Self:   		new Binding(propName, 	Binding.SELF,   Binding.Direction.TO),
-			Parent: 		new Binding(propName, 	Binding.PARENT, Binding.Direction.TO),
-			FirstParent: 	new Binding(propName, 	Binding.FIRST_PARENT, Binding.Direction.TO),
-			Root:			new Binding(propName, 	Binding.ROOT, 	Binding.Direction.TO),
-			Type:			function(type){
-							var b = 
-							new Binding(propName, 	Binding.TYPE, Binding.Direction.TO); 
-							b.vartype = type;
-							return b;}
-
-		}
-	};
-	
 	Binding.findValue = function(obj, path){
 		var nPath = path.split('.'),
 			result = obj;
@@ -926,7 +907,7 @@ UrlAnalyzer.prototype = {
 			set : function(value, path){
 
 				var nPath = path.split('.');
-					
+				
 				for(var i=0; i< nPath.length-1; i++){
 					obj = obj[nPath[i]];
 				}
@@ -985,39 +966,6 @@ UrlAnalyzer.prototype = {
 
 	};
 
-
-	/*
-	 *	Binding type constants 
-	 * */
-	
-	Binding.Direction = {
-			FROM : 1,
-		/* Left assignment */
-			TO: 2,
-		/* 
-			determine binding based on the type of objects 
-			use right assignment by default
-		*/	
-			AUTO: 3
-	};
-	/* Right assignment */
-	
-	Binding.SELF 			= 1;
-	/* Look for properties within immediate instance */
-	
-	Binding.PARENT 			= 2;
-	/* Look for properties within direct parent of the immediate instance*/
-	
-	Binding.FIRST_PARENT 	= 3;
-	/* Look for properties within a first parent  where property if found */
-	
-	Binding.ROOT 			= 4;
-	/* Look for properties within a root of the parent chain */
-	
-	Binding.TYPE 			= 5;
-	/* Indicates type lookup lookup */
-
-
 /*
 
 ----------------------------------------------------------
@@ -1065,7 +1013,8 @@ UrlAnalyzer.prototype = {
 				var _Template = constructTemplate(mainPageHtml);
 				_Template.type = 'MainPage'; 
 				_Template = compileTemplate.call(scope,_Template);
-				display(new _Template());
+				var t = new _Template();
+				display(t);
 				
 				var end  = window.performance.now();
 				console.log('Load complete: ' + (end-start) + 'ms');
@@ -1366,7 +1315,7 @@ UrlAnalyzer.prototype = {
 	
 	function Loader(resources, oncomplete, onitemloaded) {
 		
-		if(!resources || resources.length == 0) return null;
+		if(!resources || resources.length == 0) throw 'Invalid Loader constructor';
 		
 		this.iterator = new Iterator(resources);
 		this.progress = resources.length;
@@ -1779,7 +1728,6 @@ UrlAnalyzer.prototype = {
 			} catch(ex) {}
 
 			
-			var overrideController = null;
 
 			if(!obj) 
 				throw 'Proxy object type ' + args.type + ' is not found';
@@ -1890,7 +1838,7 @@ UrlAnalyzer.prototype = {
 
 	var Controller = function Controller(){
 		
-		this.children = [];
+		if(!this.children)	this.children = [];
 
 		this.onDisplay.subscribe(function(){
 			if(!this.children) return;
@@ -2068,6 +2016,9 @@ UrlAnalyzer.prototype = {
 		this.children.push(childTemplate);
 		return this.children.length-1;
 	};
+
+
+
 	
 	
 	
@@ -2248,7 +2199,7 @@ UrlAnalyzer.prototype = {
 	/**
 	 *	Converts arbitrary string to a property name 
 	 */
-	function propertyName(name){
+	function propertyName(name, esc){
 		var fn = function(c){
 			if (c== '_') return false; 
 			return Tokenizer.isAlphaNum(c); 
@@ -2261,7 +2212,7 @@ UrlAnalyzer.prototype = {
 		var iscap = false;
 		
 		while(token = t.nextToken()){
-			if(!fn(token)) continue;
+			if(!fn(token) || (token =='sjs' && esc == true)) continue;
 			result = result + (iscap?capitalize(token):token);	
 			iscap = true;
 		}
@@ -2281,17 +2232,17 @@ UrlAnalyzer.prototype = {
 		
 		for(var i=0; i<attributes.length; i++){
 			var attr = attributes[i]
-			,	name = propertyName(attr.name);
+			,	name = propertyName(attr.name,true);
 			
-			if(startsWith(attr.value,'_.Binding(')){
+			if(startsWith(attr.value,'binding(')){
 				result = result + separator + name + ':' + attr.value;	
 				separator = ', ';
 				continue;	
 			}
 			
-			if(RESERVED_ATTRIBUTES.indexOf(attr.name) < 0) continue;
+			if(RESERVED_ATTRIBUTES.indexOf(name) < 0) continue;
 			
-			result = result + separator + attr.name + ':\'' + attr.value + '\''; 
+			result = result + separator + name + ':\'' + attr.value + '\''; 
 			separator = ', ';
 		}
 		return result;
@@ -2305,13 +2256,13 @@ UrlAnalyzer.prototype = {
 		//empty configuration of the include tag
 		var idx = node.innerHTML.indexOf('{');
 		if( idx < 0){
-			json = '_.Obj.call(scope,{'+ attributes +'})';
+			json = 'Obj.call(scope,{'+ attributes +'})';
 		}
 			
 		else {	
 			if(attributes) attributes = attributes + ',';
 			
-			json = '_.Obj.call(scope,{' + attributes +
+			json = 'Obj.call(scope,{' + attributes +
 			node.innerHTML.substring(idx+1)
 			+')'
 		}
@@ -2328,7 +2279,7 @@ UrlAnalyzer.prototype = {
 			
 		if(attributes) attributes = attributes + ', '
 			
-		var json = '_.Obj.call(scope,{'+
+		var json = 'Obj.call(scope,{'+
 			attributes + 
 			node.innerHTML.substring(node.innerHTML.indexOf('{')+1)
 			+')'
@@ -2348,7 +2299,7 @@ UrlAnalyzer.prototype = {
 		if(parent.tagName == 'SJS-ELEMENT')
 			json = 'null, type:\'' + _type + '\''; 			
 		else
-			json = '_.Obj.call(scope,{type:\''+ _type + '\'})';
+			json = 'Obj.call(scope,{type:\''+ _type + '\'})';
 
 		if(replace === true)
 			node.parentNode.replaceChild(document.createTextNode(json),node);
@@ -2378,8 +2329,7 @@ UrlAnalyzer.prototype = {
 		
 		var scope = this;
 
-		if(	dom.tagName != 'SJS-INCLUDE' && 
-			dom.tagName != 'SJS-ELEMENT')
+		if(	dom.tagName != 'SJS-INCLUDE' &&	dom.tagName != 'SJS-ELEMENT')
 			return handle_INLINE_HTML.call(scope, dom, parent, true);	
 
 		var	elements = 	selectNodes({childNodes:dom.childNodes},
@@ -2434,7 +2384,8 @@ UrlAnalyzer.prototype = {
 			var node = nodes[i]
 			,	parent = node.parentNode
 			,	json = convertToProxyJson.call(scope,node, node.tagName)
-			, 	fn = new Function("var _ = arguments[0]; var scope = this; var window = document = null; return " + json)
+			, 	fn = new Function("var binding = arguments[0].binding, Obj = arguments[0].Obj; " + 
+								  "var scope = this; var window = document = null; return " + json)
 			 	
 			var result = fn.call(scope,sjs());
 
@@ -2461,10 +2412,10 @@ UrlAnalyzer.prototype = {
 		var source = null;
 		
 		switch(binding.type){
-		case Binding.SELF:
+		case BINDING_TYPES.SELF:
 			break;
 		
-		case Binding.PARENT:
+		case BINDING_TYPES.PARENT:
 			if(!instance.parent) throw 'Cannot resolve parent binding, instance parent is not null';
 			
 			var v = Binding.Value(instance.parent);
@@ -2476,13 +2427,13 @@ UrlAnalyzer.prototype = {
 					};
 			break;
 			
-		case Binding.FIRST_PARENT:
+		case BINDING_TYPES.FIRST_PARENT:
 			break;
 			
-		case Binding.ROOT:
+		case BINDING_TYPES.ROOT:
 			break;
 			
-		case Binding.TYPE:
+		case BINDING_TYPES.TYPE:
 			logging.debug.log('Resolving binding to type: ' + binding.vartype);
 			var parent = instance;
 			
@@ -2560,7 +2511,7 @@ UrlAnalyzer.prototype = {
 
 	function constructTemplate(html){
 	
-		var wrapper = document.createElement('sjs-element');
+		var wrapper = document.createElement('sjs-component');
 		wrapper.innerHTML = html;
 
 		return new Template(wrapper);
@@ -2686,8 +2637,7 @@ UrlAnalyzer.prototype = {
 			}
 			
 			var obj = Object.create(controller.prototype);
-			obj.constructor = controller;
-			
+				
 			
 			obj.ref = {};
 			obj.elements = {};
@@ -2741,6 +2691,7 @@ UrlAnalyzer.prototype = {
 		};
 		
 		Component.isComponent = true;
+		Component.template = template;
 
 		return Component;
 	}; 
@@ -2891,7 +2842,7 @@ UrlAnalyzer.prototype = {
 			compileTemplates(scope);
 			
 			if(typeof definition === 'function') {
-				var _exports = definition.call({'sjs':_sjs,'scope':scope}); 
+				var _exports = definition.call({'sjs':_sjs,'scope':scope}, _sjs); 
 				if(!_exports) _exports = Object.create(null);
 				MODULE_MAP[url] = mixin(_exports,scope.components);
 			}
@@ -2975,6 +2926,7 @@ UrlAnalyzer.prototype = {
 			close : close,
 			endswith:endsWith,
 			mixin: mixin,
+			binding : binding,
 						
 			load	: include,		
 			include : include,
@@ -2984,7 +2936,7 @@ UrlAnalyzer.prototype = {
 			Class : Class,
 			Controller : Controller,
 			Obj : Obj,
-			Binding : Binding,
+			
 			HttpRequest : HttpRequest,	
 			Event : EventSingleton,	
 			
@@ -2995,8 +2947,7 @@ UrlAnalyzer.prototype = {
 			
 			modules: listModules
 		
-	});
-}
+	});}
 	
 	
 	//core.debug = debug;

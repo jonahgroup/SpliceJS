@@ -178,9 +178,15 @@ definition:function(){
         if(this.elements.defaultScroller){
             Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
                 this.elements.headPositioner.style.left = (0 - eargs.source.scrollLeft) + 'px'; 
-                this.onScroll();
+				this.onScroll(eargs.source.scrollTop);
             },this);
         }
+		
+		
+		this.onScroll.subscribe(function(){
+			this.pageNext();
+		},this);
+		
 		
 		Event.attach(window, 'onresize').subscribe(function(){this.reflow();},this);
 		
@@ -602,9 +608,11 @@ definition:function(){
 	/* data table variat decoder */
 	var DataTableFactory = function DataTableFactory(args){
 	
-		if(args.scroll === 'no') 	 return new (Component('NoScrollDataTable')(DataTable))(args);
-		if(args.scroll === 'custom') return new (Component('CustomScrollDataTable')(DataTable))(args); 
-									 return new (Component('DefaultScrollDataTable')(DataTable))(args);
+		var components = scope.components;
+	
+		if(args.scroll === 'no') 	 return new components.NoScrollDataTable(args);
+		if(args.scroll === 'custom') return new components.CustomScrollDataTable(args); 
+									 return new components.DefaultScrollDataTable(args);
 	};
 
 

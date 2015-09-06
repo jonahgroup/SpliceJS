@@ -4,10 +4,10 @@
         content:{
             dropDownItem:
             <sjs-include sjs-type="SpliceJS.Controls.Calendar">
-                {onDateSelected: _.Binding('receiveFromCalendar').Type('DatePicker')}
+                {onDateSelected: binding('receiveFromCalendar').type('DatePicker')}
             </sjs-include>
         },
-		dataIn:_.Binding('onDateSelected').Parent,
+		dataIn: binding('onDateSelected').parent,
 	}
 	</sjs-include>
 </sjs-component>

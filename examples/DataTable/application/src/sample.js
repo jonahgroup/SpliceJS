@@ -1,5 +1,4 @@
-/* global _sjs */
-/* global SpliceJS */
+/* global sjs */
 sjs({
 	
 	required:[
@@ -11,15 +10,15 @@ sjs({
 		'sample.css',
 		'sample.html'
 	],
-	definition:function(){
+	definition:function(sjs){
 		
 		var scope = this.scope;
 		
-		var Class 		= this.Class
-		,	Event 		= this.Event
-		,	HttpRequest = this.HttpRequest
-		,	absPath 	= this.absPath 
-		,	mixin 		= this.mixin
+		var Class 		= sjs.Class
+		,	Event 		= sjs.Event
+		,	HttpRequest = sjs.HttpRequest
+		,	absPath 	= sjs.absPath 
+		,	mixin 		= sjs.mixin
 		,	UIControl 	= scope.SpliceJS.UI.UIControl
 		,	TextField	= scope.SpliceJS.Controls.TextField;
 
@@ -31,6 +30,7 @@ sjs({
 		var SampleController = Class.extend(UIControl)(			
 			
 			function SampleController(){
+				this.super();
 				
 				this.currentPage = 1;
 				

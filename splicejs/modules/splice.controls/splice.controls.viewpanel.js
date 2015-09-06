@@ -9,8 +9,8 @@ required:[
 definition:function(){
 	
 	var scope = this.scope
-	,	overlay = this.display.overlay
-	,	Class = this.Class;
+	,	overlay = this.sjs.display.overlay
+	,	Class = this.sjs.Class;
 	var UIControl = scope.SpliceJS.UI.UIControl
 	
 	/**

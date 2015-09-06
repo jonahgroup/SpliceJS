@@ -7,11 +7,11 @@ required:[
 ],
 
 
-definition:function(){
+definition:function(sjs){
 
 	var scope = this.scope
-	,	Class = this.Class
-	,	HttpRequest = this.HttpRequest;
+	,	Class = sjs.Class
+	,	HttpRequest = sjs.HttpRequest;
 	
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 

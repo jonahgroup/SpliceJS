@@ -1,5 +1,6 @@
 body {
 	overflow: hidden;
+	font-family: 'Arial Narrow', Arial, sans-serif;
 }
 
 .sample-table.-sjs-datatable-root {

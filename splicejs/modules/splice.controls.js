@@ -29,14 +29,14 @@ required:[
 
 ]
 , 	
-definition:function(){
+definition:function(sjs){
 	"use strict";
 	var scope = this.scope;
 
 	/* imports */
-	var Class = this.Class
-	, 	Event = this.Event
-	,	Controller = this.Controller;
+	var Class = sjs.Class
+	, 	Event = sjs.Event;
+	
 	
 	var UIControl = scope.SpliceJS.UI.UIControl;
 	

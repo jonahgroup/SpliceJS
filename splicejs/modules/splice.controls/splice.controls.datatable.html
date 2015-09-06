@@ -1,9 +1,11 @@
 <!-- Uses native scrolling functionality and maintians static header -->
-<sjs-component  sjs-type="DefaultScrollDataTable" sjs-controller="DataTableController">
+<sjs-component  sjs-type="DefaultScrollDataTable" sjs-controller="DataTableController" sjs-export>
 	<div class="-sjs-datatable-root" style="position:absolute; left:0px; top:0px; right:0px; bottom:0px; overflow:hidden;" sjs-element="root">
 		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:hidden;">
 		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:auto;" sjs-element="defaultScroller">
 			<sjs-include type="DataTableBody" ref="body"></sjs-include>
+			<div sjs-element="fakie"></div>
+			
 		</div>
 		<div style="position:absolute; top:0px;left:0px;" sjs-element="headPositioner" >
 			<sjs-include type="DataTableHeader" ref="head"></sjs-include>
@@ -16,15 +18,15 @@
 
 
 <!-- DataTable template to features custom scrolling implementation -->
-<sjs-component  sjs-type="CustomScrollDataTable" sjs-controller="DataTableController">
+<sjs-component  sjs-type="CustomScrollDataTable" sjs-controller="DataTableController" sjs-export>
 	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="root">
 		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">{
 			ref:'scrollPanel',
 			content:{
 				scrollContent:<sjs-include  sjs-type="DataTableBody"		
-											sjs-ref="_.Binding('body').Type('CustomScrollDataTable')"></sjs-include>,
+											sjs-ref="binding('body').type('CustomScrollDataTable')"></sjs-include>,
 				staticContent:<sjs-include 	sjs-type="DataTableHeader" 	
-											sjs-ref="_.Binding('head').Type('CustomScrollDataTable')"></sjs-include>
+											sjs-ref="binding('head').type('CustomScrollDataTable')"></sjs-include>
 			}
 		}</sjs-include>
 	</div>
@@ -32,7 +34,7 @@
 
 
 <!-- Does not use view-port scrolling, layout is managed by the including container -->
-<sjs-component  sjs-type="NoScrollDataTable" sjs-controller="DataTableController">
+<sjs-component  sjs-type="NoScrollDataTable" sjs-controller="DataTableController" sjs-export>
 	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="root">
 		<sjs-include type="DataTableBody" ref="body,head"></sjs-include>
 	</div>
@@ -61,10 +63,10 @@
 		<div class="content" sjs-element="content"></div>
 		<sjs-include type="FilterTrigger" ref="filterTrigger"> 
 			{
-				onDropDown:_.Binding('filterDropDownOpen').Type('DataTable'),
-				dataIn:_.Binding('onData').Parent,
+				onDropDown: binding('filterDropDownOpen').type('DataTable'),
+				dataIn: binding('onData').parent,
 				dropDownItem:<sjs-include type="FilterList" singleton="parent">
-						{dataIn:_.Binding('onFilterList').Type('DataTable')}
+						{dataIn: binding('onFilterList').type('DataTable')}
 					</sjs-include>
 			}
 		</sjs-include>
@@ -90,7 +92,7 @@
 			<sjs-include type="SpliceJS.Controls.ListBox">
 				{
 					isScrollable:true,
-					dataIn:_.Binding('onData').Parent,
+					dataIn: binding('onData').parent,
 					itemTemplate:<sjs-include type="FilterListItem"></sjs-include>
 				}
 			</sjs-include>
@@ -99,12 +101,12 @@
 			<div style="float:right;">
 			<sjs-include type="SpliceJS.Controls.Button">{
 				content:{label:'Ok'},
-				onClick:_.Binding('createFilter').Parent
+				onClick: binding('createFilter').parent
 			}</sjs-include>
 			<sjs-include type="SpliceJS.Controls.Button">
 				{
 					content:{label:'Cancel'},
-					onClick:_.Binding('close').Type('SpliceJS.Controls.DropDownController')
+					onClick: binding('close').type('SpliceJS.Controls.DropDownController')
 				}</sjs-include>
 			<div>
 		</div>

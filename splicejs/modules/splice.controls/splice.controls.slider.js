@@ -6,11 +6,11 @@
         'splice.controls.slider.html'
     ]
     ,
-    definition:function(){
+    definition:function(sjs){
         
         /* framework imports */
         var scope = this.scope
-        ,   Class = this.Class;
+        ,   Class = sjs.Class;
         
         var UIControl = scope.SpliceJS.UI.UIControl
         ,   DragAndDrop = scope.SpliceJS.UI.DragAndDrop;

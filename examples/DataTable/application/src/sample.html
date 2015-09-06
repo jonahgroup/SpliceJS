@@ -6,12 +6,12 @@
 	<!-- our search input -->
 	<div style="padding-top:0.5em; padding-bottom:0.5em;"><span style="padding-left:10px; font-size:10px; font-family:Arial;">Search:</span>
 		<sjs-include sjs-type="SpliceJS.Controls.TextField" sjs-controller="SearchTextField">{
-			onData:_.Binding('onFilterData').Parent,
-			dataIn:_.Binding('onClearFilter').Parent,
+			onData: binding('onFilterData').parent,
+			dataIn: binding('onClearFilter').parent,
 			isRealTime: true 
 		}</sjs-include>
 	
-		<sjs-include type="SpliceJS.Controls.Button" ref="searchButton">
+		<sjs-include sjs-type="SpliceJS.Controls.Button" sjs-ref="searchButton">
 			{
 				isHidden:true,
 				animate:true,
@@ -24,7 +24,7 @@
 			<sjs-include type="SpliceJS.Controls.DomIterator">
 				{
 					from:1, to:10,
-					onStyleSelect: _.Binding('selectPageStyle').Parent, 
+					onStyleSelect: binding('selectPageStyle').parent, 
 					dom:<div style="display:inline;"><span class="page">@i</span></div>
 				}
 			</sjs-include>
@@ -41,11 +41,11 @@
 				  class="sample-table" 
 				  layout="fill">
 		{
-			pageSize:2000,
-			dataIn:_.Binding('onSampleData').Parent,
-			filterData:_.Binding('onFilterData').Parent,
-			pageNext: _.Binding('onNextPage').Parent,
-			pagePrev:_.Binding('onPrevPage').Parent,
+			pageSize:20,
+			dataIn: 	binding('onSampleData').parent,
+			filterData: binding('onFilterData').parent,
+			pageNext: 	binding('onNextPage').parent,
+			pagePrev: 	binding('onPrevPage').parent,
 			rowTemplate:<sjs-include type="SampleRow"></sjs-include>
 		}
 	</sjs-include>
@@ -54,9 +54,9 @@
 
 	<sjs-include type="SpliceJS.UI.KeyListener">
 		{
-			onEsc:_.Binding('onClearFilter').Parent,
-			onRight:_.Binding('onNextPage').Parent,
-			onLeft: _.Binding('onPrevPage').Parent,
+			onEsc:   binding('onClearFilter').parent,
+			onRight: binding('onNextPage').parent,
+			onLeft:  binding('onPrevPage').parent,
 		}
 	</sjs-include>
 </sjs-component>
@@ -68,7 +68,7 @@
 	<sjs-include type="SpliceJS.Controls.DomIterator">
 		{
 			from: 1,
-			to:_.Binding('columnCount').Parent,
+			to: binding('columnCount').parent,
 			contentTemplate:'@',
 			dom:<div>@i</div>
 		}

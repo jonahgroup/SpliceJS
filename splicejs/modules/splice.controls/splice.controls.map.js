@@ -11,7 +11,7 @@ required:[
 
 definition:function(){
 	var scope = this.scope
-	, 	Class = this.Class;
+	, 	Class = this.sjs.Class;
 	
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 	

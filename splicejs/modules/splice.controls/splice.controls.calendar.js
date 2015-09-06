@@ -196,10 +196,10 @@ definition:function(){
 
 
 
-	var Class = this.Class
-	,	Event = this.Event;
+	var Class = this.sjs.Class
+	,	Event = this.sjs.Event;
 
-	var Calendar = Class.extend(this.Controller)(function CalendarController(){
+	var Calendar = Class.extend(this.sjs.Controller)(function CalendarController(){
 		this.super();
 		
 		var dt = new Date();

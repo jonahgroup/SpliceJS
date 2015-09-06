@@ -9,8 +9,8 @@ required:[
 definition:function(){
 
 	var scope = this.scope
-	,	Class 		= this.Class
-	,	Event 		= this.Event;
+	,	Class 		= this.sjs.Class
+	,	Event 		= this.sjs.Event;
 	 
 	var	UIControl 	= scope.SpliceJS.UI.UIControl;
 

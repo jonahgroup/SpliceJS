@@ -14,7 +14,7 @@ required:[
 
 definition:function(){
 
-	var Class = this.Class
+	var Class = this.sjs.Class
 	,	scope = this.scope;
 	
 	var	D3Canvas = scope.SpliceJS.Controls.D3Canvas;
