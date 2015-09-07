@@ -1799,6 +1799,7 @@ UrlAnalyzer.prototype = {
 		
 			var key = keys[k];
 
+			if(key === 'controller') continue;
 			if(key === 'ref') 		continue;
 			if(key === 'content') 	continue; //content is processed separately
 						
@@ -2274,7 +2275,7 @@ UrlAnalyzer.prototype = {
 	}
 
 	function handle_SJS_ELEMENT(node, parent, replace){
-		var type = node.getAttribute('type')
+		var type = node.getAttribute('sjs-type')
 		,	attributes = collectAttributes(node,RESERVED_ATTRIBUTES);
 			
 		if(attributes) attributes = attributes + ', '
@@ -2308,7 +2309,7 @@ UrlAnalyzer.prototype = {
 			build new template and store within scope 
 			run template compiler
 		*/
-		var sjs_node = document.createElement('sjs-template');
+		var sjs_node = document.createElement('sjs-component');
 		
 		sjs_node.appendChild(node);
 		var template = new Template(sjs_node);
@@ -2316,8 +2317,7 @@ UrlAnalyzer.prototype = {
 		 
 
 		if(parent.tagName == 'SJS-ELEMENT'){
-			sjs_node.attributes['controller'] = 'Controller';
-			//template.declaration = {type:_type, tie:'SpliceJS.Controls.UIElement'};
+			sjs_node.attributes['sjs-controller'] = 'Controller';
 		}
 		
 		compileTemplate.call(scope, template);
@@ -2383,7 +2383,7 @@ UrlAnalyzer.prototype = {
 			
 			var node = nodes[i]
 			,	parent = node.parentNode
-			,	json = convertToProxyJson.call(scope,node, node.tagName)
+			,	json = convertToProxyJson.call(scope, node, node.tagName)
 			, 	fn = new Function("var binding = arguments[0].binding, Obj = arguments[0].Obj; " + 
 								  "var scope = this; var window = document = null; return " + json)
 			 	
@@ -2637,7 +2637,7 @@ UrlAnalyzer.prototype = {
 			}
 			
 			var obj = Object.create(controller.prototype);
-				
+			obj.constructor = controller;	
 			
 			obj.ref = {};
 			obj.elements = {};

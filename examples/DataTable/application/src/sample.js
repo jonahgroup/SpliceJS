@@ -59,7 +59,6 @@ sjs({
 			}
 		);
 		
-		
 		mixin(SampleController.prototype, {
 		
 			onSampleData  	: Event,

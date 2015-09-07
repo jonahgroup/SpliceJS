@@ -17,17 +17,6 @@ definition:function(){
 	
 	var Animate = scope.Animation.Animate;
 
-	/**
-	 * HTML Element decorator
-	 */
-	var UIElement = Class.extend(Controller)(function UIElement(args){
-		var self = this;
-		this.concrete.dom.onclick = function(){
-			self.onClick(self);
-		}
-	});
-
-	UIElement.prototype.onClick = Event;
 
 	/**
 	 * Base UIControl class
@@ -184,6 +173,19 @@ definition:function(){
 		if(!n) return 0;
 		return n;
 	}
+
+	/**
+	 * HTML Element decorator
+	 */
+	var UIElement = Class.extend(UIControl)(function UIElement(args){
+		this.super();
+		var self = this;
+		this.concrete.dom.onclick = function(){
+			self.onClick(self);
+		}
+	});
+
+	UIElement.prototype.onClick = Event;
 
 
 	/*
@@ -379,6 +381,7 @@ definition:function(){
 	//module exports
 	return {
 		UIControl:	 UIControl,
+		UIElement:	 UIElement,
 		KeyListener: KeyListener,
 		//singletons
 		Positioning: Positioning,
