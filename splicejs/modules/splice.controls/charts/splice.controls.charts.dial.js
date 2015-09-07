@@ -2,13 +2,14 @@
 sjs({
 	
 required:[
-	
+	{'Animation': '{sjshome}/modules/splice.animation.js'}
 ],
 
-definition:function(){
+definition:function(sjs){
 	
-	var Class = this.Class;
-
+	var Class = sjs.Class;
+	var Animation = this.scope.Animation;
+	
 	var Dial = Class(function Dial(){
 	
 	    this.dom = this.canvas = this.elements.root;
@@ -57,8 +58,8 @@ definition:function(){
 			var alpha = self.ghost_alpha;
 			self.value = Math.round(100 * (self.alpha - self.arcStart) / self.arcRange);
 			
-			new _.StoryBoard([
-	            new _.Animation(self._alpha, alpha, 700, _.Animation.cubicEaseInOut, 
+			new Animation.StoryBoard([
+	            new Animation.Animation(self._alpha, alpha, 700, Animation.Animation.cubicEaseInOut, 
 	            		function(v){
 	            	self.alpha = v;
 	            	self.draw();

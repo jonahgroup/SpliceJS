@@ -1,9 +1,9 @@
 /* global sjs */
 sjs({
 
-definition:function(){
+definition:function(sjs){
 
-	var Class = this.Class;
+	var Class = sjs.Class;
 
 	var LineChart = Class(function LineChart(){
 

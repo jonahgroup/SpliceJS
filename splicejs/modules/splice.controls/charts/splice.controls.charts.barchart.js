@@ -1,10 +1,10 @@
 sjs({
 
 
-definition:function(){
+definition:function(sjs){
 
-	var Class = this.Class;
-
+	var Class = sjs.Class
+	,	debug = sjs.debug;
 
 	var BarChart = Class(function BarChart(){
 
@@ -15,8 +15,8 @@ definition:function(){
 
 		var data = this.dataItem;
 		
-		_.debug.log("Bar Chart");
-		_.debug.log(data);
+		debug.log("Bar Chart");
+		debug.log(data);
 		
 		if(!data) return;
 

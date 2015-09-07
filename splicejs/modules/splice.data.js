@@ -1,8 +1,8 @@
 /* global sjs */
 sjs({
-definition:function(){
+definition:function(sjs){
 
-	var mixin = this.mixin;
+	var mixin = sjs.mixin;
 
 	var DataStep = function DataStep(dowork, issource){
 		mixin(this,{

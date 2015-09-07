@@ -1,8 +1,8 @@
 /* global sjs */
 sjs({
-definition:function(){
+definition:function(sjs){
 
-	var Tokenizer = this.Tokenizer;
+	var Tokenizer = sjs.Tokenizer;
 
 	function getValueUnit(value){
 		if(!value) return null;

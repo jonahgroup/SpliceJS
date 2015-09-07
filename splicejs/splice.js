@@ -2813,7 +2813,7 @@ UrlAnalyzer.prototype = {
 		 * Module has no required includes
 		 * */
 		if(!required || required.length < 1) {
-			MODULE_MAP[url] = definition.call(_sjs,_sjs); 
+			MODULE_MAP[url] = definition.call({'sjs':_sjs,'scope':scope}, _sjs); 
 			return;
 		}
 		

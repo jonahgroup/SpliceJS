@@ -1,12 +1,12 @@
 /* global sjs */
 sjs({
 
-definition:function(){
+definition:function(sjs){
     "use strict";
 
 	//configuration constants
-	var	SPLICE_REMOTE_ENDPOINT = this.config.SPLICE_REMOTE_ENDPOINT
-	,	SPLICE_REMOTE_CALL_ADAPTER = this.config.SPLICE_REMOTE_CALL_ADAPTER;
+	var	SPLICE_REMOTE_ENDPOINT = sjs.config.SPLICE_REMOTE_ENDPOINT
+	,	SPLICE_REMOTE_CALL_ADAPTER = sjs.config.SPLICE_REMOTE_CALL_ADAPTER;
 	
 	var HttpRequest = this.HttpRequest
 	,	debug = this.debug;
