@@ -70,10 +70,9 @@ sjs({
 		console.log(result);
 		
 		var result = data.data(10).to(function(item){return item%2;}).to(function(item){return item*5;}).current();
-		
-		
-		
 		console.log(result);
 		
+		var itr = data.data(10).to(function(item){return item%2;}).to(function(item){return item*5;});
+		itr.next(function(item){console.log(item);});
 	}
 });

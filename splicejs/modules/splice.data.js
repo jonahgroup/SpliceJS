@@ -61,7 +61,13 @@ definition:function(sjs){
 	var NumericIterator = Class.extend(Iterator)(function NumericIterator(n,callback){
 		this.super(callback);
 		this.n = n;
+		this.current = 0;
 	});
+	
+	NumericIterator.prototype.next = function(callback){
+		if(this.current == this.n) return;
+		callback(this.fn(this.current++));	
+	};
 	
 	
 	NumericIterator.prototype.iterate = function(callback){
@@ -82,6 +88,13 @@ definition:function(sjs){
 		this.super(callback);
 		this.iterator = iterator;	
 	});
+	
+	NestedIterator.prototype.next = function(callback){
+		var self = this;
+		this.iterator.next(function(item){
+			callback(self.fn(item));	
+		});		
+	};
 	
 	NestedIterator.prototype.iterate = function(callback){
 		var self = this;
