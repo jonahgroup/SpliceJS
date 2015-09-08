@@ -82,18 +82,25 @@ definition:function(){
 			page:	new DataStep(function(data){
 				return applyPage.call(self,data)
 			}),
+			
+			frame:	new DataStep(function(data){
+				return applyFrame.call(self,data);
+			}),
+			
 			sort:	new DataStep(function(data){
 				if(self.sortCell == undefined || self.sortCell == null )
 					return data;
 				return applySort(data,self.sortCell.index, self.sortCell.sortOrder);
 			}),
+			
+			
 			render:	new DataStep(function(data){
 				return data;
 			})
 		};
 		
 		//build data pipeline
-		dataSteps.source.add(dataSteps.filter).add(dataSteps.page).add(dataSteps.sort).add(dataSteps.render);
+		dataSteps.source.add(dataSteps.filter).add(dataSteps.page).add(dataSteps.frame).add(dataSteps.sort).add(dataSteps.render);
 				
 		this.dataSteps = dataSteps;
 				
@@ -129,6 +136,9 @@ definition:function(){
 	DataTable.prototype.pageTo = function(page){
 		this.pageCurrent = page;	
 	};
+	
+
+	
 
 	/*
 	 * Updating data model
@@ -255,6 +265,12 @@ definition:function(){
 		};
 	};
 	
+	
+	function applyFrame(source){
+			return source;
+	};
+	
+	
 	//this is in place sorting
 	function applySort(source,columnIndex,order){
 		
@@ -348,9 +364,9 @@ definition:function(){
 		}
 		*/
 		
-		
+		var drl = this.dataRows.length;
 		fdata( data.length - this.dataRows.length ).asyncloop((function(j){
-			j = j + this.dataRows.length;
+			j = j + drl;
 			data_row = new this.bodyRowTemplate({parent:this, columnCount});
 			this.dataRows.push(data_row);
 			data_row.dataIn(data[j]);

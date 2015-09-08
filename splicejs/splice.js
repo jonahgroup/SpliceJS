@@ -998,7 +998,7 @@ UrlAnalyzer.prototype = {
 				required:BOOT_SOURCE,
 				definition:function(){
 					removePreloader();
-					READY.callback.call(this);
+					READY.callback.call(this,this.sjs);
 				}	
 			});
 			return;	

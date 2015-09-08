@@ -6,8 +6,9 @@ sjs().display.overlay(new (sjs('buttons.js').TextField)());
 sjs().display.overlay(new (sjs('buttons.js').RadioButton)());
 
 /* test inheritance */
-sjs(function(){
-	var Class = this.Class;
+console.log('--------------------- Inheritance testing ---------------- ');
+sjs(function(sjs){
+	var Class = sjs.Class;
 	
 	var A  = Class(function A(){
 		this.name = 'this is a'; 	
@@ -54,13 +55,25 @@ sjs(function(){
 
 });
 
-console.log('--------------------- break between modules ---------------- ');
+console.log('--------------------- Data Testing ---------------- ');
 
-sjs(function(){
-	var fn = Function('var binding = arguments[0].Binding; var scope = this; var Obj = arguments[0].Obj; return binding;');
-	var result = fn.call(this,this);
-	console.log(result);
-	return {
-		test:'Test2'
+sjs({
+	required:[
+		{'Data':'{sjshome}/modules/splice.data.js'}
+	],
+	definition:function(sjs){
+		
+		var data = this.scope.Data;
+		
+		console.log("----- numeric iterator -----");
+		var result = data.data(10).to().current();
+		console.log(result);
+		
+		var result = data.data(10).to(function(item){return item%2;}).to(function(item){return item*5;}).current();
+		
+		
+		
+		console.log(result);
+		
 	}
 });

@@ -2,7 +2,8 @@
 sjs({
 definition:function(sjs){
 
-	var mixin = sjs.mixin;
+	var mixin = sjs.mixin
+	,	Class = sjs.Class;
 
 	var DataStep = function DataStep(dowork, issource){
 		mixin(this,{
@@ -35,6 +36,60 @@ definition:function(sjs){
 			this.data = data;
 		}
 	};
+
+	/*
+		Iterator
+	*/
+	function Iterator(callback){
+		this.fn = (typeof callback === 'function') ? callback : function(item){return item;};
+	};
+
+	//returns array
+	Iterator.prototype.current = function(){
+		var result = [];
+		this.iterate(function(item){
+			result.push(item);
+		})
+		return result;
+	};
+	
+	Iterator.prototype.iterate = function(callback){
+		throw "Abstract method: Iterator.prototype.iterate(fn) implementation is not provided";
+	};
+	
+
+	var NumericIterator = Class.extend(Iterator)(function NumericIterator(n,callback){
+		this.super(callback);
+		this.n = n;
+	});
+	
+	
+	NumericIterator.prototype.iterate = function(callback){
+		callback = callback ? callback : function(){};
+		if(this.fn != null){
+			for(var i=0; i<this.n; i++){
+				callback(this.fn(i));
+			}
+		} else {
+			for(var i=0; i<this.n; i++){
+				callback(i);
+			}	
+		}	
+	};
+
+
+	var NestedIterator = Class.extend(Iterator)(function NestedIterator(iterator,callback){
+		this.super(callback);
+		this.iterator = iterator;	
+	});
+	
+	NestedIterator.prototype.iterate = function(callback){
+		var self = this;
+		this.iterator.iterate(function(item){
+			callback(self.fn(item));	
+		});	
+	};
+
 
 	/*
 		Paginator
@@ -114,48 +169,52 @@ definition:function(sjs){
 	};
 
 
-		var Frame = function(data, size, step){
-		  if (size == undefined) throw 'The frame size is required';
+	var Frame = function Frame(data, size, step){
+		if (size == undefined) throw 'The frame size is required';
 
-		  this.data = data;
-		  this.size = size;
-		  this.step = step || Math.ceil(this.data.length * 0.2);
+		this.data = data;
+		this.size = size;
+		this.step = step || Math.ceil(this.data.length * 0.2);
 
-		  this.cursor = (-1)*this.step;
+		this.cursor = (-1)*this.step;
 
-		  if (this.step > this.size)
-		    throw 'The step should not exceed the size of the frame';
-		};
+		if (this.step > this.size)
+		throw 'The step should not exceed the size of the frame';
+	};
 
-		Frame.prototype.next = function () {
-		  if (this.hasMore()){
-		      this.cursor+=this.step;
-		  }
-
-		  return _frame.call(this);
-		};
-
-		Frame.prototype.hasMore = function(){
-		  return this.cursor + this.size <= this.data.length + this.step;
+	Frame.prototype.next = function () {
+		if (this.hasMore()){
+			this.cursor+=this.step;
 		}
 
-		Frame.prototype.prev = function () {
-		  if (this.cursor >= 0)
-		    this.cursor-=this.step;
+		return _frame.call(this);
+	};
 
-		  return _frame.call(this);
-		};
+	Frame.prototype.hasMore = function(){
+		return this.cursor + this.size <= this.data.length + this.step;
+	}
 
-		var _frame = function(){
-		  if (this.cursor < 0 || !this.hasMore()) return [];
+	Frame.prototype.prev = function () {
+		if (this.cursor >= 0)
+		this.cursor-=this.step;
 
-		  var cursor = Math.min(this.cursor, this.data.length - this.size);
-		  return this.data.slice( cursor , Math.min(cursor + this.size, this.data.length) );
-		}
+		return _frame.call(this);
+	};
+	
+	Frame.prototype.to = function(n){
+		
+	};
 
-		Frame.prototype.current = function(){
-		   return _frame.call(this);
-		};
+	var _frame = function(){
+		if (this.cursor < 0 || !this.hasMore()) return [];
+
+		var cursor = Math.min(this.cursor, this.data.length - this.size);
+		return this.data.slice( cursor , Math.min(cursor + this.size, this.data.length) );
+	}
+
+	Frame.prototype.current = function(){
+		return _frame.call(this);
+	};
 
 
 	function forEach(callback){
@@ -401,6 +460,27 @@ definition:function(sjs){
 
 	function data(d){
 
+		var i = null; 
+		
+		if(typeof d === 'number') 		i = new NumericIterator(d);
+		else if(d instanceof Iterator)	i = d;
+		else if(d instanceof Array) 	i = new ArrayIterator(d);
+		else if(typeof d === 'object') 	i = new ObjectIterator(d); 
+
+
+		return {
+			
+			to:	function to(callback){ 
+				return data(new NestedIterator(i, callback));
+			},
+			
+			current: function current(){	
+				return i.current();	
+			}
+		}
+
+
+/*
 		var _export  = {
 			foreach		:function(callback){return forEach.call(d,callback);},
 			filter		:function(callback){return filter.call(d,callback);},
@@ -415,7 +495,7 @@ definition:function(sjs){
 			asyncloop	:function(callback, pageSize){return function(oncomplete, onint){
 							return asyncIterator(d, callback, pageSize, oncomplete, onint);}
 						},
-			result  	:d
+			result  	:function(){return itr.current();}
 		};
 
 		// multiplex "to" function
@@ -426,10 +506,14 @@ definition:function(sjs){
 		}
 
 		return _export;
+*/
 	};
+	
+	
 	return {
 		data : data,
 		DataStep : DataStep,
+		NumericIterator: NumericIterator,
 		compare:{'default':defaultComparator}
 	};
 }
