@@ -1134,6 +1134,7 @@ UrlAnalyzer.prototype = {
 	 
 	function Namespace(path){
 		this.templates = [];
+		this.itc = 0;
 	};
 
 	
