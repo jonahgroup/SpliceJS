@@ -3,7 +3,10 @@ sjs({
 
 definition:function(sjs){
 
-	var Class = sjs.Class;
+    var scope = this.scope;
+
+    var Class = sjs.Class
+    ,   debug = sjs.debug;
 
 	var LineChart = Class(function LineChart(){
 
@@ -14,8 +17,8 @@ definition:function(sjs){
 
 		var data = this.dataItem;
 		
-		_.debug.log("Line Chart");
-		_.debug.log(data);
+		debug.log("Line Chart");
+		debug.log(data);
 
 		if(!data) return;
 

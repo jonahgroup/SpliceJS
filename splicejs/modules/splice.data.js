@@ -550,7 +550,14 @@ definition:function(sjs){
 			},
 			current: function current(){
 				return i.current();
-			}
+			},
+			array:function current(){
+				return i.current();
+			},
+			asyncloop	:function(callback, pageSize){return function(oncomplete, onint){
+						return asyncIterator(d, callback, pageSize, oncomplete, onint);}
+			},
+			sort		:function(callback){return sort.call(d,callback);}
 		}
 
 

@@ -1847,6 +1847,7 @@ UrlAnalyzer.prototype = {
 
 	Controller.prototype.onReflow = EventSingleton;
 	Controller.prototype.reflow = function(position,size,bubbleup){
+		if(!this.concrete || !this.concrete.dom) return;
 
 		if(bubbleup == true) {
 			this.reflowChildren(null,null,bubbleup);
@@ -1886,6 +1887,12 @@ UrlAnalyzer.prototype = {
 
 	Concrete.prototype.export = function(){
 		return this.dom;
+	};
+	
+	Concrete.prototype.breakout = function(){
+		if(this.dom.children.length == 1){
+			this.dom = this.dom.children[0];
+		}	
 	};
 
 	Concrete.prototype.applyContent = function(content, suspendNotify){
@@ -1997,38 +2004,6 @@ UrlAnalyzer.prototype = {
 	};
 
 
-
-	
-	
-	
-	
-	Template.prototype.normalize  = function(){
-
-		/*
-		 * reassign the wrapper if template has a root element
-		 * */
-		var nodes = this.dom.childNodes;
-		
-		var elementCount = 0; //count nodes of type "1" ELEMENT NODE
-		var firstElement = null;
-		for(var i=0; i< nodes.length; i++){
-			if(nodes[i].nodeType == 1) { 
-				elementCount++; 
-				if(!firstElement) firstElement = nodes[i];
-			}
-		}
-		if(elementCount == 1) { 
-			if(firstElement.getAttribute('data-sjs-tmp-anchor')) {
-				this.dom.normalize(); return;	
-			}
-			firstElement = this.dom.removeChild(firstElement);
-			this.dom = firstElement;
-			this.dom.normalize();
-		}
-	}
-	
-
-
 	/**
 	 * @tieInstance - instance of a tie class that is associated with the template
 	 * */
@@ -2038,12 +2013,10 @@ UrlAnalyzer.prototype = {
 		
 		var deepClone = build.cloneNode(true);
 		deepClone.normalize();
-
 		 
 		var instance = new Concrete(deepClone);
 		instance.controllerInstance = controllerInstance;
-		
-		instance.dom['-sjs-component'] = controllerInstance.constructor;
+	
 		
 		/* process dom references */
 		var elements = deepClone.querySelectorAll('[sjs-element]');
@@ -2135,7 +2108,8 @@ UrlAnalyzer.prototype = {
 				anchors[i].parentNode.replaceChild((exportDom), anchors[i]);
 			}
 		}
-
+		
+		instance.breakout();
 		return instance;
 	};
 

@@ -102,7 +102,8 @@ definition:function(sjs){
 		/* charts */
 		Chart:				scope.Charts.Chart,
 		Dial:				scope.Charts.Dial,
-		GridLayout:			scope.Grids.GridLayout,
+		GridLayout:         scope.Grids.GridLayout,
+        CellContainer:      scope.Grids.CellContainer,
 		D3Canvas:			scope.Charts.D3Canvas,
 		Map:				scope.Maps.Map,
 		/* selectors */

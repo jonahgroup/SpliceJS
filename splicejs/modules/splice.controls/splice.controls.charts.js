@@ -12,12 +12,15 @@ required:[
 
 ],
 
-definition:function(){
+definition:function(sjs){
 
-	var Class = this.sjs.Class
-	,	scope = this.scope;
+    var	scope = this.scope
+    
+    var Class = sjs.Class
+	,   debug = sjs.debug;
 	
-	var	D3Canvas = scope.SpliceJS.Controls.D3Canvas;
+	var	D3Canvas = scope.SpliceJS.Controls.D3Canvas
+    ,   data = scope.Data.data;
 
 	var CHART_MAP = {
 		Bar:  scope.Charts.BarChart,
@@ -31,13 +34,11 @@ definition:function(){
 
 	
 	var Chart = Class.extend(D3Canvas)(function ChartController(){
-		D3Canvas.call(this);	//call parent constructor
+		this.super();	//call parent constructor
 
 		var self = this
 		,	width = this.width
 		,	height = this.height
-
-
 
 		this.dM = {};	//data measures
 
@@ -108,24 +109,24 @@ definition:function(){
 	Chart.prototype.measureData = function(d3){
 		
 
-		this.dM.max = d3.max(_.data(this.dataItem).to(function(k,v){
+		this.dM.max = d3.max(data(this.dataItem).to(function(v,k){
 			return d3.max(v.data)
-		}).result);
+		}).current());
 
-		this.dM.min = d3.min(_.data(this.dataItem).to(function (k,v) {
+		this.dM.min = d3.min(data(this.dataItem).to(function (v,k) {
 		    return d3.min(v.data);
-		}).result);
+		}).current());
 
-		this.dM.count = d3.max(_.data(this.dataItem).to(function(k,v){
+		this.dM.count = d3.max(data(this.dataItem).to(function(v,k){
 			return v.data.length;
-		}).result);
+		}).current());
 
 
 		if (this.dM.min > 0) this.dM.min = 0;
 	
 
-		_.debug.log('Max ' + this.dM.max);
-		_.debug.log('Count ' + this.dM.count);
+		debug.log('Max ' + this.dM.max);
+		debug.log('Count ' + this.dM.count);
 		
 	}
 
@@ -153,7 +154,7 @@ definition:function(){
 
 	
 		var x = this.x = d3.scale.ordinal()
-			.domain(_.data(this.dM.count).to().result)
+			.domain(data(this.dM.count).to().current())
     		.rangeRoundBands([0, width]);
 
     	/*
@@ -284,12 +285,9 @@ definition:function(){
 	    return c;
 	};
 
-//end definition
-
-	return {
-		
-		ChartController: 	Chart,
-		Dial:	(scope.Charts.Dial)
+    //end definition
+   return {
+		Dial:scope.Charts.Dial
 	}
 }
 

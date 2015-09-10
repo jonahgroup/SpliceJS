@@ -1,17 +1,24 @@
 /* global JSPositioning */
 sjs({
 	
-required:[
-	{'Animation': '{sjshome}/modules/splice.animation.js'}
+required: [
+    {'SpliceJS.UI': '{sjshome}/modules/splice.ui.js'},
+	{'Animation': '{sjshome}/modules/splice.animation.js'},
+	'splice.controls.charts.dial.html'
 ],
 
 definition:function(sjs){
 	
-	var Class = sjs.Class;
-	var Animation = this.scope.Animation;
+    var scope = this.scope;
+    var Class = sjs.Class;
+
+    var Animation = scope.Animation
+    , UIControl = scope.SpliceJS.UI.UIControl;
+
 	
-	var Dial = Class(function Dial(){
-	
+	var Dial = Class.extend(UIControl)(function DialController(){
+	    this.super();
+
 	    this.dom = this.canvas = this.elements.root;
 		var canvas = this.canvas;
 	    
@@ -275,12 +282,7 @@ definition:function(sjs){
 	Dial.prototype.onchange = function(){};
 
 
-	return {
-		
-		Dial:Dial
-		
-	}
-
+	//exports go here
 
 	}
 

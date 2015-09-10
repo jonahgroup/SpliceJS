@@ -261,7 +261,7 @@ definition:function(){
 		
 		return {
 			headers:headers, 
-			data:data(records).page(this.pageSize).to(this.pageCurrent).current,
+			data:data(records).to().current()//page(this.pageSize).to(this.pageCurrent).current,
 		};
 	};
 	

@@ -11,7 +11,7 @@ definition:function(){
 	,	Class = this.sjs.Class
 	,	Event = this.sjs.Event
 	,	debug = this.sjs.debug
-	,	Obj = this.sjs.Obj;
+	,	proxy = this.sjs.proxy;
 
 	var UIControl = scope.SpliceJS.UI.UIControl
 	,	DragAndDrop = scope.SpliceJS.UI.DragAndDrop;
@@ -192,7 +192,7 @@ definition:function(){
 	/* private */
 	function addCell(content, row, col, rowSpan, colSpan){
 
-		var _CellContainer = Obj.call(scope,
+		var _CellContainer = proxy(
 		{	type:'CellContainer',
 			row:row, 
 			col:col, 
