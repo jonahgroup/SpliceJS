@@ -2770,9 +2770,18 @@ UrlAnalyzer.prototype = {
 		var _sjs = mixin(sjs(),{
 			Class : proxyClass,
 			proxy : (function(){return proxy.apply(this,arguments);}).bind(scope),
-			load  : (function(filename){
+			load  : (function(filenames){
 				
-				return load.apply(this,arguments);
+				return (function(fn){
+					var imports = prepareImports(filenames, this.__sjs_uri__.path);
+					
+					include(imports.filenames,function(){
+						applyImports.call(scope,imports);
+						if(typeof fn === 'function') fn();
+					});
+					
+				}).bind(this);
+				
 			}).bind(scope)
 		});
 		

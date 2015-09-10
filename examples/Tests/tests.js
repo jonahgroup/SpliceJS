@@ -62,7 +62,7 @@ sjs({
 		{'Data':'{sjshome}/modules/splice.data.js'}
 	],
 	definition:function(sjs){
-		
+		var scope = this.scope;
 		var data = this.scope.Data.data;
 		
 		console.log("----- numeric iterator -----");
@@ -100,19 +100,19 @@ sjs({
 		
 		console.log(bi.current());
 		
+		
+		sjs.load([{'Applets':'{sjshome}/modules/splice.controls/splice.controls.buttons.js'}])(
+			function(){
+				
+				var v = new scope.Applets.Button();
+				console.log(v);	
+			}
+		);
+		
 	
 	}
 });
 
 var button = new (sjs('buttons.js')().Button)();
 console.log(button);
-/*
-sjs({
-	required:['tests.html'],
-	definition:function(){
-	
-		var tc = new this.scope.components.TestComponent();
-		console.log(tc);
-	}
-});
-*/
+
