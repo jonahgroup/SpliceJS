@@ -14,7 +14,7 @@ definition:function(){
 	var	UIControl = scope.SpliceJS.UI.UIControl
 
 	var Popup = Class.extend(UIControl)(function PopupController(){
-		UIControl.call(this);
+		this.super();
 
 		this.ratio = { width: 4, height: 3 };
 
@@ -34,7 +34,7 @@ definition:function(){
 	    var mask = this.elements['popupMask'];
 
 	    //measure document
-	    var dim = SpliceJS.Ui.Positioning.windowDimensions();
+	    var dim = scope.SpliceJS.UI.Positioning.windowDimensions();
 
 	    var size = { width: 10, height: 10 };
 	    var position = { left: 0, top: 0 };

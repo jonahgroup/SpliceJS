@@ -1133,13 +1133,7 @@ UrlAnalyzer.prototype = {
 	 
 	 
 	function Namespace(path){
-	
-		this._path = path;
 		this.templates = [];
-		this.path = path;
-		this.compindex = [];
-		this.itc = 0;
-	
 	};
 
 	
@@ -1675,26 +1669,13 @@ UrlAnalyzer.prototype = {
 	Templating Engine
 
 */
-	
-	function Scope(path){
-		this.templates = [];
-		this.path = path;
-		this.compindex = [];
-		this.itc = 0;
-	};
-
-	Scope.prototype.getNextTemplateName = function(){
-		return '__impTemplate' + (this.itc++);
-	};
-
-
 
 	/**
 	 * Object descriptor
 	 * @type: data type of the object to be created
 	 * @parameters:	parameters to be passed to the object behind proxy
 	 * */
-	var Obj = function Obj(args){
+	var proxy = function proxy(args){
 		/*
 		 * Scope object
 		 * Includers scope - should be used for resolving bindings
@@ -1713,19 +1694,15 @@ UrlAnalyzer.prototype = {
 				obj = scope.lookup(args.type);
 			} catch(ex){}
 			
+			if(!obj) try {
+				obj = scope.component.lookup(args.type);
+			} catch(ex){}
+						
 			/* lone template is being included */
 			if(!obj) try {
 				obj = scope.templates[args.type];
 			} catch(ex) {}
-					  
-			if(!obj) try {
-				obj = scope[args.type]; 
-			} catch(ex) {}
-			
 
-			if(!obj) try {
-				obj = Namespace.lookup(args.type);
-			} catch(ex) {}
 
 			
 
@@ -2167,7 +2144,7 @@ UrlAnalyzer.prototype = {
 		//var start  = window.performance.now();
 		
 		this.templates = [];
-		this.components = []; //component exports
+		this.components = new Namespace(''); //component exports
 		
 		container.innerHTML = fileSource;
 		
@@ -2257,13 +2234,13 @@ UrlAnalyzer.prototype = {
 		//empty configuration of the include tag
 		var idx = node.innerHTML.indexOf('{');
 		if( idx < 0){
-			json = 'Obj.call(scope,{'+ attributes +'})';
+			json = 'proxy.call(scope,{'+ attributes +'})';
 		}
 			
 		else {	
 			if(attributes) attributes = attributes + ',';
 			
-			json = 'Obj.call(scope,{' + attributes +
+			json = 'proxy.call(scope,{' + attributes +
 			node.innerHTML.substring(idx+1)
 			+')'
 		}
@@ -2280,7 +2257,7 @@ UrlAnalyzer.prototype = {
 			
 		if(attributes) attributes = attributes + ', '
 			
-		var json = 'Obj.call(scope,{'+
+		var json = 'proxy.call(scope,{'+
 			attributes + 
 			node.innerHTML.substring(node.innerHTML.indexOf('{')+1)
 			+')'
@@ -2300,7 +2277,7 @@ UrlAnalyzer.prototype = {
 		if(parent.tagName == 'SJS-ELEMENT')
 			json = 'null, type:\'' + _type + '\''; 			
 		else
-			json = 'Obj.call(scope,{type:\''+ _type + '\'})';
+			json = 'proxy.call(scope,{type:\''+ _type + '\'})';
 
 		if(replace === true)
 			node.parentNode.replaceChild(document.createTextNode(json),node);
@@ -2384,13 +2361,13 @@ UrlAnalyzer.prototype = {
 			var node = nodes[i]
 			,	parent = node.parentNode
 			,	json = convertToProxyJson.call(scope, node, node.tagName)
-			, 	fn = new Function("var binding = arguments[0].binding, Obj = arguments[0].Obj; " + 
-								  "var scope = this; var window = document = null; return " + json)
+			, 	fn = new Function("var binding = arguments[0].binding; var proxy = arguments[0].proxy; " + 
+								  "var scope = this; var window = null; var document = null; return " + json)
 			 	
 			var result = fn.call(scope,sjs());
 
 			if(typeof result !==  'function'){				
-				result = Obj.call(scope,result);
+				result = proxy.call(scope,result);
 			}
 
 			var childId = template.addChild(result);
@@ -2437,11 +2414,16 @@ UrlAnalyzer.prototype = {
 			logging.debug.log('Resolving binding to type: ' + binding.vartype);
 			var parent = instance;
 			
-			var vartype = scope.lookup(binding.vartype);
+			//1. component lookup
+			var vartype = scope.components.lookup(binding.vartype);
+			//2. imports lookup 
+			if(!vartype) 
+				vartype = scope.lookup(binding.vartype);
+			//3. target not found
 			if (!vartype) throw 'Unable to resolve binding target type: ' + binding.vartype;
 			
 			while(parent) {
-				if(parent instanceof vartype) {
+				if(parent.__sjs_type__ === vartype.type) {
 					logging.debug.log('Found instance of type: ' + binding.vartype);
 					
 					var v = Binding.Value(parent);
@@ -2638,6 +2620,7 @@ UrlAnalyzer.prototype = {
 			
 			var obj = Object.create(controller.prototype);
 			obj.constructor = controller;	
+			obj.__sjs_type__ = template.type;
 			
 			obj.ref = {};
 			obj.elements = {};
@@ -2692,6 +2675,7 @@ UrlAnalyzer.prototype = {
 		
 		Component.isComponent = true;
 		Component.template = template;
+		Component.type = template.type;
 
 		return Component;
 	}; 
@@ -2742,6 +2726,18 @@ UrlAnalyzer.prototype = {
 		return {namespaces:namespaces, filenames:filenames};
 	};
 
+
+	function applyImports(imports){
+		var scope = this;
+		for(var i=0; i<imports.namespaces.length; i++){
+			var ns = imports.namespaces[i];
+			//looking up exports
+			var x = MODULE_MAP[absPath(ns.path)];
+			if(!x) continue;
+			ns = getNamespace.call(scope,ns.ns,true,false);
+			ns.place(x);
+		}
+	};
 	
 	/**
 	 * Builds module and compiles late(s) from module definition. 
@@ -2753,7 +2749,7 @@ UrlAnalyzer.prototype = {
 	 */
 	function Module(moduleDefinition){
 	
-	    var scope = new Namespace(path); //our module scope
+	    var scope = new Namespace(null); //our module scope
 			scope.singletons = {constructors:[], instances:[]};
 		
 		var proxyClass = function(fn){
@@ -2772,19 +2768,27 @@ UrlAnalyzer.prototype = {
 		};
 			
 		var _sjs = mixin(sjs(),{
-			Class : proxyClass
+			Class : proxyClass,
+			proxy : (function(){return proxy.apply(this,arguments);}).bind(scope),
+			load  : (function(filename){
+				
+				return load.apply(this,arguments);
+			}).bind(scope)
 		});
 		
-		
-		
-		
-		//use absolute URL there is no reason not to
 		var path = getPath(LoadingWatcher.name).path;
 		var url = LoadingWatcher.url;
+		var filename = LoadingWatcher.name;
 		
-		var imp = prepareImports(moduleDefinition.required, path);
+		scope.__sjs_uri__ = {
+			path:path,
+			url:url,
+			res:filename	
+		};
 		
-		var required 	= imp.filenames;
+		var imports = prepareImports(moduleDefinition.required, path);
+		
+		var required 	= imports.filenames;
 		var definition  = moduleDefinition.definition;
 
 
@@ -2825,15 +2829,8 @@ UrlAnalyzer.prototype = {
 			/*
 				Inject Scope Dependencies
 			 */
-			if(imp.namespaces) {
-				for(var i=0; i<imp.namespaces.length; i++){
-					var ns = imp.namespaces[i];
-					//looking up exports
-					var x = MODULE_MAP[absPath(ns.path)];
-					if(!x) continue;
-					ns = getNamespace.call(scope,ns.ns,true,false);
-					ns.place(x);
-				}
+			if(imports.namespaces) {
+				applyImports.call(scope,imports);
 			}
 				/* 
 			 * Templates are compiled after module has been defined
@@ -2888,14 +2885,18 @@ UrlAnalyzer.prototype = {
 		
 		//lookup module
 		if(typeof m  === 'string'){
-				
+			var mdl = null;	
 			var keys = Object.keys(MODULE_MAP);
 			for(var i=0; i < keys.length; i++){
 				var key = keys[i];
-				if(key.endsWith(m)) return MODULE_MAP[key];  					
+				if(key.endsWith(m)) mdl = MODULE_MAP[key];  					
 			}
 			return function(callback){
-				//async module loader here				
+				if(mdl != null) {
+					if(typeof callback === 'function') callback(mdl);
+					return mdl;
+				}
+				return mdl;
 			};
 		};
 		
@@ -2927,6 +2928,7 @@ UrlAnalyzer.prototype = {
 			endswith:endsWith,
 			mixin: mixin,
 			binding : binding,
+			proxy:proxy,
 						
 			load	: include,		
 			include : include,
@@ -2935,7 +2937,7 @@ UrlAnalyzer.prototype = {
 			Namespace: Namespace,
 			Class : Class,
 			Controller : Controller,
-			Obj : Obj,
+			
 			
 			HttpRequest : HttpRequest,	
 			Event : EventSingleton,	

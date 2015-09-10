@@ -14,21 +14,21 @@ definition:function(sjs){
 			}
 		);
 		this.dowork = dowork;
-	};
+	};	
 	DataStep.prototype = {
 		run:function(args){
 			var in_data = null;
 			if(this.issource) in_data = this.data;
-			else 
+			else
 				in_data = this.input.data;
-				
+
 			this.data = this.dowork(in_data, args);
 			for(var i=0; i< this.next.length; i++){
 				this.next[i].run();
 			}
 		},
 		add:function(step){
-			this.next.push(step);	
+			this.next.push(step);
 			step.input = this;
 			return step;
 		},
@@ -47,67 +47,124 @@ definition:function(sjs){
 	//returns array
 	Iterator.prototype.current = function(){
 		var result = [];
-		this.iterate(function(item){
-			result.push(item);
+		this.iterate(function(v,k){
+			result.push(v);
 		})
 		return result;
 	};
-	
+
 	Iterator.prototype.iterate = function(callback){
 		throw "Abstract method: Iterator.prototype.iterate(fn) implementation is not provided";
 	};
-	
 
+
+	/**
+	 *
+	 */
 	var NumericIterator = Class.extend(Iterator)(function NumericIterator(n,callback){
 		this.super(callback);
 		this.n = n;
 		this.current = 0;
 	});
-	
+
+	/**
+	 * Returns false when last item is reached
+	 */
 	NumericIterator.prototype.next = function(callback){
-		if(this.current == this.n) return;
-		callback(this.fn(this.current++));	
+		if(this.current == this.n) return false;
+		callback(this.fn(this.current++));
+		if(this.current == this.n) return false;
+		return true;
 	};
-	
-	
+
+
 	NumericIterator.prototype.iterate = function(callback){
 		callback = callback ? callback : function(){};
-		if(this.fn != null){
-			for(var i=0; i<this.n; i++){
-				callback(this.fn(i));
-			}
-		} else {
-			for(var i=0; i<this.n; i++){
-				callback(i);
-			}	
-		}	
+
+		for(var i=0; i<this.n; i++){
+			callback(this.fn(i));
+		}
 	};
 
-
+	/**
+	 *
+	 */
 	var NestedIterator = Class.extend(Iterator)(function NestedIterator(iterator,callback){
 		this.super(callback);
-		this.iterator = iterator;	
+		this.iterator = iterator;
 	});
-	
+
 	NestedIterator.prototype.next = function(callback){
 		var self = this;
-		this.iterator.next(function(item){
-			callback(self.fn(item));	
-		});		
+		return this.iterator.next(function(item){
+			callback(self.fn(item));
+		});
 	};
-	
+
 	NestedIterator.prototype.iterate = function(callback){
 		var self = this;
-		this.iterator.iterate(function(item){
-			callback(self.fn(item));	
-		});	
+		this.iterator.iterate(function(){
+			arguments[0] = self.fn.apply(self,arguments);
+			callback.apply(this,arguments);
+		});
+	};
+
+	/**
+	 * Iterates over array elements
+	 */
+	var ArrayIterator = Class.extend(Iterator)(function ArrayIterator(array,callback){
+		this.super(callback);
+		this.array = array;
+		this.position = 0;
+	});
+
+	ArrayIterator.prototype.next = function(callback){
+		if(this.position >= this.array.length) return false;
+		callback(this.fn(this.array[this.position]), this.position);
+		this.position++;
+		if(this.position >= this.array.length) return false;
+		return true;
+	};
+
+	ArrayIterator.prototype.iterate = function(callback){
+		if(typeof callback !== 'function') return;
+		for(var i=0; i< this.array.length; i++){
+			callback(this.fn(this.array[i]),i);
+		}
+	};
+
+
+
+
+	/**
+	 * Iterates over object properties
+	 */
+	var ObjectIterator = Class.extend(Iterator)(function ObjectIterator(obj, callback){
+		this.super(callback);
+		this.obj = obj;
+		this.keys = Object.keys(obj);
+		this.position = 0;
+	});
+
+	ObjectIterator.prototype.next = function(callback){
+		if(this.position >= this.keys.length) return false;
+		var key = this.keys[this.position];
+		callback(this.fn(this.obj[key]),key);
+		this.position++;
+		if(this.position >= this.keys.length) return false;
+	};
+
+	ObjectIterator.prototype.iterate = function(callback){
+		for(var i=0; i< this.keys.length; i++){
+			var key = this.keys[i];
+			callback(this.fn(this.obj[key]),key);
+		}
 	};
 
 
 	/*
 		Paginator
 	*/
-
 	var Paginator = function Paginator(data, pageSize, startPage){
 
 		this.data = data;
@@ -213,9 +270,9 @@ definition:function(sjs){
 
 		return _frame.call(this);
 	};
-	
+
 	Frame.prototype.to = function(n){
-		
+
 	};
 
 	var _frame = function(){
@@ -375,35 +432,35 @@ definition:function(sjs){
 		return target;
 	};
 
-	
+
 	function defaultComparator(a,b) {
 		var aa = +a
-		,	bb = +b; 
-		
+		,	bb = +b;
+
 		aa = Number.isNaN(aa)?a:aa;
 		bb = Number.isNaN(bb)?b:bb;
-		
+
 		if(aa < bb) return -1;
 		if(aa > bb) return 1;
-		return 0;	
+		return 0;
 	};
-	
+
 
 	function sort(callback){
 		//may only sort arrays
-		
+
 		if(!callback) callback = defaultComparator;
-		
-		var target = this;	
+
+		var target = this;
 		return {
 			asc:function(){
 				target.sort(callback);
-				return data(target);					
+				return data(target);
 			},
 			desc:function(){
 				target.sort(function(a,b) {return -1 * callback(a,b);});
 				return data(target);
-			}			
+			}
 		};
 	};
 
@@ -441,24 +498,24 @@ definition:function(sjs){
 	function asyncIterator(d, callback,pageSize, oncomplete, oninterrupt){
 		var page_size = 20
 		,	length = 0;
-		
+
 		if(typeof d === 'number') length = d;
-		if(d instanceof Array ) length = d.length; 
-		
+		if(d instanceof Array ) length = d.length;
+
 		if(pageSize) page_size = pageSize;
-		
-		var	pages = Math.floor(length / page_size) + ( (length % page_size) / (length % page_size ))		
+
+		var	pages = Math.floor(length / page_size) + ( (length % page_size) / (length % page_size ))
 		,	count = {p:0};
-		
+
 		var fn = function(){
-			if(count.p >=  pages) { 
+			if(count.p >=  pages) {
 				if(typeof oncomplete === 'function' ) oncomplete();
 				return;
 			}
 			var start = page_size * count.p
-			,	end  = start + page_size; 
-			for(var i = start; 
-					i < end && i < length; 
+			,	end  = start + page_size;
+			for(var i = start;
+					i < end && i < length;
 					i++ ) {
 				callback(i)
 			}
@@ -466,29 +523,33 @@ definition:function(sjs){
 			if(typeof oninterrupt === 'function') oninterrupt();
 			setTimeout(fn,1);
 		}
-		
+
 		fn();
 	};
 
 
 	function data(d){
 
-		var i = null; 
-		
+		var i = null;
+
 		if(typeof d === 'number') 		i = new NumericIterator(d);
-		else if(d instanceof Iterator)	i = d;
 		else if(d instanceof Array) 	i = new ArrayIterator(d);
-		else if(typeof d === 'object') 	i = new ObjectIterator(d); 
+		else if(d instanceof Iterator)	i = d;
+		else if(typeof d === 'object') 	i = new ObjectIterator(d);
 
 
 		return {
-			
-			to:	function to(callback){ 
+			to:	function to(callback){
 				return data(new NestedIterator(i, callback));
 			},
-			
-			current: function current(){	
-				return i.current();	
+			each:function(callback){
+				i.iterate(callback);
+			},
+			next:function(callback){
+				return i.next(callback);
+			},
+			current: function current(){
+				return i.current();
 			}
 		}
 
@@ -521,8 +582,8 @@ definition:function(sjs){
 		return _export;
 */
 	};
-	
-	
+
+
 	return {
 		data : data,
 		DataStep : DataStep,

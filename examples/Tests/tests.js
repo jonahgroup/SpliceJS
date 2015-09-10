@@ -1,9 +1,9 @@
 //display button control
 
-sjs().display.overlay(new (sjs('buttons.js').Button)({content:{label:'This is a test button'}}));
-sjs().display.overlay(new (sjs('buttons.js').CheckBox)());
-sjs().display.overlay(new (sjs('buttons.js').TextField)());
-sjs().display.overlay(new (sjs('buttons.js').RadioButton)());
+sjs().display.overlay(new (sjs('buttons.js')().Button)({content:{label:'This is a test button'}}));
+sjs().display.overlay(new (sjs('buttons.js')().CheckBox)());
+sjs().display.overlay(new (sjs('buttons.js')().TextField)());
+sjs().display.overlay(new (sjs('buttons.js')().RadioButton)());
 
 /* test inheritance */
 console.log('--------------------- Inheritance testing ---------------- ');
@@ -63,16 +63,56 @@ sjs({
 	],
 	definition:function(sjs){
 		
-		var data = this.scope.Data;
+		var data = this.scope.Data.data;
 		
 		console.log("----- numeric iterator -----");
-		var result = data.data(10).to().current();
+		var result = data(10).to().current();
 		console.log(result);
 		
-		var result = data.data(10).to(function(item){return item%2;}).to(function(item){return item*5;}).current();
-		console.log(result);
+		var si = data(10).to(function(item){return item%2;}).to(function(item){return item*5;});
 		
-		var itr = data.data(10).to(function(item){return item%2;}).to(function(item){return item*5;});
-		itr.next(function(item){console.log(item);});
+		// iterate over si
+		while(si.next(function(item){
+			console.log(item);
+		}));
+		
+		
+		var result = si.current();
+		
+		var ai = data(result).to(function(v,k){
+			return {k:k, v:v};	
+		}).to(function(v,k){
+			console.log(v);
+			return k;
+		});
+		
+		console.log(ai.current());
+	
+	
+		var obj = {};
+		ai.each(function(v,k){
+			obj['prop'+v] = v;
+		});
+		
+		console.log(obj);
+		
+		var bi = data(obj).to(function(v,k){return k; });
+		
+		console.log(bi.current());
+		
+	
 	}
 });
+
+var button = new (sjs('buttons.js')().Button)();
+console.log(button);
+/*
+sjs({
+	required:['tests.html'],
+	definition:function(){
+	
+		var tc = new this.scope.components.TestComponent();
+		console.log(tc);
+	}
+});
+*/

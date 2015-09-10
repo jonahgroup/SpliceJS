@@ -45,7 +45,7 @@ definition:function(sjs){
 	 *	Image Selector
      *
 	 * */
-	var ImageSelector = Class(function ImageSelector(){
+	var ImageSelector = Class(function ImageSelectorController(){
 		
 		var container = this.elements.root;
 
@@ -62,7 +62,7 @@ definition:function(sjs){
 	};
 
 
-	var PullOutPanel = Class.extend(UIControl)( function PullOutPanel(){
+	var PullOutPanel = Class.extend(UIControl)( function PullOutPanelController(){
 		this.super();
 	});
 
@@ -95,7 +95,7 @@ definition:function(sjs){
 		TextField:			scope.Buttons.TextField,
 		Slider:				scope.Buttons.Slider,
 		/* panels */
-		PullOutPanel: 		PullOutPanel,
+		
 		DrawerPanel:		scope.Panels.DrawerPanel,
 		ViewPanel:			scope.Panels.ViewPanel,
 		ScrollPanel:		scope.Panels.ScrollPanel,
