@@ -3,51 +3,51 @@ body {
 	font-family: 'Arial Narrow', Arial, sans-serif;
 }
 
-.sample-table.-sjs-datatable-root {
+.sample-table.-sjs-datatable {
 	width:100%; height:100%;
 	
 	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 	font-size:12px;
 }
 
-.sample-table.-sjs-datatable-root .-sjs-datatable-headercontainer {
+.sample-table.-sjs-datatable .-sjs-datatable-headercontainer {
 	background-color: #fefefe;
 }
 
-.sample-table.-sjs-datatable-root .-sjs-datatable th {
+.sample-table.-sjs-datatable .-sjs-table th {
 
     background-color: #274239;
     color: #fefefe;
 	font-size:0.9em;
 	border: 1px solid #37564C;
 }
-.sample-table.-sjs-datatable-root .-sjs-datatable th:hover {
+.sample-table.-sjs-datatable .-sjs-table th:hover {
     background-color: #222222;
 }
 
 
 
-.sample-table.-sjs-datatable-root .-sjs-scrollpanel .static  {
+.sample-table.-sjs-datatable .-sjs-scrollpanel .static  {
 	height:50px;
 }
-.sample-table.-sjs-datatable-root .-sjs-datatable {
+.sample-table.-sjs-datatable .-sjs-table {
 	border-collapse:  collapse;
 }
 
 
-.sample-table.-sjs-datatable-root .-sjs-datatable td {
+.sample-table.-sjs-datatable .-sjs-table td {
 	
 	border:1px solid #cecece;
 	padding-left:1em; padding-right: 1em;
 }
 
-.sample-table.-sjs-datatable-root .-search-result-highlight {
+.sample-table.-sjs-datatable .-search-result-highlight {
 	background-color:#222222;
 	color:#FFF92D;
 }
 
 
-.sample-table.-sjs-datatable-root .-sjs-datatable tbody tr:hover {
+.sample-table.-sjs-datatable .-sjs-table tbody tr:hover {
 	background-color:#eaeaea;
 	
 }

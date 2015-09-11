@@ -1,27 +1,22 @@
 <!-- Uses native scrolling functionality and maintians static header -->
 <sjs-component  sjs-type="DefaultScrollDataTable" sjs-controller="DataTableController" sjs-export>
-	<div class="-sjs-datatable-root" style="position:absolute; left:0px; top:0px; right:0px; bottom:0px; overflow:hidden;" sjs-element="root">
-		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:hidden;">
-		<div style="position:absolute; top:0px; bottom:0px; left:0px; right:0px; overflow:auto;" sjs-element="defaultScroller">
-			<sjs-include type="DataTableBody" ref="body"></sjs-include>
-			<div sjs-element="fakie"></div>
-			
-		</div>
-		<div style="position:absolute; top:0px;left:0px;" sjs-element="headPositioner" >
-			<sjs-include type="DataTableHeader" ref="head"></sjs-include>
-		</div>
-		</div>
+	<div class="-sjs-datatable" style="position:relative;" sjs-element="root">
+		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel" sjs-ref="scrollPanel">{
+			content:{
+				scrollContent:<sjs-include  sjs-type="DataTableBody"		
+											sjs-ref="binding('body').type('DefaultScrollDataTable')"></sjs-include>,
+				staticContent:<sjs-include 	sjs-type="DataTableHeader" 	
+											sjs-ref="binding('head').type('DefaultScrollDataTable')"></sjs-include>
+			}
+		}</sjs-include>
 	</div>
 </sjs-component>
 
 
-
-
 <!-- DataTable template to features custom scrolling implementation -->
 <sjs-component  sjs-type="CustomScrollDataTable" sjs-controller="DataTableController" sjs-export>
-	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="root">
-		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">{
-			ref:'scrollPanel',
+	<div class="-sjs-datatable" style="position:relative;" sjs-element="root">
+		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel" sjs-ref="scrollPanel">{
 			content:{
 				scrollContent:<sjs-include  sjs-type="DataTableBody"		
 											sjs-ref="binding('body').type('CustomScrollDataTable')"></sjs-include>,
@@ -35,27 +30,27 @@
 
 <!-- Does not use view-port scrolling, layout is managed by the including container -->
 <sjs-component  sjs-type="NoScrollDataTable" sjs-controller="DataTableController" sjs-export>
-	<div class="-sjs-datatable-root" style="position:relative;" sjs-element="root">
+	<div class="-sjs-datatable" style="position:relative;" sjs-element="root">
 		<sjs-include type="DataTableBody" ref="body,head"></sjs-include>
 	</div>
 </sjs-component>
 
 
-
-
 <!-- header template -->
 <sjs-component sjs-type="DataTableHeader">
 	<div class="-sjs-datatable-headercontainer" style="position:absolute; z-index:10; top:0px; left:0px;">
-		<table class="-sjs-datatable" sjs-element="table"></table>
+		<table class="-sjs-table" sjs-element="table"></table>
 	</div>
 </sjs-component>
+
 
 <!-- body template -->
 <sjs-component sjs-type="DataTableBody">
 	<div class="-sjs-datatable-bodycontainer" style="position:relative;" sjs-element="tableWrapper">
-		<table class="-sjs-datatable" sjs-element="table"></table>
+		<table class="-sjs-table" sjs-element="table"></table>
 	</div>
 </sjs-component>
+
 
 <!-- head cell template -->
 <sjs-component sjs-type="HeadCell">
@@ -72,6 +67,7 @@
 		</sjs-include>
 	</div>
 </sjs-component>
+
 
 <!-- Sort trigger to represent up/down arrows -->
 <sjs-component sjs-type="SortTrigger">

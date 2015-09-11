@@ -20,7 +20,7 @@ definition:function(){
 	,	dom = scope.Doc.dom;
 	
 	//static single instance
-	var dropDownContainer = new (this.scope.templates['DropDownContainer'])()
+	var dropDownContainer = new (scope.templates['DropDownContainer'])()
 	,	selectorElement = null;
 
 	var DropDownController = Class.extend(Controller)(function DropDownController(args){
@@ -53,7 +53,7 @@ definition:function(){
 
 	DropDownController.prototype.dataIn = function(data){
 		this.data = data;
-		//this.elements.selector.innerHTML = data.toString();		
+		this.elements.selector.innerHTML = data.toString();		
 	};
 
 

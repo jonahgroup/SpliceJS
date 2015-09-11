@@ -6,6 +6,10 @@
 	white-space:nowrap;
 }
 
+.-sjs-datatable .-splicejs-scrollpanel .static {
+    height:50px;
+} 
+
 .-sjs-datatable thead td {
 	padding:10px;	
 }

@@ -194,7 +194,7 @@ definition:function(){
 		
 		
 		this.onScroll.subscribe(function(){
-			this.pageNext();
+			//this.pageNext();
 		},this);
 		
 		

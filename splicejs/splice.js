@@ -860,20 +860,18 @@ UrlAnalyzer.prototype = {
 
 
 			case BINDING_TYPES.TYPE:
-
 				/*locate var type */
-				var vartype = scope[this.vartype]
-				,	parent = originInstance;
 
-				if(!vartype) vartype = Namespace.lookup(this.vartype);
-
+				var	parent = originInstance;
+				// 1. component lookup
+				var vartype = scope.components.lookup(this.vartype);
+				// 2. imports lookup	
+				if(!vartype) vartype = scope.lookup(this.vartype);
+				// 3. target not found
 				if(!vartype) throw 'Unable to resolve binding target type';
-			
 				
 				while(parent) {
-
-					if(parent instanceof vartype) return parent;
-
+					if(parent.__sjs_type__ === vartype.type) return parent;
 					parent = parent.parent;
 				}
 
@@ -1844,40 +1842,6 @@ UrlAnalyzer.prototype = {
 	Controller.prototype.onDisplay 		= EventSingleton;
 	Controller.prototype.onDomChanged 	= EventSingleton;
 	Controller.prototype.onData 		= EventSingleton;
-
-	Controller.prototype.onReflow = EventSingleton;
-	Controller.prototype.reflow = function(position,size,bubbleup){
-		if(!this.concrete || !this.concrete.dom) return;
-
-		if(bubbleup == true) {
-			this.reflowChildren(null,null,bubbleup);
-			return ;
-		}
-
-		// Get style object once and apply settings
-		var style = this.concrete.dom.style;
-		
-		style.left 		= position.left +'px';
-		style.top  		= position.top + 'px';
-		
-		style.width  	= size.width + 'px';
-		style.height 	= size.height + 'px';
-		
-		this.reflowChildren(position,size,bubbleup);
-
-		this.onReflow(position,size);
-
-	};
-
-	Controller.prototype.reflowChildren = function(position, size,bubbleup){
-		
-		for(var i=0; i<this.children.length; i++){
-			if(typeof this.children[i].reflow !== 'function') continue;
-
-			this.children[i].reflow(position,size,bubbleup);
-		}
-	};
-
 	
 
 	var Concrete = function Concrete(dom){
@@ -2244,15 +2208,19 @@ UrlAnalyzer.prototype = {
 	}	
 
 	function handle_INLINE_HTML(node, parent, replace){
-		var scope = this;
+		var scope = this
+		,	attributes = collectAttributes(node,RESERVED_ATTRIBUTES);
 		
-		var _type = scope.getNextTemplateName(),
-			json = '';
+		var _type = scope.getNextTemplateName()
+		,	json = '';
 
+		if(attributes) attributes = ',' + attributes;
+		else attributes = '';
+		
 		if(parent.tagName == 'SJS-ELEMENT')
 			json = 'null, type:\'' + _type + '\''; 			
 		else
-			json = 'proxy.call(scope,{type:\''+ _type + '\'})';
+			json = 'proxy.call(scope,{type:\''+ _type + '\''+ attributes +'})';
 
 		if(replace === true)
 			node.parentNode.replaceChild(document.createTextNode(json),node);
@@ -2526,6 +2494,9 @@ UrlAnalyzer.prototype = {
 
 	function configureHierarchy(instance, args){
 		if(!instance) return;
+		
+		var scope = this;
+		
 		instance.parent = args.parent;
 
 		if(!instance.parent) return; 
@@ -2541,7 +2512,7 @@ UrlAnalyzer.prototype = {
 		}
 		
 		if(args.ref instanceof Binding){
-			var ti = args.ref.getTargetInstance(instance,this);
+			var ti = args.ref.getTargetInstance(instance,scope);
 			if(!ti) throw 'Unable to locate target instance';
 			ti.ref[args.ref.prop] = instance;
 			return;
@@ -2934,8 +2905,6 @@ UrlAnalyzer.prototype = {
 			modules: listModules
 		
 	});}
-	
-	
 	//core.debug = debug;
 	return sjs
 

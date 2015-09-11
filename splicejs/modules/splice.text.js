@@ -395,7 +395,7 @@ function processFormat(format, valueArgs){
 
 function format(){
 
-	if(arguments.length < 2) throw '_.Text.format(string, values) takes two arguments '; 
+	if(arguments.length < 2) throw 'format(string, values) takes two arguments '; 
 
 	var input = arguments[0];
 
@@ -407,7 +407,7 @@ function format(){
 
 	while(token = lexer.nextToken()){
 
-		_.debug.log('Ma token:' + token[1]);
+
 
 		if(token[0] == STRINGBODY) {
 			result += token[1];

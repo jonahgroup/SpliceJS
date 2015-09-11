@@ -64,16 +64,16 @@ definition:function(sjs){
 	var NumericIterator = Class.extend(Iterator)(function NumericIterator(n,callback){
 		this.super(callback);
 		this.n = n;
-		this.current = 0;
+		this.position = 0;
 	});
 
 	/**
 	 * Returns false when last item is reached
 	 */
 	NumericIterator.prototype.next = function(callback){
-		if(this.current == this.n) return false;
-		callback(this.fn(this.current++));
-		if(this.current == this.n) return false;
+		if(this.position == this.n) return false;
+		callback(this.fn(this.position++));
+		if(this.position == this.n) return false;
 		return true;
 	};
 
@@ -159,6 +159,74 @@ definition:function(sjs){
 			var key = this.keys[i];
 			callback(this.fn(this.obj[key]),key);
 		}
+	};
+
+	/**
+	 * */
+	var FrameArrayIterator = Class.extend(ArrayIterator)(function FrameArrayIterator(array, start, end, transformFunction){
+		this.super(array, transformFunction);
+		this.position = start;
+		this.initialFrozenPosition = start;
+		this.endPosition = Math.min(end, this.array.length);
+	});
+
+	FrameArrayIterator.prototype.next = function(callback){
+		if(this.position >= this.endPosition) return false;
+		callback(this.fn(this.array[this.position]), this.position - this.initialFrozenPosition);
+		this.position++;
+		if(this.position >= this.endPosition) return false;
+	};
+
+	FrameArrayIterator.prototype.iterate = function(callback){
+		if(typeof callback !== 'function') return;
+		for(var i=this.initialFrozenPosition; i< this.endPosition; i++){
+			callback(this.fn(this.array[i]),i-this.initialFrozenPosition);
+		}
+	};
+
+	/** 
+	 * */
+	var FrameIterator = Class.extend(Iterator)(function FrameIterator(array, size, step, transformFunction){
+		this.super(transformFunction);
+		this.data 	= array;
+		this.size 	= size;
+		this.step 	= step || Math.ceil(this.data.length * 0.2);
+		this._cursor = {
+			position: 0,
+			frameCount : 0,
+			hasMoreFrames : true
+		};
+	});
+
+	FrameIterator.prototype.next = function(callback){
+		if (!this._cursor.hasMoreFrames) return false;
+		_frame.call(this,callback, this._cursor);
+
+		return this._cursor.hasMoreFrames;
+	};
+
+
+	FrameIterator.prototype.iterate = function(callback){
+		var _cursor = {
+			position: 0,
+			frameCount : 0,
+			hasMoreFrames : true
+		};
+		while(_cursor.hasMoreFrames){
+				_frame.call(this,callback, _cursor);
+	 	}
+	};
+
+	var _frame = function _frame(callback, cursor){
+			callback(new FrameArrayIterator(
+					this.data , cursor.position + this.size > this.data.length
+								? Math.max(this.data.length - this.size,0)
+								: cursor.position
+							  , cursor.position + this.size
+							  , this.fn), ++cursor.frameCount);
+		 cursor.hasMoreFrames = cursor.position + this.size < this.data.length;
+		 //move frame
+		 cursor.position+=this.step;
 	};
 
 
@@ -275,7 +343,7 @@ definition:function(sjs){
 
 	};
 
-	var _frame = function(){
+	var _frame_old = function(){
 		if (this.cursor < 0 || !this.hasMore()) return [];
 
 		var cursor = Math.min(this.cursor, this.data.length - this.size);
@@ -547,6 +615,9 @@ definition:function(sjs){
 			},
 			next:function(callback){
 				return i.next(callback);
+			},
+			frame:function frame(size,step,callback){
+				return data(new FrameIterator(i.current(),size,step,callback));	
 			},
 			current: function current(){
 				return i.current();

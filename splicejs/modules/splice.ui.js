@@ -75,7 +75,6 @@ definition:function(){
 	};
 	
 	UIControl.prototype.changeState = function(args){
-		debug.log('Changing button\'s state');
 		if(args && args.isHidden)
 			this.hide();
 		else 
@@ -87,18 +86,20 @@ definition:function(){
 		this.onDataIn(this.dataItem);
 	};
 	
-	UIControl.prototype.dataOut = Event;
+	UIControl.prototype.dataOut  = Event;
 	UIControl.prototype.onDataIn = Event;
-
+	UIControl.prototype.onReflow = Event;
+	
 	/**
 	 * Called by the layout manager or a parent view when container dimensions changed and
 	 * layout update is required
 	 * @param {position: {left:{number}, top:{Number}}} - top left corner position
 	 * @param {size: {width:{Number}, height:{Number}}} - parent container' dimensions
 	 * */
-/*
-	UIControl.prototype.onReflow = _.Event;
 	UIControl.prototype.reflow = function(position,size,bubbleup){
+		if(!this.concrete || !this.concrete.dom) return;
+
+		if(this.layout === 'css') return;
 
 		if(bubbleup == true) {
 			this.reflowChildren(null,null,bubbleup);
@@ -128,45 +129,8 @@ definition:function(){
 			this.children[i].reflow(position,size,bubbleup);
 		}
 	};
-*/
-
-	UIControl.prototype.applyCSSRules = function(){}
-	UIControl.prototype.applyCSSRules_NOOP = function(key, override){
-		var scope = this.scope, 
-			localRules = null, 
-			overrideRules = null;
-
-		localRules = scope.cssrules[0];
-
-		if(this.templateCSS) {
-			localRules = scope.cssrules[0][this.templateCSS];
-		}
-		
-		if(this.css && this.parentscope) {
-			overrideRules = this.parentscope.cssrules[0][this.css];
-		}
 
 
-		if(!localRules && !overrideRules) return;
-			
-		//apply local CSS rules :)
-		var dom = this.concrete.dom;
-		dom.id = 'SJS_CURRENT_CSS_TARGET'
-		var pseudo = dom.parentNode; 
-
-		if(!pseudo) {
-			pseudo = document.createElement('span');
-			pseudo.appendChild(this.concrete.dom);
-		}
-
-		if(localRules && localRules.length > 0)
-			_.CSS.applyRules(localRules, pseudo, dom.id);
-
-		if(overrideRules && overrideRules.length > 0)
-			_.CSS.applyRules(overrideRules, pseudo, dom.id);
-
-		dom.removeAttribute('id');
-	};
 
 	//returns zero or a value
 	function z(n){

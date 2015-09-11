@@ -100,19 +100,26 @@ sjs({
 		
 		console.log(bi.current());
 		
-		
 		sjs.load([{'Applets':'{sjshome}/modules/splice.controls/splice.controls.buttons.js'}])(
 			function(){
-				
 				var v = new scope.Applets.Button();
 				console.log(v);	
 			}
 		);
+
+
+		data(100).to(function(v,k,i){}).array()
 		
+		
+		data(100).frame().next(function(v,k,i){
+			while(v.next(function(v,k,i){
+				console.log(v);
+			}));
+		});		
+		
+		data('data.svc/somehting').frame().next()
 	
 	}
 });
 
-var button = new (sjs('buttons.js')().Button)();
-console.log(button);
 

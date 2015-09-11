@@ -15,15 +15,16 @@ definition:function(){
 	,	Class = this.sjs.Class
 	,	Event = this.sjs.Event;
 	
-	var UIControl = scope.SpliceJS.UI.UIControl;
-
+	var UIControl = scope.SpliceJS.UI.UIControl
+	,	format = scope.Text.format;
+	
 	var DatePicker = Class.extend(UIControl)(function DatePickerController(){
-		UIControl.call(this);
+		this.super();
 		
 		var date = new Date();
 
 		if(this.format){
-			date = _.Text.format('{0:'+this.format+'}',date);
+			date = format('{0:'+this.format+'}',date);
 		}
 
         //listen for date updates from outside
@@ -49,15 +50,12 @@ definition:function(){
 	    if (!date) return;
 
 	    if (this.format) {
-	        date = _.Text.format('{0:' + this.format + '}', date);
+	        date = format('{0:' + this.format + '}', date);
 	    }
 
 	    this.ref.selector.dataIn(date);
 	}
 
-
-	//override reflow call from parent componenets
-	DatePicker.prototype.reflow = function(){};
 
     // fires when date has been selected
 	DatePicker.prototype.onDateSelected = Event;

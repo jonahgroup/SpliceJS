@@ -1,13 +1,11 @@
-<sjs-component sjs-type="DatePicker" sjs-controller="DataPickerController" sjs-export>
-	<sjs-include sjs-type="SpliceJS.Controls.DropDownSelector">
-	{	ref:'selector',
-        content:{
+<sjs-component sjs-type="DatePicker" sjs-controller="DatePickerController" sjs-export>
+	<sjs-include sjs-type="SpliceJS.Controls.DropDownSelector" sjs-ref="selector">
+	{	
             dropDownItem:
             <sjs-include sjs-type="SpliceJS.Controls.Calendar">
                 {onDateSelected: binding('receiveFromCalendar').type('DatePicker')}
             </sjs-include>
-        },
-		dataIn: binding('onDateSelected').parent,
+            ,dataIn: binding('onDateSelected').parent,
 	}
 	</sjs-include>
 </sjs-component>
