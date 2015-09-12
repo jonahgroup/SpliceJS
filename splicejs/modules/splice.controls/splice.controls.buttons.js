@@ -178,6 +178,10 @@ definition:function(){
 	TextField.prototype.clear = function(){
 		this.elements.root.value = '';
 	};
+	
+	TextField.prototype.focus = function(){
+		this.elements.root.focus();	
+	};
 
 
 	//returning exports

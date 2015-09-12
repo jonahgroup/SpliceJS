@@ -293,10 +293,8 @@ definition:function(){
 			cell.row = cellPosition.row; //at least a single row
 		}
 
-
 		this.reflow(cell.index);
-
-		debug.log('row:' + args.row + ' col:' + args.col)
+		
 	};
 
 	GridLayout.prototype.reflow = function(cellIndex){

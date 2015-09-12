@@ -136,15 +136,14 @@ var sjs = (function(window, document){
 		};
 	}
 	
-	
-	
 	var tempBodyContent = '';
 	var progressLabel = null;
 	function showPreloader(){
 		if(window.SPLICE_SUPPRESS_PRELOADER) return;
 		tempBodyContent = document.body.innerHTML;
-		document.body.innerHTML = 
-		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:0.7em; color:#101010;">'+
+		document.body.style.backgroundColor = "#222222";
+		document.body.innerHTML =
+		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:1.2em; color:#fefefe; background-color:#222222;">'+
 		'<div style="position:relative; top:-20px">'+
 			'<div style="display:inline;"><img style="vertical-align:middle;" src="'+configuration.SPLICE_HOME+'/resources/images/bootloading.gif"/></div>'+
 			'<div style="display:inline; padding-left:1em;"><span></span></div>'+
@@ -868,7 +867,7 @@ UrlAnalyzer.prototype = {
 				// 2. imports lookup	
 				if(!vartype) vartype = scope.lookup(this.vartype);
 				// 3. target not found
-				if(!vartype) throw 'Unable to resolve binding target type';
+				if(!vartype) throw 'Unable to resolve binding target type:' + this.vartype;
 				
 				while(parent) {
 					if(parent.__sjs_type__ === vartype.type) return parent;

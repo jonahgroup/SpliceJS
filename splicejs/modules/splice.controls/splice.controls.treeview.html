@@ -1,20 +1,22 @@
-<sjs-component sjs-type="TreeView" sjs-export>
+<sjs-component sjs-type="TreeView" sjs-controller="TreeViewController" sjs-export>
 	<div class="-splicejs-treeview" sjs-element="root">
-		<sjs-include type="SpliceJS.Controls.ScrollPanel">
+		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">
 		{
 			content:{
-			staticContent:'',
-			scrollContent:<sjs-include sjs-type="Tree">{
-					ref: binding('tree').type('SpliceJS.Controls.TreeView'),
-					onTreeRefresh: binding('reflow').parent
-				}</sjs-include>		
+				staticContent:'',
+				scrollContent:
+				<sjs-include sjs-type="Tree" sjs-ref="binding('tree').type('TreeView')">
+					{
+						onTreeRefresh: binding('reflow').parent
+					}
+				</sjs-include>		
 			}
 		}
 		</sjs-include>
 	</div>
 </sjs-component>
 
-<sjs-component sjs-type="Tree" sjs-export>
+<sjs-component sjs-type="Tree" sjs-controller="TreeController" sjs-export>
 	<ul class="-splicejs-tree-root" sjs-element="treeRoot">@children</ul>
 </sjs-component>
 

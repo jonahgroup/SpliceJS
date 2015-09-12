@@ -20,7 +20,7 @@ definition:function(){
 	});
 
 
-	var Tree = Class.extend(UIControl)(function Tree(){
+	var Tree = Class.extend(UIControl)(function TreeController(){
 		this.super();
 		
 		this.onDataIn.subscribe(function(data){
