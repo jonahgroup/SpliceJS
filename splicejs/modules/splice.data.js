@@ -169,12 +169,8 @@ definition:function(sjs){
 		this.page = 0;
 		
 		// assumes iterator length is known, may not always be the case		 
-		var pages = Math.floor(source.length / pagesize) +
+		this.length = Math.floor(source.length / pagesize) +
 			( (source.length % pagesize)?1:0 );
-			
-		this.pages = pages;	
-		this.length = pages;	
-	
 	});
 	
 	// in context of paging iterator start, end boundary indicates pages
@@ -194,7 +190,7 @@ definition:function(sjs){
 		if(typeof callback === 'function') 
 			callback(this.fn(this));
 		this.page++;
-		if(this.page >= this.pages) return false;
+		if(this.page >= this.length) return false;
 		return true;		
 	};
 	
