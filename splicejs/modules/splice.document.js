@@ -207,6 +207,34 @@ definition:function(sjs){
 		}
 	};
 
+	function _box(element){
+		
+		var css = window.getComputedStyle(element,null);
+			
+		var w  = css.getPropertyValue('width')
+		,	h  = css.getPropertyValue('height')
+		,	pl = css.getPropertyValue('padding-left')
+		,	pt = css.getPropertyValue('padding-top')  
+		,	pr = css.getPropertyValue('padding-right')
+		,	pb = css.getPropertyValue('padding-bottom')
+		,  	bl = css.getPropertyValue('border-left-width')
+		,	bt = css.getPropertyValue('border-top-width')
+		,	br = css.getPropertyValue('border-right-width')
+		,	bb = css.getPropertyValue('border-bottom-width')
+		,	ml = css.getPropertyValue('margin-left')
+		,	mt = css.getPropertyValue('margin-top')
+		,	mr = css.getPropertyValue('margin-right')
+		,	mb = css.getPropertyValue('margin-bottom');
+		
+		return {
+			height:	h,
+			width:	w,	
+			padding: {left:pl, top:pt, right:pr, bottom:pb},
+			border:  {left:bl, top:bt, right:br, bottom:bb},
+			margin:  {left:ml, top:mt, right:mr, bottom:mb}
+		}	
+	};
+
 	function dom(element){
 		if(!element) return null;
 		return {
@@ -247,6 +275,10 @@ definition:function(sjs){
 				return dom(null);
 			},
 			"class":classOp(element),
+			
+			box: function(){
+				return _box(element);
+			},
 			
 			element:element
 		}	

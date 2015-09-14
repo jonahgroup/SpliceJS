@@ -42,6 +42,7 @@ definition:function(sjs){
 	*/
 	function Iterator(callback){
 		this.fn = (typeof callback === 'function') ? callback : function(item){return item;};
+		this.length = 0;
 	};
 
 	//returns array
@@ -53,10 +54,17 @@ definition:function(sjs){
 		return result;
 	};
 
-	Iterator.prototype.iterate = function(callback){
-		throw "Abstract method: Iterator.prototype.iterate(fn) implementation is not provided";
+	Iterator.prototype.iterate = function(callback, start, end){
+		throw "Abstract method: Iterator.prototype.iterate(callback) implementation is not provided";
 	};
-
+	
+	Iterator.prototype.next = function(callback){
+		throw "Abstract method: Iterator.prototype.next(callback) implementation is not provided";
+	};
+	
+	Iterator.prototype.to = function(position){
+		throw "Abstract method: Iterator.prototype.to(position) implementation is not provided";	
+	};
 
 	/**
 	 *
@@ -65,7 +73,9 @@ definition:function(sjs){
 		this.super(callback);
 		this.n = n;
 		this.position = 0;
+		this.length = n;
 	});
+
 
 	/**
 	 * Returns false when last item is reached
@@ -78,20 +88,27 @@ definition:function(sjs){
 	};
 
 
-	NumericIterator.prototype.iterate = function(callback){
+	NumericIterator.prototype.iterate = function(callback,start,end){
 		callback = callback ? callback : function(){};
+		var _start 	= 0
+		,	_end 	= this.n; 
 
-		for(var i=0; i<this.n; i++){
+		if(start) {	_start = start;	}
+		if(end) {_end = end;}
+
+		for(var i = _start; i < _end; i++){
 			callback(this.fn(i));
 		}
 	};
+	
 
 	/**
-	 *
+	 * Wraps callback around target iterator
 	 */
 	var NestedIterator = Class.extend(Iterator)(function NestedIterator(iterator,callback){
 		this.super(callback);
 		this.iterator = iterator;
+		this.length = iterator.length;
 	});
 
 	NestedIterator.prototype.next = function(callback){
@@ -101,13 +118,14 @@ definition:function(sjs){
 		});
 	};
 
-	NestedIterator.prototype.iterate = function(callback){
+	NestedIterator.prototype.iterate = function(callback,start,end){
 		var self = this;
 		this.iterator.iterate(function(){
 			arguments[0] = self.fn.apply(self,arguments);
 			callback.apply(this,arguments);
-		});
+		}, start, end);
 	};
+
 
 	/**
 	 * Iterates over array elements
@@ -116,24 +134,74 @@ definition:function(sjs){
 		this.super(callback);
 		this.array = array;
 		this.position = 0;
+		this.length = array.length;
 	});
 
 	ArrayIterator.prototype.next = function(callback){
 		if(this.position >= this.array.length) return false;
+
 		callback(this.fn(this.array[this.position]), this.position);
 		this.position++;
+
 		if(this.position >= this.array.length) return false;
 		return true;
 	};
 
-	ArrayIterator.prototype.iterate = function(callback){
+	ArrayIterator.prototype.iterate = function(callback,start,end){
 		if(typeof callback !== 'function') return;
-		for(var i=0; i< this.array.length; i++){
+		
+		var _start = 0
+		,	_end = this.length; 
+		
+		if(start) {_start = start;}
+		if(end) {_end  = end;}
+		
+		for(var i = _start; i < _end; i++){
 			callback(this.fn(this.array[i]),i);
 		}
 	};
 
 
+	var PagingIterator = Class.extend(Iterator)(function PagingIterator(source, pagesize,callback){
+		this.super(callback);
+		this.i = source;	
+		this.size = pagesize;
+		this.page = 0;
+		
+		// assumes iterator length is known, may not always be the case		 
+		var pages = Math.floor(source.length / pagesize) +
+			( (source.length % pagesize)?1:0 );
+			
+		this.pages = pages;	
+		this.length = pages;	
+	
+	});
+	
+	// in context of paging iterator start, end boundary indicates pages
+	// if present for paring iterator these arguments are ignored 
+	PagingIterator.prototype.iterate = function(callback, start, end){
+
+		if(typeof callback !== 'function') return;
+		
+		var _start = this.page * this.size
+		,	_end = _start + this.size;
+		
+		this.i.iterate(callback,_start,_end);		
+		
+	};
+	
+	PagingIterator.prototype.next = function(callback){
+		if(typeof callback === 'function') 
+			callback(this.fn(this));
+		this.page++;
+		if(this.page >= this.pages) return false;
+		return true;		
+	};
+	
+	PagingIterator.prototype.to = function(page){
+		this.page = page;
+		return this;
+	};
 
 
 	/**
@@ -242,7 +310,7 @@ definition:function(sjs){
 		this.currentPage = -1;
 
 		this.maxPage = Math.floor(this.data.length / pageSize) +
-			( (this.data.length % pageSize) / (this.data.length % pageSize)) ;
+			( (this.data.length % pageSize)?1:0);
 
 		this.minPage = -1;
 
@@ -607,8 +675,11 @@ definition:function(sjs){
 
 
 		return {
-			to:	function to(callback){
-				return data(new NestedIterator(i, callback));
+			length: i.length,
+			to:	function to(){
+				if(typeof arguments[0] === 'function') 
+					return data(new NestedIterator(i, arguments[0]));
+				return data(i.to.apply(i,arguments));
 			},
 			each:function(callback){
 				i.iterate(callback);
@@ -624,6 +695,9 @@ definition:function(sjs){
 			},
 			array:function current(){
 				return i.current();
+			},
+			page:function page(size){
+				return data(new PagingIterator(i,size,function(item){return data(item);}))
 			},
 			asyncloop	:function(callback, pageSize){return function(oncomplete, onint){
 						return asyncIterator(d, callback, pageSize, oncomplete, onint);}

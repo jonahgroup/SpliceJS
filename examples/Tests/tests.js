@@ -108,17 +108,29 @@ sjs({
 		);
 
 
-		data(100).to(function(v,k,i){}).array()
+		var i = data(100).to(function(v,k,i){})
+		console.log(i.length);
+		
+		var p = data(data(100).array()).page(10).to(function(item){return item/2;});
+		
+		console.log(p.array());
 		
 		
-		data(100).frame().next(function(v,k,i){
+		//p.next();		
+		// while(p.next(function(item){
+		// 	var a = item.array();
+		// 	console.log(a);
+		// }));
+		
+		/*
+		data(100).to().frame().next(function(v,k,i){
 			while(v.next(function(v,k,i){
 				console.log(v);
 			}));
 		});		
 		
 		data('data.svc/somehting').frame().next()
-	
+		*/
 	}
 });
 

@@ -7,12 +7,13 @@ required:[
 	'splice.controls.scrollpanel.html'
 ],
 
-definition:function(){
-	var sjs = this.sjs;
+definition:function(sjs){
+	
 
-	var Class 		= this.sjs.Class
-	, 	isTouch 	= this.sjs.config.platform.IS_TOUCH_ENABLED
-	, 	isMobile 	= this.sjs.config.platform.IS_MOBILE;
+	var Class 		= sjs.Class
+	,	Event 		= sjs.Event
+	, 	isTouch 	= sjs.config.platform.IS_TOUCH_ENABLED
+	, 	isMobile 	= sjs.config.platform.IS_MOBILE;
 	
 	var	select = this.scope.Doc.select
 	,	create = this.scope.Doc.create
@@ -39,6 +40,10 @@ definition:function(){
 		/* Current scroll offset */
 		this.currentScrollTop = 0;
 
+		/* scroll content by default */
+		this.isScrollClient = true;
+
+
 		/* Setup touch events on touch enabled platforms */
 		if(isTouch && !isMobile){
 
@@ -54,6 +59,7 @@ definition:function(){
 
 	});
 	
+	ScrollPanel.prototype.onScroll = Event;
 
 	ScrollPanel.prototype.display = function(){
 		this.reflow();
@@ -149,7 +155,7 @@ definition:function(){
 		if(!parent) return;
 		
 		parent.style.overflow = 'hidden';
-		
+		var self = this;
 		var client = this.elements.scrollClient;
 		var staticContainer = this.elements.staticContainer;
 		
@@ -267,12 +273,18 @@ definition:function(){
 				if(t <=10) t = 10;
 				if((thumbSizes.vertical.size + t) > size.height - 20) t = size.height - thumbSizes.vertical.size - 10;
 				
-				client.scrollTop = (t-10)*scale;
+				//!!!!whats with the magic number??? rework.
+				var scrollPosition = (t-10)*scale;
 				
-				// keep scrolling thumbs in their positions
+				//some scroll panel including controls may not want automatic client scroll
+				if(self.isScrollClient) {
+					client.scrollTop = scrollPosition;
+					// keep scrolling thumbs in their positions
+					//thumb.horizontal.style.bottom = (-1*parent.scrollTop + 10 ) + 'px';
+				}
+
 				thumb.vertical.style.top =  (parent.scrollTop + t) + 'px';
-				//thumb.horizontal.style.bottom = (-1*parent.scrollTop + 10 ) + 'px';
-				
+				self.onScroll(scrollPosition);
 			};
 		};
 		
@@ -299,6 +311,8 @@ definition:function(){
 				// keep scrolling thumbs in their positions
 				thumb.horizontal.style.left =  (parent.scrollLeft + t) + 'px';
 				//thumb.vertical.style.right =  (-1*parent.scrollLeft + 10) + 'px';
+				
+				self.onScroll();
 			};
 		};
 		
@@ -326,10 +340,6 @@ definition:function(){
 	}; //end attach scrollbars
 
 	//module exports
-	return {
-		controllers : {
-			ScrollPanel:ScrollPanel	
-		}
-	}
+	
 
 }});

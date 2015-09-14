@@ -49,6 +49,10 @@ definition:function(){
 		//get body and header tables, they may be one and same table
 		this.bodyTable = this.ref.body.elements.table;
 		this.headTable = this.ref.head.elements.table;
+		
+		//scroll panel reference, to configure scrolling parameters
+		this.scrollPanel = this.ref.scrollPanel;
+
 
 		this.sortTrigger = new scope.templates['SortTrigger']();
 
@@ -197,7 +201,7 @@ definition:function(){
 			//this.pageNext();
 		},this);
 		
-		
+		//!!!!! TODO: review reflow model
 		Event.attach(window, 'onresize').subscribe(function(){this.reflow();},this);
 		
 		this.onHeadClick = Event.attach(this.headTable,'onmousedown');
@@ -205,6 +209,11 @@ definition:function(){
 		
 		this.onHeadClick.subscribe(handlerHeadClick,this);
 		this.onBodyClick.subscribe(handlerBodyClick,this);
+		
+		this.scrollPanel.isScrollClient = false;
+		this.scrollPanel.onScroll.subscribe(function(args){
+			console.log(args);
+		},this);
 	};
 
 
@@ -261,13 +270,15 @@ definition:function(){
 		
 		return {
 			headers:headers, 
-			data:data(records).to().current()//page(this.pageSize).to(this.pageCurrent).current,
+			data:data(records).page(this.pageSize).to(this.pageCurrent).array(),
 		};
 	};
 	
 	
 	function applyFrame(source){
-			return source;
+		
+		
+		return source;
 	};
 	
 	
@@ -442,6 +453,9 @@ definition:function(){
 		for(var i= row.size(); i < nodes.length; i++){
 			row.append(create('td').append(nodes[i]));
 		}
+		
+		var b = row.box();
+		console.log(b);
 	};
 	
 

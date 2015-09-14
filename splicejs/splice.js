@@ -141,7 +141,7 @@ var sjs = (function(window, document){
 	function showPreloader(){
 		if(window.SPLICE_SUPPRESS_PRELOADER) return;
 		tempBodyContent = document.body.innerHTML;
-		document.body.style.backgroundColor = "#222222";
+		
 		document.body.innerHTML =
 		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:1.2em; color:#fefefe; background-color:#222222;">'+
 		'<div style="position:relative; top:-20px">'+
