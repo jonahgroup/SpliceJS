@@ -16,16 +16,15 @@ body {
 
 .sample-table.-sjs-datatable .-sjs-table th {
 
-    background-color: #274239;
-    color: #fefefe;
-	font-size:0.9em;
-	border: 1px solid #37564C;
+  background-color: #2B2C2C;
+  color: #fefefe;
+  font-size: 0.9em;
+  border: 1px solid #424242;
 }
 .sample-table.-sjs-datatable .-sjs-table th:hover {
-    background-color: #222222;
+    background-color: #303030;
+	border: 1px solid #303030;
 }
-
-
 
 .sample-table.-sjs-datatable .-sjs-scrollpanel .static  {
 	height:50px;

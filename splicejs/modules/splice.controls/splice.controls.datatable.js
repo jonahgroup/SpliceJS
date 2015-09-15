@@ -271,7 +271,7 @@ definition:function(){
 		
 		return {
 			headers:headers, 
-			data:data(records).page(this.pageSize).to(this.pageCurrent)
+			data:data(records)//.page(this.pageSize).to(this.pageCurrent)
 		};
 	};
 	
@@ -341,13 +341,16 @@ definition:function(){
 		
 	};
 
-
+	var n = 0;
 	function renderTable(){
 		
 		
 		
-		var data 	= this.dataSteps.render.data.data
+		var data 	= this.dataSteps.render.data.data.frame(50,1).to(n++)
 		, 	headers = this.dataSteps.render.data.headers;
+		
+		
+		console.log(data.length);
 		
 		measureClient.call(this, data.length);
 		
@@ -374,23 +377,29 @@ definition:function(){
 		addHeadRow(this.headTable, nodes);
 		
 		
-		var rows_update = data.frame(Math.min(this.dataRows.length?this.dataRows.length:0,data.length),1);
-		var rows_create = data.frame(data.length - this.dataRows.length,1);
 		
-		console.log('updating rows');
-		rows_update.each(function(v,k,i){
-			console.log(v);
-		});
+		var rows_update = data.range(0, Math.min(this.dataRows.length?this.dataRows.length:0,data.length));
+		var rows_create = data.range(this.dataRows.length, data.length - this.dataRows.length);
+		
+		
+		var data_row = '';
+		rows_update.each((function(v,k,i){
+			data_row = this.dataRows[i];
+			data_row.dataIn(v);	
+			addBodyRow(this.bodyTable, data_row.getNodes(), i);
+		}).bind(this));
 		
 
-		var data_row = '';
+		
+
 		//update existing rows
+		/*
 		for(var i=0; i < this.dataRows.length && i < data.length; i++) {
 			data_row = this.dataRows[i];
 			data_row.dataIn(data[i]);	
 			addBodyRow(this.bodyTable, data_row.getNodes(), i);
 		}
-
+		*/
 		
 		/* create new rows*/
 		/*
@@ -421,7 +430,7 @@ definition:function(){
 			data_row = new this.bodyRowTemplate({parent:this, columnCount});
 			this.dataRows.push(data_row);
 			data_row.dataIn(v);
-			addBodyRow(this.bodyTable, data_row.getNodes(), i+drl);
+			addBodyRow(this.bodyTable, data_row.getNodes(), i);
 			
 		}).bind(this));
 		

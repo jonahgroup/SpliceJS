@@ -37,6 +37,13 @@ definition:function(sjs){
 		}
 	};
 
+
+	function isIn(value, start,end){
+		if(value == null) return false;
+		if(value >= start && value <= end) return true;
+		return false;	
+	};
+
 	/*
 		Iterator
 	*/
@@ -213,11 +220,11 @@ definition:function(sjs){
 	/** 
 	 * Creates frame view of the source iterator	
 	 */
-	 var FrameXIterator = Class.extend(Iterator)(function FameXIterator(source, size, step, callback){
+	 var FrameXIterator = Class.extend(Iterator)(function FrameXIterator(source, size, step, callback){
 		this.super(callback);
 		this.i = source;
 		
-		this.length = source.length;
+		this.length = size;
 		this.step = step; this.size = size; this.position = 0; 
 	 
 	 	this.steps = Math.floor(this.length / this.step) + ((this.length % this.step)?1:0);
@@ -228,8 +235,11 @@ definition:function(sjs){
 	 FrameXIterator.prototype.iterate = function(callback, start, end){
 	 	 if(typeof callback !== 'function') return;
 		 
-		 var _start = this.position * this.step;
-		 var _end = _start + this.size;
+		 var _start = _s = this.position * this.step;
+		 var _end = _e = _start + this.size;
+		 
+		 if( isIn(start, _s, _e-1)) _start = start;
+		 if( isIn(end, _s, _e-1)) _end = end; 
 		 
 		 this.i.iterate(callback,_start,_end);		 
 	 };
@@ -246,6 +256,35 @@ definition:function(sjs){
 		 this.position = frameNo;
 		 return this;
 	 };
+	 
+	 /** 
+	  *	Breaks up collection into ranges 
+	  */
+	var RangeIterator = Class.extend(Iterator)(function RangeIterator(source, start, size, callback){
+		this.super(callback);
+		this.length = size;
+		this.i = source;
+		
+	 	this.start = start;
+		this.end = start + size;	  
+	});
+
+	 
+	RangeIterator.prototype.iterate = function(callback, start, end){
+		var _start = this.start
+		,	_end = this.end;
+		
+		if( isIn(start, this.start, this.end) )
+			_start = start;
+		
+		if(isIn(end, this.start, this.end))
+			_end = end;
+			
+		this.i.iterate(function(v,k,i){
+			callback(v,k,i+_start);
+		},_start,_end);	
+	}
+	 
 	 
 
 	/**
@@ -744,7 +783,9 @@ definition:function(sjs){
 				return data(new PagingIterator(i,size,function(item){return data(item);}))
 			},
 			
-			split:'new function here',
+			range:function range(start, end){
+				return data(new RangeIterator(i,start,end))
+			},
 			
 			asyncloop	:function(callback, pageSize){return function(oncomplete, onint){
 						return asyncIterator(d, callback, pageSize, oncomplete, onint);}

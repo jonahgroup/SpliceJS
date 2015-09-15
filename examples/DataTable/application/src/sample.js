@@ -48,6 +48,7 @@ sjs({
 					});
 				}, this);	
 				
+				
 				this.onClearFilter.subscribe(this.onFilterData,this);
 				this.onClearFilter.subscribe(function(){
 					this.ref.searchButton.hide();
