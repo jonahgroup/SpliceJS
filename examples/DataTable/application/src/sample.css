@@ -36,9 +36,10 @@ body {
 
 
 .sample-table.-sjs-datatable .-sjs-table td {
-	
-	border:1px solid #cecece;
-	padding-left:1em; padding-right: 1em;
+    color: #A5A5A5;
+    border: 1px solid #353535;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 .sample-table.-sjs-datatable .-search-result-highlight {
