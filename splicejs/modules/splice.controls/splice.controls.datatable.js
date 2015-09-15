@@ -33,6 +33,7 @@ definition:function(){
 	var	Doc 		= scope.Doc 
 	,	create 		= scope.Doc.create
 	,	dom 		= scope.Doc.dom
+	,	cssvalue 	= scope.Doc.cssvalue 
 	,	data 		= scope.Data.data
 	,	fdata 		= scope.Data.data
 	,	compare 	= scope.Data.compare.default
@@ -212,7 +213,7 @@ definition:function(){
 		
 		this.scrollPanel.isScrollClient = false;
 		this.scrollPanel.onScroll.subscribe(function(args){
-			console.log(args);
+			renderTable.call(this);	
 		},this);
 	};
 
@@ -270,7 +271,7 @@ definition:function(){
 		
 		return {
 			headers:headers, 
-			data:data(records).page(this.pageSize).to(this.pageCurrent).array(),
+			data:data(records).page(this.pageSize).to(this.pageCurrent)
 		};
 	};
 	
@@ -328,11 +329,27 @@ definition:function(){
 	};
 
 
+	function measureClient(recordCount){
+		
+		//1. measure client area
+		var box = dom(this.scrollPanel.elements.scrollClient).box();
+		var client_height = cssvalue(box.height);	
+	};
+	
+	
+	function measureRecordSet(){
+		
+	};
+
+
 	function renderTable(){
+		
 		
 		
 		var data 	= this.dataSteps.render.data.data
 		, 	headers = this.dataSteps.render.data.headers;
+		
+		measureClient.call(this, data.length);
 		
 		var columnCount = headers.length;
 		
@@ -356,6 +373,16 @@ definition:function(){
 		// add nodes to the table head
 		addHeadRow(this.headTable, nodes);
 		
+		
+		var rows_update = data.frame(Math.min(this.dataRows.length?this.dataRows.length:0,data.length),1);
+		var rows_create = data.frame(data.length - this.dataRows.length,1);
+		
+		console.log('updating rows');
+		rows_update.each(function(v,k,i){
+			console.log(v);
+		});
+		
+
 		var data_row = '';
 		//update existing rows
 		for(var i=0; i < this.dataRows.length && i < data.length; i++) {
@@ -376,6 +403,7 @@ definition:function(){
 		*/
 		
 		var drl = this.dataRows.length;
+		/*
 		fdata( data.length - this.dataRows.length ).asyncloop((function(j){
 			j = j + drl;
 			data_row = new this.bodyRowTemplate({parent:this, columnCount});
@@ -384,6 +412,19 @@ definition:function(){
 			addBodyRow(this.bodyTable, data_row.getNodes(), j);
 		
 		}).bind(this),70)();
+*/
+
+
+		console.log('creating new rows');
+		rows_create.each((function(v,k,i){
+			
+			data_row = new this.bodyRowTemplate({parent:this, columnCount});
+			this.dataRows.push(data_row);
+			data_row.dataIn(v);
+			addBodyRow(this.bodyTable, data_row.getNodes(), i+drl);
+			
+		}).bind(this));
+		
 		
 		
 		/* remove extra rows */
@@ -453,12 +494,8 @@ definition:function(){
 		for(var i= row.size(); i < nodes.length; i++){
 			row.append(create('td').append(nodes[i]));
 		}
-		
-		var b = row.box();
-		console.log(b);
+		return row;
 	};
-	
-
 
 	DataTable.prototype.reflow = function(){
 		/* user offsetWidth it included border sizes */

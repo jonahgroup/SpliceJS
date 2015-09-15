@@ -154,7 +154,7 @@ definition:function(sjs){
 
 	
 		var x = this.x = d3.scale.ordinal()
-			.domain(data(this.dM.count).to().current())
+			.domain(data(this.dM.count).array())
     		.rangeRoundBands([0, width]);
 
     	/*

@@ -234,6 +234,10 @@ definition:function(sjs){
 			margin:  {left:ml, top:mt, right:mr, bottom:mb}
 		}	
 	};
+	
+	function _unit(cssValue){
+		return  cssValue.substring(0,cssValue.length - 2);		
+	};
 
 	function dom(element){
 		if(!element) return null;
@@ -279,7 +283,6 @@ definition:function(sjs){
 			box: function(){
 				return _box(element);
 			},
-			
 			element:element
 		}	
 	};
@@ -320,7 +323,8 @@ definition:function(sjs){
 		},
 		window:{},
 		create:create,
-		dom:dom,
+		dom	: dom,
+		cssvalue : _unit
 		
 	}
 

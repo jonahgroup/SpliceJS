@@ -2814,6 +2814,13 @@ UrlAnalyzer.prototype = {
 	function listModules(){
 		return MODULE_MAP;	
 	};
+	
+	function measureRuntime(fn){
+		var start = window.performance.now();
+		fn();
+		var end = window.performance.now();
+		return end - start;
+	};
 
 
 /*
@@ -2878,11 +2885,13 @@ UrlAnalyzer.prototype = {
 			absPath : absPath,
 			getPath : getPath,
 			display : display,
-			close : close,
+			close 	: close,
 			endswith:endsWith,
-			mixin: mixin,
+			mixin	: mixin,
 			binding : binding,
-			proxy:proxy,
+			proxy	:proxy,
+			
+			timing	:	measureRuntime,
 						
 			load	: include,		
 			include : include,

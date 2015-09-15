@@ -66,7 +66,7 @@ sjs({
 		var data = this.scope.Data.data;
 		
 		console.log("----- numeric iterator -----");
-		var result = data(10).to().current();
+		var result = data(10).array();
 		console.log(result);
 		
 		var si = data(10).to(function(item){return item%2;}).to(function(item){return item*5;});
@@ -122,13 +122,49 @@ sjs({
 		// 	console.log(a);
 		// }));
 		
-		/*
-		data(100).to().frame().next(function(v,k,i){
-			while(v.next(function(v,k,i){
-				console.log(v);
-			}));
-		});		
 		
+		var d = data(100); //wrapped array
+		var a = d.array(); //plain array
+
+		var time_each = 0; 
+		for(var i=0; i< 100; i++){		
+		time_each += sjs.timing(function(){
+			var k=0;
+			d.each(function(item){
+				k++;
+				k--;
+			});
+		});
+		}
+		time_each = time_each / 100;
+
+		var time_plain =0;
+		for(var j=0; j< 100; j++){	
+		 time_plain +=sjs.timing(function(){
+			var k=0;
+			for(var i = 0; i < a.length; i++){
+				k++; k--;
+			}
+		});
+		}
+		time_plain = time_plain / 100;
+		
+		console.log("Pl: " + Math.floor(1000*time_plain));
+		console.log("Ea: " + Math.floor(1000*time_each));
+		
+		
+		
+		
+		/*
+		while(fi.next(function(item){
+			console.log(item.array());		
+		}));
+		console.log(fi.array());
+		*/
+		
+
+		
+		/*
 		data('data.svc/somehting').frame().next()
 		*/
 	}

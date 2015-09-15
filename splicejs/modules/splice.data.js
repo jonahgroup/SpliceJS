@@ -153,24 +153,30 @@ definition:function(sjs){
 		var _start = 0
 		,	_end = this.length; 
 		
-		if(start) {_start = start;}
-		if(end) {_end  = end;}
+		if(start != null) {_start = start;}
+		if(end != null) {_end  = end;}
 		
 		for(var i = _start; i < _end; i++){
-			callback(this.fn(this.array[i]),i);
+			callback(this.fn(this.array[i]),i,i);
 		}
 	};
 
-
+	/*
+		Creates paged view of the source iterator
+	*/
 	var PagingIterator = Class.extend(Iterator)(function PagingIterator(source, pagesize,callback){
 		this.super(callback);
 		this.i = source;	
 		this.size = pagesize;
 		this.page = 0;
 		
-		// assumes iterator length is known, may not always be the case		 
-		this.length = Math.floor(source.length / pagesize) +
+		//total number of pages, used the next call		
+		this.pages = Math.floor(source.length / pagesize) +
 			( (source.length % pagesize)?1:0 );
+	
+		// assumes iterator length is known, may not always be the case		 
+		this.length = this.size;
+		
 	});
 	
 	// in context of paging iterator start, end boundary indicates pages
@@ -182,23 +188,65 @@ definition:function(sjs){
 		var _start = this.page * this.size
 		,	_end = _start + this.size;
 		
+		if(start != null) _start = start;
+		if(end != null) _end = end;
+		
 		this.i.iterate(callback,_start,_end);		
 		
 	};
-	
+	// returns true and passes itself to a callback
 	PagingIterator.prototype.next = function(callback){
 		if(typeof callback === 'function') 
 			callback(this.fn(this));
 		this.page++;
-		if(this.page >= this.length) return false;
+		if(this.page >= this.pages) return false;
 		return true;		
 	};
 	
+	//sets are new page
 	PagingIterator.prototype.to = function(page){
 		this.page = page;
 		return this;
 	};
 
+
+	/** 
+	 * Creates frame view of the source iterator	
+	 */
+	 var FrameXIterator = Class.extend(Iterator)(function FameXIterator(source, size, step, callback){
+		this.super(callback);
+		this.i = source;
+		
+		this.length = source.length;
+		this.step = step; this.size = size; this.position = 0; 
+	 
+	 	this.steps = Math.floor(this.length / this.step) + ((this.length % this.step)?1:0);
+	 
+	 });
+
+
+	 FrameXIterator.prototype.iterate = function(callback, start, end){
+	 	 if(typeof callback !== 'function') return;
+		 
+		 var _start = this.position * this.step;
+		 var _end = _start + this.size;
+		 
+		 this.i.iterate(callback,_start,_end);		 
+	 };
+	 
+	 FrameXIterator.prototype.next = function(callback){
+	 	if(typeof callback === 'function')
+			callback(this.fn(this)); 
+		this.position++;
+		if(this.position >= this.steps) return false;
+		return true;			 
+	 };
+	 
+	 FrameXIterator.prototype.to = function(frameNo){
+		 this.position = frameNo;
+		 return this;
+	 };
+	 
 
 	/**
 	 * Iterates over object properties
@@ -683,18 +731,21 @@ definition:function(sjs){
 			next:function(callback){
 				return i.next(callback);
 			},
-			frame:function frame(size,step,callback){
-				return data(new FrameIterator(i.current(),size,step,callback));	
-			},
-			current: function current(){
+			array:function(callback){
 				return i.current();
 			},
-			array:function current(){
+			frame:function frame(size,step){
+				return data(new FrameXIterator(i,size,step,function(item){return data(item);}));	
+			},
+			current: function current(){
 				return i.current();
 			},
 			page:function page(size){
 				return data(new PagingIterator(i,size,function(item){return data(item);}))
 			},
+			
+			split:'new function here',
+			
 			asyncloop	:function(callback, pageSize){return function(oncomplete, onint){
 						return asyncIterator(d, callback, pageSize, oncomplete, onint);}
 			},
