@@ -98,7 +98,6 @@ definition:function(){
 				return applySort(data,self.sortCell.index, self.sortCell.sortOrder);
 			}),
 			
-			
 			render:	new DataStep(function(data){
 				return data;
 			})
@@ -108,6 +107,8 @@ definition:function(){
 		dataSteps.source.add(dataSteps.filter).add(dataSteps.page).add(dataSteps.frame).add(dataSteps.sort).add(dataSteps.render);
 				
 		this.dataSteps = dataSteps;
+		
+		this.scrollScale = {n:0};
 				
 		initializeTable.call(this);
 
@@ -187,6 +188,7 @@ definition:function(){
 	/**
 	 *	'private' calls 
 	 */
+	var direction = 0;
 	function initializeTable(){
 		
 		//horizontal header scrolling		
@@ -196,11 +198,6 @@ definition:function(){
 				this.onScroll(eargs.source.scrollTop);
             },this);
         }
-		
-		
-		this.onScroll.subscribe(function(){
-			//this.pageNext();
-		},this);
 		
 		//!!!!! TODO: review reflow model
 		Event.attach(window, 'onresize').subscribe(function(){this.reflow();},this);
@@ -213,6 +210,13 @@ definition:function(){
 		
 		this.scrollPanel.isScrollClient = false;
 		this.scrollPanel.onScroll.subscribe(function(args){
+			//console.log(args.vector);
+			
+			if(args.vector > 0) direction = 1;
+			else direction = -1;
+			
+			this.scrollScale.n += direction;
+			
 			renderTable.call(this);	
 		},this);
 	};
@@ -271,7 +275,7 @@ definition:function(){
 		
 		return {
 			headers:headers, 
-			data:data(records)//.page(this.pageSize).to(this.pageCurrent)
+			data:records//.page(this.pageSize).to(this.pageCurrent)
 		};
 	};
 	
@@ -342,17 +346,22 @@ definition:function(){
 	};
 
 	var n = 0;
+	
 	function renderTable(){
 		
 		
 		
-		var data 	= this.dataSteps.render.data.data.frame(50,1).to(n++)
+		var data 	= this.dataSteps.render.data.data
 		, 	headers = this.dataSteps.render.data.headers;
 		
 		
-		console.log(data.length);
+		var start = this.scrollScale.n;
+		var end  = start + 100;
 		
-		measureClient.call(this, data.length);
+		
+		//console.log(data.array());
+		
+		//measureClient.call(this, data.length);
 		
 		var columnCount = headers.length;
 		
@@ -377,41 +386,25 @@ definition:function(){
 		addHeadRow(this.headTable, nodes);
 		
 		
-		
-		var rows_update = data.range(0, Math.min(this.dataRows.length?this.dataRows.length:0,data.length));
-		var rows_create = data.range(this.dataRows.length, data.length - this.dataRows.length);
-		
-		
 		var data_row = '';
-		rows_update.each((function(v,k,i){
-			data_row = this.dataRows[i];
-			data_row.dataIn(v);	
-			addBodyRow(this.bodyTable, data_row.getNodes(), i);
-		}).bind(this));
-		
-
-		
 
 		//update existing rows
-		/*
-		for(var i=0; i < this.dataRows.length && i < data.length; i++) {
+		for(var i=0; i < this.dataRows.length && i < 100; i++) {
 			data_row = this.dataRows[i];
-			data_row.dataIn(data[i]);	
+			data_row.dataIn(data[i+start]);	
 			addBodyRow(this.bodyTable, data_row.getNodes(), i);
 		}
-		*/
+		
 		
 		/* create new rows*/
-		/*
-		for(var j=this.dataRows.length; j < data.length; j++ ){
+		for(var j=this.dataRows.length; j < 100; j++ ){
 			data_row = new this.bodyRowTemplate({parent:this, columnCount});
 			this.dataRows.push(data_row);
-			data_row.dataIn(data[j]);
+			data_row.dataIn(data[j+start]);
 			addBodyRow(this.bodyTable, data_row.getNodes(), j);
 		}
-		*/
 		
-		var drl = this.dataRows.length;
+		//var drl = this.dataRows.length;
 		/*
 		fdata( data.length - this.dataRows.length ).asyncloop((function(j){
 			j = j + drl;
@@ -423,16 +416,6 @@ definition:function(){
 		}).bind(this),70)();
 */
 
-
-		console.log('creating new rows');
-		rows_create.each((function(v,k,i){
-			
-			data_row = new this.bodyRowTemplate({parent:this, columnCount});
-			this.dataRows.push(data_row);
-			data_row.dataIn(v);
-			addBodyRow(this.bodyTable, data_row.getNodes(), i);
-			
-		}).bind(this));
 		
 		
 		

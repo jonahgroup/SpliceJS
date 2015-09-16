@@ -284,7 +284,10 @@ definition:function(sjs){
 				}
 
 				thumb.vertical.style.top =  (parent.scrollTop + t) + 'px';
-				self.onScroll(scrollPosition);
+				
+				var eargs = {vector:(position.y-offset.y), position:scrollPosition, isVertical:true};
+				
+				self.onScroll(eargs);
 			};
 		};
 		
@@ -305,14 +308,17 @@ definition:function(sjs){
 				if(t <=10) t = 10;
 				if((thumbSizes.horizontal.size+t) > size.width - 20) t = size.width - thumbSizes.horizontal.size - 10;
 				
-				client.scrollLeft = (t-10)*scale;
-				staticContainer.scrollLeft = (t-10)*scale;
+				
+				var scrollPosition = (t-10)*scale;
+				
+				client.scrollLeft = scrollPosition;
+				staticContainer.scrollLeft = scrollPosition;
 				
 				// keep scrolling thumbs in their positions
 				thumb.horizontal.style.left =  (parent.scrollLeft + t) + 'px';
 				//thumb.vertical.style.right =  (-1*parent.scrollLeft + 10) + 'px';
-				
-				self.onScroll();
+				var eargs = {vector:(position.y-offset.y), position:scrollPosition, isHorizontal:true};
+				self.onScroll(eargs);
 			};
 		};
 		

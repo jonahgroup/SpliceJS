@@ -279,9 +279,10 @@ definition:function(sjs){
 		
 		if(isIn(end, this.start, this.end))
 			_end = end;
-			
+		var counter = {i:0}	
 		this.i.iterate(function(v,k,i){
-			callback(v,k,i+_start);
+			callback(v,k,counter.i+_start);
+			counter.i++;
 		},_start,_end);	
 	}
 	 

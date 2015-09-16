@@ -26,6 +26,7 @@ required:[
 ,	{'Navigation':'splice.controls/splice.controls.pageloader.js'}
 ,	{'Editors':'splice.controls/splice.controls.codeeditor.js'}
 ,	{'Buttons':  'splice.controls/splice.controls.slider.js'}
+,	{'DataControls':'splice.controls/splice.controls.treetable.js'}
 
 ]
 , 	
@@ -120,6 +121,7 @@ definition:function(sjs){
 		StretchListBox:		scope.DataControls.StretchListBox,
 		GroupedListItem:	scope.DataControls.GroupedListItem,
 		TreeView:			scope.DataControls.TreeView,
+		TreeTable:			scope.DataControls.TreeTable,
 		/* Navigation */
 		Popup:				scope.Navigation.Popup,
 		PageLoader:			scope.Navigation.PageLoader,
