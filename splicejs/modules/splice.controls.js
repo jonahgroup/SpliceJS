@@ -1,19 +1,16 @@
 /* global _ */
 sjs({
 
-required:[	
-			
+required:[
 	{'SpliceJS.UI':'splice.ui.js'}
-,	'splice.controls/splice.controls.css'
-,  	'splice.controls/splice.controls.html'
 ,	{'Controllers':'splice.controls/splice.controls.controllers.js'}
-,  	{'Buttons':'splice.controls/splice.controls.buttons.js'}
+, {'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
 ,	{'Charts':'splice.controls/splice.controls.charts.js'}
 ,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
 ,	{'DataControls':'splice.controls/splice.controls.treeview.js'}
 ,	{'Panels':'splice.controls/splice.controls.drawerpanel.js'}
-,	{'Panels':'splice.controls/splice.controls.scrollpanel.js'}	
+,	{'Panels':'splice.controls/splice.controls.scrollpanel.js'}
 ,	{'Panels':'splice.controls/splice.controls.viewpanel.js'}
 ,	{'Grids':'splice.controls/splice.controls.gridlayout.js'}
 ,	{'Charts':'splice.controls/splice.controls.d3canvas.js'}
@@ -24,12 +21,14 @@ required:[
 ,	{'Selectors':'splice.controls/splice.controls.calendar.js'}
 ,	{'Navigation':'splice.controls/splice.controls.popup.js'}
 ,	{'Navigation':'splice.controls/splice.controls.pageloader.js'}
+,	{'Navigation':'splice.controls/splice.controls.tooltip.js'}
 ,	{'Editors':'splice.controls/splice.controls.codeeditor.js'}
 ,	{'Buttons':  'splice.controls/splice.controls.slider.js'}
 ,	{'DataControls':'splice.controls/splice.controls.treetable.js'}
-
+,	'splice.controls/splice.controls.css'
+, 'splice.controls/splice.controls.html'
 ]
-, 	
+,
 definition:function(sjs){
 	"use strict";
 	var scope = this.scope;
@@ -37,17 +36,17 @@ definition:function(sjs){
 	/* imports */
 	var Class = sjs.Class
 	, 	Event = sjs.Event;
-	
-	
+
+
 	var UIControl = scope.SpliceJS.UI.UIControl;
-	
+
 
 	/*
 	 *	Image Selector
      *
 	 * */
 	var ImageSelector = Class(function ImageSelectorController(){
-		
+
 		var container = this.elements.root;
 
 		if(this.width) 	container.width = this.width;
@@ -96,7 +95,7 @@ definition:function(sjs){
 		TextField:			scope.Buttons.TextField,
 		Slider:				scope.Buttons.Slider,
 		/* panels */
-		
+
 		DrawerPanel:		scope.Panels.DrawerPanel,
 		ViewPanel:			scope.Panels.ViewPanel,
 		ScrollPanel:		scope.Panels.ScrollPanel,
@@ -104,12 +103,12 @@ definition:function(sjs){
 		Chart:				scope.Charts.Chart,
 		Dial:				scope.Charts.Dial,
 		GridLayout:         scope.Grids.GridLayout,
-        CellContainer:      scope.Grids.CellContainer,
+    CellContainer:      scope.Grids.CellContainer,
 		D3Canvas:			scope.Charts.D3Canvas,
 		Map:				scope.Maps.Map,
 		/* selectors */
 		DropDownSelector:	scope.Selectors.DropDownSelector,
-		DropDownList:		scope.Selectors.DropDownList,		
+		DropDownList:		scope.Selectors.DropDownList,
 		DatePicker:			scope.Selectors.DatePicker,
 		Calendar:			scope.Selectors.Calendar,
 		/* data controls */
@@ -118,17 +117,18 @@ definition:function(sjs){
 		ListBox:			scope.DataControls.ListBox,
 		ListItem:			scope.DataControls.ListItem,
 		ScrollableListBox:	scope.DataControls.ScrollableListBox,
-		StretchListBox:		scope.DataControls.StretchListBox,
-		GroupedListItem:	scope.DataControls.GroupedListItem,
-		TreeView:			scope.DataControls.TreeView,
-		TreeTable:			scope.DataControls.TreeTable,
+		StretchListBox:			scope.DataControls.StretchListBox,
+		GroupedListItem:		scope.DataControls.GroupedListItem,
+		TreeView:						scope.DataControls.TreeView,
+		TreeTable:					scope.DataControls.TreeTable,
 		/* Navigation */
-		Popup:				scope.Navigation.Popup,
+		Popup:					scope.Navigation.Popup,
 		PageLoader:			scope.Navigation.PageLoader,
+		ToolTip:				scope.Navigation.ToolTip,
 		/* Editors */
 		CodeEditor:			scope.Editors.CodeEditor
-		
+
 	}
 
-// end module definition		
+// end module definition
 }});

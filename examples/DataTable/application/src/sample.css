@@ -5,7 +5,7 @@ body {
 
 .sample-table.-sjs-datatable {
 	width:100%; height:100%;
-	
+
 	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 	font-size:12px;
 }
@@ -39,6 +39,7 @@ body {
     border: 1px solid #353535;
     padding-left: 1em;
     padding-right: 1em;
+		background-color: #222A2C;
 }
 
 .sample-table.-sjs-datatable .-search-result-highlight {
@@ -48,8 +49,8 @@ body {
 
 
 .sample-table.-sjs-datatable .-sjs-table tbody tr:hover {
-	background-color:#eaeaea;
-	
+	background-color: #2F2F2F;
+
 }
 
 span.-drilldown {
@@ -69,19 +70,19 @@ span.-drilldown:hover {
 .-sjs-button {
 	padding:5px;
 	padding-left:7px; padding-right:7px;
-	
+
 }
 
 
 .-sjs-paginator .page {
-	border: 1px solid #cecece;
-	color:black;
-    font-size: 0.8em;
- 	padding:9px;
-	cursor:pointer;
-	margin-right:5px;
-	padding-top:5px;
-	padding-bottom:5px;
+	border: 1px solid #2D2D2D;
+  color: rgb(128, 137, 84);
+  font-size: 0.8em;
+  padding: 9px;
+  cursor: pointer;
+  margin-right: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 .-sjs-paginator .page:hover {
 	background-color:black;
@@ -93,4 +94,4 @@ span.-drilldown:hover {
 	background-color:black;
 	border: 1px solid black;
 	color:white;
-} 
+}
