@@ -110,7 +110,7 @@ definition:function(){
 
 		this.scrollMetrics = {
 			bufferScale:0,
-			bufferSize:20
+			bufferSize:100
 		};
 
 		initializeTable.call(this);

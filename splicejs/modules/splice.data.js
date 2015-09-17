@@ -520,7 +520,7 @@ definition:function(sjs){
 		if(this instanceof Object){
 			var keys = Object.keys(this);
 			for(var i=0; i<keys.length; i++){
-				callback( keys[i],this[keys[i]]);
+				callback(this[keys[i]],keys[i]);
 			}
 		}
 		return data(this);
@@ -614,7 +614,7 @@ definition:function(sjs){
 			if(this.hasOwnProperty(keys[i])){
 				var value = this[keys[i]];
 				if(typeof onitem === 'function')
-					value = onitem(keys[i],value,i);
+					value = onitem(value,keys[i],i);
 
 				if(value == null || value == undefined) continue;
 				result.push(value);
@@ -749,7 +749,7 @@ definition:function(sjs){
 
 
 	function data(d){
-
+/*
 		var i = null;
 
 		if(typeof d === 'number') 		i = new NumericIterator(d);
@@ -793,11 +793,11 @@ definition:function(sjs){
 			},
 			sort		:function(callback){return sort.call(d,callback);}
 		}
+*/
 
 
-/*
 		var _export  = {
-			foreach		:function(callback){return forEach.call(d,callback);},
+			each		:function(callback){return forEach.call(d,callback);},
 			filter		:function(callback){return filter.call(d,callback);},
 			group		:function(callback,gfn){return groupBy.call(d,callback,gfn);},
 			first		:function(callback){return first.call(d);},
@@ -810,6 +810,7 @@ definition:function(sjs){
 			asyncloop	:function(callback, pageSize){return function(oncomplete, onint){
 							return asyncIterator(d, callback, pageSize, oncomplete, onint);}
 						},
+			array		:function(){return d;},					
 			result  	:function(){return itr.current();}
 		};
 
@@ -821,7 +822,7 @@ definition:function(sjs){
 		}
 
 		return _export;
-*/
+
 	};
 
 
