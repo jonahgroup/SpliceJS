@@ -15,10 +15,10 @@ required:[
 definition:function(sjs){
 
     var	scope = this.scope
-    
+
     var Class = sjs.Class
 	,   debug = sjs.debug;
-	
+
 	var	D3Canvas = scope.SpliceJS.Controls.D3Canvas
     ,   data = scope.Data.data;
 
@@ -32,7 +32,7 @@ definition:function(sjs){
 		left:30,top:20, right:10, bottom:20
 	};
 
-	
+
 	var Chart = Class.extend(D3Canvas)(function ChartController(){
 		this.super();	//call parent constructor
 
@@ -47,9 +47,9 @@ definition:function(sjs){
 
 			this.measureData(this.d3);
 			this.render(this.d3);
-		
+
 		}, this);
-		
+
 
 		//subscribe to onAttach event, update chat dimensions
 		this.onAttach.subscribe(this.attach, this);
@@ -71,7 +71,7 @@ definition:function(sjs){
 
 
 		/*
-			dimensions are only valid when element is 
+			dimensions are only valid when element is
 			attached the DOM tree
 			of the outermost container
 		*/
@@ -81,13 +81,13 @@ definition:function(sjs){
 
 
 		this.reflow(this.width, this.height);
-		
-		
+
+
 	}
 
 
 	Chart.prototype.reflow = function(width, height){
-		
+
 
 		this.width = this.elements.root.clientWidth;
 		this.height = this.elements.root.clientHeight;
@@ -95,11 +95,11 @@ definition:function(sjs){
 		if(this.width <= 0) return;
 		if(this.height <= 0) return;
 
-		//var s = this.elements.root.style;		
-		
+		//var s = this.elements.root.style;
+
 		////s.width = width + 'px';
 		//s.height = height + 'px';
-		
+
 		this.svg.attr('width',this.width).attr('height',this.height);
 		this.render(this.d3);
 
@@ -107,27 +107,27 @@ definition:function(sjs){
 
 
 	Chart.prototype.measureData = function(d3){
-		
+
 
 		this.dM.max = d3.max(data(this.dataItem).to(function(v,k){
 			return d3.max(v.data)
-		}).current());
+		}).array());
 
 		this.dM.min = d3.min(data(this.dataItem).to(function (v,k) {
 		    return d3.min(v.data);
-		}).current());
+		}).array());
 
 		this.dM.count = d3.max(data(this.dataItem).to(function(v,k){
 			return v.data.length;
-		}).current());
+		}).array());
 
 
 		if (this.dM.min > 0) this.dM.min = 0;
-	
+
 
 		debug.log('Max ' + this.dM.max);
 		debug.log('Count ' + this.dM.count);
-		
+
 	}
 
 
@@ -135,7 +135,7 @@ definition:function(sjs){
 	Chart.prototype.render = function(d3){
 		if(!this.dataItem) return;
 
-		
+
 		var width = this.width - CHART_MARGIN.left - CHART_MARGIN.right;
 		var height = this.height - CHART_MARGIN.top - CHART_MARGIN.bottom;
 
@@ -144,7 +144,7 @@ definition:function(sjs){
 		if(width <= 0) return;
 		if(height <= 0) return;
 
-		/* 
+		/*
 			set scales
 			all plots use same scale
 		*/
@@ -152,29 +152,29 @@ definition:function(sjs){
 		    .domain([this.dM.min, this.dM.max])
 		    .range([height, 0]);
 
-	
+
 		var x = this.x = d3.scale.ordinal()
-			.domain(data(this.dM.count).array())
+			.domain(data(this.dM.count).to().array())
     		.rangeRoundBands([0, width]);
 
     	/*
 			draw axis x, y
-		
+
     	*/
     	var xAxis = d3.svg.axis()
     				.scale(x)
-    				.orient("bottom");		  
+    				.orient("bottom");
 
 	   	var yAxis = d3.svg.axis()
     				.scale(y)
     				.ticks(5)
-    				.orient("left");	
+    				.orient("left");
 
 
     	/* translate charting area to allow margin*/
     	this.chartArea.attr('width',width)
     	.			   attr('height', height)
-    	.			   attr('transform','translate('+ CHART_MARGIN.left +','+ CHART_MARGIN.top +')');			
+    	.			   attr('transform','translate('+ CHART_MARGIN.left +','+ CHART_MARGIN.top +')');
 
 
         /* reposition grid */
@@ -187,10 +187,10 @@ definition:function(sjs){
         renderGrid.call(this, width, height);
 
 
-    	// select chart nodes and axis nodes			
+    	// select chart nodes and axis nodes
 		var self = this
 		,	g = this.chartArea.selectAll('g[sjs-index]').data(this.dataItem);
-		
+
 
 		//new series
 		g.enter().append('g')
@@ -203,52 +203,52 @@ definition:function(sjs){
 
 
 
-		/* 
+		/*
 			update existing series
 			note: initial data selection 'g' above
-			is updated, and at this point below will 
+			is updated, and at this point below will
 			contain a merge quantity of new and existing items
 		*/
-		
+
 		g.each(function(d,i){
 
 			chartModule(d.plot).prototype.render.call(
-				{	id:d.name, 
-					dataItem : d.data, 
-					showPoints:d.showPoints, 
+				{	id:d.name,
+					dataItem : d.data,
+					showPoints:d.showPoints,
 					pointSize:d.pointSize,
-					svg : d3.select(this), 
-					scale:{x,y}, 
-					width:width, 
+					svg : d3.select(this),
+					scale:{x,y},
+					width:width,
 					height:height}
 				,d3
 			);
 
-		});	
-		
+		});
+
 		/*
 			Draw axis
 		*/
 		this.hAxis.attr('transform', 'translate('+ CHART_MARGIN.left+',' + (height + CHART_MARGIN.top) + ')').call(xAxis);
 		this.vAxis.attr('width',20).attr('transform', 'translate('+ 20 +',' + CHART_MARGIN.top + ')').call(yAxis);
-	}; 
+	};
 
 
 
 	function renderGrid(width, height) {
-	    
+
 	    var y = this.y
         ,   x = this.x;
 
 
         // horizontal lines - over Y
 	    var g = this.grid.selectAll('line[sjs-grid-y]').data(y.ticks());
-        
+
 	    g.enter().append('line').attr('sjs-grid-y', '').attr('class', 'y-line');
-        
+
 	    //n.remove();
 
-	    g.attr({   
+	    g.attr({
                 'x1': 0,
                 'x2': this.width,
                 'y1': function (d) { return y(d); },

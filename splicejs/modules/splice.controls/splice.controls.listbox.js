@@ -1,75 +1,84 @@
 sjs({
 
-required:[ 
+required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	'splice.controls.listbox.css',
 	'splice.controls.listbox.html'
 ],
 
-definition:function(){
+definition:function(sjs){
 
-	
+
 	var Class = this.sjs.Class
-	,	debug = this.sjs.debug
+	,		Event = sjs.Event
+	,		debug = this.sjs.debug
 	, 	components = this.scope.components;
-	
+
 	var	UIControl = this.scope.SpliceJS.UI.UIControl
 
-	
 
-	var ListBox = Class(function ListBox(args){
+	var ListBoxController = Class.extend(UIControl)(function ListBoxController(){
+			this.super();
 
-		if(!args) args = [];
+			this.scrollPanel 	= this.ref.scrollPanel;
+			this.contentClient 	= this.ref.scrollPanel.ref.contentClient;
 
-		if(args.isScrollable)
-			return new components.ScrollableListBox(args);	
-		else 
-			return new components.StretchListBox(args);
+			Event.attach(this.concrete.dom, `onclick`).subscribe(this.click, this);
 	});
 
+	ListBoxController.prototype.onDataItem = Event;
 
-	var ScrollableListBox = Class.extend(UIControl)(function ScrollableListBox(){
-			this.super();
-			
-			this.scrollPanel 	= this.ref.scrollPanel;
-			this.contentClient 	= this.ref.scrollPanel.ref.contentClient;	 
+	ListBoxController.prototype.click = function(args){
+		var parent = args.source;
+		while(parent){
+			if(parent.__sjs_item_index__ != null) break;
+			parent = parent.parentNode;
 		}
-	);
+		//no data item index found
+		if(parent == null) return;
 
-	ScrollableListBox.prototype.dataIn = function(dataItem){
+		var idx = parent.__sjs_item_index__;
+		console.log(this.dataItem[idx]);
+
+		//notify on data item
+		this.onDataItem(this.dataItem[idx]);
+	};
+
+
+	ListBoxController.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
 		this.contentClient.concrete.dom.innerHTML = '';
 
 		var item = null;
-		
+
 		for(var i=0; i<dataItem.length; i++) {
 			if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
 				item.dataIn(this.dataItem[i]);
-				
+				item.concrete.dom.__sjs_item_index__ = i;
+
 				if(this.contentClient){
 					this.contentClient.concrete.dom.appendChild(item.concrete.dom);
-					if(typeof item.onAttached == 'function') 
+					if(typeof item.onAttached == 'function')
 						item.onAttached();
 				}
 			}
 		}
 
 		this.reflow();
-		
+
 	};
 
-	ScrollableListBox.prototype.reflow = function(){
+	ListBoxController.prototype.reflow = function(){
 		this.ref.scrollPanel.reflow();
 	};
 
-	var StretchListBox = Class(function StretchListBox(){});
 
 
 	var ListItem = Class.extend(UIControl)(function ListItem(args){
 		this.super(args);
-	
+
 		var self = this;
 		this.concrete.dom.onclick = function(){
 			if(typeof self.onClick === 'function' )
@@ -97,9 +106,9 @@ definition:function(){
 
 	GroupedListItem.prototype.dataIn = function(dataItem){
 
-		if(!this.groupInstance) { 
-			if(this.groupTemplate) { 
-				this.groupInstance = new this.groupTemplate({parent:this}); 
+		if(!this.groupInstance) {
+			if(this.groupTemplate) {
+				this.groupInstance = new this.groupTemplate({parent:this});
 				Doc.$(this.elements.root).embed(this.groupInstance);
 			}
 		}
@@ -113,15 +122,27 @@ definition:function(){
 				var item = new this.groupItemTemplate({parent:this});
 				item.dataIn(dataItem.children[i]);
 				this.itemInstances.push(item);
-				this.elements.root.appendChild(item.concrete.dom);	
+				this.elements.root.appendChild(item.concrete.dom);
 			}}
 		}
 
 	};
 
+	// list factory
+	var ListBox = Class(function ListBox(args){
+
+		//if(!args) args = [];
+
+		if(args.isScrollable)
+			return new components.ScrollableListBox(args);
+		else
+			return new components.StretchListBox(args);
+	});
+
+
 	//exporting objects
 	return {
-		ListItem:	ListItem,		
+		ListItem:	ListItem,
 		ListBox: ListBox
 	}
 

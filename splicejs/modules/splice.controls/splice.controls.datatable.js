@@ -55,7 +55,7 @@ definition:function(){
 		this.scrollPanel = this.ref.scrollPanel;
 
 
-		this.sortTrigger = new scope.templates['SortTrigger']();
+		this.sortTrigger = new scope.components['SortTrigger']();
 
 		/*
 			table type determines scrolling layout
@@ -72,7 +72,7 @@ definition:function(){
 			pageSize: this.pageSize?this.pageSize:100,
 			bodyRowTemplate: /*this.rowTemplate  ? this.rowTemplate:*/  DefaultRow,
 			headRowTemplate: this.headTemplate ? this.headTemplate: DefaultRow,
-			headCellTemplate: scope.templates['HeadCell']
+			headCellTemplate: scope.components['HeadCell']
 		});
 
 		var self = this;
@@ -169,10 +169,10 @@ definition:function(){
 
 		var groups = data(this.dataSteps.filter.data.data).group(
 				function(item){return item[args];}).to(
-					function(k,v,i){
+					function(v,k,i){
 						return {key:k, size:v.length};
 					}
-				).result;
+				).array();
 
 		this.onFilterList(groups);
 		debug.log('data filter openeed');
@@ -185,8 +185,8 @@ definition:function(){
 	DataTable.prototype.onScroll 		= Event;
 	DataTable.prototype.onPage 	 		= Event;
 	DataTable.prototype.onRowSelected 	= Event;
-	DataTable.prototype.onFilterList 	= Event;
-	DataTable.prototype.onCellStyle 	= Event;
+	DataTable.prototype.onFilterList 		= Event;
+	DataTable.prototype.onCellStyle 		= Event;
 
 	/**
 	 *	'private' calls
@@ -195,12 +195,12 @@ definition:function(){
 	function initializeTable(){
 
 		//horizontal header scrolling
-        if(this.elements.defaultScroller){
-            Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
-                this.elements.headPositioner.style.left = (0 - eargs.source.scrollLeft) + 'px';
-				this.onScroll(eargs.source.scrollTop);
-            },this);
-        }
+  	if(this.elements.defaultScroller){
+        Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
+            this.elements.headPositioner.style.left = (0 - eargs.source.scrollLeft) + 'px';
+		this.onScroll(eargs.source.scrollTop);
+        },this);
+    }
 
 		//!!!!! TODO: review reflow model
 		Event.attach(window, 'onresize').subscribe(function(){this.reflow();},this);
@@ -220,6 +220,7 @@ definition:function(){
 			sm.bufferScale = (sm.dataSize - sm.bufferSize)  * args.position / args.height ;
 			renderTable.call(this);
 		},this);
+
 	};
 
 
@@ -231,9 +232,9 @@ definition:function(){
 
 		this.sortCell = headCell;
 
-		if( headCell.elements.filterTrigger   !== args.source &&
-			headCell.elements.filterIndicator !== args.source ){
-			sortTable.call(this,headCell);
+		if( headCell.ref.filterTrigger.elements.filterTrigger   !== args.source &&
+			  headCell.ref.filterTrigger.elements.filterIndicator !== args.source ){
+				sortTable.call(this,headCell);
 		} else {
 			pickFilter.call(this,headCell);
 		}
@@ -544,19 +545,29 @@ definition:function(){
 
 
 	var FilterList = Class(function FilterListController(){
-
+		this.filterSet = [];
 	});
 
 
 	FilterList.prototype.dataIn = function(data){
-			this.onData(data);
+			this.onDataInput(data);
+	};
+
+	FilterList.prototype.filterItem = function(args){
+		this.filterSet.push(args);
+	};
+
+	FilterList.prototype.clearFilter = function(){
+		this.filterSet = [];
 	};
 
 	FilterList.prototype.createFilter = function(){
-
+		this.onData(this.filterSet);
 	};
 
 	FilterList.prototype.onData = Event;
+	FilterList.prototype.onDataInput = Event;
+
 
 	/**
 	 *	Used when row template is not specified
@@ -659,20 +670,28 @@ definition:function(){
 
 
 	/* data table variat decoder */
-	var DataTableFactory = function DataTableFactory(args){
+	// todo: !!!! SPECIFY __sjs_type__ to the factory components
+	var DataTable = Class(function DataTable(args){
 
 		var components = scope.components;
 
-		if(args.scroll === 'no') 	 return new components.NoScrollDataTable(args);
-		if(args.scroll === 'custom') return new components.CustomScrollDataTable(args);
-									 return new components.DefaultScrollDataTable(args);
-	};
+		var result = null;
+
+		if(args.scroll === 'no') 			result =  new components.NoScrollDataTable(args);
+		if(args.scroll === 'custom') 	result =  new components.CustomScrollDataTable(args);
+		result =  new components.DefaultScrollDataTable(args);
+
+		result.__sjs_type__ = 'DataTable';
+
+		return result;
+
+	});
 
 
 
 	//module exports
 	return {
-		DataTable: DataTableFactory,
+		DataTable: DataTable,
 		DataTableRow: DataTableRow
 	}
 

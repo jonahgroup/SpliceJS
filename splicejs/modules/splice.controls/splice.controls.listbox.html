@@ -1,8 +1,9 @@
-<sjs-component sjs-type="StretchListBox" sjs-export>
+<sjs-component sjs-type="StretchListBox" sjs-controller="ListBoxController" sjs-export>
 	<div class="-splicejs-list-box" sjs-element="root"></div>
 </sjs-component>
 
-<sjs-component sjs-type="ScrollableListBox" sjs-export>
+
+<sjs-component sjs-type="ScrollableListBox" sjs-controller="ListBoxController" sjs-export>
 	<div class="-splicejs-list-box" sjs-element="root">
 		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">{
 			ref:'scrollPanel',
@@ -19,6 +20,7 @@
 	<div sjs-element="root"></div>
 </sjs-component>
 
+
 <sjs-component sjs-type="GroupedListItem" sjs-export>
 	<div class="-splicejs-list-grouped-listitem" sjs-element="root"></div>
-</sjs-component>	
+</sjs-component>

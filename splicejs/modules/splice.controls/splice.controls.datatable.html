@@ -3,9 +3,9 @@
 	<div class="-sjs-datatable" style="position:relative;" sjs-element="root">
 		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel" sjs-ref="scrollPanel">{
 			content:{
-				scrollContent:<sjs-include  sjs-type="DataTableBody"		
+				scrollContent:<sjs-include  sjs-type="DataTableBody"
 											sjs-ref="binding('body').type('DefaultScrollDataTable')"></sjs-include>,
-				staticContent:<sjs-include 	sjs-type="DataTableHeader" 	
+				staticContent:<sjs-include 	sjs-type="DataTableHeader"
 											sjs-ref="binding('head').type('DefaultScrollDataTable')"></sjs-include>
 			}
 		}</sjs-include>
@@ -18,9 +18,9 @@
 	<div class="-sjs-datatable" style="position:relative;" sjs-element="root">
 		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel" sjs-ref="scrollPanel">{
 			content:{
-				scrollContent:<sjs-include  sjs-type="DataTableBody"		
+				scrollContent:<sjs-include  sjs-type="DataTableBody"
 											sjs-ref="binding('body').type('CustomScrollDataTable')"></sjs-include>,
-				staticContent:<sjs-include 	sjs-type="DataTableHeader" 	
+				staticContent:<sjs-include 	sjs-type="DataTableHeader"
 											sjs-ref="binding('head').type('CustomScrollDataTable')"></sjs-include>
 			}
 		}</sjs-include>
@@ -54,12 +54,13 @@
 
 <!-- head cell template -->
 <sjs-component sjs-type="HeadCell">
-	<div sjs-element="root" style="position:relative;">
+	<div style="position:relative;" sjs-element="root">
 		<div class="content" sjs-element="content"></div>
-		<sjs-include type="FilterTrigger" ref="filterTrigger"> 
+		<sjs-include type="FilterTrigger" ref="filterTrigger">
 			{
 				onDropDown: binding('filterDropDownOpen').type('DataTable'),
 				dataIn: binding('onData').parent,
+				isIgnoreSelector: true,
 				dropDownItem:<sjs-include type="FilterList" singleton="parent">
 						{dataIn: binding('onFilterList').type('DataTable')}
 					</sjs-include>
@@ -75,21 +76,22 @@
 </sjs-component>
 
 <!-- Filter Trigger, with attached drop-down behavior -->
-<sjs-component sjs-type="FilterTrigger" controller="SpliceJS.Controls.DropDownController">
+<sjs-component sjs-type="FilterTrigger" sjs-controller="SpliceJS.Controls.DropDownController">
 	<div class="filter-trigger" sjs-element="root selector filterTrigger">
 		<div class="icon"><div sjs-element="filterIndicator"></div></div>
 	</div>
 </sjs-component>
 
 <!-- Filter list, display a list of available filtering options -->
-<sjs-component sjs-type="FilterList">
+<sjs-component sjs-type="FilterList" sjs-controller="FilterListController">
 	<div class="filter-control">
 		<div class="filter-body">
 			<sjs-include type="SpliceJS.Controls.ListBox">
 				{
 					isScrollable:true,
-					dataIn: binding('onData').parent,
-					itemTemplate:<sjs-include type="FilterListItem"></sjs-include>
+					dataIn: 		binding('onDataInput').parent,
+					onDataItem:	binding('filterItem').parent,
+					itemTemplate:<sjs-include sjs-type="FilterListItem"></sjs-include>
 				}
 			</sjs-include>
 		</div>
@@ -98,21 +100,24 @@
 			<sjs-include type="SpliceJS.Controls.Button">{
 				content:{label:'Ok'},
 				onClick: binding('createFilter').parent
+							 . binding('close').type('FilterTrigger')
 			}</sjs-include>
 			<sjs-include type="SpliceJS.Controls.Button">
 				{
 					content:{label:'Cancel'},
-					onClick: binding('close').type('SpliceJS.Controls.DropDownController')
+					onClick: binding('clearFilter').parent
+								 . binding('close').type('FilterTrigger')
 				}</sjs-include>
 			<div>
 		</div>
-		
+
 	</div>
 </sjs-component>
 
 <!-- Filter List Item -->
-<sjs-component sjs-type="FilterListItem" controller="SpliceJS.Controls.ListItem">
-	<div class="filterlist-item"><div style="display:inline;"><input type="checkbox"></div>
+<sjs-component sjs-type="FilterListItem" sjs-controller="SpliceJS.Controls.ListItem">
+	<div class="filterlist-item">
+		 <div style="display:inline;"><input type="checkbox"></div>
 		 <div style="display:inline;">@key</div>
 		 <div style="display:inline; float:right; margin-right:28px;">@size</div>
 	</div>

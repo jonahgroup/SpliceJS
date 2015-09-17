@@ -7,35 +7,35 @@ required:[
 	'splice.controls.selectors.html'
 ]
 ,
-definition:function(){	
-	
+definition:function(){
+
 	/* framework imports */
 	var Controller 	= this.sjs.Controller
 	,	Event 		= this.sjs.Event
 	,	Class 		= this.sjs.Class
 	,	scope 		= this.scope;
-	
+
 	/* dependency imports */
 	var	Positioning = scope.SpliceJS.UI.Positioning
 	,	dom = scope.Doc.dom;
-	
+
 	//static single instance
-	var dropDownContainer = new (scope.templates['DropDownContainer'])()
+	var dropDownContainer = new (scope.components['DropDownContainer'])()
 	,	selectorElement = null;
 
 	var DropDownController = Class.extend(Controller)(function DropDownController(args){
 		this.super();
-	
+
 		var self = this;
 	    /*
-            Subscribe to onclick instead of mousedown, because firing mousedown 
+            Subscribe to onclick instead of mousedown, because firing mousedown
             will immediately execute event within dropDown() closing the dropdown
         */
 	    Event.attach(this.elements.root, 'onmousedown').subscribe(function (e) {
 	        this.dropDown();
 	        e.cancel();
 		}, this);
-		
+
 		/*
 			Prevent closing the dropdown when dropdown container body is clicked
 		*/
@@ -44,6 +44,7 @@ definition:function(){
 		});
 
 		this.dropDownItem = this.dropDownItem;
+		if(!this.isIgnoreSelector)	this.isIgnoreSelector = false;
 
 	});
 
@@ -54,7 +55,8 @@ definition:function(){
 
 	DropDownController.prototype.dataIn = function(data){
 		this.data = data;
-		this.elements.selector.innerHTML = data.toString();		
+		if(!this.isIgnoreSelector)
+			this.elements.selector.innerHTML = data.toString();
 	};
 
 
@@ -70,7 +72,7 @@ definition:function(){
 	};
 
 	DropDownController.prototype.dropDown = function(){
-		
+
 		var left = this.elements.selector.offsetLeft
 		,	height = this.elements.selector.offsetHeight
 		,	top = height
@@ -78,23 +80,23 @@ definition:function(){
 		,	pos = Positioning.absPosition(this.elements.selector)
 		,	self = this
 		;
-		
+
 		//release previous selector if any
 		if(selectorElement){
 			dom(selectorElement).class.remove('-sjs-dropdown-open');
 		}
-		
-		
-		if(!this.dropDownItemInst && this.dropDownItem) { 
+
+
+		if(!this.dropDownItemInst && this.dropDownItem) {
 			this.dropDownItemInst = new this.dropDownItem({parent:this});
 		}
-		
+
 		dom(this.elements.selector).class.add('-sjs-dropdown-open');
 		selectorElement = this.elements.selector;
-		
+
 		//append drop down to the document root
 		document.body.appendChild(dropDownContainer.concrete.dom);
-		
+
 		dom(dropDownContainer.concrete.dom).replace(dom(this.dropDownItemInst.concrete.dom));
 
 		//cs.padding.top.value + cs.padding.bottom.value
@@ -115,15 +117,13 @@ definition:function(){
 			event.unsubscribe(hide);
 			event.pop();
 		}, this);
-	
+
 		this.onDropDown(this.data);
 
 	};
 
 	return {
-		controllers: {
-			DropDownController: DropDownController	
-		}
+			DropDownController: DropDownController
 	}
 
 }});
