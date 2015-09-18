@@ -2335,16 +2335,16 @@ UrlAnalyzer.prototype = {
 
 
 	function resolveBinding(binding, instance, key, scope){
-		if( !(binding instanceof Binding) ) throw 'Cannot resolve binding, source property is not a binding object';
+		if(!binding) return;
+		resolveBinding(binding.prev, instance, key, scope);
 
 		var source = null;
-
 		switch(binding.type){
 		case BINDING_TYPES.SELF:
 			break;
 
 		case BINDING_TYPES.PARENT:
-			if(!instance.parent) throw 'Cannot resolve parent binding, instance parent is not null';
+			if(!instance.parent) throw 'Cannot resolve parent binding, [instance.parent] is null';
 
 			var v = Binding.Value(instance.parent);
 
