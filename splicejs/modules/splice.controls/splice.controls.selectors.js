@@ -20,7 +20,7 @@ definition:function(){
 	,	dom = scope.Doc.dom;
 
 	//static single instance
-	var dropDownContainer = new (scope.components['DropDownContainer'])()
+	var dropDownContainer = new scope.components.DropDownContainerResizable()
 	,	selectorElement = null;
 
 	var DropDownController = Class.extend(Controller)(function DropDownController(args){
@@ -97,7 +97,8 @@ definition:function(){
 		//append drop down to the document root
 		document.body.appendChild(dropDownContainer.concrete.dom);
 
-		dom(dropDownContainer.concrete.dom).replace(dom(this.dropDownItemInst.concrete.dom));
+		// add content to the content element
+		dom(dropDownContainer.elements.content).replace(dom(this.dropDownItemInst.concrete.dom));
 
 		//cs.padding.top.value + cs.padding.bottom.value
 
@@ -121,6 +122,13 @@ definition:function(){
 		this.onDropDown(this.data);
 
 	};
+
+	var DropDownContainerController = Class.extend(Controller)(function DropDownContainerController(){
+
+	});
+
+
+
 
 	return {
 			DropDownController: DropDownController

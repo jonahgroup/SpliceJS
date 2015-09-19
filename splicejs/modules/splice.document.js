@@ -6,13 +6,13 @@ definition:function(sjs){
 
 	function getValueUnit(value){
 		if(!value) return null;
-	
+
 		value = value.toLowerCase();
-	
+
 		var index = value.indexOf('px');
 		if(index >= 0) {
 			return {
-				value: 	1*value.substring(0,index), 
+				value: 	1*value.substring(0,index),
 				unit: 	value.substring(index,value.length)
 			};
 		}
@@ -21,17 +21,17 @@ definition:function(sjs){
 
 	function style(element){
 		var css = window.getComputedStyle(element,null);
-	
+
 		var getValue = function(valueName){
 			return getValueUnit(css.getPropertyValue(valueName));
 		}
-	
+
 		return {
 			height: css.getPropertyValue('height'),
 			padding:{
 				left: 	getValue('padding-left'),
 				right:  getValue('padding-right'),
-				top: 	getValue('padding-top'), 
+				top: 	getValue('padding-top'),
 				bottom: getValue('padding-bottom')
 			}
 		}
@@ -45,7 +45,7 @@ definition:function(sjs){
 	function isUnknownElement(node) {
 		if(node instanceof window['HTMLUnknownElement']) return true;
 		return false;
-	}; 
+	};
 
 	/*
 	* use this where treewalker is not supported
@@ -53,14 +53,14 @@ definition:function(sjs){
 	* */
 	function dfs(dom, target, filterFn, nodesFn){
 		if(!dom) return;
-		
+
 		if(typeof filterFn === 'function') {
-			var node = filterFn(dom);  
+			var node = filterFn(dom);
 			if(node) target.push(node);
 		} else {
 			target.push(dom);
-		} 
-		
+		}
+
 		var children = [];
 		if(typeof nodesFn === 'function'){
 			children = nodesFn(dom);
@@ -68,12 +68,12 @@ definition:function(sjs){
 		else {
 			children = dom.childNodes;
 		}
-	
+
 		for(var i=0; i < children.length; i++){
 			var n = dom.childNodes[i];
 			dfs(n,target,filterFn, nodesFn);
 		}
-	}; 
+	};
 
 	function selectNodes(dom,filterFn, nodesFn){
 		var nodes = new Array();
@@ -85,8 +85,8 @@ definition:function(sjs){
 	function selectComments(dom){
 		var nodes = new Array();
 		//nodeType 8 is comment node
-		dfs(dom,nodes,function(node){ 
-			if(node.nodeType === 8) return node; return null; 
+		dfs(dom,nodes,function(node){
+			if(node.nodeType === 8) return node; return null;
 		});
 		if(nodes.length < 1) nodes = null;
 		return nodes;
@@ -94,7 +94,7 @@ definition:function(sjs){
 
 	function selectUnknownNodes(dom){
 		var nodes = new Array();
-		
+
 		dfs(dom,nodes,
 			function(node){
 				if(isUnknownElement(node)) return node;
@@ -105,7 +105,7 @@ definition:function(sjs){
 				else return node.childNodes;
 			}
 		);
-	
+
 		if(nodes.length < 1) nodes = null;
 		return nodes;
 	};
@@ -115,9 +115,9 @@ definition:function(sjs){
 		var nodes = new Array();
 		//nodeType 3 is a text node
 		dfs({childNodes:dom.childNodes},nodes,
-			function(node){ 
+			function(node){
 				if(node.nodeType === 1) return node;
-				return null; 
+				return null;
 			},
 			function(node){
 				if(node.nodeType === 1) return [];
@@ -132,12 +132,12 @@ definition:function(sjs){
 	function selectTextNodes(dom,filterFn){
 		var nodes = new Array();
 		//nodeType 3 is a text node
-		dfs(dom,nodes,function(node){ 
+		dfs(dom,nodes,function(node){
 			if(node.nodeType === 3) {
 				if(typeof filterFn === 'function')	return filterFn(node);
 				return node;
 			}
-			return null; 
+			return null;
 		});
 		if(nodes.length < 1) nodes = null;
 		return nodes;
@@ -150,7 +150,7 @@ definition:function(sjs){
 			if(n.nodeType != 3) return n;
 		}
 	};
-	
+
 	function ClassTokenizer(input){
 		var tokenizer = new Tokenizer(input)
 		,	token = null;
@@ -162,26 +162,26 @@ definition:function(sjs){
 				acc = '';
 				continue;
 			}
-			acc += token;		
+			acc += token;
 		}
 		if(acc != '') classes[acc] = 1;
 		return classes;
 	}
-	
-	
+
+
 	function addClass(element, className){
 		var current = ClassTokenizer(element.className)
 		,	toAdd = ClassTokenizer(className)
 		,	clean = element.className;
-		
+
 		for(var key in toAdd ){
 			if(key in current) continue;
 			clean += ' ' + key;
 		}
-		
+
 		element.className = clean;
 	};
-	
+
 	function removeClass(element, className){
 		var current = ClassTokenizer(element.className)
 		,	toRemove = ClassTokenizer(className)
@@ -192,32 +192,32 @@ definition:function(sjs){
 		}
 		element.className = clean;
 	};
-	
+
 	function classOp(element){
-		return { 
+		return {
 			remove: function(toRemove){
 				removeClass(element,toRemove)
 				return classOp(element);
 			},
 			add:function(toAdd){
 				addClass(element,toAdd);
-				return classOp(element); 
+				return classOp(element);
 			},
 			element:element
 		}
 	};
 
 	function _box(element){
-		
+
 		var css = window.getComputedStyle(element,null);
-			
+
 		var w  = css.getPropertyValue('width')
 		,	h  = css.getPropertyValue('height')
 		,	pl = css.getPropertyValue('padding-left')
-		,	pt = css.getPropertyValue('padding-top')  
+		,	pt = css.getPropertyValue('padding-top')
 		,	pr = css.getPropertyValue('padding-right')
 		,	pb = css.getPropertyValue('padding-bottom')
-		,  	bl = css.getPropertyValue('border-left-width')
+		, bl = css.getPropertyValue('border-left-width')
 		,	bt = css.getPropertyValue('border-top-width')
 		,	br = css.getPropertyValue('border-right-width')
 		,	bb = css.getPropertyValue('border-bottom-width')
@@ -225,18 +225,18 @@ definition:function(sjs){
 		,	mt = css.getPropertyValue('margin-top')
 		,	mr = css.getPropertyValue('margin-right')
 		,	mb = css.getPropertyValue('margin-bottom');
-		
+
 		return {
 			height:	h,
-			width:	w,	
+			width:	w,
 			padding: {left:pl, top:pt, right:pr, bottom:pb},
 			border:  {left:bl, top:bt, right:br, bottom:bb},
 			margin:  {left:ml, top:mt, right:mr, bottom:mb}
-		}	
+		}
 	};
-	
+
 	function _unit(cssValue){
-		return  cssValue.substring(0,cssValue.length - 2);		
+		return  cssValue.substring(0,cssValue.length - 2);
 	};
 
 	function dom(element){
@@ -249,7 +249,7 @@ definition:function(sjs){
 			replace:function(child){
 				element.innerHTML = '';
 				element.appendChild(child.element);
-				return dom(element);	
+				return dom(element);
 			},
 			size:	function(){
 				return element.childNodes.length;
@@ -262,7 +262,7 @@ definition:function(sjs){
 			prop:function(prop,value){
 				if(value == null || value == undefined) return element[prop];
 				element[prop] = value;
-				return dom(element);		
+				return dom(element);
 			},
 			block:function(){
 				element.style.display='block';
@@ -271,7 +271,7 @@ definition:function(sjs){
 			parent:function(sel){
 					sel = sel.toUpperCase();
 				var	node = element;
-				
+
 				while(node){
 					if(node.nodeName === sel) return dom(node);
 					node = node.parentNode;
@@ -279,22 +279,22 @@ definition:function(sjs){
 				return dom(null);
 			},
 			"class":classOp(element),
-			
+
 			box: function(){
 				return _box(element);
 			},
 			element:element
-		}	
+		}
 	};
 
 	dom.text = function(value){
-		return dom(document.createTextNode(value));	
+		return dom(document.createTextNode(value));
 	};
 
-	
+
 
 	function create(name){
-		return dom(document.createElement(name));	
+		return dom(document.createElement(name));
 	};
 
 
@@ -325,7 +325,7 @@ definition:function(sjs){
 		create:create,
 		dom	: dom,
 		cssvalue : _unit
-		
+
 	}
 
 }});

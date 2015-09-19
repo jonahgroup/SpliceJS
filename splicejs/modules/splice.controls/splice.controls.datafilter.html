@@ -1,0 +1,41 @@
+<!-- Filter list, display a list of available filtering options -->
+<sjs-component sjs-type="FilterList" sjs-controller="FilterListController" sjs-export>
+	<div class="-sjs-filter-control">
+		<div class="filter-head">
+			<sjs-include sjs-type="SpliceJS.Controls.TextField"/>
+		</div>
+		<div class="filter-body">
+			<sjs-include sjs-type="SpliceJS.Controls.ListBox">
+				{
+					isScrollable:true,
+					dataIn: 		binding('onDataInput').parent,
+					onDataItem:	binding('filterItem').parent,
+					itemTemplate:<sjs-include sjs-type="FilterListItem"></sjs-include>
+				}
+			</sjs-include>
+		</div>
+		<div class="footer">
+			<div style="float:right;">
+			<sjs-include sjs-type="SpliceJS.Controls.Button">{
+				content:{label:'Ok'},
+				onClick: binding('ok').parent
+			}</sjs-include>
+			<sjs-include sjs-type="SpliceJS.Controls.Button">
+				{
+					content:{label:'Cancel'},
+					onClick: binding('cancel').parent
+				}</sjs-include>
+			</div>
+		</div>
+	</div>
+</sjs-component>
+
+
+<!-- Filter List Item -->
+<sjs-component sjs-type="FilterListItem" sjs-controller="FilterListItemController">
+	<div class="-sjs-filterlist-item" sjs-element="root">
+		 <div class="checkbox" style="display:inline;"></div>
+		 <div style="display:inline;">@key</div>
+		 <div style="display:inline; float:right; margin-right:28px;">@size</div>
+	</div>
+</sjs-component>

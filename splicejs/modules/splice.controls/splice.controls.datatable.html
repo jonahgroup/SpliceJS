@@ -62,12 +62,12 @@
 				dataIn: binding('onData').parent,
 				isIgnoreSelector: true,
 				dropDownItem:
-					<sjs-include type="FilterList" singleton="parent">
-						{
-							dataIn: 		binding('onFilterList').type('DataTable'),
-							onData:	binding('filterData').type('DataTable')
-						}
-					</sjs-include>
+						<sjs-include type="SpliceJS.Controls.FilterList" singleton="parent">{
+							dataIn: binding('onFilterList').type('DataTable'),
+							onCancel: binding('close').type('FilterTrigger'),
+							onData:		binding('close').type('FilterTrigger').
+												binding('filterData').type('DataTable')
+						}</sjs-include>
 			}
 		</sjs-include>
 	</div>
@@ -83,46 +83,5 @@
 <sjs-component sjs-type="FilterTrigger" sjs-controller="SpliceJS.Controls.DropDownController">
 	<div class="filter-trigger" sjs-element="root selector filterTrigger">
 		<div class="icon"><div sjs-element="filterIndicator"></div></div>
-	</div>
-</sjs-component>
-
-<!-- Filter list, display a list of available filtering options -->
-<sjs-component sjs-type="FilterList" sjs-controller="FilterListController">
-	<div class="filter-control">
-		<div class="filter-body">
-			<sjs-include type="SpliceJS.Controls.ListBox">
-				{
-					isScrollable:true,
-					dataIn: 		binding('onDataInput').parent,
-					onDataItem:	binding('filterItem').parent,
-					itemTemplate:<sjs-include sjs-type="FilterListItem"></sjs-include>
-				}
-			</sjs-include>
-		</div>
-		<div class="footer">
-			<div style="float:right;">
-			<sjs-include type="SpliceJS.Controls.Button">{
-				content:{label:'Ok'},
-				onClick: binding('createFilter').parent
-							 . binding('close').type('FilterTrigger')
-			}</sjs-include>
-			<sjs-include type="SpliceJS.Controls.Button">
-				{
-					content:{label:'Cancel'},
-					onClick: binding('clearFilter').parent
-								 . binding('close').type('FilterTrigger')
-				}</sjs-include>
-			<div>
-		</div>
-
-	</div>
-</sjs-component>
-
-<!-- Filter List Item -->
-<sjs-component sjs-type="FilterListItem" sjs-controller="SpliceJS.Controls.ListItem">
-	<div class="filterlist-item">
-		 <div style="display:inline;"><input type="checkbox"></div>
-		 <div style="display:inline;">@key</div>
-		 <div style="display:inline; float:right; margin-right:28px;">@size</div>
 	</div>
 </sjs-component>

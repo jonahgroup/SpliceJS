@@ -1,6 +1,6 @@
 /*
 	Data Table
--------------------------------------------		
+-------------------------------------------
 */
 .-sjs-datatable {
 	white-space:nowrap;
@@ -8,10 +8,10 @@
 
 .-sjs-datatable .-splicejs-scrollpanel .static {
     height:50px;
-} 
+}
 
 .-sjs-datatable thead td {
-	padding:10px;	
+	padding:10px;
 }
 
 .-sjs-datatable tbody td {
@@ -25,7 +25,7 @@
 }
 
 .-sjs-datatable thead th {
-	padding:10px;	
+	padding:10px;
 	padding-right:28px;
 	padding-left:28px;
     cursor:pointer;
@@ -64,7 +64,7 @@
     top: 0px;
     left: 0px;
     display:none;
-    
+
     /**/
     width:32px;
     height:32px;
@@ -78,10 +78,10 @@
     left:50%; top:50%;
     width: 10px;
     height: 10px;
-    
+
     margin-left:-7px;
     margin-top:-7px;
-    
+
     border: 2px solid #cecece;
     border-radius: 100%;
 }
@@ -91,7 +91,7 @@
 }
 
 .-sjs-datatable thead .filter-trigger .icon div {
-	
+
 	position: absolute;
     width: 6px;
     height: 6px;
@@ -110,7 +110,7 @@
 
 /*drop down open style */
 .-sjs-datatable .filter-trigger.-sjs-dropdown-open {
-    background-color: #2B2B2B;
+    background-color: #303030;
 	display:block;
 }
 
@@ -120,7 +120,7 @@
 }
 
 
-.filter-control {
+.-sjs-filter-control {
     position:relative;
     width: 400px;
     height: 300px;
@@ -129,17 +129,36 @@
     font-size:0.8em;
 }
 
-.filter-control .filter-body {
-    
+.-sjs-filter-control .filter-head {
+	position: absolute;
+  top: 0px;
+  padding-left: 10px;
+  right: 0px;
+  left: 0px;
+  height: 33px;
+  background-color: #303030
+}
+
+.-sjs-filter-control .filter-head .-sjs-textfield {
+	background: none;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid #6ADDFF;
+	outline: none;
+	color:#cecece;
+}
+
+.-sjs-filter-control .filter-body {
+
     position: absolute;
-    top:5px;
+    top:40px;
     bottom: 53px;
     left: 0px;
     right: 0px;
 }
 
-.filter-control .footer {
-    
+.-sjs-filter-control .footer {
+
     position: absolute;
     bottom: 12px;
     left: 0px;
@@ -150,21 +169,32 @@
     border-top: 1px solid #4A4A4A;
 }
 
-.filterlist-item {
-    padding-left:5px;
-    cursor:default;
-}
-.filterlist-item:hover {
-    background-color:#222222;
-} 
-
-.filter-control .-sjs-button {
+.-sjs-filter-control .-sjs-button {
     border-radius: 0;
     font-size: 10px;
     background-color: #484848;
     border: 1px solid #6D6D6D;
 }
 
-.filter-control .-sjs-button:hover {
+.-sjs-filter-control .-sjs-button:hover {
     background-color: #5A5A5A;
+}
+
+
+.-sjs-filterlist-item {
+    padding-left:5px;
+    cursor:default;
+		padding-top: 3px;
+		padding-bottom: 3px;
+		margin-bottom: 1px;
+}
+
+
+.-sjs-filterlist-item:hover {
+    background-color:#222222;
+}
+
+.-sjs-filterlist-item.selected {
+	background-color: #8E7B18;;
+  color: #cecece;
 }

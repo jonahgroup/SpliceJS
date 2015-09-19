@@ -7,7 +7,7 @@ required:[
 	{'SpliceJS.Controls':'splice.controls.buttons.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
-	{'SpliceJS.Controls':'splice.controls.listbox.js'},
+	{'SpliceJS.Controls':'splice.controls.datafilter.js'},
 	{'Doc':  '{sjshome}/modules/splice.document.js'},
 	{'Data': '{sjshome}/modules/splice.data.js'},
 	'splice.controls.css',
@@ -54,8 +54,14 @@ definition:function(){
 		//scroll panel reference, to configure scrolling parameters
 		this.scrollPanel = this.ref.scrollPanel;
 
+		//sort trigger singleton
+		this.sortTrigger = new scope.components.SortTrigger();
 
-		this.sortTrigger = new scope.components['SortTrigger']();
+		//gouping filter cache
+		this.filterCache = {
+			calculated:[], applied:[], column:-1
+		};
+
 
 		/*
 			table type determines scrolling layout
@@ -104,14 +110,15 @@ definition:function(){
 		};
 
 		//build data pipeline
-		dataSteps.source.add(dataSteps.filter).add(dataSteps.page).add(dataSteps.frame).add(dataSteps.sort).add(dataSteps.render);
+		dataSteps.source.add(dataSteps.filter)
+		.add(dataSteps.page)
+		.add(dataSteps.frame)
+		.add(dataSteps.sort)
+		.add(dataSteps.render);
 
 		this.dataSteps = dataSteps;
 
-		this.scrollMetrics = {
-			bufferScale:0,
-			bufferSize:100
-		};
+		this.scrollMetrics = {bufferScale:0, bufferSize:100};
 
 		initializeTable.call(this);
 
@@ -119,9 +126,18 @@ definition:function(){
 
 
 	DataTable.prototype.filterData = function(dataFilter){
+
+		for(var i=0; i<dataFilter.length; i++){
+			dataFilter[i].isApplied = true;
+		}
+
+		this.filterCache.applied[this.filterCache.column] = dataFilter;
+
+/*
 		this.dataFilter = dataFilter;
 		this.dataSteps.filter.run();
 		renderTable.call(this,this.ready_data);
+*/
 	};
 
 	DataTable.prototype.clearFilter = function(){
@@ -146,9 +162,6 @@ definition:function(){
 		this.pageCurrent = page;
 	};
 
-
-
-
 	/*
 	 * Updating data model
 	 * - keep count of existing rows
@@ -167,12 +180,23 @@ definition:function(){
 
 	DataTable.prototype.filterDropDownOpen = function(args){
 
-		var groups = data(this.dataSteps.filter.data.data).group(
+		//column index
+		var idx = args;
+
+		this.filterCache.column = idx;
+
+		//get filter cache
+		var groups = this.filterCache.calculated[idx];
+
+		if(!groups) {
+			groups = data(this.dataSteps.filter.data.data).group(
 				function(item){return item[args];}).to(
 					function(v,k,i){
 						return {key:k, size:v.length};
 					}
 				).array();
+				this.filterCache.calculated[idx] = groups;
+		}
 
 		this.onFilterList(groups);
 		debug.log('data filter openeed');
@@ -198,9 +222,16 @@ definition:function(){
   	if(this.elements.defaultScroller){
         Event.attach(this.elements.defaultScroller,'onscroll').subscribe(function(eargs){
             this.elements.headPositioner.style.left = (0 - eargs.source.scrollLeft) + 'px';
-		this.onScroll(eargs.source.scrollTop);
+						this.onScroll(eargs.source.scrollTop);
         },this);
     }
+
+		//on mouse down handler for rearanging columns by dragging
+		Event.attach(this.headTable,'onmousedown').subscribe(function(){
+
+			console.log('test');
+
+		});
 
 		//!!!!! TODO: review reflow model
 		Event.attach(window, 'onresize').subscribe(function(){this.reflow();},this);
@@ -543,30 +574,6 @@ definition:function(){
 		}
 	};
 
-
-	var FilterList = Class(function FilterListController(){
-		this.filterSet = [];
-	});
-
-
-	FilterList.prototype.dataIn = function(data){
-			this.onDataInput(data);
-	};
-
-	FilterList.prototype.filterItem = function(args){
-		this.filterSet.push(args);
-	};
-
-	FilterList.prototype.clearFilter = function(){
-		this.filterSet = [];
-	};
-
-	FilterList.prototype.createFilter = function(){
-		this.onData(this.filterSet);
-	};
-
-	FilterList.prototype.onData = Event;
-	FilterList.prototype.onDataInput = Event;
 
 
 	/**
