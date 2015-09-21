@@ -378,6 +378,9 @@ definition:function(){
 
 	};
 
+	/**
+
+	*/
 	function renderTable(){
 
 		var data 	= this.dataSteps.render.data.data
@@ -601,6 +604,25 @@ definition:function(){
 	DefaultRow.prototype.getNodes = function(){
 		return this.nodes;
 	};
+
+
+	var BaseHierarchyRow = function BaseHierarchyRow(){
+				this.nodes = [];
+	};
+
+	BaseHierarchyRow.prototype.dataIn = function(data){
+				if(!data) return;
+
+				//add new nodes
+				for(var i= this.nodes.length; i<data.length; i++){
+						if(i == 0) {
+							this.nodes.push(dom.div())
+						}
+				}
+	};
+
+
+
 
 
 	/**
