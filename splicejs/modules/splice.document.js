@@ -295,10 +295,11 @@ definition:function(sjs){
 									var value = sjs.propvalue(newvalue,key);
 									if(value == null) continue;
 
+									/*
 									if(hv) {
 										value = (value+'').replace(new RegExp(hv,'gi'),'<span class="-search-result-highlight">'+hv+'</span>');
 									}
-
+									*/
 									var list = element.__sjs_value_map__[key];
 									for(var j=0; j<list.length; j++ ){
 										list[j].nodeValue = value;

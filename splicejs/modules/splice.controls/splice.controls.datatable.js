@@ -692,31 +692,9 @@ definition:function(){
 			d.value(data,i,'te');
 		}
 
+		this.dataOut(item);
+
 	}
-
-
-		/*
-		 * process content placeholders before they are
-		 * pulled by parent control
-		 * */
-/*
-		var textNodes = Doc.select.textNodes(this.concrete.dom);
-		this.contentMap = [];
-
-		for(var i=0; i<textNodes.length; i++){
-			var value = textNodes[i].nodeValue;
-			if(!value) continue;
-			if(value.indexOf('@') !== 0) continue;
-
-			var key = value.substring(1,value.length);
-
-			var span = document.createElement('span');
-			textNodes[i].parentNode.replaceChild(span,textNodes[i]);
-			this.contentMap[key] = span;
-		}
-*/
-
-
 
 	DataTableRow.prototype.onDeleteClick = function(){
 		this.onDelete(this.data);
@@ -724,26 +702,6 @@ definition:function(){
 
 	DataTableRow.prototype.onHighlightValue = function(){};
 
-	DataTableRow.prototype.___dataIn = function(data, filter_value){
-
-		this.data = data.data;
-
-		for(var key in this.contentMap){
-			var node = this.contentMap[key];
-			if(!this.contentMap.hasOwnProperty(key)) continue;
-
-			var value = data[key];
-			if(node){
-				if(filter_value) {
-					node.innerHTML = splitHighlightValue(value,filter_value);
-				} else {
-					node.innerHTML = value;
-				}
-			}
-		}
-
-		this.dataOut(this.data);
-	};
 
 	DataTableRow.prototype.getNodes = function(){
 		return this.nodes;
@@ -759,9 +717,6 @@ definition:function(){
 
 		return value.replace(new RegExp(hv,'gi'),'<span class="-search-result-highlight">'+hv+'</span>');
 	}
-
-
-
 
 
 	/**

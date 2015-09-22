@@ -6,30 +6,29 @@ required:[
 definition:function(){
 
 	//enable strict mode
-	"use strict"; 
-	
+	"use strict";
+
 	// importing framework features makes our code less verbose
 	var Class = this.sjs.Class
-	, 	Event = this.sjs.Event
+	, Event = this.sjs.Event
 	,	debug = this.sjs.debug
-	, 	Controller = this.sjs.Controller
+	, Controller = this.sjs.Controller
 	,	scope = this.scope;
-	
-	var Animate = scope.Animation.Animate;
 
+	var Animate = scope.Animation.Animate;
 
 	/**
 	 * Base UIControl class
 	 */
 	var UIControl = Class.extend(Controller)(function UIControl(args){
-		
 		this.super(args);
-		
+
+
 		if(this.isHidden) {
-			this.prevDisplayState = this.elements.root.style.display; 
+			this.prevDisplayState = this.elements.root.style.display;
 			this.elements.root.style.display = 'none';
 		}
-		
+
 		this.dataItem = null;
 
 		var self = this;
@@ -39,14 +38,14 @@ definition:function(){
 		});
 
 	});
-	
+
 	UIControl.prototype.hide = function(){
 		var self = this;
-		
+
 		if(this.isHidden) return;
 
-		this.prevDisplayState = this.elements.root.style.display; 
-		
+		this.prevDisplayState = this.elements.root.style.display;
+
 		if(this.animate){
 			Animate(this.elements.root).opacity(100, 0, 300,function(){
 				self.elements.root.style.display = 'none';
@@ -57,27 +56,27 @@ definition:function(){
 		}
 		this.isHidden = true;
 	};
-	
+
 	UIControl.prototype.show = function(){
 		if(!this.isHidden) return;
 		if(this.animate) {
 			this.elements.root.style.opacity = 0;
 		}
-		
+
 		if(!this.prevDisplayState) this.prevDisplayState = 'inline';
-		
+
 		this.elements.root.style.display = this.prevDisplayState;
-		
+
 		if(this.animate) {
 			Animate(this.elements.root).opacity(0, 100, 300);
 		}
 		this.isHidden = false;
 	};
-	
+
 	UIControl.prototype.changeState = function(args){
 		if(args && args.isHidden)
 			this.hide();
-		else 
+		else
 			this.show();
 	};
 
@@ -85,11 +84,11 @@ definition:function(){
 		this.dataItem = data;
 		this.onDataIn(this.dataItem);
 	};
-	
+
 	UIControl.prototype.dataOut  = Event;
 	UIControl.prototype.onDataIn = Event;
 	UIControl.prototype.onReflow = Event;
-	
+
 	/**
 	 * Called by the layout manager or a parent view when container dimensions changed and
 	 * layout update is required
@@ -108,13 +107,13 @@ definition:function(){
 
 		// Get style object once and apply settings
 		var style = this.concrete.dom.style;
-		
+
 		style.left 		= position.left +'px';
 		style.top  		= position.top + 'px';
-		
+
 		style.width  	= size.width + 'px';
 		style.height 	= size.height + 'px';
-		
+
 		this.reflowChildren(position,size,bubbleup);
 
 		this.onReflow(position,size);
@@ -122,7 +121,7 @@ definition:function(){
 	};
 
 	UIControl.prototype.reflowChildren = function(position, size,bubbleup){
-		
+
 		for(var i=0; i<this.children.length; i++){
 			if(typeof this.children[i].reflow !== 'function') continue;
 
@@ -174,10 +173,10 @@ definition:function(){
 				+ document.documentElement.scrollTop;
 		}
 		return {x:posx,y:posy};
-	    },	
-	    
+	    },
+
 	    /*
-	    	Returns element coordinates in 
+	    	Returns element coordinates in
 	    	document.body coordinate space
 	    */
 	    absPosition: function(obj_element) {
@@ -185,12 +184,12 @@ definition:function(){
 	    	var location  = new Array(0,0);
 
 	    	while (n != undefined) {
-	            
+
 	            location[0] += z(n.offsetLeft);
 	            location[1] += z(n.offsetTop);
-	            
+
 	            location[1] -= n.scrollTop;
-	            
+
 	            n = n.offsetParent;
 			}
 
@@ -199,30 +198,30 @@ definition:function(){
 				y:location[1] + z(document.body.scrollTop)
 			};
 	    },
-	    
-	    
+
+
 	    containsPoint:function(element,p) {
 	        pos = JSPositioning.absPosition(element);
-	        
+
 			pos.height = element.clientHeight;
 			pos.width = element.clientWidth;
-			
+
 			if( p.x >= pos.x && p.x <= (pos.x + pos.width)) {
 			if(p.y >= pos.y && p.y <= pos.y + (pos.height / 2))
 	            return 1;
 			else if(p.y >= pos.y + (pos.height / 2) && p.y <= pos.y + pos.height )
 	            return -1;
 			}
-	            return 0;	
+	            return 0;
 	    },
-	    
+
 	    documentDimensions:function(){
 	        docWidth = 0;
 	        docHeight = 0;
-	        
+
 	        docWidth = document.body.offsetWidth?document.body.offsetWidth:window.innerWidth;
 	        docHeight = document.body.offsetHeight?document.body.offsetHeight:window.innerHeight;
-	        
+
 	        return {width:docWidth, height:docHeight};
 	    },
 
@@ -231,10 +230,10 @@ definition:function(){
 	    }
 	};
 
-	
+
 
 	/*
-		Drag and Drop implementation 
+		Drag and Drop implementation
 	*/
 
 	var DragAndDrop =  {
@@ -242,43 +241,43 @@ definition:function(){
 		draggable:null,
 		dummy:null,
 		started:false,
-		
+
 		/* contains position of the original click */
-	    offset:null,    
-	    
+	    offset:null,
+
 		//array of DOM elements that track drop event
 	    trackers:null,
-	    
+
 	    startDrag:function(elementnode, event){
-	    	
+
 	    	this.ondragfired = false;
-	    	
+
 	    	this.disableSelection(document.body, event);
 			//get original position of the trigger node
 			//p = JSPositioning.absPosition(elementnode);
 			var p = Positioning.mousePosition(event);
-			
+
 			this.offset = {x:p.x,y:p.y};
-			
-			document.body.onmousemove = function(event) {DragAndDrop.drag(event);	};	
-			document.body.onmouseup   = function(event) {DragAndDrop.stopdrag(event);	}; 	
-			
+
+			document.body.onmousemove = function(event) {DragAndDrop.drag(event);	};
+			document.body.onmouseup   = function(event) {DragAndDrop.stopdrag(event);	};
+
 			// event.preventDefault();
 	        this.onpickup(p);
 		},
-		
+
 		stopdrag:function(e) {
-			
-			
+
+
 			document.body.onmousemove = function(){};
 			document.body.onmouseup = function(){};
-			
-			
+
+
 			this.enableSelection(document.body);
 			this.ondragfired = false;
 			this.onstop();
 		},
-		
+
 		drag:function(e) {
 			var mousePos = Positioning.mousePosition(e);
 			this.ondrag(mousePos,DragAndDrop.offset);
@@ -288,7 +287,7 @@ definition:function(){
 			this.ondragfired = true;
 			document.body.style.cursor='default';
 		},
-		
+
 		onpickup:function(){},
 		onbegin:function(){},
 	    ondrag:function(){},
@@ -297,31 +296,31 @@ definition:function(){
 
 	    setOpacity:function(element,value){
 			element.style.opacity = value/100;
-			element.style.filter = 'alpha(opacity=' + value + ')'; 
+			element.style.filter = 'alpha(opacity=' + value + ')';
 			element.style.zindex = 100;
 		},
-		
+
 		disableSelection: function(element) {
             element.onselectstart = function() {return false;};
             element.unselectable = "on";
             element.style.MozUserSelect = "none";
-            
+
 		},
-		
+
 		enableSelection: function(element){
             element.onselectstart = null;
             element.unselectable = "off";
             element.style.MozUserSelect = "all";
-            
+
 		}
 	};
 
 	/**
 	 * Global KeyListener
-	 * 
+	 *
 	 */
 	var KeyListener = Class(function KeyListener(){
-		
+
 			Event.attach(window, 'onkeydown').subscribe(
 			function(args){
 				switch(args.keyCode){
@@ -340,7 +339,7 @@ definition:function(){
 	KeyListener.prototype.onRight 	= Event;
 	KeyListener.prototype.onLeft	= Event;
 	KeyListener.prototype.onUp 		= Event;
-	KeyListener.prototype.onDown 	= Event; 
+	KeyListener.prototype.onDown 	= Event;
 
 	//module exports
 	return {
