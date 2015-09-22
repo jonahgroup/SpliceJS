@@ -207,6 +207,25 @@ definition:function(sjs){
 		}
 	};
 
+
+	function buildValueMap(element){
+		var textNodes = selectTextNodes(element)
+		,	valueMap = {};
+
+		for(var i=0; i<textNodes.length; i++){
+			var node = textNodes[i];
+			if(node.nodeValue[0] !== '@') continue;
+
+			var val = node.nodeValue.substring(1);
+			var list = 	valueMap[val];
+			if(!list) {
+				valueMap[val] = list = [];
+			}
+			list.push(node);
+		}
+		return valueMap;
+	};
+
 	function _box(element){
 
 		var css = window.getComputedStyle(element,null);
@@ -242,32 +261,64 @@ definition:function(sjs){
 	function dom(element){
 		if(!element) return null;
 		return {
+
 			append: function(child){
 				element.appendChild(child.element);
 				return dom(element);
 			},
+
 			replace:function(child){
 				element.innerHTML = '';
 				element.appendChild(child.element);
 				return dom(element);
 			},
+
 			size:	function(){
 				return element.childNodes.length;
 			},
-			value:function(newvalue){
-				//test node
-				if(element.nodeType == 3) element.nodeValue = newvalue;
-				return dom(element);
+
+			value:function(newvalue,idx,hv){
+
+				switch(element.nodeType) {
+					//text node
+					case 3 :
+						element.nodeValue = newvalue;
+						return dom(element);
+					//html element node
+					case 1:
+						if(!element.__sjs_value_map__){
+								element.__sjs_value_map__ = buildValueMap(element);
+						}
+						var keys = Object.keys(element.__sjs_value_map__);
+						for(var i=0; i < keys.length; i++){
+									var key = keys[i];
+									var value = sjs.propvalue(newvalue,key);
+									if(value == null) continue;
+
+									if(hv) {
+										value = (value+'').replace(new RegExp(hv,'gi'),'<span class="-search-result-highlight">'+hv+'</span>');
+									}
+
+									var list = element.__sjs_value_map__[key];
+									for(var j=0; j<list.length; j++ ){
+										list[j].nodeValue = value;
+									}
+						}
+					return dom(element);
+				}
 			},
+
 			prop:function(prop,value){
 				if(value == null || value == undefined) return element[prop];
 				element[prop] = value;
 				return dom(element);
 			},
+
 			block:function(){
 				element.style.display='block';
 				return dom(element);
 			},
+
 			parent:function(sel){
 					sel = sel.toUpperCase();
 				var	node = element;

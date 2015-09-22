@@ -76,7 +76,7 @@
 
 <!-- Sort trigger to represent up/down arrows -->
 <sjs-component sjs-type="SortTrigger">
-	<div class="sort-trigger up" sjs-element="sortTrigger"></div>
+	<div class="arrow up" sjs-element="sortTrigger"></div>
 </sjs-component>
 
 <!-- Filter Trigger, with attached drop-down behavior -->
@@ -84,4 +84,13 @@
 	<div class="filter-trigger" sjs-element="root selector filterTrigger">
 		<div class="icon"><div sjs-element="filterIndicator"></div></div>
 	</div>
+</sjs-component>
+
+<!-- Hierarchy row, hierarchy column -->
+<sjs-component sjs-type="HierarchyTrigger">
+		<div class="-sjs-datatable-group"  sjs-element="root">
+				<div sjs-element="padding"></div>
+				<div sjs-element="trigger"></div>
+				<div class="data-value" sjs-element="value"></div>
+		</div>
 </sjs-component>

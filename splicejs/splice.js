@@ -313,6 +313,20 @@ var sjs = (function(window, document){
 		return nodes;
 	};
 
+	function getPropertyValue(obj, path){
+		var nPath = path.split('.'),
+			result = obj;
+
+		if(nPath.length < 1) return null;
+
+		for (var i = 0; i< nPath.length; i++){
+
+			result = result[nPath[i]];
+
+			if (!result) return null;
+		}
+		return result;
+	};
 
 
 	function display(controller,target){
@@ -906,7 +920,6 @@ UrlAnalyzer.prototype = {
 
 		return result;
 	}
-
 
 	Binding.Value = function(obj){
 
@@ -2899,7 +2912,8 @@ UrlAnalyzer.prototype = {
 			endswith:endsWith,
 			mixin	: mixin,
 			binding : binding,
-			proxy	:proxy,
+			proxy	: proxy,
+			propvalue : getPropertyValue,
 
 			timing	:	measureRuntime,
 

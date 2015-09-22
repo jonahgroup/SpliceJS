@@ -38,7 +38,7 @@ definition:function(){
 	,	fdata 		= scope.Data.data
 	,	compare 	= scope.Data.compare.default
 	,	DataStep 	= scope.Data.DataStep
-	, 	UIControl 	= scope.SpliceJS.UI.UIControl;
+	, UIControl 	= scope.SpliceJS.UI.UIControl;
 
 	/**
 	 * DataTable
@@ -76,10 +76,11 @@ definition:function(){
 			headerRow : null,
 			pageCurrent:0,
 			pageSize: this.pageSize?this.pageSize:100,
-			bodyRowTemplate: /*this.rowTemplate  ? this.rowTemplate:*/  DefaultRow,
+			bodyRowTemplate: this.rowTemplate  ? this.rowTemplate: DefaultRow,
 			headRowTemplate: this.headTemplate ? this.headTemplate: DefaultRow,
-			headCellTemplate: scope.components['HeadCell']
+			headCellTemplate: scope.components.HeadCell
 		});
+
 
 		var self = this;
 		//data steps
@@ -228,9 +229,7 @@ definition:function(){
 
 		//on mouse down handler for rearanging columns by dragging
 		Event.attach(this.headTable,'onmousedown').subscribe(function(){
-
 			console.log('test');
-
 		});
 
 		//!!!!! TODO: review reflow model
@@ -271,6 +270,10 @@ definition:function(){
 		}
 	};
 
+
+	function handlerBodyClick(args){
+		console.log(args.source);
+	};
 
 	function sortComparator(columnIndex, order){
 		return function(a,b){
@@ -357,14 +360,6 @@ definition:function(){
 	};
 
 
-	function pickFilter(headCell){
-		debug.log('picking filters');
-	};
-
-	function handlerBodyClick(args){
-
-	};
-
 
 	function measureClient(recordCount){
 
@@ -392,9 +387,6 @@ definition:function(){
 		var start = Math.round(this.scrollMetrics.bufferScale);
 		var end  = start + this.scrollMetrics.bufferSize;
 
-		console.log('Start:' + start);
-		console.log('End:' + end);
-
 		var columnCount = headers.length;
 
 		/*check and create table body */
@@ -407,7 +399,7 @@ definition:function(){
 			this.headRow = new this.headRowTemplate({parent:this,columnCount});
 		}
 		//update create header row template nodes
-		this.headRow.dataIn(headers);
+		this.headRow.dataIn({data:headers});
 
 		/*  wrap nodes into header cells,
 		 *	to give us sorting controls and options triggers
@@ -423,16 +415,29 @@ definition:function(){
 		//update existing rows
 		for(var i=0; i < this.scrollMetrics.bufferSize && i  < this.dataRows.length;  i++) {
 			data_row = this.dataRows[i];
-			data_row.dataIn(data[i+start]);
+			data_row.dataIn({
+					level: i%10,
+					children:true,
+					expanded:false,
+					data:data[i+start]
+			});
 			addBodyRow(this.bodyTable, data_row.getNodes(), i);
 		}
 
 
 		/* create new rows*/
 		for(var j = this.dataRows.length; j < this.scrollMetrics.bufferSize; j++ ){
-			data_row = new this.bodyRowTemplate({parent:this, columnCount});
+
+			//data_row = new this.bodyRowTemplate({parent:this, columnCount});
+			data_row = new TreeRow(new this.bodyRowTemplate({parent:this, columnCount}));
+
 			this.dataRows.push(data_row);
-			data_row.dataIn(data[j+start]);
+			data_row.dataIn({
+				level: j%10,
+				children:true,
+				expanded:false,
+				data:data[j+start]
+			});
 			addBodyRow(this.bodyTable, data_row.getNodes(), j);
 		}
 
@@ -587,8 +592,10 @@ definition:function(){
 	};
 
 
-	DefaultRow.prototype.dataIn = function(data){
-		if(!data) return;
+	DefaultRow.prototype.dataIn = function(item){
+		if(!item) return;
+
+		var data = item.data;
 
 		//update existing values
 		for(var j = 0; j < this.nodes.length; j++ ){
@@ -605,21 +612,51 @@ definition:function(){
 		return this.nodes;
 	};
 
-
-	var BaseHierarchyRow = function BaseHierarchyRow(){
+	/**
+	 *	This is a wrapper row to srap
+	 */
+	var TreeRow = function TreeRow(rowTemplate){
+				this.row = rowTemplate;
 				this.nodes = [];
+
+				this.trigger = new scope.components.HierarchyTrigger();
+
+				this.arrow = dom(this.trigger.elements.trigger);
+				this.padding = dom(this.trigger.elements.padding);
+
+				this.s = this.trigger.concrete.dom.style;
 	};
 
-	BaseHierarchyRow.prototype.dataIn = function(data){
-				if(!data) return;
+	TreeRow.prototype.dataIn = function(item){
+				if(!item) return;
+				this.row.dataIn(item);
 
-				//add new nodes
-				for(var i= this.nodes.length; i<data.length; i++){
-						if(i == 0) {
-							this.nodes.push(dom.div())
+				// initial node creation
+				if(this.nodes.length == 0) {
+						var innerNodes = this.row.getNodes();
+						dom(this.trigger.elements.value).append(innerNodes[0]);
+						this.nodes.push(dom(this.trigger.concrete.dom));
+						for(var i=1; i < innerNodes.length; i++){
+								this.nodes.push(innerNodes[i]);
 						}
 				}
+
+				//update level offset
+				this.s.paddingLeft = (item.level * 10) +'px';
+
+				if(item.children === true) {
+					this.arrow.class.add('arrow');
+				}
+
+				if(item.expanded === true){
+					this.arrow.class.add('down');
+				}
 	};
+
+	TreeRow.prototype.getNodes = function(){
+			return this.nodes;
+	};
+
 
 
 
@@ -632,10 +669,37 @@ definition:function(){
 
 		if(args.columnCount) this.columnCount = args.columnCount;
 
+		//reference to raw children nodes
+		this.childrenNodes = this.concrete.dom.children;
+		//get children nodes
+		this.nodes = [];
+	});
+
+
+	DataTableRow.prototype.dataIn = function(item){
+
+		var data = item.data;
+
+		//update nodes
+		for(var i = 0; i < this.nodes.length; i++){
+			this.nodes[i].value(data,i,'te');
+		}
+
+		//add new nodes
+		for(var i = this.nodes.length; i < item.data.length; i++ ){
+			var d = dom(this.childrenNodes[i]);
+			this.nodes.push(d);
+			d.value(data,i,'te');
+		}
+
+	}
+
+
 		/*
 		 * process content placeholders before they are
 		 * pulled by parent control
 		 * */
+/*
 		var textNodes = Doc.select.textNodes(this.concrete.dom);
 		this.contentMap = [];
 
@@ -650,7 +714,9 @@ definition:function(){
 			textNodes[i].parentNode.replaceChild(span,textNodes[i]);
 			this.contentMap[key] = span;
 		}
-	});
+*/
+
+
 
 	DataTableRow.prototype.onDeleteClick = function(){
 		this.onDelete(this.data);
@@ -658,9 +724,9 @@ definition:function(){
 
 	DataTableRow.prototype.onHighlightValue = function(){};
 
-	DataTableRow.prototype.dataIn = function(data, filter_value){
+	DataTableRow.prototype.___dataIn = function(data, filter_value){
 
-		this.data = data;
+		this.data = data.data;
 
 		for(var key in this.contentMap){
 			var node = this.contentMap[key];
@@ -680,7 +746,7 @@ definition:function(){
 	};
 
 	DataTableRow.prototype.getNodes = function(){
-
+		return this.nodes;
 	};
 
 	DataTableRow.prototype.dataOut = Event;
@@ -698,8 +764,9 @@ definition:function(){
 
 
 
-	/* data table variat decoder */
-	// todo: !!!! SPECIFY __sjs_type__ to the factory components
+	/**
+	 *		DataTable variat factory
+	 */
 	var DataTable = Class(function DataTable(args){
 
 		var components = scope.components;
@@ -715,7 +782,6 @@ definition:function(){
 		return result;
 
 	});
-
 
 
 	//module exports

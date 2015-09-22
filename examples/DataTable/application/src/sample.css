@@ -50,7 +50,14 @@ body {
 
 .sample-table.-sjs-datatable .-sjs-table tbody tr:hover {
 	background-color: #2F2F2F;
+}
 
+.sample-table .current {
+	color: #cecece;
+}
+
+.sample-table .previous {
+	color: #C0AC77;
 }
 
 span.-drilldown {

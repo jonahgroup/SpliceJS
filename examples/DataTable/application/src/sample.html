@@ -2,15 +2,15 @@
 <!-- sample application template -->
 <sjs-component sjs-type="Sample" sjs-controller="SampleController" sjs-export>
 <div style="position:absolute; left:0px; top:0px; right:0px; bottom:0px;">
-	
+
 	<!-- our search input -->
 	<div style="padding-top:0.5em; padding-bottom:0.5em;"><span style="padding-left:10px; font-size:10px; font-family:Arial;">Search:</span>
 		<sjs-include sjs-type="SpliceJS.Controls.TextField" sjs-controller="SearchTextField">{
 			onData: binding('onFilterData').parent,
 			dataIn: binding('onClearFilter').parent,
-			isRealTime: true 
+			isRealTime: true
 		}</sjs-include>
-	
+
 		<sjs-include sjs-type="SpliceJS.Controls.Button" sjs-ref="searchButton">
 			{
 				isHidden:true,
@@ -18,26 +18,26 @@
 				content:{label:'Clear'}
 			}
 		</sjs-include>
-		
+
 		<div style="float:right; margin-top:4px;">
 			<div class="-sjs-paginator">
 			<sjs-include type="SpliceJS.Controls.DomIterator">
 				{
 					from:1, to:10,
-					onStyleSelect: binding('selectPageStyle').parent, 
+					onStyleSelect: binding('selectPageStyle').parent,
 					dom:<div style="display:inline;"><span class="page">@i</span></div>
 				}
 			</sjs-include>
-				
+
 			</div>
 		</div>
 	</div>
-	
+
 	<!-- our data table-->
 	<div style="position:absolute; width:100%; top:2.8em; bottom:0px;">
-	<sjs-include  type="SpliceJS.Controls.DataTable" 
-				  ref="dataTable" 
-				  class="sample-table" 
+	<sjs-include  type="SpliceJS.Controls.DataTable"
+				  ref="dataTable"
+				  class="sample-table"
 				  layout="fill">
 		{
 			pageSize:100,
@@ -45,7 +45,7 @@
 			filterData: binding('onFilterData').parent,
 			pageNext: 	binding('onNextPage').parent,
 			pagePrev: 	binding('onPrevPage').parent,
-			rowTemplate:<sjs-include type="SampleRow"></sjs-include>
+			rowTemplate:<sjs-include sjs-type="SampleRow"></sjs-include>
 		}
 	</sjs-include>
 	</div>
@@ -62,14 +62,17 @@
 
 
 <!-- data table row template -->
-<sjs-component sjs-type="SampleRow" controller="SpliceJS.Controls.DataTableRow">
+<sjs-component sjs-type="SampleRow" sjs-controller="SpliceJS.Controls.DataTableRow">
 	<div><span class="-drilldown">@0</span></div>
-	<sjs-include type="SpliceJS.Controls.DomIterator">
+	<sjs-include sjs-type="SpliceJS.Controls.DomIterator" sjs-singleton="Sample">
 		{
 			from: 1,
 			to: binding('columnCount').parent,
 			contentTemplate:'@',
-			dom:<div>@i</div>
+			dom:<div>
+					<div class="current">@i</div>
+					<div class="previous">Email Length: <span>@1.length</span></div>
+			</div>
 		}
 	</sjs-include>
 </sjs-component>
