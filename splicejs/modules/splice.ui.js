@@ -98,21 +98,21 @@ definition:function(){
 	UIControl.prototype.reflow = function(position,size,bubbleup){
 		if(!this.concrete || !this.concrete.dom) return;
 
-		if(this.layout === 'css') return;
-
 		if(bubbleup == true) {
 			this.reflowChildren(null,null,bubbleup);
 			return ;
 		}
 
 		// Get style object once and apply settings
-		var style = this.concrete.dom.style;
+		if(this.layout !== 'css') {
+			var style = this.concrete.dom.style;
 
-		style.left 		= position.left +'px';
-		style.top  		= position.top + 'px';
+			style.left 		= position.left +'px';
+			style.top  		= position.top + 'px';
 
-		style.width  	= size.width + 'px';
-		style.height 	= size.height + 'px';
+			style.width  	= size.width + 'px';
+			style.height 	= size.height + 'px';
+		}
 
 		this.reflowChildren(position,size,bubbleup);
 

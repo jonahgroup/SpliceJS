@@ -21,8 +21,6 @@ definition:function(sjs){
 	var ListBoxController = Class.extend(UIControl)(function ListBoxController(){
 			this.super();
 
-			this.items = [];
-
 			this.scrollPanel 	= this.ref.scrollPanel;
 			this.contentClient 	= this.ref.scrollPanel.ref.contentClient;
 
@@ -41,10 +39,10 @@ definition:function(sjs){
 		if(parent == null) return;
 
 		var idx = parent.__sjs_item_index__;
-
+		console.log(this.dataItem[idx]);
 
 		//notify on data item
-		this.onDataItem(this.items[idx]);
+		this.onDataItem(this.dataItem[idx]);
 	};
 
 
@@ -59,8 +57,6 @@ definition:function(sjs){
 				item = new this.itemTemplate({parent:this});
 				item.dataIn(this.dataItem[i]);
 				item.concrete.dom.__sjs_item_index__ = i;
-
-				this.items[i] = item;
 
 				if(this.contentClient){
 					this.contentClient.concrete.dom.appendChild(item.concrete.dom);

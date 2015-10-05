@@ -322,8 +322,7 @@ var sjs = (function(window, document){
 		for (var i = 0; i< nPath.length; i++){
 
 			result = result[nPath[i]];
-
-			if (!result) return null;
+			if (result == null) return null;
 		}
 		return result;
 	};
@@ -2938,6 +2937,6 @@ UrlAnalyzer.prototype = {
 
 	});}
 	//core.debug = debug;
-	return sjs
+	return sjs;
 
 })(window,document);

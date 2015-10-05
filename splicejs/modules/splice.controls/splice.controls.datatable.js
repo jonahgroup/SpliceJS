@@ -378,6 +378,9 @@ definition:function(){
 	*/
 	function renderTable(){
 
+		var fn_start = window.performance.now();
+
+
 		var data 	= this.dataSteps.render.data.data
 		, 	headers = this.dataSteps.render.data.headers;
 
@@ -416,7 +419,7 @@ definition:function(){
 		for(var i=0; i < this.scrollMetrics.bufferSize && i  < this.dataRows.length;  i++) {
 			data_row = this.dataRows[i];
 			data_row.dataIn({
-					level: i%10,
+					level: this.isTreeTable?data[i+start][1]:0,
 					children:true,
 					expanded:false,
 					data:data[i+start]
@@ -429,11 +432,14 @@ definition:function(){
 		for(var j = this.dataRows.length; j < this.scrollMetrics.bufferSize; j++ ){
 
 			//data_row = new this.bodyRowTemplate({parent:this, columnCount});
-			data_row = new TreeRow(new this.bodyRowTemplate({parent:this, columnCount}));
+			if(this.isTreeTable)
+				data_row = new TreeRow(new this.bodyRowTemplate({parent:this, columnCount}));
+			else
+				data_row = new this.bodyRowTemplate({parent:this, columnCount});
 
 			this.dataRows.push(data_row);
 			data_row.dataIn({
-				level: j%10,
+				level: this.isTreeTable?data[j+start][1]:0,
 				children:true,
 				expanded:false,
 				data:data[j+start]
@@ -457,6 +463,9 @@ definition:function(){
 	//	truncateRows(this.bodyTable, data.length);
 
 		this.reflow();
+
+		var fn_end = window.performance.now();
+		console.log('DataTable frame rate ' + 1000/(fn_end-fn_start));
 	};
 
 	//returns a get of nodes
@@ -642,7 +651,7 @@ definition:function(){
 				}
 
 				//update level offset
-				this.s.paddingLeft = (item.level * 10) +'px';
+				this.s.paddingLeft = (item.level * 20) +'px';
 
 				if(item.children === true) {
 					this.arrow.class.add('arrow');
@@ -689,7 +698,7 @@ definition:function(){
 		for(var i = this.nodes.length; i < item.data.length; i++ ){
 			var d = dom(this.childrenNodes[i]);
 			this.nodes.push(d);
-			d.value(data,i,'te');
+			d.value(data,i);
 		}
 
 		this.dataOut(item);

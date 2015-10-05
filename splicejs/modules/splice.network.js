@@ -7,98 +7,83 @@ definition:function(sjs){
 	//configuration constants
 	var	SPLICE_REMOTE_ENDPOINT = sjs.config.SPLICE_REMOTE_ENDPOINT
 	,	SPLICE_REMOTE_CALL_ADAPTER = sjs.config.SPLICE_REMOTE_CALL_ADAPTER;
-	
-	var HttpRequest = this.HttpRequest
-	,	debug = this.debug;
-	
-    var Remote = Object.create(null);
-	
 
-    //arguemnt array of remote calls - array of strings, 
+	var HttpRequest = sjs.HttpRequest
+	,	debug = sjs.debug;
+
+
+    //arguemnt array of remote calls - array of strings,
     //or an object to receive remote call declarations
-	var RemoteCalls = function (obj) {
-
-	    var fn = function (calls) {
-
-	        if (!(calls instanceof Array)) calls = [calls];
-
-	        var remote = this.Remote;
-	        if (!remote) remote = this.Remote = Object.create(null);
-
-	        for (var i = 0; i < calls.length; i++) {
-
-	            var call = calls[i]
-                , nparts = call.split('.')
-                , fullCall = call;
 
 
-	            for (var n = 0; n < nparts.length - 1; n++) {
-	                if (!remote[nparts[n]]) remote[nparts[n]] = {};
-	                remote = remote[nparts[n]];
-	            }
+  function registerCalls(calls, endpoint, adapter) {
 
-	            call = nparts[nparts.length - 1];
+      if (!(calls instanceof Array)) calls = [calls];
+      var remote = this;
 
-	            if (remote[call] != null && remote[call] != undefined) continue;
+      for (var i = 0; i < calls.length; i++) {
+          remote = this;
 
-	            remote[call] = (function () {
-	                var methodName = this.methodName;
-	                var args = arguments;
+          var call = calls[i]
+          , nparts = call.split('.')
+          , fullCall = call;
 
-	                return function (oncomplete, onfailure) {
-	                    if (!oncomplete || typeof (oncomplete) !== 'function') return;
+          for (var n = 0; n < nparts.length - 1; n++) {
+              if (!remote[nparts[n]]) remote[nparts[n]] = {};
+              remote = remote[nparts[n]];
+          }
 
-	                    if (!SPLICE_REMOTE_ENDPOINT) //perform a stronger check for a valid URL syntax
-	                        throw 'Remote end-point is not configured';
+          call = nparts[nparts.length - 1];
 
-	                    HttpRequest.post({
-	                        /* TODO: server end point URL, turn into a configurable property */
-	                        url: SPLICE_REMOTE_ENDPOINT,
+          if (remote[call] != null && remote[call] != undefined) continue;
 
-	                        contentType: 'application/json;charset=UTF-8',
+          remote[call] = (function () {
+              var methodName = this.methodName;
+              var args = arguments;
 
-	                        data: serialize(methodName, args),
+              return function (oncomplete, onfailure) {
+                  if (!oncomplete || typeof (oncomplete) !== 'function') return;
 
-	                        onok: function (response) {
-	                            if (typeof (oncomplete) === 'function')
-	                            oncomplete(deserialize(response.text));
-	                        },
+                  HttpRequest.post({
+                      /* TODO: server end point URL, turn into a configurable property */
+                      url: endpoint,
 
-	                        onfail: function (response) {
-	                            if (typeof (onfailure) === 'function')
-	                            onfailure(error(response.text));
-	                        }
-	                    });
-	                }
-	            }).bind({ methodName: fullCall });
-	        }
-	    };
-        
-	    if (obj instanceof Array) return fn.call(this, obj);
-        
-	    return function (a) { fn.call(obj, a);}
-	};
-	
+                      contentType: 'application/json;charset=UTF-8',
+
+                      data: serialize(methodName, args, adapter),
+
+                      onok: function (response) {
+                          if (typeof (oncomplete) === 'function')
+                          oncomplete(deserialize(response.text, adapter));
+                      },
+
+                      onfail: function (response) {
+                          if (typeof (onfailure) === 'function')
+                          onfailure(error(response.text));
+                      }
+                  });
+              }
+          }).bind({ methodName: fullCall });
+      }
+  };
 
 
-	function error(response) {
-	    var adapter = _.Namespace.lookup(SPLICE_REMOTE_CALL_ADAPTER);
 
+	function error(response, adapter) {
 	    if (adapter != null) {
 	        if (typeof adapter.error !== 'function') {
-	            throw 'Remote call adapter: ' + SPLICE_REMOTE_CALL_ADAPTER + ' must implement "error" method';
+	            throw 'Remote call adapter must implement "error" method';
 	        }
 	        return adapter.error(response);
 	    }
-	    
 	    return "remote call error";
-	}
-    
-	function deserialize(response){
-		var adapter = _.Namespace.lookup(SPLICE_REMOTE_CALL_ADAPTER);
-	
+	};
+
+
+	function deserialize(response, adapter){
+
 		if(adapter != null){
-			return adapter.deserialize(response);	
+			return adapter.deserialize(response);
 		}
 
 		var result = JSON.parse(response.text);
@@ -106,25 +91,42 @@ definition:function(sjs){
 	};
 
 
-	function serialize(methodName, args) {
-		var json = null
-	    ,   adapter = _.Namespace.lookup(SPLICE_REMOTE_CALL_ADAPTER);
-        
+	function serialize(methodName, args, adapter) {
+		var json = null;
+
+
 		if (!args) args = [];
 
 		if (adapter != null)
 		    json = adapter.serialize(methodName, args);
-        else 
+        else
 		    json = '{"request":{"Call":"' + methodName + '","Parameters":' + JSON.stringify(args) + '}}';
 
 		debug.log(json);
-		
+
 		return json;
 	};
 
+  function Remote(url, adapter){
+    this.endpoint = url;
+    this.adapter = adapter;
+  };
+
+  Remote.prototype.calls = function calls(remoteCalls){
+    registerCalls.call(this,remoteCalls, this.endpoint, this.adapter);
+    return this;
+  };
+
+
+  function remote(url, adapter) {
+    return new Remote(url, adapter);
+  };
+
+
+
 	return {
-		RemoteCalls: RemoteCalls
-	}	
+    remote : remote
+	}
 
 }
 });

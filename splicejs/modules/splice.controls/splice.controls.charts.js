@@ -65,7 +65,7 @@ definition:function(sjs){
 
 		this.hAxis = this.svg.append('g').attr('class', 'horizontal-axis');
 		this.vAxis = this.svg.append('g').attr('class', 'vertical-axis');
-        this.grid  = this.svg.append('g').attr('class', 'chart-grid')
+    this.grid  = this.svg.append('g').attr('class', 'chart-grid')
 
 		this.chartArea = this.svg.append('g').attr('class','chart-area');
 

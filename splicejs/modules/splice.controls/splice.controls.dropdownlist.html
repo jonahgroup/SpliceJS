@@ -1,9 +1,12 @@
 <sjs-component sjs-type="DropDownList" sjs-controller="DropDownListController" sjs-export>
 	<sjs-include sjs-type="SpliceJS.Controls.DropDownSelector">
-	{	ref:'selector',
-        content:{
-            dropDownItem:<sjs-include sjs-type="SpliceJS.Controls.ListBox"></sjs-include>
-        }
+	{
+		    dropDownItem:
+				<sjs-include sjs-type="SpliceJS.Controls.ListBox">
+					{
+						dataIn:binding('onDataIn').type('DropDownList')
+					}
+				</sjs-include>
 	}
 	</sjs-include>
 </sjs-component>

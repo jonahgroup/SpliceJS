@@ -14,7 +14,7 @@ definition:function(sjs){
 			}
 		);
 		this.dowork = dowork;
-	};	
+	};
 	DataStep.prototype = {
 		run:function(args){
 			var in_data = null;
@@ -41,7 +41,7 @@ definition:function(sjs){
 	function isIn(value, start,end){
 		if(value == null) return false;
 		if(value >= start && value <= end) return true;
-		return false;	
+		return false;
 	};
 
 	/*
@@ -64,13 +64,13 @@ definition:function(sjs){
 	Iterator.prototype.iterate = function(callback, start, end){
 		throw "Abstract method: Iterator.prototype.iterate(callback) implementation is not provided";
 	};
-	
+
 	Iterator.prototype.next = function(callback){
 		throw "Abstract method: Iterator.prototype.next(callback) implementation is not provided";
 	};
-	
+
 	Iterator.prototype.to = function(position){
-		throw "Abstract method: Iterator.prototype.to(position) implementation is not provided";	
+		throw "Abstract method: Iterator.prototype.to(position) implementation is not provided";
 	};
 
 	/**
@@ -98,7 +98,7 @@ definition:function(sjs){
 	NumericIterator.prototype.iterate = function(callback,start,end){
 		callback = callback ? callback : function(){};
 		var _start 	= 0
-		,	_end 	= this.n; 
+		,	_end 	= this.n;
 
 		if(start) {	_start = start;	}
 		if(end) {_end = end;}
@@ -107,7 +107,7 @@ definition:function(sjs){
 			callback(this.fn(i));
 		}
 	};
-	
+
 
 	/**
 	 * Wraps callback around target iterator
@@ -156,13 +156,13 @@ definition:function(sjs){
 
 	ArrayIterator.prototype.iterate = function(callback,start,end){
 		if(typeof callback !== 'function') return;
-		
+
 		var _start = 0
-		,	_end = this.length; 
-		
+		,	_end = this.length;
+
 		if(start != null) {_start = start;}
 		if(end != null) {_end  = end;}
-		
+
 		for(var i = _start; i < _end; i++){
 			callback(this.fn(this.array[i]),i,i);
 		}
@@ -173,43 +173,43 @@ definition:function(sjs){
 	*/
 	var PagingIterator = Class.extend(Iterator)(function PagingIterator(source, pagesize,callback){
 		this.super(callback);
-		this.i = source;	
+		this.i = source;
 		this.size = pagesize;
 		this.page = 0;
-		
-		//total number of pages, used the next call		
+
+		//total number of pages, used the next call
 		this.pages = Math.floor(source.length / pagesize) +
 			( (source.length % pagesize)?1:0 );
-	
-		// assumes iterator length is known, may not always be the case		 
+
+		// assumes iterator length is known, may not always be the case
 		this.length = this.size;
-		
+
 	});
-	
+
 	// in context of paging iterator start, end boundary indicates pages
-	// if present for paring iterator these arguments are ignored 
+	// if present for paring iterator these arguments are ignored
 	PagingIterator.prototype.iterate = function(callback, start, end){
 
 		if(typeof callback !== 'function') return;
-		
+
 		var _start = this.page * this.size
 		,	_end = _start + this.size;
-		
+
 		if(start != null) _start = start;
 		if(end != null) _end = end;
-		
-		this.i.iterate(callback,_start,_end);		
-		
+
+		this.i.iterate(callback,_start,_end);
+
 	};
 	// returns true and passes itself to a callback
 	PagingIterator.prototype.next = function(callback){
-		if(typeof callback === 'function') 
+		if(typeof callback === 'function')
 			callback(this.fn(this));
 		this.page++;
 		if(this.page >= this.pages) return false;
-		return true;		
+		return true;
 	};
-	
+
 	//sets are new page
 	PagingIterator.prototype.to = function(page){
 		this.page = page;
@@ -217,76 +217,76 @@ definition:function(sjs){
 	};
 
 
-	/** 
-	 * Creates frame view of the source iterator	
+	/**
+	 * Creates frame view of the source iterator
 	 */
 	 var FrameXIterator = Class.extend(Iterator)(function FrameXIterator(source, size, step, callback){
 		this.super(callback);
 		this.i = source;
-		
+
 		this.length = size;
-		this.step = step; this.size = size; this.position = 0; 
-	 
+		this.step = step; this.size = size; this.position = 0;
+
 	 	this.steps = Math.floor(this.length / this.step) + ((this.length % this.step)?1:0);
-	 
+
 	 });
 
 
 	 FrameXIterator.prototype.iterate = function(callback, start, end){
 	 	 if(typeof callback !== 'function') return;
-		 
+
 		 var _start = _s = this.position * this.step;
 		 var _end = _e = _start + this.size;
-		 
+
 		 if( isIn(start, _s, _e-1)) _start = start;
-		 if( isIn(end, _s, _e-1)) _end = end; 
-		 
-		 this.i.iterate(callback,_start,_end);		 
+		 if( isIn(end, _s, _e-1)) _end = end;
+
+		 this.i.iterate(callback,_start,_end);
 	 };
-	 
+
 	 FrameXIterator.prototype.next = function(callback){
 	 	if(typeof callback === 'function')
-			callback(this.fn(this)); 
+			callback(this.fn(this));
 		this.position++;
 		if(this.position >= this.steps) return false;
-		return true;			 
+		return true;
 	 };
-	 
+
 	 FrameXIterator.prototype.to = function(frameNo){
 		 this.position = frameNo;
 		 return this;
 	 };
-	 
-	 /** 
-	  *	Breaks up collection into ranges 
+
+	 /**
+	  *	Breaks up collection into ranges
 	  */
 	var RangeIterator = Class.extend(Iterator)(function RangeIterator(source, start, size, callback){
 		this.super(callback);
 		this.length = size;
 		this.i = source;
-		
+
 	 	this.start = start;
-		this.end = start + size;	  
+		this.end = start + size;
 	});
 
-	 
+
 	RangeIterator.prototype.iterate = function(callback, start, end){
 		var _start = this.start
 		,	_end = this.end;
-		
+
 		if( isIn(start, this.start, this.end) )
 			_start = start;
-		
+
 		if(isIn(end, this.start, this.end))
 			_end = end;
-		var counter = {i:0}	
+		var counter = {i:0}
 		this.i.iterate(function(v,k,i){
 			callback(v,k,counter.i+_start);
 			counter.i++;
-		},_start,_end);	
+		},_start,_end);
 	}
-	 
-	 
+
+
 
 	/**
 	 * Iterates over object properties
@@ -336,7 +336,7 @@ definition:function(sjs){
 		}
 	};
 
-	/** 
+	/**
 	 * */
 	var FrameIterator = Class.extend(Iterator)(function FrameIterator(array, size, step, transformFunction){
 		this.super(transformFunction);
@@ -623,6 +623,34 @@ definition:function(sjs){
 		return data(result);
 	};
 
+
+
+function _objectToMap(onitem){
+	var result = {}
+	, keys = Object.keys(this);
+
+	if(!keys) return data(result);
+	if(keys.length < 1) return data(result);
+
+	for(var i=0; i<keys.length; i++){
+		if(this.hasOwnProperty(keys[i])){
+			var value = this[keys[i]];
+			if(typeof onitem === 'function')
+				value = onitem(value,keys[i],i);
+
+			if(value == null || value == undefined) continue;
+			if(value.key && value.value) {
+				result[value.key] = value.value;
+			} else {
+				result[keys[i]] = value;
+			}
+		}
+	}
+	return data(result);
+};
+
+
+
 	/**
 	 *	Array transformation function
 	 */
@@ -748,6 +776,16 @@ definition:function(sjs){
 	};
 
 
+	function _dfs(tree, children, callback, level, child){
+		if(tree == null) return;
+		callback(tree,level,child);
+		var ch = tree[children];
+		for(var i=0; i<ch.length; i++){
+			_dfs(ch[i],children,callback,level+1,i);
+		}
+	};
+
+
 	function data(d){
 /*
 		var i = null;
@@ -761,7 +799,7 @@ definition:function(sjs){
 		return {
 			length: i.length,
 			to:	function to(){
-				if(typeof arguments[0] === 'function') 
+				if(typeof arguments[0] === 'function')
 					return data(new NestedIterator(i, arguments[0]));
 				return data(i.to.apply(i,arguments));
 			},
@@ -775,7 +813,7 @@ definition:function(sjs){
 				return i.current();
 			},
 			frame:function frame(size,step){
-				return data(new FrameXIterator(i,size,step,function(item){return data(item);}));	
+				return data(new FrameXIterator(i,size,step,function(item){return data(item);}));
 			},
 			current: function current(){
 				return i.current();
@@ -783,11 +821,11 @@ definition:function(sjs){
 			page:function page(size){
 				return data(new PagingIterator(i,size,function(item){return data(item);}))
 			},
-			
+
 			range:function range(start, end){
 				return data(new RangeIterator(i,start,end))
 			},
-			
+
 			asyncloop	:function(callback, pageSize){return function(oncomplete, onint){
 						return asyncIterator(d, callback, pageSize, oncomplete, onint);}
 			},
@@ -798,20 +836,25 @@ definition:function(sjs){
 
 		var _export  = {
 			each		:function(callback){return forEach.call(d,callback);},
-			filter		:function(callback){return filter.call(d,callback);},
+			filter	:function(callback){return filter.call(d,callback);},
 			group		:function(callback,gfn){return groupBy.call(d,callback,gfn);},
 			first		:function(callback){return first.call(d);},
 			nth			:function(callback){return nth.call(d);},
-			page        :function(size,start) { return new Paginator(d, size, start);},
-			frame       :function(size,move){return new Frame(d,size,move);},
+			page    :function(size,start) { return new Paginator(d, size, start);},
+			frame   :function(size,move){return new Frame(d,size,move);},
 			sort		:function(callback){return sort.call(d,callback);},
 			size		:function(callback){return size.call(d,callback);},
 			add			:function(toadd){return add.call(d,toadd);},
 			asyncloop	:function(callback, pageSize){return function(oncomplete, onint){
 							return asyncIterator(d, callback, pageSize, oncomplete, onint);}
 						},
-			array		:function(){return d;},					
-			result  	:function(){return itr.current();}
+			array		:function(){return d;},
+			result  :function(){return itr.current();},
+			tree		:function(prop){return {
+					dfs:function(callback){
+						_dfs(d,prop,callback,0);
+					}
+			}}
 		};
 
 		// multiplex "to" function
@@ -819,7 +862,10 @@ definition:function(sjs){
 			_export.to = function(callback){return _numberToArray.call(d,callback);};
 		} else if(typeof d === 'object' || d instanceof Array) {
 			_export.to = function(callback){return _objectToArray.call(d,callback);};
+			_export.map = function(callback){return _objectToMap.call(d,callback);};
 		}
+
+
 
 		return _export;
 
