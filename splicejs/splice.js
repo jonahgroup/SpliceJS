@@ -1880,11 +1880,20 @@ UrlAnalyzer.prototype = {
 		}
 	};
 
-	Concrete.prototype.applyContent = function(content, suspendNotify){
+	Concrete.prototype.applyContent = function(content, instance, scope, suspendNotify){
 
 		var deepClone = this.dom;
 		var controllerInstance = this.controllerInstance;
 
+		if(content instanceof Binding){
+			console.log('content is a binding');
+			var targetInstance = content.getTargetInstance(instance,scope);
+
+			content = targetInstance.__sjs_args__.content;
+
+			if(content == null || !content) return;
+
+		}
 
 		if(!this.contentMap) {
 			var contentNodes = selectTextNodes(deepClone, function(node){
@@ -1911,6 +1920,7 @@ UrlAnalyzer.prototype = {
 			var obj = content[key];
 			var newNode = null;
 
+			/* proxy object, could be another control */
 			if(typeof obj === 'function') {
 				var contentInstance = new obj({parent:controllerInstance});
 				if(contentInstance.concrete) {
@@ -2038,15 +2048,12 @@ UrlAnalyzer.prototype = {
 		* Getcontent nodes
 		*/
 		if(parameters.content)
-		instance.applyContent(parameters.content, true);
+		instance.applyContent(parameters.content, controllerInstance, scope, true);
 
 
 		if(typeof controllerInstance.handleContent === 'function'){
 			controllerInstance.handleContent(parameters.content);
 		}
-
-
-
 
 
 		/*
@@ -2591,6 +2598,9 @@ UrlAnalyzer.prototype = {
 			obj.elements = {};
 			obj.children = [];
 			obj.scope = scope;
+
+
+			obj.__sjs_args__ = args;
 
 
 			/*
