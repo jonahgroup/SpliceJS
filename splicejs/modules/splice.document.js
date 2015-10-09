@@ -262,6 +262,11 @@ definition:function(sjs){
 		if(!element) return null;
 		return {
 
+			clear: function(){
+					element.innerHTML = '';
+					return dom(element);
+			},
+
 			append: function(child){
 				element.appendChild(child.element);
 				return dom(element);

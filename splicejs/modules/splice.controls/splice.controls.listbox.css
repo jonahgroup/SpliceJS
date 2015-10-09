@@ -1,4 +1,8 @@
-.-splicejs-list-box {
+.-sjs-list-box {
 	position:absolute;
 	top:0px; bottom:0px; left:0px; right:0px;
+}
+
+.-sjs-list-box-base {
+	position:relative;
 }

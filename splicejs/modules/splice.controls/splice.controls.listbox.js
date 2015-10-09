@@ -3,6 +3,7 @@ sjs({
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
+	{'Doc':'{sjshome}/modules/splice.document.js'},
 	'splice.controls.listbox.css',
 	'splice.controls.listbox.html'
 ],
@@ -16,13 +17,20 @@ definition:function(sjs){
 	, 	components = this.scope.components;
 
 	var	UIControl = this.scope.SpliceJS.UI.UIControl
-
+	,		dom = this.scope.Doc.dom;
 
 	var ListBoxController = Class.extend(UIControl)(function ListBoxController(){
 			this.super();
+			this.dom = null;
 
-			this.scrollPanel 	= this.ref.scrollPanel;
-			this.contentClient 	= this.ref.scrollPanel.ref.contentClient;
+			if(this.ref.contentClient) {
+				this.dom = dom(this.ref.contentClient.concrete.dom);
+			}
+			else {
+				this.dom = dom(this.elements.root);
+			}
+
+			if(!this.itemTemplate) this.itemTemplate = DefaultListItem;
 
 			Event.attach(this.concrete.dom, `onclick`).subscribe(this.click, this);
 	});
@@ -48,21 +56,27 @@ definition:function(sjs){
 
 	ListBoxController.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
-		this.contentClient.concrete.dom.innerHTML = '';
+		this.dom.clear();
 
 		var item = null;
 
 		for(var i=0; i<dataItem.length; i++) {
 			if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
-				item.dataIn(this.dataItem[i]);
+
+				if(this.dataPath){
+					item.dataIn(sjs.propvalue(this.dataItem[i],this.dataPath));
+				} else {
+					item.dataIn(this.dataItem[i]);
+				}
+
 				item.concrete.dom.__sjs_item_index__ = i;
 
-				if(this.contentClient){
-					this.contentClient.concrete.dom.appendChild(item.concrete.dom);
-					if(typeof item.onAttached == 'function')
-						item.onAttached();
-				}
+
+				this.dom.append(dom(item.concrete.dom));
+				if(typeof item.onAttached == 'function')
+					item.onAttached();
+
 			}
 		}
 
@@ -71,8 +85,25 @@ definition:function(sjs){
 	};
 
 	ListBoxController.prototype.reflow = function(){
+		if(!this.ref.scrollPanel) return;
+
 		this.ref.scrollPanel.reflow();
+
 	};
+
+	var DefaultListItem = Class(function DefaultListItem(){
+			this.concrete =  {
+				dom : document.createElement('div')
+			};
+
+			this.concrete.dom.className = '-sjs-listbox-item';
+	});
+
+	DefaultListItem.prototype.dataIn = function(dataItem){
+		if(!dataItem) return;
+		this.concrete.dom.innerHTML = dataItem.toString();
+	};
+
 
 
 

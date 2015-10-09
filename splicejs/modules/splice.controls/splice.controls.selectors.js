@@ -50,7 +50,7 @@ definition:function(){
 
 
 	DropDownController.prototype.onDropDown = Event;
-	DropDownController.prototype.onDropDownComplete = Event;
+	//DropDownController.prototype.onDropDownComplete = Event;
 
 
 	DropDownController.prototype.dataIn = function(data){

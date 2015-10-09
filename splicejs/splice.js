@@ -2530,7 +2530,7 @@ UrlAnalyzer.prototype = {
 
 		instance.parent.children.push(instance);
 
-		if(!args.ref) return;
+	//	if(!args.ref) return;
 
 		if(typeof args.ref == 'string') {
 			instance.parent.ref[args.ref] = instance;
@@ -2544,7 +2544,15 @@ UrlAnalyzer.prototype = {
 			return;
 		}
 
-		throw 'Invalid [ref] value, must be a string or an instance of Binding';
+		if(args['class'] instanceof Binding){
+			var ti = args['class'].getTargetInstance(instance,scope);
+			if(!ti) throw 'Unable to locate target instance';
+			args['class'] = getPropertyValue(ti,args['class'].prop);
+			console.log('class binding');
+			return;
+		}
+
+	//	throw 'Invalid [ref] value, must be a string or an instance of Binding';
 	};
 
 

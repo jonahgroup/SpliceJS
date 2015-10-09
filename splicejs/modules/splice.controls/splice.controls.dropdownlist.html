@@ -2,10 +2,14 @@
 	<sjs-include sjs-type="SpliceJS.Controls.DropDownSelector" sjs-ref="selector">
 	{
 				content:binding('content').parent,
+				onDropDown:binding('onDropDown').parent,
 				dropDownItem:
-				<sjs-include sjs-type="SpliceJS.Controls.ListBox">
+				<sjs-include class="binding('css.list').type('DropDownList')"
+										 sjs-type="SpliceJS.Controls.ListBox">
 					{
-						dataIn:binding('onDataIn').type('DropDownList')
+						dataIn:binding('onDataIn').type('DropDownList'),
+						itemTemplate:binding('itemTemplate').type('DropDownList'),
+						dataPath:binding('dataPath').type('DropDownList')
 					}
 				</sjs-include>
 	}

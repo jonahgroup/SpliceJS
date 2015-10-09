@@ -1,14 +1,16 @@
 <sjs-component sjs-type="StretchListBox" sjs-controller="ListBoxController">
-	<div class="-splicejs-list-box" sjs-element="root"></div>
+	<div class="-sjs-list-box-base" sjs-element="root"></div>
 </sjs-component>
 
 
 <sjs-component sjs-type="ScrollableListBox" sjs-controller="ListBoxController">
-	<div class="-splicejs-list-box" sjs-element="root">
+	<div class="-sjs-list-box" sjs-element="root">
 		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">{
 			ref:'scrollPanel',
 			content:{
-				scrollContent:<sjs-include sjs-type="ContentClient" sjs-ref="contentClient"></sjs-include>,
+				scrollContent:<sjs-include 	sjs-type="ContentClient"
+																		sjs-ref="binding('contentClient').type('ScrollableListBox')">
+											</sjs-include>,
 				staticContent:''
 			}
 		}</sjs-include>
