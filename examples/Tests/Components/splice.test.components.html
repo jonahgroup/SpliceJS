@@ -1,8 +1,10 @@
 <sjs-component sjs-type="Components" sjs-controller="ComponentsTest" sjs-export>
 
-<div>
-  <div style="float:left; margin-right:20px;">ComboBox</div>
-  <div style="float:left;">
+<table class="-component-test-table">
+<!-- ComboBox -->
+<tr>
+  <td>ComboBox</td>
+  <td>
   <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
     {
         default:'Please select an item',
@@ -10,7 +12,17 @@
         onDataItem: binding('provinceSelected').parent
     }
   </sjs-include>
-  </div>
-</div>
+</td>
+</tr>
+
+
+<!-- Another Component -->
+<tr>
+  <td>Component Name</td>
+  <td>Component Include</td>
+</tr>
+
+
+
 
 </sjs-component>
