@@ -1861,7 +1861,7 @@ UrlAnalyzer.prototype = {
 
 	Controller.prototype.onAttach 		= EventSingleton;
 	Controller.prototype.onDisplay 		= EventSingleton;
-	Controller.prototype.onDomChanged 	= EventSingleton;
+	Controller.prototype.onDomChanged = EventSingleton;
 	Controller.prototype.onData 		= EventSingleton;
 
 

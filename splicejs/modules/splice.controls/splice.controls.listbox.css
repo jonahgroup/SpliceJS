@@ -6,3 +6,12 @@
 .-sjs-list-box-base {
 	position:relative;
 }
+
+.-sjs-listbox-item {
+	padding:5px;
+	cursor:default;
+}
+
+.-sjs-listbox-item:hover {
+	background-color: #333333;
+}
