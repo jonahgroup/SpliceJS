@@ -1,6 +1,19 @@
 <sjs-component sjs-type="Components" sjs-controller="ComponentsTest" sjs-export>
 
 <table class="-component-test-table">
+
+
+<!-- Button Component -->
+<tr>
+  <td>Button</td>
+  <td>
+    <sjs-include sjs-type="SpliceJS.Controls.Button">
+      {content: {label: 'Test Button'}}
+    </sjs-include>
+  </td>
+</tr>
+
+
 <!-- ComboBox -->
 <tr>
   <td>ComboBox</td>
@@ -14,6 +27,83 @@
   </sjs-include>
 </td>
 </tr>
+
+
+<!-- DropDownList -->
+<tr>
+  <td>DropDownList</td>
+  <td>
+  <sjs-include sjs-type="SpliceJS.Controls.DropDownList">
+    {
+        content:{selectedItem:'Provinces'},
+        dataIn: binding('onProvinces').parent,
+        onDataItem: binding('provinceSelected').parent
+    }
+  </sjs-include>
+</td>
+</tr>
+
+
+<!-- ListBox No Scroll-->
+<tr>
+  <td>ListBox - No Scroll</td>
+  <td>
+  <sjs-include sjs-type="SpliceJS.Controls.ListBox">
+    {
+        dataIn: binding('onProvinces').parent,
+        onDataItem: binding('provinceSelected').parent
+    }
+  </sjs-include>
+</td>
+</tr>
+
+
+<!-- ListBox Scrollable-->
+<tr>
+  <td>ListBox - Scroll</td>
+  <td>
+  <div style="position:relative; width:100px; height:100px;">
+    <sjs-include sjs-type="SpliceJS.Controls.ListBox">
+      {
+          dataIn: binding('onProvinces').parent,
+          onDataItem: binding('provinceSelected').parent,
+          isScrollable: true
+      }
+    </sjs-include>
+  </div>
+</td>
+</tr>
+
+<!-- ListBox Scrollable-->
+<tr>
+  <td>Charts</td>
+  <td>
+  <div style="position:relative; width:300px; height:160px;">
+    <sjs-include sjs-type="SpliceJS.Controls.Chart">
+      {
+          dataIn: binding('onChartsData').parent,
+      }
+    </sjs-include>
+  </div>
+</td>
+</tr>
+
+
+<!-- ListBox Scrollable-->
+<tr>
+  <td>Bar Chart</td>
+  <td>
+  <div style="position:relative; width:300px; height:160px;">
+    <sjs-include sjs-type="SpliceJS.Controls.Chart">
+      {
+          dataIn: binding('onBarChartData').parent,
+      }
+    </sjs-include>
+  </div>
+</td>
+</tr>
+
+
 
 
 <!-- Another Component -->
