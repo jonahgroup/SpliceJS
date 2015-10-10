@@ -13,6 +13,17 @@
   </td>
 </tr>
 
+<!-- Check Component -->
+<tr>
+  <td>CheckBox</td>
+  <td>
+    <sjs-include sjs-type="SpliceJS.Controls.CheckBox">
+      {content: {label: 'Test Button'}}
+    </sjs-include>
+  </td>
+</tr>
+
+
 
 <!-- ComboBox -->
 <tr>
@@ -62,7 +73,7 @@
 <tr>
   <td>ListBox - Scroll</td>
   <td>
-  <div style="position:relative; width:100px; height:100px;">
+  <div style="position:relative; width:100%; height:100px;">
     <sjs-include sjs-type="SpliceJS.Controls.ListBox">
       {
           dataIn: binding('onProvinces').parent,
@@ -92,7 +103,7 @@
 <tr>
   <td>CheckListBox - Scroll</td>
   <td>
-  <div style="position:relative; width:100px; height:100px;">
+  <div style="position:relative; width:100%; height:100px;">
     <sjs-include sjs-type="SpliceJS.Controls.CheckListBox">
       {
           dataIn: binding('onProvinces').parent,
@@ -104,8 +115,22 @@
 </td>
 </tr>
 
+<!-- DropDownCheckList -->
+<tr>
+  <td>DropDownCheckList</td>
+  <td>
+  <sjs-include sjs-type="SpliceJS.Controls.DropDownCheckList">
+    {
+        content:{selectedItem:'Provinces'},
+        dataIn: binding('onProvinces').parent,
+        onDataItem: binding('provinceSelected').parent
+    }
+  </sjs-include>
+</td>
+</tr>
 
-<!-- ListBox Scrollable-->
+
+<!-- Multiple Charts -->
 <tr>
   <td>Charts</td>
   <td>
@@ -120,7 +145,7 @@
 </tr>
 
 
-<!-- ListBox Scrollable-->
+<!-- Bar Chart-->
 <tr>
   <td>Bar Chart</td>
   <td>

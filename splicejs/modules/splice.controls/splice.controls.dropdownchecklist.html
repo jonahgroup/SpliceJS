@@ -1,0 +1,18 @@
+<sjs-component sjs-type="DropDownCheckList" sjs-controller="DropDownCheckListController" sjs-export>
+	<sjs-include sjs-type="SpliceJS.Controls.DropDownSelector" sjs-ref="selector">
+	{
+				content:binding('content').parent,
+				onDropDown:binding('dropDown').parent,
+				dropDownItem:
+				<sjs-include class="binding('css.list').type('DropDownCheckList')"
+										 sjs-type="SpliceJS.Controls.CheckListBox">
+					{
+						dataIn:binding('onListData').type('DropDownCheckList'),
+						itemTemplate:binding('itemTemplate').type('DropDownCheckList'),
+						dataPath:binding('dataPath').type('DropDownCheckList'),
+						onDataItem:binding('onDataItem').type('DropDownCheckList')
+					}
+				</sjs-include>
+	}
+	</sjs-include>
+</sjs-component>

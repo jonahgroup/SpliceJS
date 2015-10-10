@@ -3,5 +3,7 @@
 }
 
 .-sjs-checklistbox-item.checked {
-    background: url('resources/checklistbox/black/checkmark.png') no-repeat 7px center;
+    background-image: url('resources/checklistbox/black/checkmark.png');
+    background-position: 7px center;
+    background-repeat: no-repeat;
 }
