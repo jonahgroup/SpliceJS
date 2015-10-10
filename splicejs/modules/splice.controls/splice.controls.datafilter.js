@@ -47,7 +47,7 @@ definition:function(sjs){
 
 
 
-    var FilterListItem = Class.extend(this.scope.SpliceJS.Controls.ListItem)(
+    var FilterListItem = Class.extend(this.scope.SpliceJS.Controls.ListItemController)(
       function FilterListItemController(){
         this.super();
 

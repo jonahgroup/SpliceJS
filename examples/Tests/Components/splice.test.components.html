@@ -74,6 +74,37 @@
 </td>
 </tr>
 
+
+<!-- CheckListBox No Scroll-->
+<tr>
+  <td>CheckListBox - No Scroll</td>
+  <td>
+  <sjs-include sjs-type="SpliceJS.Controls.CheckListBox">
+    {
+        dataIn: binding('onProvinces').parent,
+        onDataItem: binding('provinceSelected').parent
+    }
+  </sjs-include>
+</td>
+</tr>
+
+<!-- CheckListBox Scrollable-->
+<tr>
+  <td>CheckListBox - Scroll</td>
+  <td>
+  <div style="position:relative; width:100px; height:100px;">
+    <sjs-include sjs-type="SpliceJS.Controls.CheckListBox">
+      {
+          dataIn: binding('onProvinces').parent,
+          onDataItem: binding('provinceSelected').parent,
+          isScrollable: true
+      }
+    </sjs-include>
+  </div>
+</td>
+</tr>
+
+
 <!-- ListBox Scrollable-->
 <tr>
   <td>Charts</td>

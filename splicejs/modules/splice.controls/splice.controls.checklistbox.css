@@ -1,0 +1,7 @@
+.-sjs-checklistbox-item {
+  padding-left:30px;
+}
+
+.-sjs-checklistbox-item.checked {
+    background: url('resources/checklistbox/black/checkmark.png') no-repeat 7px center;
+}

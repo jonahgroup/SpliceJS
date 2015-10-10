@@ -5,9 +5,9 @@ required:[
 ],
 definition:function(sjs){
 
-  var UIControl = this.scope.SpliceJS.UI.UIControl;
 
-  var ToolTip  = sjs.Class.extend(UIControl)(function ToolTipController(){
+
+  var ToolTip  = sjs.Class.extend(sjs.Controller)(function ToolTipController(){
 
   });
 

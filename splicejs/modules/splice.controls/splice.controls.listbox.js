@@ -23,6 +23,8 @@ definition:function(sjs){
 			this.super();
 			this.dom = null;
 
+			this.listItems = [];
+
 			if(this.ref.contentClient) {
 				this.dom = dom(this.ref.contentClient.concrete.dom);
 			}
@@ -35,6 +37,7 @@ definition:function(sjs){
 			Event.attach(this.concrete.dom, `onclick`).subscribe(this.click, this);
 	});
 
+	ListBoxController.prototype.onListItem = Event;
 	ListBoxController.prototype.onDataItem = Event;
 
 	ListBoxController.prototype.click = function(args){
@@ -48,6 +51,9 @@ definition:function(sjs){
 
 		var idx = parent.__sjs_item_index__;
 		console.log(this.dataItem[idx]);
+
+		//notify list items listener
+		this.onListItem(this.listItems[idx]);
 
 		//notify on data item
 		this.onDataItem(this.dataItem[idx]);
@@ -63,6 +69,7 @@ definition:function(sjs){
 		for(var i=0; i<dataItem.length; i++) {
 			if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
+				this.listItems.push(item);
 
 				if(this.dataPath){
 					item.dataIn(sjs.propvalue(this.dataItem[i],this.dataPath));
@@ -107,7 +114,7 @@ definition:function(sjs){
 
 
 
-	var ListItem = Class.extend(UIControl)(function ListItem(args){
+	var ListItemController = Class.extend(UIControl)(function ListItemController(args){
 		this.super(args);
 
 		var self = this;
@@ -119,7 +126,7 @@ definition:function(sjs){
 	});
 
 
-	ListItem.prototype.dataIn = function(dataItem){
+	ListItemController.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
 		this.concrete.applyContent(dataItem);
 		this.dataOut(dataItem);
@@ -173,7 +180,7 @@ definition:function(sjs){
 
 	//exporting objects
 	return {
-		ListItem:	ListItem,
+		ListItemController:	ListItemController,
 		ListBox: ListBox
 	}
 
