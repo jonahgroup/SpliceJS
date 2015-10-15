@@ -28,14 +28,16 @@ definition:function(sjs){
   ];
 
  var scatterChart = [
-      {plot: "Scatter", name:"series1", data: [[12,14], [16,12], [65,45], [165,50], [180,327], [190,365], [200,45]]},
-      {plot: "Scatter", name:"series2", data: [[13,14], [13,341], [65,122], [165,12], [32,56], [234,365], [123,45]]},
-      {plot:'ScatterLine',name:'line1',data:[[0,0],[250,370]]}
+      {plot: 'Scatter',    name: 'series1', data: [[12,14], [16,12], [65,45], [165,50], [180,327], [190,365], [200,45]]},
+      {plot: 'Scatter',    name: 'series2', data: [[13,14], [13,341], [65,122], [165,12], [32,56], [234,365], [123,45]]},
+      {plot: 'ScatterLine',name:'line1',data:[[0,0],[250,370]]}
  ];
 
   var barchart = {
 
   };
+
+  var testCheck = {checked:true};
 
   var ComponentsTest = Class.extend(Controller)(function ComponentsTest(){
     this.super();
@@ -47,7 +49,14 @@ definition:function(sjs){
     this.onChartsData(charts);
     this.onScatterChartData(scatterChart);
 
+    this.onTestCheck(testCheck);
+
   };
+
+  ComponentsTest.prototype.testCheck = function(item){
+    console.log(item);
+  };
+
 
   ComponentsTest.prototype.provincesSelection = function(provinces){
     console.log(provinces);
@@ -62,6 +71,8 @@ definition:function(sjs){
 
   ComponentsTest.prototype.onChartsData = Event;
   ComponentsTest.prototype.onScatterChartData = Event;
+
+  ComponentsTest.prototype.onTestCheck = Event;
 
 }
 

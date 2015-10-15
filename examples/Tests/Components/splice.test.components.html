@@ -16,7 +16,10 @@
   <td>CheckBox</td>
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.CheckBox">
-      {content: {label: 'Test Button'}}
+      {
+        dataIn:binding('onTestCheck').parent,
+        onChecked:binding('testCheck').parent
+      }
     </sjs-include>
   </td>
 </tr>
@@ -93,7 +96,6 @@
         dataIn: binding('onProvinces').parent,
         onDataItem: binding('provinceSelected').parent,
         onSelection: binding('provincesSelection').parent,
-        itemTemplate:<sjs-include sjs-type="CheckListItemTemplate"></sjs-include>
     }
   </sjs-include>
 </td>
@@ -124,7 +126,6 @@
         content:{selectedItem:'Provinces'},
         dataIn: binding('onProvinces').parent,
         onDataItem: binding('provinceSelected').parent,
-        itemTemplate:<sjs-include sjs-type="CheckListItemTemplate"></sjs-include>
     }
   </sjs-include>
 </td>
@@ -180,10 +181,4 @@
   <td>Component Name</td>
   <td>Component Include</td>
 </tr>
-
-</sjs-component>
-
-
-<sjs-component sjs-type="CheckListItemTemplate" sjs-controller="SpliceJS.Controls.CheckListItemController">
-<div>@dataItem</div>
 </sjs-component>

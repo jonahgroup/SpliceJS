@@ -2,6 +2,7 @@
 sjs({
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
+	{'Doc': '{sjshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
 	'splice.controls.buttons.html'
 ]
@@ -9,34 +10,35 @@ required:[
 definition:function(){
 
 	var scope = this.scope
-	, 	Class = this.sjs.Class
+	, Class = this.sjs.Class
 	,	Event = this.sjs.Event
-	,	debug = this.sjs.debug;
-	
+	,	debug = this.sjs.debug
+	, dom = this.scope.Doc.dom;
+
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 
 	var Button = Class.extend(UIControl)(function ButtonController(args){
-		
+
 		this.super(arguments);
-			
+
 		var self = this;
 		this.elements.root.onclick = function(){
 			if(self.isDisabled == true) return;
 			self.onClick(self.dataItem);
-
 		};
-		
+
 		if(this.isDisabled) this.disable();
-		
+
 	});
 
 	Button.prototype.onClick = Event;
 
+
 	Button.prototype.handleContent = function(content){
 		if(!content) return;
-		
+
 		if(content['label']){
-			this.elements.root.value = content['label']; 
+			this.elements.root.value = content['label'];
 		} else {
 			this.elements.root.value = 'button';
 		}
@@ -45,13 +47,13 @@ definition:function(){
 	Button.prototype.setLabel = function(label){
 		this.elements.root.value = label;
 	};
-	
+
 	Button.prototype.enable = function(){
 		this.elements.root.className = '-splicejs-button';
 		this.isDisabled = false;
 		this.onDomChanged();
 	};
-	
+
 	Button.prototype.disable = function(){
 		this.elements.root.className = '-splicejs-button-disabled';
 		this.isDisabled = true;
@@ -61,35 +63,57 @@ definition:function(){
 
 
 	/**
-	 * 
+	 *
 	 * Check box
 	 * */
 	var CheckBox = Class.extend(UIControl)(function CheckBoxController(args){
 		this.super(arguments);
 
 		var self = this;
-		
+
+		this.isChecked = false;
+
 		this.concrete.dom.onclick = function(){
-			debug.log('I am check box');
-			var isChecked = self.concrete.dom.checked; 
+
 			if(self.dataItem) {
-				self.dataItem[self.dataPath] = isChecked;
+				if(self.dataPath) {
+					self.dataItem[self.dataPath] = self.isChecked = !self.dataItem[self.dataPath];
+
+				} else {
+					self.dataItem['checked'] = self.isChecked = !self.dataItem['checked'];
+				}
+			} else {
+				self.isChecked = !self.isChecked;
 			}
-			
-			if(self.dataOut) 	self.dataOut(self.dataItem);
-			if(self.onCheck)	self.onCheck(isChecked);
+
+			self.check(self.isChecked);
+			self.onChecked(self.dataItem);
 		};
 	});
 
-	
+	CheckBox.prototype.onChecked = Event;
+
 	CheckBox.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
-		if(this.dataItem && (this.dataItem[this.dataPath] === true)){
-			this.concrete.dom.checked = true;
+
+		if(this.dataPath) {
+			this.isChecked = this.dataItem[this.dataPath];
+		} else {
+			this.isChecked = this.dataItem['checked'];
 		}
-		else this.concrete.dom.checked = false; 
+		this.check(this.isChecked);
+
 	};
-	
+
+	CheckBox.prototype.check = function(isChecked){
+		this.isChecked = isChecked;
+		if(isChecked === true) {
+			dom(this.concrete.dom).class.add('checked');
+		} else {
+			dom(this.concrete.dom).class.remove('checked');
+		}
+	};
+
 	CheckBox.prototype.clear = function(){
 		this.concrete.dom.checked = false;
 	};
@@ -101,7 +125,7 @@ definition:function(){
 	 * */
 	var RadioButton = Class.extend(UIControl)(function RadioButtonController(args){
 		this.super(arguments);
-	
+
 		var self = this;
 		this.elements.root.onclick = function(){
 
@@ -114,10 +138,10 @@ definition:function(){
 			}
 			self.dataOut(self.dataItem);
 		}
-	
+
 	});
-	
-	
+
+
 	RadioButton.prototype.dataIn = function(dataItem){
 		UIControl.prototype.dataIn.call(this,dataItem);
 
@@ -130,16 +154,16 @@ definition:function(){
 			this.elements.root.checked = true;
 		}
 		else {
-			this.elements.root.checked = false;	
+			this.elements.root.checked = false;
 		}
 	};
-	
-	
+
+
 	var TextField = Class.extend(UIControl)(function TextFieldController(){
 		this.super(arguments);
 
 		var self = this;
-		
+
 		var f = function(args){
 			if(this.dataPath) {
 				this.dataItem[self.dataPath] = args.source.value;
@@ -147,40 +171,40 @@ definition:function(){
 			else {
 				this.dataItem = {value:args.source.value};
 			}
-			
+
 			this.onData(this.dataItem);
 		};
-		
+
 		this.onKeyUp  = Event.attach(this.elements.root,'onkeyup');
 		this.onChange = Event.attach(this.elements.root,'onchange');
-		
+
 		if(this.isRealTime){
 			this.onKeyUp.subscribe(f, this);
 		}
-		else { 
+		else {
 			this.onChange.subscribe(f, this);
 		}
 
 	});
-	
+
 	TextField.prototype.onData = Event;
-		
+
 	TextField.prototype.dataIn = function(dataItem){
 		UIControl.prototype.dataIn.call(this,dataItem);
 		var value = null;
 		if(this.dataPath) value = this.dataItem[this.dataPath];
 		else value = dataItem;
-		
-		if(value!=null && value != undefined) 
+
+		if(value!=null && value != undefined)
 			this.elements.root.value = value;
 	};
-	
+
 	TextField.prototype.clear = function(){
 		this.elements.root.value = '';
 	};
-	
+
 	TextField.prototype.focus = function(){
-		this.elements.root.focus();	
+		this.elements.root.focus();
 	};
 
 

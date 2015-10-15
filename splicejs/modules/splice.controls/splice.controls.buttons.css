@@ -46,6 +46,13 @@
 	  border: 1px solid #cecece;
 	  left: 0px;
 	  top: 0px;
-	  background-image: url('resources/checklistbox/black/checkmark.png');
-	  background-repeat: no-repeat;
+}
+
+.-sjs-checkbox:hover {
+	background-color:#424A49;
+}
+
+.-sjs-checkbox.checked {
+	background-image: url('resources/checklistbox/black/checkmark.png');
+	background-repeat: no-repeat;
 }
