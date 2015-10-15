@@ -7,6 +7,7 @@ required:[
 	{'Charts' : 'charts/splice.controls.charts.dial.js'},
 	{'Charts' : 'charts/splice.controls.charts.barchart.js'},
 	{'Charts' : 'charts/splice.controls.charts.linechart.js'},
+	{'Charts' : 'charts/splice.controls.charts.scatterchart.js'},
 	'splice.controls.charts.html',
 	'splice.controls.charts.css',
 
@@ -24,7 +25,9 @@ definition:function(sjs){
 
 	var CHART_MAP = {
 		Bar:  scope.Charts.BarChart,
-		Line: scope.Charts.LineChart
+		Line: scope.Charts.LineChart,
+		Scatter: scope.Charts.ScatterChart,
+		ScatterLine: scope.Charts.ScatterLineChart
 	};
 
 
@@ -110,14 +113,22 @@ definition:function(sjs){
 
 
 		this.dM.max = d3.max(data(this.dataItem).to(function(v,k){
-			return d3.max(v.data)
+			if (v.data.length>0 && v.data[0] instanceof Array){
+				return d3.max(v.data, function(d){return d[1];});
+			}
+			else
+				return d3.max(v.data)
 		}).array());
 
 		this.dM.min = d3.min(data(this.dataItem).to(function (v,k) {
+			if (v.data.length>0 && v.data[0] instanceof Array)
+				return d3.min(v.data, function(d){return d[1];});
+		    
 		    return d3.min(v.data);
 		}).array());
 
 		this.dM.count = d3.max(data(this.dataItem).to(function(v,k){
+
 			return v.data.length;
 		}).array());
 

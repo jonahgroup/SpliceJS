@@ -27,6 +27,12 @@ definition:function(sjs){
     {plot:'Line',name:'series1',data:[10,20,5,23]}
   ];
 
+ var scatterChart = [
+      {plot: "Scatter", name:"series1", data: [[12,14], [16,12], [65,45], [165,50], [180,327], [190,365], [200,45]]},
+      {plot: "Scatter", name:"series2", data: [[13,14], [13,341], [65,122], [165,12], [32,56], [234,365], [123,45]]},
+      {plot:'ScatterLine',name:'line1',data:[[0,0],[250,370]]}
+ ];
+
   var barchart = {
 
   };
@@ -39,6 +45,8 @@ definition:function(sjs){
   ComponentsTest.prototype.display = function(){
     this.onProvinces(provinces);
     this.onChartsData(charts);
+    this.onScatterChartData(scatterChart);
+
   };
 
   ComponentsTest.prototype.provincesSelection = function(provinces){
@@ -53,6 +61,7 @@ definition:function(sjs){
   };
 
   ComponentsTest.prototype.onChartsData = Event;
+  ComponentsTest.prototype.onScatterChartData = Event;
 
 }
 
