@@ -41,6 +41,11 @@ definition:function(sjs){
     this.onChartsData(charts);
   };
 
+  ComponentsTest.prototype.provincesSelection = function(provinces){
+    console.log(provinces);
+  };
+
+
 
   ComponentsTest.prototype.onProvinces = Event;
   ComponentsTest.prototype.provinceSelected = function(item){

@@ -27,13 +27,25 @@
 
 .-sjs-button:hover {
 	background-color: #1CD0FA;
-	border: 1px solid #1CD0FA;	
+	border: 1px solid #1CD0FA;
 }
 
 
 .-sjs-textfield {
 	font-size: 13px;
-  	padding: 5px;
+  padding: 5px;
  	border: 1px solid #cecece;
  	border-radius: 3px;
+}
+
+.-sjs-checkbox {
+		display:inline-block;
+		width: 13px;
+	  height: 13px;
+	  position: relative;
+	  border: 1px solid #cecece;
+	  left: 0px;
+	  top: 0px;
+	  background-image: url('resources/checklistbox/black/checkmark.png');
+	  background-repeat: no-repeat;
 }

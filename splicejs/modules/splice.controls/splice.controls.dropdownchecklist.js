@@ -46,6 +46,7 @@ sjs({
 	ListController.prototype.onDropDown = Event;
 	ListController.prototype.onListData = Event;
 	ListController.prototype.onDataItem = Event;
+	//ListController.prototype.onSelection = Event;
 
 
 	/* module exports */

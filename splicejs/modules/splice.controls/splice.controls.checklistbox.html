@@ -1,3 +1,35 @@
-<sjs-component sjs-type="CheckListBoxItem" sjs-controller="CheckListItemController">
-  <div class="-sjs-listbox-item -sjs-checklistbox-item"></div>
+<sjs-component sjs-type="StretchListBox" sjs-controller="CheckListBoxController">
+	<div class="-sjs-list-box-base" sjs-element="root"></div>
+</sjs-component>
+
+
+<sjs-component sjs-type="ScrollableListBox" sjs-controller="CheckListBoxController">
+	<div class="-sjs-list-box" sjs-element="root">
+		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">{
+			ref:'scrollPanel',
+			content:{
+				scrollContent:<sjs-include 	sjs-type="ContentClient"
+																		sjs-ref="binding('contentClient').type('ScrollableListBox')">
+											</sjs-include>,
+				staticContent:''
+			}
+		}</sjs-include>
+	</div>
+</sjs-component>
+
+
+<sjs-component sjs-type="ContentClient">
+	<div sjs-element="root"></div>
+</sjs-component>
+
+
+<sjs-component sjs-type="GroupedListItem" sjs-export>
+	<div class="-splicejs-list-grouped-listitem" sjs-element="root"></div>
+</sjs-component>
+
+
+
+
+<sjs-component sjs-type="CheckListBoxItem" sjs-controller="CheckListItemController" sjs-export>
+  <div class="-sjs-listbox-item -sjs-checklistbox-item">@dataItem</div>
 </sjs-component>

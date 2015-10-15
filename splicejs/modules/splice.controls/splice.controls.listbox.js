@@ -62,11 +62,24 @@ definition:function(sjs){
 
 	ListBoxController.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
-		this.dom.clear();
+		//this.dom.clear();
 
 		var item = null;
 
-		for(var i=0; i<dataItem.length; i++) {
+		// update existing items if any
+		for(var i=0; i<this.listItems.length; i++){
+			var item = this.listItems[i];
+
+			if(this.dataPath){
+				item.dataIn(sjs.propvalue(this.dataItem[i],this.dataPath));
+			} else {
+				item.dataIn(this.dataItem[i]);
+			}
+		}
+
+
+		// add new items
+		for(var i= this.listItems.length; i<dataItem.length; i++) {
 			if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
 				this.listItems.push(item);
@@ -79,11 +92,9 @@ definition:function(sjs){
 
 				item.concrete.dom.__sjs_item_index__ = i;
 
-
 				this.dom.append(dom(item.concrete.dom));
 				if(typeof item.onAttached == 'function')
 					item.onAttached();
-
 			}
 		}
 
@@ -181,6 +192,7 @@ definition:function(sjs){
 	//exporting objects
 	return {
 		ListItemController:	ListItemController,
+		ListBoxController:ListBoxController,
 		ListBox: ListBox
 	}
 

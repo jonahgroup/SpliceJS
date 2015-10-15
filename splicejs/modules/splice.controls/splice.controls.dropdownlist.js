@@ -7,7 +7,7 @@ sjs({
 		'splice.controls.dropdownlist.html'
 	],
 
-	definition:function(){
+	definition:function(sjs){
 
 	var scope = this.scope
 	,	Class = this.sjs.Class
@@ -40,7 +40,11 @@ sjs({
 	};
 
 	ListController.prototype.setSelectedItem = function(item){
+		if(this.dataPath){
+			this.ref.selector.dataIn(sjs.propvalue(item,this.dataPath));
+		} else {
 			this.ref.selector.dataIn(item);
+		}
 	};
 
 	ListController.prototype.onDropDown = Event;

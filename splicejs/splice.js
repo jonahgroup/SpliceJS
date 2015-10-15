@@ -1773,6 +1773,7 @@ UrlAnalyzer.prototype = {
 		Proxy.type 			= args.type;
 		Proxy.ref 			= args.ref;
 		Proxy.parameters 	= args;
+		Proxy.__sjs_isproxy__ = true;
 
 		return Proxy;
 
@@ -2451,11 +2452,14 @@ UrlAnalyzer.prototype = {
 			return;
 		}
 
-		if(typeof source.value() === 'function')
+		if(source.value().__sjs_isproxy__ === true){
+				dest.instance[dest.path] = source.instance[source.path];
+		}
+		else if(typeof source.value() === 'function'){
 			dest.instance[dest.path] = 	function(){
 					return source.instance[source.path].apply(source.instance,arguments);
 				}
-
+		}
 		else
 			dest.instance[dest.path] = source.instance[source.path];
 	};

@@ -12,18 +12,26 @@ sjs({
 
     var ComboBox = Class(function ComboBox(args){
 
-        var dropDownList = new DropDownList(args);
+        this.dropDownList = new DropDownList(args);
         //default selection
         if(this.default){
-          dropDownList.setSelectedItem(this.default);
+          if(this.dataPath) {
+            var a = {};
+            a[this.dataPath] = this.default;
+            this.dropDownList.setSelectedItem(a);
+          } else {
+            this.dropDownList.setSelectedItem(this.default);
+          }
         }
 
-        dropDownList.onDataItem.subscribe(function(item){
+        //override default implementation of the setSelectedItem
+        var save_setSelectedItem = this.dropDownList.setSelectedItem;
+
+        this.dropDownList.onDataItem.subscribe(function(item){
           this.setSelectedItem(item);
-        },dropDownList);
+        },this.dropDownList);
 
-
-        return dropDownList;
+        return this.dropDownList;
     });
 
 
