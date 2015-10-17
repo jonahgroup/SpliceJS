@@ -19,7 +19,7 @@ definition:function(){
 	var Grid = function(rows,columns){
 		this.rows 		= rows;
 		this.columns 	= columns;
-		
+
 		//fill matrix, keeps track of the grid fill positions
 		this.positions = Array(this.rows*this.columns);
 	};
@@ -40,7 +40,7 @@ definition:function(){
 
 	Grid.prototype.setSize = function(rows, columns){
 		this.rows = rows;
-		this.columns = columns; 
+		this.columns = columns;
 	};
 
 	/*
@@ -54,7 +54,7 @@ definition:function(){
 	Grid.prototype.emptyCell = function(){
 		for(var i=0; i<this.positions.length; i++){
 			if(!this.positions[i]){
-				return {row:Math.floor(i/this.columns), 
+				return {row:Math.floor(i/this.columns),
 						col:i % this.columns};
 			}
 		}
@@ -67,9 +67,9 @@ definition:function(){
 	,	move 	= 5;
 
 
-	/* 
-	*	
-	*	Cell container class 
+	/*
+	*
+	*	Cell container class
 	*
 	*/
 	var CellContainer = Class.extend(UIControl)(function CellContainerController(){
@@ -85,7 +85,7 @@ definition:function(){
 		Event.attach(this.elements.topEdge,'onmousedown').subscribe(
 			function(e){self.onStartResize(e,top);}
 		);
-			
+
 
 		Event.attach(this.elements.rightEdge,'onmousedown').subscribe(
 			function(e){self.onStartResize(e,right);}
@@ -110,8 +110,11 @@ definition:function(){
 
 
 	CellContainer.prototype.onStartResize = Event;
-	CellContainer.prototype.onResize 	  =	Event;
+	CellContainer.prototype.onResize 	    =	Event;
 	CellContainer.prototype.onEndResize   =	Event;
+	CellContainer.prototype.onCellSize 	  = Event;
+
+	CellContainer.prototype.onRemove = Event;
 
 
 	CellContainer.prototype.startResize = function(e,direction){
@@ -121,6 +124,7 @@ definition:function(){
 		var self = this;
 		DragAndDrop.ondrag =  function(p,offset){
 			self.onResize({mouse:p,direction:direction, src:self});
+			self.onCellSize(self);
 		}
 	};
 
@@ -131,7 +135,8 @@ definition:function(){
 		var self = this;
 		DragAndDrop.ondrag =  function(p,offset){
 			self.onResize({mouse:p,direction:move, src:self});
-		}	
+			self.onCellSize(self);
+		}
 	};
 
 
@@ -139,10 +144,14 @@ definition:function(){
 		UIControl.prototype.reflowChildren.call(this,{left:0, top:0}, size, bubbleup);
 	};
 
+	CellContainer.prototype.remove = function(){
+		this.onRemove(this);
+	};
 
 
-	/* 
-	*	
+
+	/*
+	*
 	*	Grid Layout implementation
 	*
 	*/
@@ -158,17 +167,23 @@ definition:function(){
 		if(!this.grid)			this.grid = {columns:2, rows:2};
 		this.grid = new Grid(this.grid.rows, this.grid.columns);
 
+		/*
+			hook into window resize event only if grid layout
+			is configured as a toplevel component
+		*/
+		if(this.attachToWindow === true ) {
 		Event.attach(window,'onresize').subscribe(function(){
 			this.reflow();}
 		,this);
+	 }
 
-		var self = this;
+		// a collection of cells, contained in a null object
+		this.layoutCells = Object.create(null);
+		// cell sequence counter
+		this.cellSequence = 1;
 
-		this.layoutCells = [];
+		this.onDisplay.subscribe(this.display, this);
 
-		this.onDisplay.subscribe(function(){
-			self.display();
-		});
 	});
 
 
@@ -179,12 +194,12 @@ definition:function(){
 
 			for(var i=0; i< this.cells.length; i++) {
 
-				addCell.call(this,	this.cells[i].content, 
+				addCell.call(this,	this.cells[i].content,
 					this.cells[i].row, this.cells[i].col,
 					this.cells[i].rowspan, this.cells[i].colspan);
-			
+
 			}
-			
+
 			this.reflow();
 		}
 	};
@@ -194,23 +209,21 @@ definition:function(){
 
 		var _CellContainer = proxy(
 		{	type:'CellContainer',
-			row:row, 
-			col:col, 
-			colspan:colSpan, 
+			row:row,
+			col:col,
+			colspan:colSpan,
 			rowspan:rowSpan,
 			content:{body: content}
 		});
 
-		var cellIndex = this.layoutCells.length;
+		var cellIndex = this.cellSequence++;
 
-		var cell =  new _CellContainer({parent:this, index:cellIndex}); 
-		
-		cell.onResize.subscribe(function(args){
-				this.resizeCell(args);
-			}
-		,this);
+		var cell =  new _CellContainer({parent:this, index:cellIndex});
 
-		this.layoutCells.push(cell);
+		cell.onResize.subscribe(this.resizeCell, this);
+		cell.onRemove.subscribe(this.removeCell, this);
+
+		this.layoutCells[cell.index] = cell;
 		this.elements.root.appendChild(cell.concrete.dom);
 		cell.onAttach();
 		cell.onDisplay();
@@ -222,25 +235,43 @@ definition:function(){
 		this.reflow();
 	};
 
+	/**
+		Removes all cells from the layout
+	*/
+	GridLayout.prototype.clear = function(){
+			var keys = Object.keys(this.layoutCells);
 
-	GridLayout.prototype.addCellAuto = function(component){
+			for(var key in keys){
+					this.elements.root.removeChild(this.layoutCells[keys[key]].concrete.dom);
+			}
+			this.layoutCells = Object.create(null);
+	};
 
+	/**
+		Removes single cell
+		@param {CellContainerController} cell - cell to be deleted
+	*/
+	GridLayout.prototype.removeCell = function(cell){
+		this.elements.root.removeChild(cell.concrete.dom);
+		delete this.layoutCells[cell.index];
 	};
 
 
 	GridLayout.prototype.getEmptyCell = function(){
-		
+
 		var to = this.grid.rows * this.grid.columns
 		,	cells = this.layoutCells;
+
+		var keys = Object.keys(this.layoutCells);
 
 		for(var i=0; i < to; i++){
 			var row = Math.floor(i / this.grid.columns)
 			, 	col = i % this.grid.columns
-			,	test = true;		
+			,	test = true;
 
-			for(var j=0; j< cells.length; j++){
-				var cell = cells[j]
-				
+			for(var j=0; j< keys.length; j++){
+				var cell = cells[keys[j]];
+
 				if(row >= cell.row && row <= (cell.row + cell.rowspan-1))
 				if(col >= cell.col && col <= (cell.col + cell.colspan-1))
 					test = false;
@@ -248,14 +279,12 @@ definition:function(){
 				if(col >= cell.col && col <= (cell.col + cell.colspan-1))
 				if(row >= cell.row && row <= (cell.row + cell.rowspan-1))
 					test = false;
+			}
 
-
-			}			
-
-			if(test == true) return {row:row, col:col};	
+			if(test == true) return {row:row, col:col};
 		}
 
-		return null;		
+		return null;
 	};
 
 
@@ -269,16 +298,16 @@ definition:function(){
 		if(direction == bottom) {
 			cell.rowspan = cellPosition.row - cell.row + 1; //at least a single row
 		}
-		
+
 		if(direction == right) {
 			cell.colspan = cellPosition.col - cell.col + 1; //at least a single row
 		}
-		
-		
+
+
 		if(direction == left) {
 			cell.col = cellPosition.col; //at least a single row
 		}
-		
+
 		if(direction == top) {
 
 			var newSpan = cell.row + cell.rowspan - cellPosition.row;
@@ -294,7 +323,7 @@ definition:function(){
 		}
 
 		this.reflow(cell.index);
-		
+
 	};
 
 	GridLayout.prototype.reflow = function(cellIndex){
@@ -303,51 +332,51 @@ definition:function(){
 		var outer_margin = this.outerMargin;
 
 		var DOM = this.elements.root;
-		
 
-		var grid = this.grid; 
-	
+
+		var grid = this.grid;
+
 		/*tiled reflow*/
 		var workarea = { clientWidth:  DOM.clientWidth  - 2 * outer_margin,
 					 	 clientHeight: DOM.clientHeight - 2 * outer_margin};
-	
+
 		var cards = this.layoutCells;
-	
-		/* calculate unit size 
+
+		/* calculate unit size
 	 	* based on client and grid size
 	 	* */
 		var unitWidth = (workarea.clientWidth - (grid.columns - 1) * margin) / grid.columns;
 			unitWidth -= 2; /*border adjustment */
-		
-		var unitHeight = (workarea.clientHeight- (grid.rows - 1) * margin) / grid.rows;	
+
+		var unitHeight = (workarea.clientHeight- (grid.rows - 1) * margin) / grid.rows;
 			unitHeight -= 2;
 
-		grid.clear();	
-		
+		grid.clear();
 
-		var from = 0;
-		var to = cards.length - 1;
+		var keys = null;
 
+		//get cell keys
 		if(cellIndex != undefined) {
-			from = cellIndex;
-			to = cellIndex;
+			keys = [cellIndex];
+		} else {
+			keys = Object.keys(cards);
 		}
 
-		for(var i=from; i <= to; i++){
-			
-			//var style = cards[i].dom.style; 
-			
+		for(var k = 0; k < keys.length; k++){
+			var i = keys[k];
+			//var style = cards[i].dom.style;
+
 			/* panel position*/
 			var l = outer_margin + (cards[i].col*unitWidth  + cards[i].col * margin);
 			var t = outer_margin + (cards[i].row*unitHeight + cards[i].row * margin);
-			
+
 			/*panel size*/
 			var w 	= cards[i].colspan * unitWidth + (margin * (cards[i].colspan -  1));
 			var h 	= cards[i].rowspan * unitHeight + (margin * (cards[i].rowspan - 1));
-			
+
 			/* update grid */
 			grid.fillGrid(cards[i].row, cards[i].col, cards[i].rowspan, cards[i].colspan, cards[i]);
-		
+
 			cards[i].reflow({left:l,top:t},{width:w, height:h});
 		}
 	};
@@ -359,35 +388,35 @@ definition:function(){
 
 
 	GridLayout.prototype.getCellForPoint = function(p){
-	
+
 		var margin 		 = this.margin;
 		var outer_margin = this.outerMargin;
-		
-		var DOM = this.elements.root;		
-		
+
+		var DOM = this.elements.root;
+
 		var offset = scope.SpliceJS.UI.Positioning.absPosition(DOM);
 
-		var grid = this.grid; 
-		
+		var grid = this.grid;
+
 		var workarea = {dom: DOM,
 						clientWidth:  DOM.clientWidth  - 2 * outer_margin,
 						clientHeight: DOM.clientHeight - 2 * outer_margin};
-		
+
 		var unitWidth = (workarea.clientWidth - (grid.columns - 1) * margin) / grid.columns;
 		unitWidth -= 2; /*border adjustment */
 
-		var unitHeight = (workarea.clientHeight- (grid.rows - 1) * margin) / grid.rows;	
+		var unitHeight = (workarea.clientHeight- (grid.rows - 1) * margin) / grid.rows;
 		unitHeight -= 2;
-		
+
 		var p = {
-			x:p.x-offset.x, 
+			x:p.x-offset.x,
 			y:p.y-offset.y
 		};
-		
+
 		/* panel position*/
 		var col = Math.floor((p.x - outer_margin) / (unitWidth  + margin));
 		var row = Math.floor((p.y - outer_margin) / (unitHeight + margin));
-		
+
 		return {row:row, col:col};
 	};
 

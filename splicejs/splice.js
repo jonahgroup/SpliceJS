@@ -1950,15 +1950,25 @@ UrlAnalyzer.prototype = {
 
 					continue;
 				}
-			}
+			} else
+
+			if(obj instanceof Controller){
+				obj.parent = controllerInstance;
+				controllerInstance.children.push(obj);
+				// resolve bindings
+
+				newNode = obj.concrete.export();
+			} else
 
 			if(typeof obj === 'string'){
 				newNode = document.createTextNode(obj);
-			}
+			} else
 
 			if(typeof obj === 'number'){
 				newNode = document.createTextNode(obj);
 			}
+
+
 
 			if(!newNode) continue;
 

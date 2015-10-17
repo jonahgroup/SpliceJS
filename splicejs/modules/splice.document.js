@@ -278,6 +278,10 @@ definition:function(sjs){
 				return dom(element);
 			},
 
+			remove:function(child){
+					element.removeChild(child.element);
+			},
+
 			size:	function(){
 				return element.childNodes.length;
 			},

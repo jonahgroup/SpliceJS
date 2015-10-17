@@ -2,13 +2,17 @@
 
   definition: function(sjs){
 
-      var Class = sjs.Class, 
-          debug = sjs.debug;
+      var Class = sjs.Class,
+          debug = sjs.debug,
+          Event = sjs.Event;
 
       var ScatterChart = Class(function ScatterChart(){});
 
+      ScatterChart.prototype.onDataItem = Event;
+
+
       ScatterChart.prototype.render = function(d3){
-          
+
           //DataItem will be injected
           var data = this.dataItem;
 
@@ -31,28 +35,28 @@
                       .attr("height",height);
 
           //chart is already G group.
-     
+
           var xScale = //this.scale.x;
            d3.scale.linear()
               .domain([0, d3.max(data, function(v){
                     return v[0];
                   })
               ])
-              .range([0, width-spacing]); 
+              .range([0, width-spacing]);
 
 
           var yScale = this.scale.y;
-          
+
           var c = chart.selectAll("circle")
                        .data(data);
-            
+
           c.enter()
             .append("circle")
             .attr("cx",function(d){return xScale(d[0]);})
             .attr("cy", function(d){return yScale(d[1]);})
             .attr("r", size);
 
-            
+
             //Remove old items
           c.exit().remove();
 
@@ -74,7 +78,7 @@
 
           var width = this.width
           ,   height = this.height;
-         
+
 
          var spacing = 20;
 
@@ -83,17 +87,17 @@
                       .attr("width", width)
                       .attr("height",height);
 
-        var xScale = 
+        var xScale =
            d3.scale.linear()
               .domain([0, d3.max(data, function(v){
                     return v[0];
                   })
               ])
-              .range([0, width-spacing]); 
+              .range([0, width-spacing]);
 
 
           var yScale = this.scale.y;
-          
+
 
           var line = d3.svg.line()
                   .x(function (d){return xScale(d[0]);})
@@ -116,4 +120,3 @@
   }
 
  });
-

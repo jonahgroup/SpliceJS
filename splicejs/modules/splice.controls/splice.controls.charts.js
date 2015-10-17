@@ -18,7 +18,8 @@ definition:function(sjs){
     var	scope = this.scope
 
     var Class = sjs.Class
-	,   debug = sjs.debug;
+	,   debug = sjs.debug
+	,	Event = sjs.Event;
 
 	var	D3Canvas = scope.SpliceJS.Controls.D3Canvas
     ,   data = scope.Data.data;
@@ -50,8 +51,13 @@ definition:function(sjs){
 
 			this.measureData(this.d3);
 			this.render(this.d3);
-
 		}, this);
+
+
+		Event.attach(this.elements.root, 'onmousedown').subscribe(function(args){
+			var sourceData = args.source.__data__ || [10,10];
+			this.onChartItem({data:sourceData,name:'series1'});
+		},this);
 
 
 		//subscribe to onAttach event, update chat dimensions
@@ -59,6 +65,7 @@ definition:function(sjs){
 
 	});
 
+	Chart.prototype.onChartItem = Event;
 
 	Chart.prototype.attach = function(){
 
@@ -123,7 +130,7 @@ definition:function(sjs){
 		this.dM.min = d3.min(data(this.dataItem).to(function (v,k) {
 			if (v.data.length>0 && v.data[0] instanceof Array)
 				return d3.min(v.data, function(d){return d[1];});
-		    
+
 		    return d3.min(v.data);
 		}).array());
 
