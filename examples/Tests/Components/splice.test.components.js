@@ -42,6 +42,18 @@ definition:function(sjs){
   var ComponentsTest = Class.extend(Controller)(function ComponentsTest(){
     this.super();
     this.onDisplay.subscribe(this.display, this);
+
+    // value read
+    var v = sjs.propvalue(charts)('0.data.1').value;
+    // value assign
+    sjs.propvalue(charts)('0.data.1').value = v + 1;
+    if( (v+1) == sjs.propvalue(charts)('0.data.1').value){
+      console.log('Test pass: propvalue');
+    }
+    else {
+      throw 'Test fail: propvalue';
+    }
+
   });
 
   ComponentsTest.prototype.display = function(){

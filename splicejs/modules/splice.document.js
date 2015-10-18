@@ -301,7 +301,7 @@ definition:function(sjs){
 						var keys = Object.keys(element.__sjs_value_map__);
 						for(var i=0; i < keys.length; i++){
 									var key = keys[i];
-									var value = sjs.propvalue(newvalue,key);
+									var value = sjs.propvalue(newvalue)(key).value;
 									if(value == null) continue;
 
 									/*

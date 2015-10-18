@@ -7,7 +7,7 @@ required:[
 	'splice.controls.buttons.html'
 ]
 ,
-definition:function(){
+definition:function(sjs){
 
 	var scope = this.scope
 	, Class = this.sjs.Class
@@ -77,8 +77,7 @@ definition:function(){
 
 			if(self.dataItem) {
 				if(self.dataPath) {
-					self.dataItem[self.dataPath] = self.isChecked = !self.dataItem[self.dataPath];
-
+					sjs.propvalue(self.dataItem)(self.dataPath).value = self.isChecked = !self.dataItem[self.dataPath];
 				} else {
 					self.dataItem['checked'] = self.isChecked = !self.dataItem['checked'];
 				}
@@ -97,7 +96,7 @@ definition:function(){
 		this.dataItem = dataItem;
 
 		if(this.dataPath) {
-			this.isChecked = this.dataItem[this.dataPath];
+			this.isChecked = sjs.propvalue(this.dataItem)(this.dataPath).value;
 		} else {
 			this.isChecked = this.dataItem['checked'];
 		}

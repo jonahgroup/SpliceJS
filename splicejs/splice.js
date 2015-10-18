@@ -313,19 +313,50 @@ var sjs = (function(window, document){
 		return nodes;
 	};
 
-	function getPropertyValue(obj, path){
+/*
+	function propertyValue(obj, path, newValue){
 		var nPath = path.split('.'),
 			result = obj;
 
 		if(nPath.length < 1) return null;
 
 		for (var i = 0; i< nPath.length; i++){
-
 			result = result[nPath[i]];
 			if (result == null) return null;
 		}
 		return result;
 	};
+*/
+
+function _propertyValueLocator(path){
+			var npath = path.split('.')
+			,	result = this;
+
+			//loop over path parts
+			for(var i=0; i < npath.length-1; i++ ){
+				result = result[npath[i]];
+				if(result == null) throw 'Property ' + path + ' is not found in object ' + obj;
+			}
+			var p = npath[npath.length - 1];
+			if(result[p] == undefined) throw 'Property ' + path + ' is not found in object ' + obj;
+
+			//hash map object
+			return Object.defineProperty(Object.create(null),'value',{
+				get:function(){
+					return result[p];
+				},
+				set:function(newValue){
+					result[p] = newValue;
+				}
+			});
+};
+
+function propertyValue(obj){
+	return _propertyValueLocator.bind(obj);
+}
+
+
+
 
 
 	function display(controller,target){
@@ -2944,7 +2975,7 @@ UrlAnalyzer.prototype = {
 			mixin	: mixin,
 			binding : binding,
 			proxy	: proxy,
-			propvalue : getPropertyValue,
+			propvalue : propertyValue,
 
 			timing	:	measureRuntime,
 
