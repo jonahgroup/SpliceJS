@@ -108,13 +108,13 @@ definition:function(){
 	CellContainer.prototype.onMove 	  	  = Event;
 	CellContainer.prototype.onEndMove 	  = Event;
 
-
 	CellContainer.prototype.onStartResize = Event;
 	CellContainer.prototype.onResize 	    =	Event;
 	CellContainer.prototype.onEndResize   =	Event;
 	CellContainer.prototype.onCellSize 	  = Event;
 
 	CellContainer.prototype.onRemove = Event;
+	CellContainer.prototype.onMaximize = Event;
 
 
 	CellContainer.prototype.startResize = function(e,direction){
@@ -148,12 +148,14 @@ definition:function(){
 		this.onRemove(this);
 	};
 
+	CellContainer.prototype.maximize = function(){
+		this.onMaximize(this);
+	};
 
-
-	/*
+	/**
 	*
 	*	Grid Layout implementation
-	*
+	* @constructor
 	*/
 	var GridLayout = Class.extend(UIControl)(function GridLayoutController(){
 
@@ -186,6 +188,7 @@ definition:function(){
 
 	});
 
+	GridLayout.prototype.onRemoveCell = Event;
 
 	GridLayout.prototype.display = function(){
 
@@ -193,18 +196,26 @@ definition:function(){
 		if(this.cells && this.cells.length > 0){
 
 			for(var i=0; i< this.cells.length; i++) {
-
 				addCell.call(this,	this.cells[i].content,
 					this.cells[i].row, this.cells[i].col,
 					this.cells[i].rowspan, this.cells[i].colspan);
-
 			}
-
 			this.reflow();
 		}
 	};
 
+
 	/* private */
+	function restoreCell(cell){
+	//	cell.onResize.subscribe(this.resizeCell, this);
+	//	cell.onRemove.subscribe(this.removeCell, this);
+
+		this.layoutCells[cell.index] = cell;
+		this.elements.root.appendChild(cell.concrete.dom);
+		cell.onAttach();
+		cell.onDisplay();
+	}
+
 	function addCell(content, row, col, rowSpan, colSpan){
 
 		var _CellContainer = proxy(
@@ -222,6 +233,7 @@ definition:function(){
 
 		cell.onResize.subscribe(this.resizeCell, this);
 		cell.onRemove.subscribe(this.removeCell, this);
+		cell.onMaximize.subscribe(this.maximizeCell,this);
 
 		this.layoutCells[cell.index] = cell;
 		this.elements.root.appendChild(cell.concrete.dom);
@@ -236,6 +248,23 @@ definition:function(){
 	};
 
 	/**
+		Atempts to restore layout cell
+	*/
+	GridLayout.prototype.restoreCell = function(){
+		restoreCell.apply(this,arguments);
+		this.reflow();
+	};
+
+	/**
+		Returns a collection of the layout cells
+		@return {object} - indexed hash map, where index is an integer
+											 indexes are not always sequential
+	*/
+	GridLayout.prototype.getCells = function(){
+		return this.layoutCells;
+	};
+
+	/**
 		Removes all cells from the layout
 	*/
 	GridLayout.prototype.clear = function(){
@@ -247,6 +276,11 @@ definition:function(){
 			this.layoutCells = Object.create(null);
 	};
 
+	GridLayout.prototype.maximizeCell = function(cell){
+		console.log('Maximizing cell');
+	};
+
+
 	/**
 		Removes single cell
 		@param {CellContainerController} cell - cell to be deleted
@@ -254,6 +288,7 @@ definition:function(){
 	GridLayout.prototype.removeCell = function(cell){
 		this.elements.root.removeChild(cell.concrete.dom);
 		delete this.layoutCells[cell.index];
+		this.onRemoveCell(cell);
 	};
 
 
@@ -324,6 +359,14 @@ definition:function(){
 
 		this.reflow(cell.index);
 
+	};
+
+	GridLayout.prototype.maximizeCell = function(cell){
+		cell.col = cell.row = 0;
+		cell.rowspan = this.grid.rows;
+		cell.colspan = this.grid.columns;
+
+		this.reflow(cell.index);
 	};
 
 	GridLayout.prototype.reflow = function(cellIndex){

@@ -250,7 +250,15 @@ definition:function(sjs){
 			width:	w,
 			padding: {left:pl, top:pt, right:pr, bottom:pb},
 			border:  {left:bl, top:bt, right:br, bottom:bb},
-			margin:  {left:ml, top:mt, right:mr, bottom:mb}
+			margin:  {left:ml, top:mt, right:mr, bottom:mb},
+			unit:function(){return {
+					height:	+_unit(h),
+					width:	+_unit(w),
+					padding: {left: +_unit(pl), top: +_unit(pt), right: +_unit(pr), bottom: +_unit(pb)},
+					border:  {left: +_unit(bl), top: +_unit(bt), right: +_unit(br), bottom: +_unit(bb)},
+					margin:  {left: +_unit(ml), top: +_unit(mt), right: +_unit(mr), bottom: +_unit(mb)}
+				}
+			}
 		}
 	};
 
@@ -368,6 +376,14 @@ definition:function(sjs){
 		return window.screen.height;
 	}
 
+	function windowWidth(){
+		return window.innerWidth;
+	}
+
+	function windowHeight(){
+		return window.innerHeight;
+	}
+
 	return {
 		style:style,
 		select:{
@@ -380,9 +396,12 @@ definition:function(sjs){
 		},
 		screen:{
 			width		:screenWidth,
-			height		:screenHeight
+			height	:screenHeight
 		},
-		window:{},
+		window:{
+			width		:windowWidth,
+			height	:windowHeight
+		},
 		create:create,
 		dom	: dom,
 		cssvalue : _unit

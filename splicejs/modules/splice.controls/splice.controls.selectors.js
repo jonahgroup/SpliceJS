@@ -32,8 +32,8 @@ definition:function(){
             will immediately execute event within dropDown() closing the dropdown
         */
 	    Event.attach(this.elements.root, 'onmousedown').subscribe(function (e) {
-	        this.dropDown();
-	        e.cancel();
+				e.cancel();
+				this.dropDown();
 		}, this);
 
 		/*
@@ -45,6 +45,8 @@ definition:function(){
 
 		this.dropDownItem = this.dropDownItem;
 		if(!this.isIgnoreSelector)	this.isIgnoreSelector = false;
+
+		this.dropDownContainerSize = {left:0,top:0};
 
 	});
 
@@ -71,6 +73,25 @@ definition:function(){
 		dom(selectorElement).class.remove('-sjs-dropdown-open');
 	};
 
+
+	DropDownController.prototype.clientSize = function(client){
+
+		var s = dropDownContainer.concrete.dom.style;
+
+		var content = dom(client.concrete.dom);
+		/*
+			check is position adjustment is required to
+			remain in client view
+		*/
+		var boxWidth = content.box().unit().width;
+		var windowWidth = scope.Doc.window.width();
+
+		//adjust left position by the pixels width
+		if( (boxWidth + this.dropDownContainerSize.left) > windowWidth ){
+			s.left = (windowWidth - boxWidth) + 'px';
+		}
+	};
+
 	DropDownController.prototype.dropDown = function(){
 
 		var left = this.elements.selector.offsetLeft
@@ -86,7 +107,7 @@ definition:function(){
 			dom(selectorElement).class.remove('-sjs-dropdown-open');
 		}
 
-
+		//create instance of the dropdown content item
 		if(!this.dropDownItemInst && this.dropDownItem) {
 			this.dropDownItemInst = new this.dropDownItem({parent:this});
 		}
@@ -97,20 +118,27 @@ definition:function(){
 		//append drop down to the document root
 		document.body.appendChild(dropDownContainer.concrete.dom);
 
-		// add content to the content element
-		dom(dropDownContainer.elements.content).replace(dom(this.dropDownItemInst.concrete.dom));
+		//dom api for content
+		var content = dom(this.dropDownItemInst.concrete.dom);
 
-		//cs.padding.top.value + cs.padding.bottom.value
+		// add content to the content element
+		dom(dropDownContainer.elements.content).replace(content);
+
 
 		left = pos.x;
 		top =  height +  pos.y;
 
+		this.dropDownContainerSize.left = left;
+		this.dropDownContainerSize.top = top;
 
+
+		//set position and display mode of the drop-down container
 		s.left = left + 'px';
 		s.top =  top + 'px';
-
 		s.display='block';
 
+
+		// !!!!!! refactor
 		this.onModalClose = Event.attach(document.body, 'onmousedown');
 
 		// close on body mouse down

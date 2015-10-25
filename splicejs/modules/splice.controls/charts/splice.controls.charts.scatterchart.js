@@ -104,6 +104,7 @@
                   .y(function (d){return yScale(d[1]);})
                   .interpolate("linear");
 
+
           chart
             .append("path")
             .attr("d",line(data))

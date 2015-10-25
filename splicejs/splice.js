@@ -328,35 +328,32 @@ var sjs = (function(window, document){
 	};
 */
 
-function _propertyValueLocator(path){
-			var npath = path.split('.')
-			,	result = this;
+	function _propertyValueLocator(path){
+				var npath = path.split('.')
+				,	result = this;
 
-			//loop over path parts
-			for(var i=0; i < npath.length-1; i++ ){
-				result = result[npath[i]];
-				if(result == null) throw 'Property ' + path + ' is not found in object ' + obj;
-			}
-			var p = npath[npath.length - 1];
-			if(result[p] == undefined) throw 'Property ' + path + ' is not found in object ' + obj;
-
-			//hash map object
-			return Object.defineProperty(Object.create(null),'value',{
-				get:function(){
-					return result[p];
-				},
-				set:function(newValue){
-					result[p] = newValue;
+				//loop over path parts
+				for(var i=0; i < npath.length-1; i++ ){
+					result = result[npath[i]];
+					if(result == null) throw 'Property ' + path + ' is not found in object ' + obj;
 				}
-			});
-};
+				var p = npath[npath.length - 1];
+				if(result[p] == undefined) throw 'Property ' + path + ' is not found in object ' + obj;
 
-function propertyValue(obj){
-	return _propertyValueLocator.bind(obj);
-}
+				//hash map object
+				return Object.defineProperty(Object.create(null),'value',{
+					get:function(){
+						return result[p];
+					},
+					set:function(newValue){
+						result[p] = newValue;
+					}
+				});
+	};
 
-
-
+	function propertyValue(obj){
+		return _propertyValueLocator.bind(obj);
+	};
 
 
 	function display(controller,target){
@@ -644,6 +641,7 @@ UrlAnalyzer.prototype = {
 	function Event(fn){
 		this.transformer = fn;
 	};
+
 	Event.prototype.transform = function(fn){
 		return new Event(fn);
 	};
@@ -753,7 +751,7 @@ UrlAnalyzer.prototype = {
 		MulticastEvent.unsubscribe = function(callback){
 			var idx = callbacks.length-1;
 			for(var i=0; i < callbacks[idx].length; i++) {
-				if( callbacks[idx][i] == callback ) {
+				if( callbacks[idx][i].callback == callback ) {
 					logging.debug.log('unsubscribing...');
 					callbacks[idx].splice(i,1);
 					instances[idx].splice(i,1);
@@ -1879,7 +1877,6 @@ UrlAnalyzer.prototype = {
 			}
 		},this);
 
-
 		this.onAttach.subscribe(function(){
 			if(!this.children) return;
 			for(var i=0; i< this.children.length; i++){
@@ -1894,7 +1891,18 @@ UrlAnalyzer.prototype = {
 	Controller.prototype.onAttach 		= EventSingleton;
 	Controller.prototype.onDisplay 		= EventSingleton;
 	Controller.prototype.onDomChanged = EventSingleton;
-	Controller.prototype.onData 		= EventSingleton;
+	Controller.prototype.onData 		  = EventSingleton;
+
+	//iterate over children and release event listeners
+	Controller.prototype.dispose = function(){
+			for(var i=0; i<this.children.length; i++){
+				var child = this.children[i];
+				if(child instanceof Controller){
+					child.dispose();
+				}
+			}// end for children
+			console.log('releasing events');
+	};
 
 
 	var Concrete = function Concrete(dom){
@@ -2057,9 +2065,7 @@ UrlAnalyzer.prototype = {
 
 		/* process dom references */
 		var elements = deepClone.querySelectorAll('[sjs-element]');
-
-		var element = deepClone
-		,	rootElement = null;
+		var element = deepClone;
 
 		if(controllerInstance)
 		for(var i=-1; i< elements.length; i++){
@@ -2073,11 +2079,10 @@ UrlAnalyzer.prototype = {
 					controllerInstance.elements[parts[p]] = element;
 				}
 			}
-
-			if(ref == 'root'){
-				rootElement = element;
-			}
 		}
+
+		//get element marked "root"
+		var rootElement = controllerInstance.elements['root'];
 
 		//apply style
 		if(rootElement){
@@ -2592,7 +2597,7 @@ UrlAnalyzer.prototype = {
 		if(args['class'] instanceof Binding){
 			var ti = args['class'].getTargetInstance(instance,scope);
 			if(!ti) throw 'Unable to locate target instance';
-			args['class'] = getPropertyValue(ti,args['class'].prop);
+			args['class'] = propertyValue(ti)(args['class'].prop).value;
 			console.log('class binding');
 			return;
 		}

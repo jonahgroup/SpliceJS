@@ -63,21 +63,22 @@ definition:function(sjs){
 		//subscribe to onAttach event, update chat dimensions
 		this.onAttach.subscribe(this.attach, this);
 
+
+		//single svg node per chart
+		this.svg = this.d3.select().append('svg')
+
+		this.hAxis = this.svg.append('g').attr('class', 'horizontal-axis');
+		this.vAxis = this.svg.append('g').attr('class', 'vertical-axis');
+		this.grid  = this.svg.append('g').attr('class', 'chart-grid')
+
+		this.chartArea = this.svg.append('g').attr('class','chart-area');
 	});
 
 	Chart.prototype.onChartItem = Event;
 
 	Chart.prototype.attach = function(){
 
-		//single svg node per chart
-		this.svg = this.d3.select().append('svg')
 
-
-		this.hAxis = this.svg.append('g').attr('class', 'horizontal-axis');
-		this.vAxis = this.svg.append('g').attr('class', 'vertical-axis');
-    this.grid  = this.svg.append('g').attr('class', 'chart-grid')
-
-		this.chartArea = this.svg.append('g').attr('class','chart-area');
 
 
 		/*

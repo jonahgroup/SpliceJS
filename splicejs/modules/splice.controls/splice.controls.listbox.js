@@ -71,7 +71,7 @@ definition:function(sjs){
 			var item = this.listItems[i];
 
 			if(this.dataPath){
-				item.dataIn(sjs.propvalue(this.dataItem[i],this.dataPath));
+				item.dataIn(sjs.propvalue(this.dataItem[i])(this.dataPath).value);
 			} else {
 				item.dataIn(this.dataItem[i]);
 			}
@@ -85,7 +85,7 @@ definition:function(sjs){
 				this.listItems.push(item);
 
 				if(this.dataPath){
-					item.dataIn(sjs.propvalue(this.dataItem[i],this.dataPath));
+					item.dataIn(sjs.propvalue(this.dataItem[i])(this.dataPath).value);
 				} else {
 					item.dataIn(this.dataItem[i]);
 				}
@@ -99,8 +99,10 @@ definition:function(sjs){
 		}
 
 		this.reflow();
-
+		if(!this.ref.scrollPanel) this.onResize(this);
 	};
+
+	ListBoxController.prototype.onResize = Event;
 
 	ListBoxController.prototype.reflow = function(){
 		if(!this.ref.scrollPanel) return;
@@ -108,6 +110,9 @@ definition:function(sjs){
 		this.ref.scrollPanel.reflow();
 
 	};
+
+
+
 
 	var DefaultListItem = Class(function DefaultListItem(){
 			this.concrete =  {
@@ -119,6 +124,7 @@ definition:function(sjs){
 
 	DefaultListItem.prototype.dataIn = function(dataItem){
 		if(!dataItem) return;
+		this.dataItem = dataItem;
 		this.concrete.dom.innerHTML = dataItem.toString();
 	};
 

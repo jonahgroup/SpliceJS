@@ -15,7 +15,7 @@ required:[
 	'splice.controls.datatable.html'
 ],
 
-definition:function(){
+definition:function(sjs){
 	"use strict";
 
 	function _if(obj){
@@ -28,7 +28,8 @@ definition:function(){
 	,	Event = this.sjs.Event
 	,	mixin = this.sjs.mixin
 	,	debug = this.sjs.debug
-	,	scope = this.scope;
+	,	scope = this.scope
+	,	Controller = sjs.Controller;
 
 	var	Doc 		= scope.Doc
 	,	create 		= scope.Doc.create
@@ -213,6 +214,18 @@ definition:function(){
 	DataTable.prototype.onFilterList 		= Event;
 	DataTable.prototype.onCellStyle 		= Event;
 
+
+	DataTable.prototype.dispose = function(){
+			console.log('releasing table');
+			this.onWindowResize.unsubscribe(reflowTable);
+			Controller.prototype.dispose.call(this);
+	};
+
+	/* callback for window's on resize event*/
+	function reflowTable(){
+		this.reflow();
+	}
+
 	/**
 	 *	'private' calls
 	 */
@@ -233,7 +246,7 @@ definition:function(){
 		});
 
 		//!!!!! TODO: review reflow model
-		Event.attach(window, 'onresize').subscribe(function(){this.reflow();},this);
+		this.onWindowResize = Event.attach(window, 'onresize').subscribe(reflowTable, this);
 
 		this.onHeadClick = Event.attach(this.headTable,'onmousedown');
 		this.onBodyClick = Event.attach(this.bodyTable,'onmousedown');

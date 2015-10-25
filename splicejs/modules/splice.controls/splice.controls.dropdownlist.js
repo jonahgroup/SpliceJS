@@ -41,7 +41,7 @@ sjs({
 
 	ListController.prototype.setSelectedItem = function(item){
 		if(this.dataPath){
-			this.ref.selector.dataIn(sjs.propvalue(item,this.dataPath));
+			this.ref.selector.dataIn(sjs.propvalue(item)(this.dataPath).value);
 		} else {
 			this.ref.selector.dataIn(item);
 		}
