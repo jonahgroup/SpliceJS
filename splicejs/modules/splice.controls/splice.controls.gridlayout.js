@@ -16,6 +16,7 @@ definition:function(){
 	var UIControl = scope.SpliceJS.UI.UIControl
 	,	DragAndDrop = scope.SpliceJS.UI.DragAndDrop;
 
+
 	var Grid = function(rows,columns){
 		this.rows 		= rows;
 		this.columns 	= columns;
@@ -103,7 +104,7 @@ definition:function(){
 
 	});
 
-
+	CellContainer.prototype.onAdd 				= Event;
 	CellContainer.prototype.onStartMove   =	Event;
 	CellContainer.prototype.onMove 	  	  = Event;
 	CellContainer.prototype.onEndMove 	  = Event;
@@ -151,6 +152,14 @@ definition:function(){
 	CellContainer.prototype.maximize = function(){
 		this.onMaximize(this);
 	};
+
+	CellContainer.prototype.content = function(content){
+		if(!content.body) return;
+	};
+
+	var DEFAULT_OUTTER_MARGIN = 10;
+	var DEFAULT_MARGIN = 10;
+
 
 	/**
 	*
@@ -206,17 +215,43 @@ definition:function(){
 
 
 	/* private */
+/*
 	function restoreCell(cell){
 	//	cell.onResize.subscribe(this.resizeCell, this);
 	//	cell.onRemove.subscribe(this.removeCell, this);
-
 		this.layoutCells[cell.index] = cell;
 		this.elements.root.appendChild(cell.concrete.dom);
 		cell.onAttach();
 		cell.onDisplay();
 	}
+*/
+	function addCell(content, position){
 
-	function addCell(content, row, col, rowSpan, colSpan){
+
+
+		if(content instanceof CellContainer){
+			this.layoutCells[content.index] = content;
+			if(content.isSoftRemoved) {
+				content.concrete.dom.style.display = 'block';
+				content.onDisplay();
+				return;
+			}
+
+
+			this.elements.root.appendChild(content.concrete.dom);
+
+			content.isAttached = true;
+
+			content.onAttach();
+			content.onDisplay();
+			content.onAdd(content);
+			return;
+		}
+
+		var row = position[0]
+		,	col = position[1]
+		,	rowSpan = position[2]
+		,	colSpan = position[3];
 
 		var _CellContainer = proxy(
 		{	type:'CellContainer',
@@ -239,13 +274,44 @@ definition:function(){
 		this.elements.root.appendChild(cell.concrete.dom);
 		cell.onAttach();
 		cell.onDisplay();
+		cell.onAdd(cell);
+
+		return cell;
 	};
 
+
+	GridLayout.prototype.getCell = function(position){
+			var row = position[0]
+			,	col = position[1]
+			,	rowSpan = position[2]
+			,	colSpan = position[3];
+
+			var _CellContainer = proxy(
+			{	type:'CellContainer',
+				row:row,
+				col:col,
+				colspan:colSpan,
+				rowspan:rowSpan
+			});
+
+			var cellIndex = this.cellSequence++;
+
+			var cell =  new _CellContainer({parent:this, index:cellIndex});
+
+			cell.onResize.subscribe(this.resizeCell, this);
+			cell.onRemove.subscribe(this.removeCell, this);
+			cell.onMaximize.subscribe(this.maximizeCell,this);
+
+			return cell;
+
+	};
 
 	GridLayout.prototype.addCell = function(){
-		addCell.apply(this,arguments);
+		var cell = addCell.apply(this,arguments);
 		this.reflow();
+		return cell;
 	};
+
 
 	/**
 		Atempts to restore layout cell
@@ -280,15 +346,24 @@ definition:function(){
 		console.log('Maximizing cell');
 	};
 
-
 	/**
 		Removes single cell
 		@param {CellContainerController} cell - cell to be deleted
 	*/
-	GridLayout.prototype.removeCell = function(cell){
-		this.elements.root.removeChild(cell.concrete.dom);
+	GridLayout.prototype.removeCell = function(cell,isSoft){
+
+		if(isSoft){
+			cell.concrete.dom.style.display = 'none';
+			cell.isSoftRemoved = true;
+		}
+		else {
+			this.elements.root.removeChild(cell.concrete.dom);
+			cell.isAttached = false;
+		}
+
 		delete this.layoutCells[cell.index];
-		this.onRemoveCell(cell);
+		this.onRemoveCell(cell,isSoft);
+
 	};
 
 
@@ -369,6 +444,22 @@ definition:function(){
 		this.reflow(cell.index);
 	};
 
+	GridLayout.prototype.setOutterMargin = function(margin){
+		if(margin == null) {
+			this.outerMargin = DEFAULT_OUTTER_MARGIN;
+			return;
+		}
+		this.outerMargin = margin;
+	};
+
+	GridLayout.prototype.setMargin = function(margin){
+		if(margin == null){
+			this.margin = DEFAULT_MARGIN;
+			return;
+		}
+		this.margin = margin;
+	};
+
 	GridLayout.prototype.reflow = function(cellIndex){
 
 		var margin 		 = this.margin;
@@ -424,6 +515,14 @@ definition:function(){
 		}
 	};
 
+	/**
+		@param {int} rows - number of rows in the grid, min 1
+		@param {int} cols - number of cols in the grid, min 1
+	*/
+	GridLayout.prototype.setGridSize = function(rows, cols){
+
+	};
+
 	GridLayout.prototype.setGrid = function(grid){
 		this.grid.setSize(grid);
 		this.reflow();
@@ -463,8 +562,10 @@ definition:function(){
 		return {row:row, col:col};
 	};
 
+	/* module exports */
+	return  {
 
-	return  {}
+	}
 
 
 }

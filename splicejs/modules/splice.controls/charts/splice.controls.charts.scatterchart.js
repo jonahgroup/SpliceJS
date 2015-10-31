@@ -16,9 +16,6 @@
           //DataItem will be injected
           var data = this.dataItem;
 
-          debug.log("scatter chart");
-          debug.log(data);
-
           /*Data will be array of pairs*/
 
           if (!data) return;
@@ -69,11 +66,7 @@
           //DataItem will be injected
           var data = this.dataItem;
 
-          debug.log("scatter line chart");
-          debug.log(data);
-
           /*Data will be array of pairs*/
-
           if (!data) return;
 
           var width = this.width

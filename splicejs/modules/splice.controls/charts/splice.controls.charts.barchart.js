@@ -14,13 +14,8 @@ definition:function(sjs){
 	BarChart.prototype.render = function(d3){
 
 		var data = this.dataItem;
-		
-		debug.log("Bar Chart");
-		debug.log(data);
-		
+
 		if(!data) return;
-
-
 
 		var width = this.width
 		,	height = this.height
@@ -47,9 +42,9 @@ definition:function(sjs){
 
 		*/
 
-		ag.attr("transform", function(d, i) { 
+		ag.attr("transform", function(d, i) {
 		 	var position = x(i);
-			return 'translate(' + position + ',0)'; 
+			return 'translate(' + position + ',0)';
 		});
 
 
@@ -60,12 +55,12 @@ definition:function(sjs){
 		    .attr('height', function(d){ return height - y(d); });
 
 
-		g.exit().remove();    
+		g.exit().remove();
 
 
-		g.attr("transform", function(d, i) { 
+		g.attr("transform", function(d, i) {
 		 	var position = x(i);
-			return 'translate(' + position + ',0)'; 
+			return 'translate(' + position + ',0)';
 		});
 
 
@@ -74,7 +69,7 @@ definition:function(sjs){
 		    .attr('x', spacing)
 		    .attr('y', function(d){return y(d);})
 		    .attr('height', function(d){ return height - y(d); });
-    
+
 
 
 
@@ -82,9 +77,9 @@ definition:function(sjs){
 
 
 	return {
-		
+
 		BarChart:BarChart
-		
+
 	}
 
 

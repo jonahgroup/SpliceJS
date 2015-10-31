@@ -144,9 +144,6 @@ definition:function(sjs){
 		if (this.dM.min > 0) this.dM.min = 0;
 
 
-		debug.log('Max ' + this.dM.max);
-		debug.log('Count ' + this.dM.count);
-
 	}
 
 

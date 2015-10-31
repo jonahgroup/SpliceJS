@@ -1863,6 +1863,26 @@ UrlAnalyzer.prototype = {
 		return instance;
 	};
 
+	function buildContentMap(element){
+		var textNodes = selectTextNodes(element)
+		,	valueMap = {};
+
+		if(!textNodes) return;
+
+		for(var i=0; i<textNodes.length; i++){
+			var node = textNodes[i];
+			if(node.nodeValue[0] !== '@') continue;
+
+			var val = node.nodeValue.substring(1);
+			var list = 	valueMap[val];
+			if(!list) {
+				valueMap[val] = list = [];
+			}
+			list.push(node);
+		}
+		return valueMap;
+	};
+
 
 	var Controller = function Controller(){
 
@@ -1879,11 +1899,14 @@ UrlAnalyzer.prototype = {
 
 		this.onAttach.subscribe(function(){
 			if(!this.children) return;
+
 			for(var i=0; i< this.children.length; i++){
 				var child = this.children[i];
+				child.__sjs_is_attached__ = this.__sjs_is_attached__;
 				if(typeof child.onAttach === 'function')
 					child.onAttach();
 			}
+
 		},this);
 
 	};
@@ -1892,6 +1915,39 @@ UrlAnalyzer.prototype = {
 	Controller.prototype.onDisplay 		= EventSingleton;
 	Controller.prototype.onDomChanged = EventSingleton;
 	Controller.prototype.onData 		  = EventSingleton;
+
+
+	function decodeContent(content){
+		if(typeof obj === 'string'){
+			return document.createTextNode(obj);
+		}
+		if(typeof obj === 'number'){
+			return document.createTextNode(obj);
+		}
+		if(content instanceof Controller){
+			return content.concrete.dom;
+		}
+		return null;
+	}
+
+	//
+	Controller.prototype.content = function(source){
+			if(!this.__sjs_content_map__)
+			throw 'Unable to apply content, content map is not available, make sure "sjs-content-map" is not false for a given component';
+
+			var keys = Object.keys(this.__sjs_content_map__);
+			for(var key in  keys){
+				var newNode = decodeContent(source[keys[key]]);
+				if(!newNode) continue;
+
+				//if child node is already added, skip
+				if(this.__sjs_content_map__[keys[key]][0] == newNode)
+					return;
+
+				this.__sjs_content_map__[keys[key]][0].parentNode.replaceChild(newNode,this.__sjs_content_map__[keys[key]][0]);
+				this.__sjs_content_map__[keys[key]][0] = newNode;
+			}
+	};
 
 	//iterate over children and release event listeners
 	Controller.prototype.dispose = function(){
@@ -2029,7 +2085,7 @@ UrlAnalyzer.prototype = {
 
 		//export attribute exists
 		if(this.dom.attributes['sjs-export']) {
-			var exp = dom.getAttribute('sjs-export').value;
+			var exp = dom.getAttribute('sjs-export');
 			if(!exp) this.export = this.type;
 			else this.export = exp;
 		}
@@ -2089,6 +2145,8 @@ UrlAnalyzer.prototype = {
 			if(parameters && parameters.class)
 				rootElement.className = parameters.class + ' ' + rootElement.className;
 		}
+
+		controllerInstance.__sjs_content_map__ = buildContentMap(instance.dom);
 
 	   /*
 		* Handle content declaration
@@ -2817,7 +2875,22 @@ UrlAnalyzer.prototype = {
 
 				}).bind(this);
 
-			}).bind(scope)
+			}).bind(scope),
+			loadscope:function(targetscope){
+				return (function(filenames){
+
+					return (function(fn){
+						var imports = prepareImports(filenames, this.__sjs_uri__.path);
+
+						include(imports.filenames,function(){
+							applyImports.call(scope,imports);
+							if(typeof fn === 'function') fn();
+						});
+
+					}).bind(this);
+
+				}).bind(targetscope);
+			}
 		});
 
 		var path = getPath(LoadingWatcher.name).path;
@@ -2885,7 +2958,20 @@ UrlAnalyzer.prototype = {
 			if(typeof definition === 'function') {
 				var _exports = definition.call({'sjs':_sjs,'scope':scope}, _sjs);
 				if(!_exports) _exports = Object.create(null);
-				MODULE_MAP[url] = mixin(_exports,scope.components);
+
+				//get only exported components
+
+				var components = {};
+				if(scope.components){
+				var keys = Object.keys(scope.components);
+				for(var key in keys) {
+					var comp = scope.components[keys[key]];
+					if(comp && comp.isComponent && comp.template.export) {
+						components[comp.template.export] = comp;
+					}
+				}
+				}
+				MODULE_MAP[url] = mixin(_exports,components);
 			}
 		},collectTemplates);
 	};
@@ -2910,6 +2996,22 @@ UrlAnalyzer.prototype = {
 		fn();
 		var end = window.performance.now();
 		return end - start;
+	};
+
+	function runAsync(fn){
+		var asyncfn = function(){
+			setTimeout(1,function(){
+				fn()
+			});
+		}
+
+		asyncfn.call = function(){
+
+				fn.apply(arguments[0])
+
+		};
+		return asyncfn;
+
 	};
 
 
@@ -2981,6 +3083,7 @@ UrlAnalyzer.prototype = {
 			binding : binding,
 			proxy	: proxy,
 			propvalue : propertyValue,
+			async: runAsync,
 
 			timing	:	measureRuntime,
 

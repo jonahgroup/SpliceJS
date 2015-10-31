@@ -16,9 +16,6 @@ definition:function(sjs){
 	LineChart.prototype.render = function(d3){
 
 		var data = this.dataItem;
-		
-		debug.log("Line Chart");
-		debug.log(data);
 
 		if(!data) return;
 
@@ -37,16 +34,16 @@ definition:function(sjs){
 		// line generator
 		var lineFunction = d3.svg.line()
 		.	x(function(d,i){ return x(i)+x.rangeBand()/2;})
-		.	y(function(d,i){ return y(d);})    
+		.	y(function(d,i){ return y(d);})
 		.	interpolate('linear');
 
 		var areaFunction = d3.svg.area()
 		.	x(function(d,i){ return x(i)+x.rangeBand()/2;})
-		.	y0(function(d,i){ return y(0);})    
-		.	y1(function(d,i){ return y(d);})    
+		.	y0(function(d,i){ return y(0);})
+		.	y1(function(d,i){ return y(d);})
 
-	
-		
+
+
 		/* render area under the curve*/
 		if(this.showArea) {
 		var area = this.svg.select('path[class="area"]');
@@ -69,7 +66,7 @@ definition:function(sjs){
 		.	attr('fill','none')
 		.	attr('stroke','#000')
 		.	attr('stroke-linejoin', 'round');
-		
+
 
 
 		var g = chart.selectAll("g").data(data);
@@ -80,14 +77,14 @@ definition:function(sjs){
 
 
 
-		/* 
-			no inversion for Y axis	
+		/*
+			no inversion for Y axis
 			it is already inverted
 		*/
 
-		ag.attr("transform", function(d, i) { 
+		ag.attr("transform", function(d, i) {
 		 	var position = x(i);
-			return 'translate(' + position + ',0)'; 
+			return 'translate(' + position + ',0)';
 		});
 
 		if(this.showPoints == true)
@@ -103,13 +100,13 @@ definition:function(sjs){
 		    .text(function(d) { return d; });
 
 
-		//drop extra items    
+		//drop extra items
 		g.exit().remove();
 
 
-		g.attr("transform", function(d, i) { 
+		g.attr("transform", function(d, i) {
 		 	 	var position = x(i);
-		 		return 'translate(' + position + ',0)'; 
+		 		return 'translate(' + position + ',0)';
 		});
 
 
@@ -119,7 +116,7 @@ definition:function(sjs){
 			.attr("r",this.pointSize)
 			.attr("cx", x.rangeBand()/2)
 			.attr("cy", function(d){return y(d);} );
-				
+
 		g.select("text")
     		.attr("x", x.rangeBand()/2)
 		    .attr("y", function(d){return y(d) - 10;})
@@ -129,9 +126,9 @@ definition:function(sjs){
 
 
 	return {
-		
+
 		LineChart:LineChart
-		
+
 	}
 
 }});
