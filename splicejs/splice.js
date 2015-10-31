@@ -335,10 +335,10 @@ var sjs = (function(window, document){
 				//loop over path parts
 				for(var i=0; i < npath.length-1; i++ ){
 					result = result[npath[i]];
-					if(result == null) throw 'Property ' + path + ' is not found in object ' + obj;
+					if(result == null) throw 'Property ' + path + ' is not found in object ' + result;
 				}
 				var p = npath[npath.length - 1];
-				if(result[p] == undefined) throw 'Property ' + path + ' is not found in object ' + obj;
+				if(result[p] == undefined) throw 'Property ' + path + ' is not found in object ' + result;
 
 				//hash map object
 				return Object.defineProperty(Object.create(null),'value',{
@@ -1864,16 +1864,15 @@ UrlAnalyzer.prototype = {
 	};
 
 	function buildContentMap(element){
-		var textNodes = selectTextNodes(element)
+		var contentNodes = element.querySelectorAll('[sjs-content]')
 		,	valueMap = {};
 
-		if(!textNodes) return;
+		if(!contentNodes) return;
 
-		for(var i=0; i<textNodes.length; i++){
-			var node = textNodes[i];
-			if(node.nodeValue[0] !== '@') continue;
+		for(var i=0; i<contentNodes.length; i++){
+			var node = contentNodes[i];
 
-			var val = node.nodeValue.substring(1);
+			var val = node.getAttribute('sjs-content');
 			var list = 	valueMap[val];
 			if(!list) {
 				valueMap[val] = list = [];
@@ -1940,12 +1939,16 @@ UrlAnalyzer.prototype = {
 				var newNode = decodeContent(source[keys[key]]);
 				if(!newNode) continue;
 
-				//if child node is already added, skip
-				if(this.__sjs_content_map__[keys[key]][0] == newNode)
-					return;
+				var contentNode = this.__sjs_content_map__[keys[key]][0];
 
-				this.__sjs_content_map__[keys[key]][0].parentNode.replaceChild(newNode,this.__sjs_content_map__[keys[key]][0]);
-				this.__sjs_content_map__[keys[key]][0] = newNode;
+				//if child node is already added, skip
+				if(contentNode.childNodes[0] == newNode)	return;
+
+				if(contentNode.childNodes[0]) {
+					contentNode.replaceChild(newNode,contentNode.childNodes[0]);
+				} else {
+					contentNode.appendChild(newNode);
+				}
 			}
 	};
 
