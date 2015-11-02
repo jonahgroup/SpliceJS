@@ -1886,7 +1886,7 @@ UrlAnalyzer.prototype = {
 	var Controller = function Controller(){
 
 		if(!this.children)	this.children = [];
-
+		if(!this.__sjs_visual_children__) this.__sjs_visual_children__ = [];
 		this.onDisplay.subscribe(function(){
 			if(!this.children) return;
 			for(var i=0; i< this.children.length; i++){
@@ -1916,16 +1916,41 @@ UrlAnalyzer.prototype = {
 	Controller.prototype.onData 		  = EventSingleton;
 
 
+	function abandonVisualParent(controller){
+		var children = controller.__sjs_visual_parent__.__sjs_visual_children__;
+		for(var i=0; i < children.length; i++){
+			if(children[i] == controller) children.splice(i,1);
+			break;
+		}
+		controller.__sjs_visual_parent__ = null;
+	};
+
+	function gainVisualParent(controller,parent){
+		controller.__sjs_visual_parent__ = parent;
+		var children = parent.__sjs_visual_children__;
+		for(var i=0; i<children.length; i++){
+			if(children[i] == controller) return;
+		}
+		children.push(controller);
+	};
+
+
 	function decodeContent(content){
-		if(typeof obj === 'string'){
+		if(typeof content === 'string'){
 			return document.createTextNode(obj);
 		}
-		if(typeof obj === 'number'){
+
+		if(typeof content === 'number'){
 			return document.createTextNode(obj);
 		}
+
 		if(content instanceof Controller){
+			//update visual parent
+			abandonVisualParent(content);
+			gainVisualParent(content, this);
 			return content.concrete.dom;
 		}
+
 		return null;
 	}
 
@@ -1936,7 +1961,7 @@ UrlAnalyzer.prototype = {
 
 			var keys = Object.keys(this.__sjs_content_map__);
 			for(var key in  keys){
-				var newNode = decodeContent(source[keys[key]]);
+				var newNode = decodeContent.call(this,source[keys[key]]);
 				if(!newNode) continue;
 
 				var contentNode = this.__sjs_content_map__[keys[key]][0];
@@ -2635,12 +2660,13 @@ UrlAnalyzer.prototype = {
 		var scope = this;
 
 		instance.parent = args.parent;
+		instance.__sjs_visual_parent__ = args.parent;
 
 		if(!instance.parent) return;
 
 
 		instance.parent.children.push(instance);
-
+		instance.__sjs_visual_parent__.__sjs_visual_children__.push(instance);
 	//	if(!args.ref) return;
 
 		if(typeof args.ref == 'string') {
@@ -2716,6 +2742,7 @@ UrlAnalyzer.prototype = {
 			obj.ref = {};
 			obj.elements = {};
 			obj.children = [];
+			obj.__sjs_visual_children__ = [];
 			obj.scope = scope;
 
 

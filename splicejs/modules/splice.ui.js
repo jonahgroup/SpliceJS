@@ -122,10 +122,9 @@ definition:function(){
 
 	UIControl.prototype.reflowChildren = function(position, size,bubbleup){
 
-		for(var i=0; i<this.children.length; i++){
-			if(typeof this.children[i].reflow !== 'function') continue;
-
-			this.children[i].reflow(position,size,bubbleup);
+		for(var i=0; i<this.__sjs_visual_children__.length; i++){
+			if(typeof this.__sjs_visual_children__[i].reflow !== 'function') continue;
+			this.__sjs_visual_children__[i].reflow(position,size,bubbleup);
 		}
 	};
 

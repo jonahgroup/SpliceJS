@@ -153,10 +153,6 @@ definition:function(){
 		this.onMaximize(this);
 	};
 
-	CellContainer.prototype.content = function(content){
-		if(!content.body) return;
-	};
-
 	var DEFAULT_OUTTER_MARGIN = 10;
 	var DEFAULT_MARGIN = 10;
 
