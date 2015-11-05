@@ -227,8 +227,10 @@ definition:function(){
 
 		if(content instanceof CellContainer){
 			this.layoutCells[content.index] = content;
+
 			if(content.isSoftRemoved) {
 				content.concrete.dom.style.display = 'block';
+				content.isShown = true;
 				content.onDisplay();
 				return;
 			}
@@ -237,6 +239,7 @@ definition:function(){
 			this.elements.root.appendChild(content.concrete.dom);
 
 			content.isAttached = true;
+			content.isShown = true;
 
 			content.onAttach();
 			content.onDisplay();
@@ -277,10 +280,21 @@ definition:function(){
 
 
 	GridLayout.prototype.getCell = function(position){
+			if(!position) position = [];
+
 			var row = position[0]
 			,	col = position[1]
 			,	rowSpan = position[2]
 			,	colSpan = position[3];
+
+			//next empty cell is a default position of the cell
+			if(row == null || col == null) {
+				var position = this.getEmptyCell();
+				row  = position.row;
+				col = position.col;
+				rowSpan = 1;
+				colSpan = 1;
+			}
 
 			var _CellContainer = proxy(
 			{	type:'CellContainer',
@@ -333,7 +347,10 @@ definition:function(){
 			var keys = Object.keys(this.layoutCells);
 
 			for(var key in keys){
-					this.elements.root.removeChild(this.layoutCells[keys[key]].concrete.dom);
+					var cell = this.layoutCells[keys[key]];
+					cell.isAttached = false;
+					cell.isShown = false;
+					this.elements.root.removeChild(cell.concrete.dom);
 			}
 			this.layoutCells = Object.create(null);
 	};
@@ -351,11 +368,14 @@ definition:function(){
 		if(isSoft){
 			cell.concrete.dom.style.display = 'none';
 			cell.isSoftRemoved = true;
+
 		}
 		else {
 			this.elements.root.removeChild(cell.concrete.dom);
 			cell.isAttached = false;
 		}
+
+		cell.isShown = false;
 
 		delete this.layoutCells[cell.index];
 		this.onRemoveCell(cell,isSoft);
@@ -476,10 +496,7 @@ definition:function(){
 	 	* based on client and grid size
 	 	* */
 		var unitWidth = (workarea.clientWidth - (grid.columns - 1) * margin) / grid.columns;
-			unitWidth -= 2; /*border adjustment */
-
-		var unitHeight = (workarea.clientHeight- (grid.rows - 1) * margin) / grid.rows;
-			unitHeight -= 2;
+		var unitHeight = (workarea.clientHeight - (grid.rows - 1) * margin) / grid.rows;
 
 		grid.clear();
 

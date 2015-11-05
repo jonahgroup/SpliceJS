@@ -33,9 +33,9 @@ definition:function(sjs){
 
 	var	Doc 		= scope.Doc
 	,	create 		= scope.Doc.create
-	,	dom 		= scope.Doc.dom
+	,	dom 			= scope.Doc.dom
 	,	cssvalue 	= scope.Doc.cssvalue
-	,	data 		= scope.Data.data
+	,	data 			= scope.Data.data
 	,	fdata 		= scope.Data.data
 	,	compare 	= scope.Data.compare.default
 	,	DataStep 	= scope.Data.DataStep

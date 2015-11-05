@@ -335,17 +335,19 @@ var sjs = (function(window, document){
 				//loop over path parts
 				for(var i=0; i < npath.length-1; i++ ){
 					result = result[npath[i]];
-					if(result == null) throw 'Property ' + path + ' is not found in object ' + result;
+					if(result == null) console.warn('Property ' + path + ' is not found in object ' + result);
 				}
 				var p = npath[npath.length - 1];
-				if(result[p] == undefined) throw 'Property ' + path + ' is not found in object ' + result;
+				if(result && result[p] == undefined) console.warn('Property ' + path + ' is not found in object ' + result);
 
 				//hash map object
 				return Object.defineProperty(Object.create(null),'value',{
 					get:function(){
+						if(!result) return null;
 						return result[p];
 					},
 					set:function(newValue){
+						if(!result) return;
 						result[p] = newValue;
 					}
 				});
@@ -386,6 +388,166 @@ var sjs = (function(window, document){
 		if(object.tagName && object.tagName != '') return true;
 		return false;
 	};
+
+
+/**
+	Dom manipulation api
+*/
+function Dom(dom){
+	if(typeof dom === 'string'){
+		this.htmlElement = document.createElement(dom);
+	} else
+		this.htmlElement = dom;
+};
+
+Dom.prototype.class = function(className){
+	var self = this;
+	return {
+		remove: function(){
+			removeClass(self.htmlElement,className)
+			return self;
+		},
+		add:function(){
+			addClass(self.htmlElement,className);
+			return self;
+		}
+	}
+};
+
+Dom.prototype.display = function(target){
+	var self = this;
+	return {
+		show :function(){
+			if(!target)
+				document.body.appendChild(self.htmlElement);
+			return self;
+		}
+	}
+};
+
+Dom.prototype.style = function(styleString){
+	//var rules = CssTokenizer(styleString);
+	this.htmlElement.setAttribute('style',styleString)
+	return this;
+};
+
+Dom.prototype.clear = function(){
+	this.htmlElement.innerHTML = '';
+	return this;
+};
+
+
+Dom.prototype.parent = function(){
+
+};
+
+Dom.prototype.content = function(content){
+	if(typeof content === 'string'){
+		this.htmlElement.innerHTML = content;
+	}
+	return this;
+};
+
+Dom.prototype.position = function(){
+		var self = this;
+		return {
+			abs:function(){
+				return self;
+			}
+		}
+};
+
+
+function CssTokenizer(input){
+	var t = new Tokenizer(input);
+	var rules = []
+	,	token = null;
+
+	var acc = '';
+	while(token = t.nextToken()){
+		if(Tokenizer.isSpace(token)) continue;
+		if(Tokenizer.isAlphaNum(token)) {
+			acc += token; continue;
+		}
+		//rule value mode
+		if(token == ':') {
+			var rule = {property:acc, values:cssRuleValue(t)}
+			rules.push(rule);
+			acc = '';
+			continue;
+		}
+	}
+	return rules;
+}
+
+function composeCssRules(){
+	var rules
+	for(var i=0; i<rules.length; i++){
+		var prop = rules[i].property;
+	}
+}
+
+
+function cssRuleValue(tokenizer){
+	var token = null
+	,	acc = ''
+	,	values = [];
+	while(token = tokenizer.nextToken()){
+		if(Tokenizer.isSpace(token) && acc != ''){
+			values.push(acc); acc = ''; continue;
+		}
+		if(Tokenizer.isAlphaNum(token)) {
+			acc += token; continue;
+		}
+		if(token == ';') {
+			if(acc != '') values.push(acc);
+			return values;
+		}
+	}
+	return values;
+}
+
+function ClassTokenizer(input){
+	var tokenizer = new Tokenizer(input)
+	,	token = null;
+	var classes = Object.create(null)
+	,	acc = '';
+	while(token = tokenizer.nextToken()){
+		if(Tokenizer.isSpace(token)) {
+			classes[acc] = 1;
+			acc = '';
+			continue;
+		}
+		acc += token;
+	}
+	if(acc != '') classes[acc] = 1;
+	return classes;
+};
+
+
+function addClass(element, className){
+	var current = ClassTokenizer(element.className)
+	,	toAdd = ClassTokenizer(className)
+	,	clean = element.className;
+
+	for(var key in toAdd ){
+		if(key in current) continue;
+		clean += ' ' + key;
+	}
+
+	element.className = clean;
+};
+
+function removeClass(element, className){
+	var current = ClassTokenizer(element.className)
+	,	toRemove = ClassTokenizer(className)
+	,	clean = '';
+	for(var key in current){
+		if(key in toRemove) continue;
+		clean += ' ' + key;
+	}
+	element.className = clean;
+};
 
 
 
@@ -1937,11 +2099,11 @@ UrlAnalyzer.prototype = {
 
 	function decodeContent(content){
 		if(typeof content === 'string'){
-			return document.createTextNode(obj);
+			return document.createTextNode(content);
 		}
 
 		if(typeof content === 'number'){
-			return document.createTextNode(obj);
+			return document.createTextNode(content);
 		}
 
 		if(content instanceof Controller){
@@ -1952,7 +2114,12 @@ UrlAnalyzer.prototype = {
 		}
 
 		return null;
-	}
+	};
+
+	function invalidateContent(){
+		this._lastWidth = null;
+		this._lastHeight = null;
+	};
 
 	//
 	Controller.prototype.content = function(source){
@@ -1974,6 +2141,8 @@ UrlAnalyzer.prototype = {
 				} else {
 					contentNode.appendChild(newNode);
 				}
+
+				invalidateContent.call(this);
 			}
 	};
 
@@ -2003,7 +2172,9 @@ UrlAnalyzer.prototype = {
 			this.dom = this.dom.children[0];
 		}
 	};
-
+	/**
+	 *	@param {Namespace} scope
+	 */
 	Concrete.prototype.applyContent = function(content, instance, scope, suspendNotify){
 
 		var deepClone = this.dom;
@@ -2134,8 +2305,10 @@ UrlAnalyzer.prototype = {
 
 
 	/**
-	 * @tieInstance - instance of a tie class that is associated with the template
-	 * */
+	 * @param {Controller} controllerInstance  - instance of a controller class that is associated with the template
+	 * @param {object} parameters
+	 	 @param {Namespace} scope - module scope
+	 */
 	Template.prototype.getInstance = function(controllerInstance, parameters, scope){
 
 		var build = this.dom;
@@ -2181,6 +2354,7 @@ UrlAnalyzer.prototype = {
 		* Getcontent nodes
 		*/
 		if(parameters.content)
+		//instance if a concrete == template instance
 		instance.applyContent(parameters.content, controllerInstance, scope, true);
 
 
@@ -3114,6 +3288,8 @@ UrlAnalyzer.prototype = {
 			proxy	: proxy,
 			propvalue : propertyValue,
 			async: runAsync,
+
+			dom:function(dom){ return new Dom(dom);},
 
 			timing	:	measureRuntime,
 

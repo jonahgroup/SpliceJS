@@ -103,6 +103,9 @@ definition:function(){
 			return ;
 		}
 
+
+
+
 		// Get style object once and apply settings
 		if(this.layout !== 'css') {
 			var style = this.concrete.dom.style;
@@ -114,7 +117,12 @@ definition:function(){
 			style.height 	= size.height + 'px';
 		}
 
-		this.reflowChildren(position,size,bubbleup);
+		if(this._lastWidth != size.width || this._lastHeight != size.height ) {
+			this.reflowChildren(position,size,bubbleup);
+		}
+
+		this._lastWidth = size.width;
+		this._lastHeight = size.height;
 
 		this.onReflow(position,size);
 
