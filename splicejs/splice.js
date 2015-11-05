@@ -393,14 +393,14 @@ var sjs = (function(window, document){
 /**
 	Dom manipulation api
 */
-function Dom(dom){
+function View(dom){
 	if(typeof dom === 'string'){
 		this.htmlElement = document.createElement(dom);
 	} else
 		this.htmlElement = dom;
 };
 
-Dom.prototype.class = function(className){
+View.prototype.class = function(className){
 	var self = this;
 	return {
 		remove: function(){
@@ -414,7 +414,7 @@ Dom.prototype.class = function(className){
 	}
 };
 
-Dom.prototype.display = function(target){
+View.prototype.display = function(target){
 	var self = this;
 	return {
 		show :function(){
@@ -425,30 +425,30 @@ Dom.prototype.display = function(target){
 	}
 };
 
-Dom.prototype.style = function(styleString){
+View.prototype.style = function(styleString){
 	//var rules = CssTokenizer(styleString);
 	this.htmlElement.setAttribute('style',styleString)
 	return this;
 };
 
-Dom.prototype.clear = function(){
+View.prototype.clear = function(){
 	this.htmlElement.innerHTML = '';
 	return this;
 };
 
 
-Dom.prototype.parent = function(){
+View.prototype.parent = function(){
 
 };
 
-Dom.prototype.content = function(content){
+View.prototype.content = function(content){
 	if(typeof content === 'string'){
 		this.htmlElement.innerHTML = content;
 	}
 	return this;
 };
 
-Dom.prototype.position = function(){
+View.prototype.position = function(){
 		var self = this;
 		return {
 			abs:function(){
@@ -676,8 +676,7 @@ UrlAnalyzer.prototype = {
 		var a = Array("Msxml2.XMLHTTP","Microsoft.XMLHTTP");
     	if (window.ActiveXObject)
         for (var i = 0; i < a.length; i++) {
-           	try {this.transport = new ActiveXObject(a[i]);}
-        	catch (ex) {console.log(ex);}
+           	this.transport = new ActiveXObject(a[i]);
         }
         else if (window.XMLHttpRequest)   this.transport =  new XMLHttpRequest();
 	};
@@ -1475,7 +1474,6 @@ UrlAnalyzer.prototype = {
 	function _super(inst,b,args){
 		if(!b) return;
 		_super(inst,b.base,args);
-		//console.log('Calling super');
 		b.apply(inst,args);
 	};
 
@@ -1497,6 +1495,19 @@ UrlAnalyzer.prototype = {
 		}
 	};
 
+	function extend(_class, base){
+		_class.prototype = Object.create(base.prototype);
+		_class.prototype.constructor = _class;
+		_class.base = base.prototype.constructor;
+		_class.prototype.super = function(){
+			this.super = function(){};
+			_super(this,_class.base, arguments);
+		}
+	};
+
+	function prototype(_class,_proto){
+		return mixin(_class.prototype,_proto);
+	};
 
 	function Iterator(collection){
 		this.data = collection;
@@ -1899,26 +1910,13 @@ UrlAnalyzer.prototype = {
 			/* create instance of the proxy object
 			 * local scope lookup takes priority
 			 */
-			var obj = null;
+			var obj = scope.lookup(args.type);
 
-			if(!obj) try{
-				obj = scope.lookup(args.type);
-			} catch(ex){}
-
-			if(!obj) try {
-				obj = scope.components.lookup(args.type);
-			} catch(ex){}
-
+			if(!obj) obj = scope.components.lookup(args.type);
 			/* lone template is being included */
-			if(!obj) try {
-				obj = scope.templates[args.type];
-			} catch(ex) {}
+			if(!obj) obj = scope.templates[args.type];
 
-
-
-
-			if(!obj)
-				throw 'Proxy object type ' + args.type + ' is not found';
+			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
 
 
@@ -2044,8 +2042,10 @@ UrlAnalyzer.prototype = {
 		return valueMap;
 	};
 
-
-	var Controller = function Controller(){
+/**
+	Controller class
+*/
+function Controller(){
 
 		if(!this.children)	this.children = [];
 		if(!this.__sjs_visual_children__) this.__sjs_visual_children__ = [];
@@ -2181,13 +2181,9 @@ UrlAnalyzer.prototype = {
 		var controllerInstance = this.controllerInstance;
 
 		if(content instanceof Binding){
-			console.log('content is a binding');
 			var targetInstance = content.getTargetInstance(instance,scope);
-
 			content = targetInstance.__sjs_args__.content;
-
 			if(content == null || !content) return;
-
 		}
 
 		if(!this.contentMap) {
@@ -2859,7 +2855,6 @@ UrlAnalyzer.prototype = {
 			var ti = args['class'].getTargetInstance(instance,scope);
 			if(!ti) throw 'Unable to locate target instance';
 			args['class'] = propertyValue(ti)(args['class'].prop).value;
-			console.log('class binding');
 			return;
 		}
 
@@ -3289,8 +3284,7 @@ UrlAnalyzer.prototype = {
 			propvalue : propertyValue,
 			async: runAsync,
 
-			dom:function(dom){ return new Dom(dom);},
-
+			view:function(dom){return new View(dom);},
 			timing	:	measureRuntime,
 
 			load	: include,
@@ -3300,7 +3294,8 @@ UrlAnalyzer.prototype = {
 			Namespace: Namespace,
 			Class : Class,
 			Controller : Controller,
-
+			extend:extend,
+			prototype:prototype,
 
 			HttpRequest : HttpRequest,
 			Event : EventSingleton,

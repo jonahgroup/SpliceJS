@@ -53,39 +53,37 @@ definition:function(sjs){
     else {
       throw 'Test fail: propvalue';
     }
+  });
+
+  sjs.prototype(ComponentsTest,{
+
+    display : function(){
+      this.onProvinces(provinces);
+      this.onChartsData(charts);
+      this.onScatterChartData(scatterChart);
+      this.onTestCheck(testCheck);
+    },
+
+    testCheck : function(item){
+      console.log(item);
+    },
+
+    provincesSelection:function(provinces){
+      console.log(provinces);
+    },
+
+    provinceSelected : function(item){
+        console.log('Selected province is:' + item);
+    },
+
+    onProvinces : Event,
+    onChartsData: Event,
+    onScatterChartData :Event,
+    onTestCheck: Event
 
   });
 
-  ComponentsTest.prototype.display = function(){
-    this.onProvinces(provinces);
-    this.onChartsData(charts);
-    this.onScatterChartData(scatterChart);
-
-    this.onTestCheck(testCheck);
-
-  };
-
-  ComponentsTest.prototype.testCheck = function(item){
-    console.log(item);
-  };
-
-
-  ComponentsTest.prototype.provincesSelection = function(provinces){
-    console.log(provinces);
-  };
-
-
-
-  ComponentsTest.prototype.onProvinces = Event;
-  ComponentsTest.prototype.provinceSelected = function(item){
-      console.log('Selected province is:' + item);
-  };
-
-  ComponentsTest.prototype.onChartsData = Event;
-  ComponentsTest.prototype.onScatterChartData = Event;
-
-  ComponentsTest.prototype.onTestCheck = Event;
-
+  return {}
 }
 
 
