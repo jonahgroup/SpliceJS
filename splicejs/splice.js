@@ -3210,7 +3210,16 @@ function Controller(){
 
 		};
 		return asyncfn;
+	};
 
+	function findModule(m){
+		var mdl = null;
+		var keys = Object.keys(MODULE_MAP);
+		for(var i=0; i < keys.length; i++){
+			var key = keys[i];
+			if(key.endsWith(m)) mdl = MODULE_MAP[key];
+		}
+		return mdl;
 	};
 
 
@@ -3233,24 +3242,24 @@ function Controller(){
 		//dependent module definition
 		if( typeof m === 'object' && typeof m.definition === 'function'){
 			return Module(m);
-		};
+		}
 
 		//lookup module
 		if(typeof m  === 'string'){
-			var mdl = null;
-			var keys = Object.keys(MODULE_MAP);
-			for(var i=0; i < keys.length; i++){
-				var key = keys[i];
-				if(key.endsWith(m)) mdl = MODULE_MAP[key];
-			}
+			var mdl = findModule(m);
 			return function(callback){
 				if(mdl != null) {
 					if(typeof callback === 'function') callback(mdl);
 					return mdl;
 				}
+
+				load([m],function(){
+					if(typeof callback === 'function') callback(findModule(m));
+				})
+
 				return mdl;
 			};
-		};
+		}
 
 		return mixin(Object.create(null), {
 
