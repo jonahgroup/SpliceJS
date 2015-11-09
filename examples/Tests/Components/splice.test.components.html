@@ -1,5 +1,4 @@
 <sjs-component sjs-type="Components" sjs-controller="ComponentsTest" sjs-export>
-<div>something</div>
 <table class="-component-test-table">
 <!-- Button Component -->
 <tr>
@@ -34,7 +33,8 @@
     {
         default:'Please select an item',
         dataIn: binding('onProvinces').parent,
-        onDataItem: binding('provinceSelected').parent
+        onDataItem: binding('provinceSelected').parent,
+        css:{list: 'test-drop-down-list'}
     }
   </sjs-include>
 </td>
@@ -49,7 +49,8 @@
     {
         content:{selectedItem:'Provinces'},
         dataIn: binding('onProvinces').parent,
-        onDataItem: binding('provinceSelected').parent
+        onDataItem: binding('provinceSelected').parent,
+        css:{list: 'test-drop-down-list'}
     }
   </sjs-include>
 </td>
@@ -95,7 +96,7 @@
     {
         dataIn: binding('onProvinces').parent,
         onDataItem: binding('provinceSelected').parent,
-        onSelection: binding('provincesSelection').parent,
+        onSelection: binding('provincesSelection').parent
     }
   </sjs-include>
 </td>
@@ -126,6 +127,7 @@
         content:{selectedItem:'Provinces'},
         dataIn: binding('onProvinces').parent,
         onDataItem: binding('provinceSelected').parent,
+          css:{list: 'test-drop-down-list'}
     }
   </sjs-include>
 </td>
