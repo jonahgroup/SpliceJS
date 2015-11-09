@@ -33,10 +33,6 @@ definition:function(){
 
 		var self = this;
 
-		this.onDomChanged.subscribe(function(){
-			self.applyCSSRules();
-		});
-
 	});
 
 	UIControl.prototype.hide = function(){

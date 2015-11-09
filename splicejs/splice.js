@@ -798,14 +798,65 @@ UrlAnalyzer.prototype = {
 		}
 	};
 
+	/**
+		@param {object} instance - taget object instance to
+		receive event configuration
+	*/
+	function Event(instance){
+		if(!(this instanceof Event))
+		return {
+			attach:function(configuration){
+				var keys = Object.keys(configuration);
+				for(var i=0; i<keys.length; i++){
+					var evt = configuration[keys[i]];
+					if(!(evt instanceof Event) ) continue;
+					instance[keys[i]] = evt.attach(instance, keys[i]);
+				}
+				return instance;
+			}
+		}
 
-	function Event(fn){
-		this.transformer = fn;
+
+		this.eventType = 'multicast';
+		this.isStop = false;
 	};
 
 	Event.prototype.transform = function(fn){
-		return new Event(fn);
+		var e = mixin(new Event(),this)
+		e.transformer = fn;
+		return e;
 	};
+
+	Event.prototype.stop = function(fn){
+		var e = mixin(new Event(),this)
+		e.transformer = fn;
+		e.isStop = true;
+		return e;
+	};
+
+	Event.multicast = (function(){
+		var e = mixin(new Event(),this)
+		e.eventType= 'multicast';
+
+		e.stop = mixin(new Event(),e);
+		e.stop.isStop = true;
+
+		return e;
+	})();
+
+	Event.multicast = (function(){
+		var e = mixin(new Event(),this)
+		e.eventType= 'multicast';
+
+		e.stop = mixin(new Event(),e);
+		e.stop.isStop = true;
+
+		return e;
+	})();
+
+
+
+
 
 	Event.prototype.attach = function(object, property, cancelBubble){
 
@@ -2049,6 +2100,13 @@ function Controller(){
 
 		if(!this.children)	this.children = [];
 		if(!this.__sjs_visual_children__) this.__sjs_visual_children__ = [];
+
+		Event(this).attach({
+			onAttach	:	Event.multicast,
+			onDisplay	:	Event.multicast,
+			onData		: Event.multicast
+		});
+
 		this.onDisplay.subscribe(function(){
 			if(!this.children) return;
 			for(var i=0; i< this.children.length; i++){
@@ -2070,13 +2128,14 @@ function Controller(){
 
 		},this);
 
-	};
 
+	};
+/*
 	Controller.prototype.onAttach 		= EventSingleton;
 	Controller.prototype.onDisplay 		= EventSingleton;
 	Controller.prototype.onDomChanged = EventSingleton;
 	Controller.prototype.onData 		  = EventSingleton;
-
+*/
 
 	function abandonVisualParent(controller){
 		var children = controller.__sjs_visual_parent__.__sjs_visual_children__;
@@ -3030,6 +3089,49 @@ function Controller(){
 		}
 	};
 
+
+	function _exports(scope){
+		return {
+			scope:function(){
+				for(var i=0; i < arguments.length; i++){
+					var arg = arguments[i];
+					if(typeof arg === 'function' ){
+						scope[getFunctionName(arg)] = arg;
+						continue;
+					}
+
+					if(typeof arg === 'object'){
+						var keys = Object.keys(arg);
+						for(var i=0; i < keys.length; i++){
+							scope[keys[i]] = arg[keys[i]];
+						}
+						continue;
+					}
+				}
+			},
+
+			module:function(){
+				var exports = scope.__sjs_module_exports__;
+				if(!exports) exports = scope.__sjs_module_exports__ = {};
+				for(var i=0; i < arguments.length; i++){
+					var arg = arguments[i];
+					if(typeof arg === 'function' ){
+						exports[getFunctionName(arg)] = arg;
+						continue;
+					}
+
+					if(typeof arg === 'object'){
+						var keys = Object.keys(arg);
+						for(var i=0; i < keys.length; i++){
+							exports[keys[i]] = arg[keys[i]];
+						}
+						continue;
+					}
+				}
+			}
+		}
+	};
+
 	/**
 	 * Builds module and compiles late(s) from module definition.
 	 * The templates will be compiled recursively,
@@ -3061,6 +3163,7 @@ function Controller(){
 
 		var _sjs = mixin(sjs(),{
 			Class : proxyClass,
+			exports:_exports(scope),
 			proxy : (function(){return proxy.apply(this,arguments);}).bind(scope),
 			load  : (function(filenames){
 
@@ -3308,7 +3411,7 @@ function Controller(){
 
 			HttpRequest : HttpRequest,
 			Event : EventSingleton,
-
+			event:	Event,
 			Tokenizer:Tokenizer,
 			UrlAnalyzer:UrlAnalyzer,
 

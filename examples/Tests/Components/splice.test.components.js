@@ -15,8 +15,9 @@ definition:function(sjs){
 
   var Class = sjs.Class
   , Controller = sjs.Controller
-  , Event = sjs.Event;
-
+  , Event = sjs.Event
+  , event = sjs.event
+  , exports = sjs.exports;
 
   var provinces = [
     'Ontario','British Columbia', 'Alberta', 'Quebec','New Brunswick', 'Nova Scotia'
@@ -41,7 +42,23 @@ definition:function(sjs){
 
   var ComponentsTest = Class.extend(Controller)(function ComponentsTest(){
     this.super();
-    this.onDisplay.subscribe(this.display, this);
+
+    event(this).attach({
+      onProvinces         : event.multicast,
+      onChartsData        : event.multicast,
+      onScatterChartData  : event.multicast,
+      onTestCheck         : event.multicast
+    });
+
+  });
+
+  ComponentsTest.prototype.initialize = function(){
+    this.onDisplay.subscribe(function(){
+      this.onProvinces(provinces);
+      this.onChartsData(charts);
+      this.onScatterChartData(scatterChart);
+      this.onTestCheck(testCheck);
+    }, this);
 
     // value read
     var v = sjs.propvalue(charts)('0.data.1').value;
@@ -53,37 +70,31 @@ definition:function(sjs){
     else {
       throw 'Test fail: propvalue';
     }
-  });
+  };
 
-  sjs.prototype(ComponentsTest,{
+  ComponentsTest.prototype.testCheck = function(item){
+    console.log(item);
+  },
 
-    display : function(){
-      this.onProvinces(provinces);
-      this.onChartsData(charts);
-      this.onScatterChartData(scatterChart);
-      this.onTestCheck(testCheck);
-    },
+  ComponentsTest.prototype.provincesSelection = function(provinces){
+    console.log(provinces);
+  },
 
-    testCheck : function(item){
-      console.log(item);
-    },
+  ComponentsTest.prototype.provinceSelected = function(item){
+      console.log('Selected province is:' + item);
+  }
 
-    provincesSelection:function(provinces){
-      console.log(provinces);
-    },
 
-    provinceSelected : function(item){
-        console.log('Selected province is:' + item);
-    },
+  //scope exports
+  exports.scope(
+    ComponentsTest
+  );
 
-    onProvinces : Event,
-    onChartsData: Event,
-    onScatterChartData :Event,
-    onTestCheck: Event
+  //module exports
+  exports.module(
+    ComponentsTest
+  );
 
-  });
-
-  return {}
 }
 
 
