@@ -444,6 +444,11 @@ View.prototype.parent = function(){
 View.prototype.content = function(content){
 	if(typeof content === 'string'){
 		this.htmlElement.innerHTML = content;
+		return this;
+	}
+	if(typeof content === 'number'){
+		this.htmlElement.innerHTML = content;
+		return this;
 	}
 	return this;
 };
@@ -844,9 +849,9 @@ UrlAnalyzer.prototype = {
 		return e;
 	})();
 
-	Event.multicast = (function(){
+	Event.unicast = (function(){
 		var e = mixin(new Event(),this)
-		e.eventType= 'multicast';
+		e.eventType= 'unicast';
 
 		e.stop = mixin(new Event(),e);
 		e.stop.isStop = true;
@@ -944,7 +949,7 @@ UrlAnalyzer.prototype = {
 
 			callbacks[idx].push({callback:callback,is_async:false});
 			instances[idx].push(instance);
-			return this;
+			return object;
 		};
 
 		MulticastEvent.subscribeAsync = function(callback,instance){
@@ -1034,8 +1039,23 @@ UrlAnalyzer.prototype = {
 				MulticastEvent.subscribe(arguments);
 			}
 
+		} else if(object instanceof View){
+			object[property] = MulticastEvent;
+
+			object.htmlElement[property] = (function(e){
+				if(!e) e = window.event;
+				if(cancelBubble){
+					e.cancelBubble = true;
+					if (e.stopPropagation) e.stopPropagation();
+				}
+				var eventArgs = domEventArgs(e);
+				eventArgs.view = object;
+				this[property](eventArgs);
+			}).bind(object);
+			console.log('attaching event to view instance');
 		}
 		else {
+
 			object[property] = MulticastEvent;
 
 		}
@@ -2127,15 +2147,12 @@ function Controller(){
 			}
 
 		},this);
-
-
 	};
-/*
-	Controller.prototype.onAttach 		= EventSingleton;
-	Controller.prototype.onDisplay 		= EventSingleton;
-	Controller.prototype.onDomChanged = EventSingleton;
-	Controller.prototype.onData 		  = EventSingleton;
-*/
+
+	Controller.prototype.initialize = function(){
+		console.warn('"initialize" method is not implemented in ' + getFunctionName(this.constructor));
+	};
+	Controller.prototype.attachViews = function(){}
 
 	function abandonVisualParent(controller){
 		var children = controller.__sjs_visual_parent__.__sjs_visual_children__;
@@ -2368,8 +2385,14 @@ function Controller(){
 
 		var build = this.dom;
 
+		var views = {};
+
 		var deepClone = build.cloneNode(true);
 		deepClone.normalize();
+
+		/*build views*/
+		views.root = new View(deepClone.children[0]);
+
 
 		var instance = new Concrete(deepClone);
 		instance.controllerInstance = controllerInstance;
@@ -2380,15 +2403,16 @@ function Controller(){
 		var element = deepClone;
 
 		if(controllerInstance)
-		for(var i=-1; i< elements.length; i++){
-			if(i > -1) element = elements[i];
-
+		for(var i=0; i< elements.length; i++){
+			element = elements[i];
+			var view = new View(element);
 			var ref = element.getAttribute('sjs-element');
 			if(ref) {
 				//allow multiple element references to a single element
 				var parts = ref.split(' ');
 				for(var p=0; p<parts.length; p++ ) {
 					controllerInstance.elements[parts[p]] = element;
+					views[parts[p]] = view;
 				}
 			}
 		}
@@ -2464,6 +2488,8 @@ function Controller(){
 		}
 
 		instance.breakout();
+		controllerInstance.views = views;
+		controllerInstance.attachViews(views);
 		return instance;
 	};
 
@@ -2963,9 +2989,14 @@ function Controller(){
 				}
 			}
 
+/*
 			var obj = Object.create(controller.prototype);
 			obj.constructor = controller;
 			obj.__sjs_type__ = template.type;
+*/
+
+			var obj = new controller(args);
+
 
 			obj.ref = {};
 			obj.elements = {};
@@ -2973,9 +3004,7 @@ function Controller(){
 			obj.__sjs_visual_children__ = [];
 			obj.scope = scope;
 
-
 			obj.__sjs_args__ = args;
-
 
 			/*
 			 * assign reference to a parent and
@@ -2994,7 +3023,6 @@ function Controller(){
 			 */
 			bindDeclarations(args, obj, args._includer_scope);
 
-
 			/*
 				Instantiate Template
 			*/
@@ -3002,7 +3030,8 @@ function Controller(){
 			obj.concrete = template.getInstance(obj, args, scope);
 
 
-			controller.apply(obj, [args]);
+			obj.initialize();
+			//controller.apply(obj, [args]);
 
 /*		postpone singleton
 			if(args.singleton) {

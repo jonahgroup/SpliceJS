@@ -12,24 +12,37 @@ definition:function(sjs){
 	var scope = this.scope
 	, Class = this.sjs.Class
 	,	Event = this.sjs.Event
+	,	event = sjs.event
 	,	debug = this.sjs.debug
 	, dom = this.scope.Doc.dom;
 
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 
 	var Button = Class.extend(UIControl)(function ButtonController(args){
+		this.super(args);
 
-		this.super(arguments);
+		event(this).attach({
+			onClick : event.multicast
+		});
+	});
 
-		var self = this;
-		this.elements.root.onclick = function(){
-			if(self.isDisabled == true) return;
-			self.onClick(self.dataItem);
-		};
+	Button.prototype.attachViews = function(views){
+
+	};
+
+	Button.prototype.initialize = function(){
+
+		event(this.views.root).attach({
+			onclick	:	event.unicast
+		});
+
+		this.views.root.onclick.subscribe(function(){
+			if(this.isDisabled == true) return;
+			this.onClick(this.dataItem);
+		},this);
 
 		if(this.isDisabled) this.disable();
-
-	});
+	};
 
 	Button.prototype.onClick = Event;
 
