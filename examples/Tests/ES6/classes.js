@@ -100,8 +100,6 @@ sjs({definition:function(sjs){
 
 
 
-
-
   /* cross framework*/
   class XShape extends BShape {
     constructor(){

@@ -10,7 +10,9 @@
   </td>
 </tr>
 
-<!-- Check Component -->
+
+
+<!-- CheckBox Component -->
 <tr>
   <td>CheckBox</td>
   <td>
@@ -24,160 +26,22 @@
 </tr>
 
 
-
-<!-- ComboBox -->
+<!-- Text Field -->
 <tr>
-  <td>ComboBox</td>
+  <td>TextField</td>
   <td>
-  <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
-    {
-        default:'Please select an item',
-        dataIn: binding('onProvinces').parent,
-        onDataItem: binding('provinceSelected').parent
-    }
-  </sjs-include>
-</td>
-</tr>
-
-
-<!-- DropDownList -->
-<tr>
-  <td>DropDownList</td>
-  <td>
-  <sjs-include sjs-type="SpliceJS.Controls.DropDownList">
-    {
-        content:{selectedItem:'Provinces'},
-        dataIn: binding('onProvinces').parent,
-        onDataItem: binding('provinceSelected').parent
-    }
-  </sjs-include>
-</td>
-</tr>
-
-
-<!-- ListBox No Scroll-->
-<tr>
-  <td>ListBox - No Scroll</td>
-  <td>
-  <sjs-include sjs-type="SpliceJS.Controls.ListBox">
-    {
-        dataIn: binding('onProvinces').parent,
-        onDataItem: binding('provinceSelected').parent
-    }
-  </sjs-include>
-</td>
-</tr>
-
-
-<!-- ListBox Scrollable-->
-<tr>
-  <td>ListBox - Scroll</td>
-  <td>
-  <div style="position:relative; width:100%; height:100px;">
-    <sjs-include sjs-type="SpliceJS.Controls.ListBox">
-      {
-          dataIn: binding('onProvinces').parent,
-          onDataItem: binding('provinceSelected').parent,
-          isScrollable: true
-      }
+    <sjs-include sjs-type="SpliceJS.Controls.TextField">
     </sjs-include>
-  </div>
-</td>
+  </td>
 </tr>
 
 
-<!-- CheckListBox No Scroll-->
-<tr>
-  <td>CheckListBox - No Scroll</td>
-  <td>
-  <sjs-include sjs-type="SpliceJS.Controls.CheckListBox">
-    {
-        dataIn: binding('onProvinces').parent,
-        onDataItem: binding('provinceSelected').parent,
-        onSelection: binding('provincesSelection').parent,
-    }
-  </sjs-include>
-</td>
-</tr>
-
-<!-- CheckListBox Scrollable-->
-<tr>
-  <td>CheckListBox - Scroll</td>
-  <td>
-  <div style="position:relative; width:100%; height:100px;">
-    <sjs-include sjs-type="SpliceJS.Controls.CheckListBox">
-      {
-          dataIn: binding('onProvinces').parent,
-          onDataItem: binding('provinceSelected').parent,
-          isScrollable: true
-      }
-    </sjs-include>
-  </div>
-</td>
-</tr>
-
-<!-- DropDownCheckList -->
-<tr>
-  <td>DropDownCheckList</td>
-  <td>
-  <sjs-include sjs-type="SpliceJS.Controls.DropDownCheckList">
-    {
-        content:{selectedItem:'Provinces'},
-        dataIn: binding('onProvinces').parent,
-        onDataItem: binding('provinceSelected').parent,
-    }
-  </sjs-include>
-</td>
-</tr>
-
-
-<!-- Multiple Charts -->
-<tr>
-  <td>Charts</td>
-  <td>
-  <div style="position:relative; width:300px; height:160px;">
-    <sjs-include sjs-type="SpliceJS.Controls.Chart">
-      {
-          dataIn: binding('onChartsData').parent,
-      }
-    </sjs-include>
-  </div>
-</td>
-</tr>
-
-
-<!-- Bar Chart-->
-<tr>
-  <td>Bar Chart</td>
-  <td>
-  <div style="position:relative; width:300px; height:160px;">
-    <sjs-include sjs-type="SpliceJS.Controls.Chart">
-      {
-          dataIn: binding('onBarChartData').parent,
-      }
-    </sjs-include>
-  </div>
-</td>
-</tr>
-
-
-<!-- Scatter Chart-->
-<tr>
-  <td>Scatter Chart</td>
-  <td>
-  <div style="position:relative; width:300px; height:160px;">
-    <sjs-include sjs-type="SpliceJS.Controls.Chart">
-      {
-          dataIn: binding('onScatterChartData').parent,
-      }
-    </sjs-include>
-  </div>
-</td>
-</tr>
 
 <!-- Another Component -->
 <tr>
   <td>Component Name</td>
   <td>Component Include</td>
 </tr>
+</table>
+
 </sjs-component>

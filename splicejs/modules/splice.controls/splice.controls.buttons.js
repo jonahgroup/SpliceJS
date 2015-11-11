@@ -13,22 +13,21 @@ definition:function(sjs){
 	, Class = this.sjs.Class
 	,	Event = this.sjs.Event
 	,	event = sjs.event
+	,	exports = sjs.exports
 	,	debug = this.sjs.debug
 	, dom = this.scope.Doc.dom;
 
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 
-	var Button = Class.extend(UIControl)(function ButtonController(args){
+	var Button = Class(function ButtonController(args){
 		this.super(args);
 
 		event(this).attach({
 			onClick : event.multicast
 		});
-	});
 
-	Button.prototype.attachViews = function(views){
+	}).extend(UIControl);
 
-	};
 
 	Button.prototype.initialize = function(){
 
@@ -43,9 +42,6 @@ definition:function(sjs){
 
 		if(this.isDisabled) this.disable();
 	};
-
-	Button.prototype.onClick = Event;
-
 
 	Button.prototype.handleContent = function(content){
 		if(!content) return;
@@ -79,31 +75,36 @@ definition:function(sjs){
 	 *
 	 * Check box
 	 * */
-	var CheckBox = Class.extend(UIControl)(function CheckBoxController(args){
-		this.super(arguments);
-
-		var self = this;
-
+	var CheckBox = Class(function CheckBoxController(args){
+		this.super(args);
 		this.isChecked = false;
 
-		this.concrete.dom.onclick = function(){
+		event(this).attach({onChecked:event.multicast});
 
-			if(self.dataItem) {
-				if(self.dataPath) {
-					sjs.propvalue(self.dataItem)(self.dataPath).value = self.isChecked = !self.dataItem[self.dataPath];
+	}).extend(UIControl);
+
+	CheckBox.prototype.initialize = function(){
+		event(this.views.root).attach({
+			onclick :	event.multicast
+		}).onclick.subscribe(function(){
+
+			var dataItem = this.dataItem;
+
+			if(dataItem) {
+				if(this.dataPath) {
+					sjs.propvalue(dataItem)(this.dataPath).value = this.isChecked = !dataItem[this.dataPath];
 				} else {
-					self.dataItem['checked'] = self.isChecked = !self.dataItem['checked'];
+					dataItem['checked'] = this.isChecked = !dataItem['checked'];
 				}
 			} else {
-				self.isChecked = !self.isChecked;
+				this.isChecked = !this.isChecked;
 			}
 
-			self.check(self.isChecked);
-			self.onChecked(self.dataItem);
-		};
-	});
+			this.check(this.isChecked);
+			this.onChecked(dataItem);
 
-	CheckBox.prototype.onChecked = Event;
+		},this);
+	}
 
 	CheckBox.prototype.dataIn = function(dataItem){
 		this.dataItem = dataItem;
@@ -135,7 +136,7 @@ definition:function(sjs){
 	/**
 	 * RadioButton
 	 * */
-	var RadioButton = Class.extend(UIControl)(function RadioButtonController(args){
+	var RadioButton = Class(function RadioButtonController(args){
 		this.super(arguments);
 
 		var self = this;
@@ -151,7 +152,7 @@ definition:function(sjs){
 			self.dataOut(self.dataItem);
 		}
 
-	});
+	}).extend(UIControl);
 
 
 	RadioButton.prototype.dataIn = function(dataItem){
@@ -171,35 +172,43 @@ definition:function(sjs){
 	};
 
 
-	var TextField = Class.extend(UIControl)(function TextFieldController(){
-		this.super(arguments);
+	var TextField = Class(function TextFieldController(args){
+		this.super(args);
 
-		var self = this;
+		event(this).attach({
+			onData : event.multicast
+		});
 
-		var f = function(args){
-			if(this.dataPath) {
-				this.dataItem[self.dataPath] = args.source.value;
-			}
-			else {
-				this.dataItem = {value:args.source.value};
-			}
+	}).extend(UIControl);
 
-			this.onData(this.dataItem);
-		};
 
-		this.onKeyUp  = Event.attach(this.elements.root,'onkeyup');
-		this.onChange = Event.attach(this.elements.root,'onchange');
-
-		if(this.isRealTime){
-			this.onKeyUp.subscribe(f, this);
+	function _textFieldOnKey(args){
+		if(this.dataPath) {
+			this.dataItem[self.dataPath] = args.source.value;
 		}
 		else {
-			this.onChange.subscribe(f, this);
+			this.dataItem = {value:args.source.value};
 		}
 
-	});
+		this.onData(this.dataItem);
+	};
 
-	TextField.prototype.onData = Event;
+	TextField.prototype.initialize = function(){
+
+		event(this.views.root).attach({
+			onkeyup		:	event.unicast,
+			onchange 	: event.unicast
+		});
+
+		if(this.isRealTime){
+			this.views.root.onkeyup.subscribe(_textFieldOnKey, this);
+		}
+		else {
+			this.views.root.onchange.subscribe(_textFieldOnKey, this);
+		}
+
+	}
+
 
 	TextField.prototype.dataIn = function(dataItem){
 		UIControl.prototype.dataIn.call(this,dataItem);
@@ -220,7 +229,18 @@ definition:function(sjs){
 	};
 
 
-	//returning exports
+
+
+
+	/* module scope and exports */
+	exports.scope(
+		Button, CheckBox, TextField
+	);
+
+	exports.module(
+		Button, CheckBox, TextField
+	);
+
 
 }
 
