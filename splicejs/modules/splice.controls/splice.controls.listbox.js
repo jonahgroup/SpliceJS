@@ -37,7 +37,7 @@ definition:function(sjs){
 
 	ListBoxController.prototype.initialize = function(){
 			event(this.views.root).attach({	onclick	:	event.unicast	})
-			.onclick.subscribe(this.click,this);
+			.onclick.subscribe(_itemClick,this);
 
 			if(this.ref.contentClient) {
 				this.dom = this.ref.contentClient.views.root;
@@ -47,8 +47,10 @@ definition:function(sjs){
 			}
 	};
 
-
-	ListBoxController.prototype.click = function(args){
+	/**
+		Private
+	*/
+	function _itemClick(args){
 		var parent = args.source;
 		while(parent){
 			if(parent.__sjs_item_index__ != null) break;
