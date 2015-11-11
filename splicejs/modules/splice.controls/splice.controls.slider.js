@@ -7,17 +7,18 @@
     ]
     ,
     definition:function(sjs){
-        
+
         /* framework imports */
         var scope = this.scope
-        ,   Class = sjs.Class;
-        
+        , exports = sjs.exports
+        , Class = sjs.Class;
+
         var UIControl = scope.SpliceJS.UI.UIControl
         ,   DragAndDrop = scope.SpliceJS.UI.DragAndDrop;
-        
-        
-        var Slider = Class.extend(UIControl)(function SliderController() {
-            UIControl.call(this);
+
+
+        var Slider = Class(function SliderController(args) {
+            this.super(args);
 
             this.onAttach.subscribe(this.attach, this);
             this.onDisplay.subscribe(this.display, this);
@@ -31,9 +32,9 @@
             _.Event.attach(this.elements.rightThumb, 'onmousedown').subscribe(function (e) {
                 startMoveThumb.call(this, e, this.elements.rightThumb);
             }, this);
-        });
+        }).extend(UIControl);
 
-        
+
         //override reflow
         Slider.prototype.reflow = function () {
         }

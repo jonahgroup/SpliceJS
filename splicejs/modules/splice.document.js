@@ -2,7 +2,8 @@
 sjs({
 definition:function(sjs){
 
-	var Tokenizer = sjs.Tokenizer;
+	var Tokenizer = sjs.Tokenizer
+	,	exports = sjs.exports;
 
 	function getValueUnit(value){
 		if(!value) return null;
@@ -384,28 +385,28 @@ definition:function(sjs){
 		return window.innerHeight;
 	}
 
-	return {
-		style:style,
-		select:{
+	exports.module(
+		{style:style},
+		{select:{
 			setTitle:		setTitle,
 			firstNonText:	firstNonText,
 			textNodes:		selectTextNodes,
 			elementNodes:	selectElementNodes,
 			unknownNodes:	selectUnknownNodes,
 			commentNodes:	selectComments
-		},
-		screen:{
+		}},
+		{screen:{
 			width		:screenWidth,
 			height	:screenHeight
-		},
-		window:{
+		}},
+		{window:{
 			width		:windowWidth,
 			height	:windowHeight
-		},
-		create:create,
-		dom	: dom,
-		cssvalue : _unit
+		}},
+		{create:create},
+		{dom	: dom},
+		{cssvalue : _unit}
 
-	}
+	);
 
 }});

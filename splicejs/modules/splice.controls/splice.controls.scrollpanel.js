@@ -22,7 +22,7 @@ definition:function(sjs){
 
 
 
-	var ScrollPanel = Class.extend(UIControl)(function ScrollPanel(args){
+	var ScrollPanel = Class(function ScrollPanel(args){
 		if(!args) return;
 
 		this.super(args);
@@ -57,7 +57,7 @@ definition:function(sjs){
 			self.display();
 		});
 
-	});
+	}).extend(UIControl);
 
 	ScrollPanel.prototype.onScroll = Event;
 

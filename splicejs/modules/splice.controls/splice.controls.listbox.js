@@ -12,33 +12,41 @@ definition:function(sjs){
 
 
 	var Class = this.sjs.Class
-	,		Event = sjs.Event
+	,		event = sjs.event
+	,		exports = sjs.exports
 	,		debug = this.sjs.debug
 	, 	components = this.scope.components;
 
 	var	UIControl = this.scope.SpliceJS.UI.UIControl
 	,		dom = this.scope.Doc.dom;
 
-	var ListBoxController = Class.extend(UIControl)(function ListBoxController(){
+	var ListBoxController = Class(function ListBoxController(){
 			this.super();
-			this.dom = null;
-
 			this.listItems = [];
 
-			if(this.ref.contentClient) {
-				this.dom = dom(this.ref.contentClient.concrete.dom);
-			}
-			else {
-				this.dom = dom(this.elements.root);
-			}
+			event(this).attach({
+				onListItem : event.multicast,
+				onDataItem : event.multicast,
+				onResize   : event.multicast
+			});
 
 			if(!this.itemTemplate) this.itemTemplate = DefaultListItem;
 
-			Event.attach(this.concrete.dom, `onclick`).subscribe(this.click, this);
-	});
+	}).extend(UIControl);
 
-	ListBoxController.prototype.onListItem = Event;
-	ListBoxController.prototype.onDataItem = Event;
+
+	ListBoxController.prototype.initialize = function(){
+			event(this.views.root).attach({	onclick	:	event.unicast	})
+			.onclick.subscribe(this.click,this);
+
+			if(this.ref.contentClient) {
+				this.dom = this.ref.contentClient.views.root;
+			}
+			else {
+				this.dom = this.views.root;
+			}
+	};
+
 
 	ListBoxController.prototype.click = function(args){
 		var parent = args.source;
@@ -92,7 +100,7 @@ definition:function(sjs){
 
 				item.concrete.dom.__sjs_item_index__ = i;
 
-				this.dom.append(dom(item.concrete.dom));
+				this.dom.content(sjs.view(item.concrete.dom)).add();
 				if(typeof item.onAttached == 'function')
 					item.onAttached();
 			}
@@ -102,7 +110,7 @@ definition:function(sjs){
 		if(!this.ref.scrollPanel) this.onResize(this);
 	};
 
-	ListBoxController.prototype.onResize = Event;
+
 
 	ListBoxController.prototype.reflow = function(){
 		if(!this.ref.scrollPanel) return;
@@ -131,7 +139,7 @@ definition:function(sjs){
 
 
 
-	var ListItemController = Class.extend(UIControl)(function ListItemController(args){
+	var ListItemController = Class(function ListItemController(args){
 		this.super(args);
 
 		var self = this;
@@ -140,7 +148,7 @@ definition:function(sjs){
 				self.onClick(self.dataItem);
 		};
 
-	});
+	}).extend(UIControl);
 
 
 	ListItemController.prototype.dataIn = function(dataItem){
@@ -148,8 +156,6 @@ definition:function(sjs){
 		this.concrete.applyContent(dataItem);
 		this.dataOut(dataItem);
 	};
-
-
 
 
 	var GroupedListItem = Class(function GroupedListItem(args){
@@ -186,8 +192,6 @@ definition:function(sjs){
 	// list factory
 	var ListBox = Class(function ListBox(args){
 
-		//if(!args) args = [];
-
 		if(args.isScrollable)
 			return new components.ScrollableListBox(args);
 		else
@@ -195,12 +199,15 @@ definition:function(sjs){
 	});
 
 
+
+	exports.scope(
+		ListBoxController
+	)
+
 	//exporting objects
-	return {
-		ListItemController:	ListItemController,
-		ListBoxController:ListBoxController,
-		ListBox: ListBox
-	}
+	exports.module(
+		ListItemController, ListBoxController, ListBox
+	)
 
 }
 

@@ -62,9 +62,9 @@ definition:function(sjs){
 	};
 
 
-	var PullOutPanel = Class.extend(UIControl)( function PullOutPanelController(){
+	var PullOutPanel = Class( function PullOutPanelController(){
 		this.super();
-	});
+	}).extend(UIControl);
 
 
 	PullOutPanel.prototype.onOpen  = Event;

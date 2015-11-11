@@ -8,19 +8,31 @@ sjs({
 	],
 
 	definition:function(sjs){
+		"use strict";
 
 	var scope = this.scope
-	,	Class = this.sjs.Class
-	,	Event = this.sjs.Event;
+	,	exports = sjs.exports
+	,	event = sjs.event
+	,	Class = this.sjs.Class;
 
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 
 		/**
 	 * Drop down list
 	 * */
-	var ListController = Class.extend(UIControl)(function DropDownListController(args){
+	var ListController = Class(function DropDownListController(args){
 		this.super();
-		this.dom = this.concrete.dom;
+
+		event(this).attach({
+			onDropDown : event.multicast,
+			onListData : event.multicast,
+			onDataItem : event.multicast
+		});
+
+	}).extend(UIControl);
+
+
+	ListController.prototype.initialize = function(){
 
 		this.onDataIn.subscribe(function(item){
 			this.onListData(item);
@@ -30,7 +42,8 @@ sjs({
 			this.ref.selector.close();
 		},this);
 
-	});
+	};
+
 
 	ListController.prototype.dropDown = function(){
 		if(this.dataItem) {
@@ -47,14 +60,18 @@ sjs({
 		}
 	};
 
-	ListController.prototype.onDropDown = Event;
-	ListController.prototype.onListData = Event;
-	ListController.prototype.onDataItem = Event;
 
+
+
+	/* scope exports for component consumption*/
+	exports.scope(
+		ListController
+	);
 
 	/* module exports */
-	return {
-		DropDownListController: ListController
-	};
+	exports.module(
+		ListController
+	);
+
 
 }});

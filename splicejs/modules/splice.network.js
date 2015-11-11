@@ -9,7 +9,8 @@ definition:function(sjs){
 	,	SPLICE_REMOTE_CALL_ADAPTER = sjs.config.SPLICE_REMOTE_CALL_ADAPTER;
 
 	var HttpRequest = sjs.HttpRequest
-	,	debug = sjs.debug;
+  , exports = sjs.exports
+  ,	debug = sjs.debug;
 
 
     //arguemnt array of remote calls - array of strings,
@@ -123,10 +124,10 @@ definition:function(sjs){
   };
 
 
-
-	return {
-    remote : remote
-	}
+  // module exports
+	exports.module(
+    remote 
+	);
 
 }
 });

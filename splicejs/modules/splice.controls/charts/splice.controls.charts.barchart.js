@@ -4,6 +4,7 @@ sjs({
 definition:function(sjs){
 
 	var Class = sjs.Class
+	,	exports = sjs.exports
 	,	debug = sjs.debug;
 
 	var BarChart = Class(function BarChart(){
@@ -27,7 +28,7 @@ definition:function(sjs){
 		var chart = this.svg
 					 .attr('class', ('bar' + (this.id != null ? (' ' + this.id) : '')))
 					 .attr("width", width)
-		    		 .attr("height", height);
+		    	 .attr("height", height);
 
 
 		var g = chart.selectAll("g").data(data);
@@ -70,17 +71,12 @@ definition:function(sjs){
 		    .attr('y', function(d){return y(d);})
 		    .attr('height', function(d){ return height - y(d); });
 
-
-
-
 	};
 
 
-	return {
-
-		BarChart:BarChart
-
-	}
+	exports.module(
+		BarChart
+	);
 
 
 }});

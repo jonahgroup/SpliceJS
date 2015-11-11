@@ -3,7 +3,8 @@ sjs({
 definition:function(sjs){
 
 	var mixin = sjs.mixin
-	,	Class = sjs.Class;
+	,	Class = sjs.Class
+	,	exports = sjs.exports;
 
 	var DataStep = function DataStep(dowork, issource){
 		mixin(this,{
@@ -76,12 +77,12 @@ definition:function(sjs){
 	/**
 	 *
 	 */
-	var NumericIterator = Class.extend(Iterator)(function NumericIterator(n,callback){
+	var NumericIterator = Class(function NumericIterator(n,callback){
 		this.super(callback);
 		this.n = n;
 		this.position = 0;
 		this.length = n;
-	});
+	}).extend(Iterator);
 
 
 	/**
@@ -112,11 +113,11 @@ definition:function(sjs){
 	/**
 	 * Wraps callback around target iterator
 	 */
-	var NestedIterator = Class.extend(Iterator)(function NestedIterator(iterator,callback){
+	var NestedIterator = Class(function NestedIterator(iterator,callback){
 		this.super(callback);
 		this.iterator = iterator;
 		this.length = iterator.length;
-	});
+	}).extend(Iterator);
 
 	NestedIterator.prototype.next = function(callback){
 		var self = this;
@@ -137,12 +138,12 @@ definition:function(sjs){
 	/**
 	 * Iterates over array elements
 	 */
-	var ArrayIterator = Class.extend(Iterator)(function ArrayIterator(array,callback){
+	var ArrayIterator = Class(function ArrayIterator(array,callback){
 		this.super(callback);
 		this.array = array;
 		this.position = 0;
 		this.length = array.length;
-	});
+	}).extend(Iterator);
 
 	ArrayIterator.prototype.next = function(callback){
 		if(this.position >= this.array.length) return false;
@@ -171,7 +172,7 @@ definition:function(sjs){
 	/*
 		Creates paged view of the source iterator
 	*/
-	var PagingIterator = Class.extend(Iterator)(function PagingIterator(source, pagesize,callback){
+	var PagingIterator = Class(function PagingIterator(source, pagesize,callback){
 		this.super(callback);
 		this.i = source;
 		this.size = pagesize;
@@ -184,7 +185,7 @@ definition:function(sjs){
 		// assumes iterator length is known, may not always be the case
 		this.length = this.size;
 
-	});
+	}).extend(Iterator);
 
 	// in context of paging iterator start, end boundary indicates pages
 	// if present for paring iterator these arguments are ignored
@@ -220,7 +221,7 @@ definition:function(sjs){
 	/**
 	 * Creates frame view of the source iterator
 	 */
-	 var FrameXIterator = Class.extend(Iterator)(function FrameXIterator(source, size, step, callback){
+	 var FrameXIterator = Class(function FrameXIterator(source, size, step, callback){
 		this.super(callback);
 		this.i = source;
 
@@ -229,7 +230,7 @@ definition:function(sjs){
 
 	 	this.steps = Math.floor(this.length / this.step) + ((this.length % this.step)?1:0);
 
-	 });
+	 }).extend(Iterator);
 
 
 	 FrameXIterator.prototype.iterate = function(callback, start, end){
@@ -260,14 +261,14 @@ definition:function(sjs){
 	 /**
 	  *	Breaks up collection into ranges
 	  */
-	var RangeIterator = Class.extend(Iterator)(function RangeIterator(source, start, size, callback){
+	var RangeIterator = Class(function RangeIterator(source, start, size, callback){
 		this.super(callback);
 		this.length = size;
 		this.i = source;
 
 	 	this.start = start;
 		this.end = start + size;
-	});
+	}).extend(Iterator);
 
 
 	RangeIterator.prototype.iterate = function(callback, start, end){
@@ -291,12 +292,12 @@ definition:function(sjs){
 	/**
 	 * Iterates over object properties
 	 */
-	var ObjectIterator = Class.extend(Iterator)(function ObjectIterator(obj, callback){
+	var ObjectIterator = Class(function ObjectIterator(obj, callback){
 		this.super(callback);
 		this.obj = obj;
 		this.keys = Object.keys(obj);
 		this.position = 0;
-	});
+	}).extend(Iterator);
 
 	ObjectIterator.prototype.next = function(callback){
 		if(this.position >= this.keys.length) return false;
@@ -315,12 +316,12 @@ definition:function(sjs){
 
 	/**
 	 * */
-	var FrameArrayIterator = Class.extend(ArrayIterator)(function FrameArrayIterator(array, start, end, transformFunction){
+	var FrameArrayIterator = Class(function FrameArrayIterator(array, start, end, transformFunction){
 		this.super(array, transformFunction);
 		this.position = start;
 		this.initialFrozenPosition = start;
 		this.endPosition = Math.min(end, this.array.length);
-	});
+	}).extend(ArrayIterator);
 
 	FrameArrayIterator.prototype.next = function(callback){
 		if(this.position >= this.endPosition) return false;
@@ -338,7 +339,7 @@ definition:function(sjs){
 
 	/**
 	 * */
-	var FrameIterator = Class.extend(Iterator)(function FrameIterator(array, size, step, transformFunction){
+	var FrameIterator = Class(function FrameIterator(array, size, step, transformFunction){
 		this.super(transformFunction);
 		this.data 	= array;
 		this.size 	= size;
@@ -348,7 +349,7 @@ definition:function(sjs){
 			frameCount : 0,
 			hasMoreFrames : true
 		};
-	});
+	}).extend(Iterator);
 
 	FrameIterator.prototype.next = function(callback){
 		if (!this._cursor.hasMoreFrames) return false;
@@ -872,11 +873,9 @@ function _objectToMap(onitem){
 	};
 
 
-	return {
-		data : data,
-		DataStep : DataStep,
-		NumericIterator: NumericIterator,
-		compare:{'default':defaultComparator}
-	};
+	exports.module(
+		data,	DataStep,
+		{compare: {'default':defaultComparator} }
+	);
 }
 });

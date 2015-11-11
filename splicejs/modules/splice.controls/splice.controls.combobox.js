@@ -6,6 +6,7 @@ sjs({
   definition:function(sjs){
 
     var scope = this.scope
+    , exports = sjs.exports
     , Class = sjs.Class;
 
     var DropDownList = scope.SpliceJS.Controls.DropDownList;
@@ -36,9 +37,9 @@ sjs({
 
 
 
-    return {
-      ComboBox : ComboBox
-    };
+    exports.module(
+      ComboBox
+    );
   }
 
 });

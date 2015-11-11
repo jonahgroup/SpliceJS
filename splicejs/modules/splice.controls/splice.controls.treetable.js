@@ -5,18 +5,18 @@ required:[
 ],
 
 definition:function(sjs){
-	
+
 	var UIControl = this.scope.SpliceJS.UI.UIControl;
-		
-	var TreeTable = sjs.Class.extend(UIControl)(function TreeTableController(){
-		this.super();	
-	});
-	
+
+	var TreeTable = sjs.Class(function TreeTableController(){
+		this.super();
+	}).extend(UIControl);
+
 	TreeTable.prototype.dataIn = function(){
-			
+
 	};
-	
-	
-	
-}	
+
+
+
+}
 })

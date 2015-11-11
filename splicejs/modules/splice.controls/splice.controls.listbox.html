@@ -5,7 +5,7 @@
 
 <sjs-component sjs-type="ScrollableListBox" sjs-controller="ListBoxController" sjs-export>
 	<div class="-sjs-list-box" sjs-element="root">
-		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">{
+		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel" sjs-ref="scrollPanel">{
 			ref:'scrollPanel',
 			content:{
 				scrollContent:<sjs-include 	sjs-type="ContentClient"
@@ -19,10 +19,10 @@
 
 
 <sjs-component sjs-type="ContentClient">
-	<div sjs-element="root"></div>
+	<div></div>
 </sjs-component>
 
 
 <sjs-component sjs-type="GroupedListItem" sjs-export>
-	<div class="-splicejs-list-grouped-listitem" sjs-element="root"></div>
+	<div class="-splicejs-list-grouped-listitem"></div>
 </sjs-component>

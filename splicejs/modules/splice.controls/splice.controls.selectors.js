@@ -7,13 +7,15 @@ required:[
 	'splice.controls.selectors.html'
 ]
 ,
-definition:function(){
+definition:function(sjs){
+	"use strict";
 
 	/* framework imports */
 	var Controller 	= this.sjs.Controller
-	,	Event 		= this.sjs.Event
-	,	Class 		= this.sjs.Class
-	,	scope 		= this.scope;
+	,	exports = sjs.exports
+	,	event = sjs.event
+	,	Class = this.sjs.Class
+	,	scope = this.scope;
 
 	/* dependency imports */
 	var	Positioning = scope.SpliceJS.UI.Positioning
@@ -23,24 +25,12 @@ definition:function(){
 	var dropDownContainer = new scope.components.DropDownContainerResizable()
 	,	selectorElement = null;
 
-	var DropDownController = Class.extend(Controller)(function DropDownController(args){
-		this.super();
+	//
+	var DropDownController = Class(function DropDownController(args){
+		this.super(args);
 
-		var self = this;
-	    /*
-            Subscribe to onclick instead of mousedown, because firing mousedown
-            will immediately execute event within dropDown() closing the dropdown
-        */
-	    Event.attach(this.elements.root, 'onmousedown').subscribe(function (e) {
-				e.cancel();
-				this.dropDown();
-		}, this);
-
-		/*
-			Prevent closing the dropdown when dropdown container body is clicked
-		*/
-		Event.attach(dropDownContainer.concrete.dom,'onmousedown').subscribe(function(e){
-			e.cancel();
+		event(this).attach({
+			onDropDown : event.multicast
 		});
 
 		this.dropDownItem = this.dropDownItem;
@@ -48,12 +38,20 @@ definition:function(){
 
 		this.dropDownContainerSize = {left:0,top:0};
 
-	});
+	}).extend(Controller);
 
 
-	DropDownController.prototype.onDropDown = Event;
-	//DropDownController.prototype.onDropDownComplete = Event;
+	DropDownController.prototype.initialize = function(){
+			/*
+					Subscribe to onclick instead of mousedown, because firing mousedown
+					will immediately execute event within dropDown() closing the dropdown
+			*/
+		event(this.views.root).attach({ onmousedown : event.unicast })
+		.onmousedown.subscribe(function(e){
+			this.dropDown();
+		},this);
 
+	};
 
 	DropDownController.prototype.dataIn = function(data){
 		this.data = data;
@@ -138,28 +136,35 @@ definition:function(){
 		s.display='block';
 
 
+/*
 		// !!!!!! refactor
-		this.onModalClose = Event.attach(document.body, 'onmousedown');
+		this.onModalClose = event(sjs.view(document.body)).attach({
+			onmousedown : event.multicast
+		}).onmousedown;
 
 		// close on body mouse down
 		this.onModalClose.push().subscribe(hide, this).cleanup(function (event) {
 			event.unsubscribe(hide);
 			event.pop();
 		}, this);
-
+*/
 		this.onDropDown(this.data);
+
 
 	};
 
-	var DropDownContainerController = Class.extend(Controller)(function DropDownContainerController(){
-
-	});
-
+	var DropDownContainerController = Class(function DropDownContainerController(){
+	}).extend(Controller);
 
 
+	/* scope exports for template consumption*/
+	exports.scope(
+		DropDownController, DropDownContainerController
+	);
 
-	return {
-			DropDownController: DropDownController
-	}
+	/* module exports */
+	exports.module(
+		DropDownController
+	)
 
 }});

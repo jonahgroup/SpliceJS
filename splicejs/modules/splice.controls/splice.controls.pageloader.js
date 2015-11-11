@@ -9,13 +9,13 @@ definition:function(){
 
 	var scope = this.scope
 	,	Class = this.sjs.Class;
-	
+
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 
 
-	Class.extend(UIControl)(function PageLoaderController(){
+	var PageLoader = Class(function PageLoaderController(){
 		this.super();
-	});
+	}).extend(UIControl);
 
 }
 

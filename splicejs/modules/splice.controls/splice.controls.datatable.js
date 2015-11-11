@@ -44,9 +44,9 @@ definition:function(sjs){
 	/**
 	 * DataTable
 	 * */
-	var DataTable = Class.extend(UIControl)(function DataTableController(args){
+	var DataTable = Class(function DataTableController(args){
 		/* call parent constructor */
-		this.super(arguments);
+		this.super(args);
 
 		//get body and header tables, they may be one and same table
 		this.bodyTable = this.ref.body.elements.table;
@@ -124,7 +124,7 @@ definition:function(sjs){
 
 		initializeTable.call(this);
 
-	});
+	}).extend(UIControl);
 
 
 	DataTable.prototype.filterData = function(dataFilter){

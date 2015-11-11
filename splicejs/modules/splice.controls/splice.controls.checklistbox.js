@@ -21,6 +21,7 @@ sjs({
     , Class = sjs.Class
     , Event = sjs.Event
     , proxy = sjs.proxy
+    , exports = sjs.exports
     , dom = this.scope.Doc.dom
     , components = this.scope.components;
 
@@ -28,9 +29,9 @@ sjs({
     , ListItem = scope.components.CheckListBoxItem;
 
 
-    var CheckListBoxController = Class.extend(ListBoxController)(function CheckListBoxController(args){
+    var CheckListBoxController = Class(function CheckListBoxController(args){
       this.super(args);
-    });
+    }).extend(ListBoxController);
 
     CheckListBoxController.prototype.onSelection = Event;
 
@@ -108,10 +109,9 @@ sjs({
     }
 
     // module exports
-    return {
-      CheckListBox: CheckListBox,
-      CheckListItemController : CheckListItemController
-    }
+    exports.module (
+      CheckListBox , CheckListItemController
+    );
 
   }
 });

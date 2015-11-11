@@ -17,9 +17,10 @@ definition:function(sjs){
 
     var	scope = this.scope
 
-    var Class = sjs.Class
-	,   debug = sjs.debug
-	,	Event = sjs.Event;
+		var Class = sjs.Class
+		, debug = sjs.debug
+		,	exports = sjs.exports
+		,	Event = sjs.Event;
 
 	var	D3Canvas = scope.SpliceJS.Controls.D3Canvas
     ,   data = scope.Data.data;
@@ -37,7 +38,7 @@ definition:function(sjs){
 	};
 
 
-	var Chart = Class.extend(D3Canvas)(function ChartController(){
+	var Chart = Class(function ChartController(){
 		this.super();	//call parent constructor
 
 		var self = this
@@ -72,7 +73,7 @@ definition:function(sjs){
 		this.grid  = this.svg.append('g').attr('class', 'chart-grid')
 
 		this.chartArea = this.svg.append('g').attr('class','chart-area');
-	});
+	}).extend(D3Canvas);
 
 	Chart.prototype.onChartItem = Event;
 
@@ -302,9 +303,9 @@ definition:function(sjs){
 	};
 
     //end definition
-   return {
-		Dial:scope.Charts.Dial
-	}
+   exports.module(
+		{Dial:scope.Charts.Dial}
+	);
 }
 
 

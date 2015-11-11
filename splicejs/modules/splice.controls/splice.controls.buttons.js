@@ -11,11 +11,9 @@ definition:function(sjs){
 
 	var scope = this.scope
 	, Class = this.sjs.Class
-	,	Event = this.sjs.Event
 	,	event = sjs.event
 	,	exports = sjs.exports
-	,	debug = this.sjs.debug
-	, dom = this.scope.Doc.dom;
+	,	debug = this.sjs.debug;
 
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 
@@ -88,9 +86,9 @@ definition:function(sjs){
 			onclick :	event.multicast
 		}).onclick.subscribe(function(){
 
-			var dataItem = this.dataItem;
+		var dataItem = this.dataItem;
 
-			if(dataItem) {
+		if(dataItem) {
 				if(this.dataPath) {
 					sjs.propvalue(dataItem)(this.dataPath).value = this.isChecked = !dataItem[this.dataPath];
 				} else {
@@ -121,14 +119,14 @@ definition:function(sjs){
 	CheckBox.prototype.check = function(isChecked){
 		this.isChecked = isChecked;
 		if(isChecked === true) {
-			dom(this.concrete.dom).class.add('checked');
+			this.views.root.class('checked').add();
 		} else {
-			dom(this.concrete.dom).class.remove('checked');
+			this.views.root.class('checked').remove();
 		}
 	};
 
 	CheckBox.prototype.clear = function(){
-		this.concrete.dom.checked = false;
+		this.views.root.class('checked').remove();
 	};
 
 
@@ -211,10 +209,8 @@ definition:function(sjs){
 
 
 	TextField.prototype.dataIn = function(dataItem){
-		UIControl.prototype.dataIn.call(this,dataItem);
-		var value = null;
+		var value = this.dataItem = dataItem;
 		if(this.dataPath) value = this.dataItem[this.dataPath];
-		else value = dataItem;
 
 		if(value!=null && value != undefined)
 			this.elements.root.value = value;
@@ -233,12 +229,17 @@ definition:function(sjs){
 
 
 	/* module scope and exports */
+
 	exports.scope(
-		Button, CheckBox, TextField
+		{ButtonController 	 : Button},
+		{CheckBoxController  : CheckBox},
+		{TextFieldController : TextField}
 	);
 
 	exports.module(
-		Button, CheckBox, TextField
+		{ButtonController 	 : Button},
+		{CheckBoxController  : CheckBox},
+		{TextFieldController : TextField}
 	);
 
 

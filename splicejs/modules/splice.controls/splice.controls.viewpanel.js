@@ -1,5 +1,5 @@
 sjs({
-	
+
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.viewpanel.html',
@@ -7,21 +7,21 @@ required:[
 ],
 
 definition:function(){
-	
+
 	var scope = this.scope
 	,	overlay = this.sjs.display.overlay
 	,	Class = this.sjs.Class;
 	var UIControl = scope.SpliceJS.UI.UIControl
-	
+
 	/**
-	 *	
+	 *
 	 * ViewPanel
 	 * Allows transitioning between views
 	 */
 
-	var ViewPanel = Class.extend(UIControl)(function ViewPanelController(){
+	var ViewPanel = Class(function ViewPanelController(){
 		this.super();
-	 	
+
 		this.viewInstances = [];
 
 	 	if(this.views && this.views.length > 0) {
@@ -43,7 +43,7 @@ definition:function(){
 	 		self.display();
 	 	});
 
-	});
+	}).extend(UIControl);
 
 
 
@@ -53,15 +53,15 @@ definition:function(){
 			size client panels
 		*/
 		var contSize = _.Doc.$(this.elements.root).size();
-			
-		
+
+
 		_.Doc.$(this.elements.panel1).size(contSize);
 		_.Doc.$(this.elements.panel2).size(contSize);
-				
+
 		_.Doc.$(this.elements.panel2).position({left:contSize.width});
 
 		overlay(this.viewInstances[0],this.panels[this.activePanelIndex]);
-		
+
 	};
 
 
@@ -81,21 +81,21 @@ definition:function(){
 
 
 		_.Doc.$(offscrPanel).embed(view);
-		
-		
+
+
 		activePanel.className += ' -splicejs-left-transition';
 		offscrPanel.className += ' -splicejs-left-transition';
 
 		var handler = function(e){
-									
+
 			activePanel.className = _.Text(activePanel.className).remword('-splicejs-left-transition');
-			activePanel.style.left = '100%';	
+			activePanel.style.left = '100%';
 
 			self.activePanelIndex = 1 - self.activePanelIndex;
 			self.activeViewIndex = viewIndex;
 
 			activePanel.transitionend = null;
-			
+
 			activePanel.removeEventListener("transitionend", handler , true);
 		};
 

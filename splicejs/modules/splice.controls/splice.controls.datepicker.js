@@ -14,13 +14,13 @@ definition:function(){
 	var scope = this.scope
 	,	Class = this.sjs.Class
 	,	Event = this.sjs.Event;
-	
+
 	var UIControl = scope.SpliceJS.UI.UIControl
 	,	format = scope.Text.format;
-	
-	var DatePicker = Class.extend(UIControl)(function DatePickerController(){
+
+	var DatePicker = Class(function DatePickerController(){
 		this.super();
-		
+
 		var date = new Date();
 
 		if(this.format){
@@ -32,10 +32,10 @@ definition:function(){
 		    this.setDate(date);
 		}, this);
 
-	});
+	}).extend(UIControl);
 
 
-	
+
 
 	DatePicker.prototype.receiveFromCalendar = function (date) {
 	    this.setDate(date);
@@ -45,7 +45,7 @@ definition:function(){
 
 
 
-    //sets dates and will not trigger events    
+    //sets dates and will not trigger events
 	DatePicker.prototype.setDate = function (date) {
 	    if (!date) return;
 

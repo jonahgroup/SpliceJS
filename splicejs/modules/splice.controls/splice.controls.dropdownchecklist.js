@@ -7,18 +7,20 @@ sjs({
 		'splice.controls.dropdownchecklist.html'
 	],
 
-	definition:function(){
-
+	definition:function(sjs){
+		"use strict";
+		
 	var scope = this.scope
 	,	Class = this.sjs.Class
-	,	Event = this.sjs.Event;
+	,	Event = this.sjs.Event
+	,	exports = sjs.exports;
 
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 
 		/**
 	 * Drop down list
 	 * */
-	var ListController = Class.extend(UIControl)(function DropDownCheckListController(args){
+	var ListController = Class(function DropDownCheckListController(args){
 		this.super();
 		this.dom = this.concrete.dom;
 
@@ -30,7 +32,7 @@ sjs({
 		//	this.ref.selector.close();
 		},this);
 
-	});
+	}).extend(UIControl);
 
 	ListController.prototype.dropDown = function(){
 		if(this.dataItem) {

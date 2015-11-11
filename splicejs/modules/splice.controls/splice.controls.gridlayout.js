@@ -73,7 +73,7 @@ definition:function(){
 	*	Cell container class
 	*
 	*/
-	var CellContainer = Class.extend(UIControl)(function CellContainerController(){
+	var CellContainer = Class(function CellContainerController(){
 		this.super();
 
 		//attach events to drive resizing of the cell container
@@ -102,7 +102,7 @@ definition:function(){
 		this.onEndResize.subscribe(this.endResize, this);
 		this.onStartMove.subscribe(this.startMove,this);
 
-	});
+	}).extend(UIControl);
 
 	CellContainer.prototype.onAdd 				= Event;
 	CellContainer.prototype.onStartMove   =	Event;
@@ -162,7 +162,7 @@ definition:function(){
 	*	Grid Layout implementation
 	* @constructor
 	*/
-	var GridLayout = Class.extend(UIControl)(function GridLayoutController(){
+	var GridLayout = Class(function GridLayoutController(){
 
 		UIControl.call(this);
 
@@ -191,7 +191,7 @@ definition:function(){
 
 		this.onDisplay.subscribe(this.display, this);
 
-	});
+	}).extend(UIControl);
 
 	GridLayout.prototype.onRemoveCell = Event;
 

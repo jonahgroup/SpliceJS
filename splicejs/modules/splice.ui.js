@@ -3,7 +3,7 @@ sjs({
 required:[
 	{'Animation':'{sjshome}/modules/splice.animation.js'}
 ],
-definition:function(){
+definition:function(sjs){
 
 	//enable strict mode
 	"use strict";
@@ -15,25 +15,31 @@ definition:function(){
 	, Controller = this.sjs.Controller
 	,	scope = this.scope;
 
+	var event = sjs.event
+	,	exports = sjs.exports;
+
 	var Animate = scope.Animation.Animate;
 
 	/**
 	 * Base UIControl class
 	 */
-	var UIControl = Class.extend(Controller)(function UIControl(args){
+	var UIControl = Class(function UIControl(args){
 		this.super(args);
+
+		event(this).attach({
+			dataOut  : event.multicast,
+			onDataIn : event.multicast,
+			onReflow : event.multicast
+		});
 
 
 		if(this.isHidden) {
 			this.prevDisplayState = this.elements.root.style.display;
 			this.elements.root.style.display = 'none';
 		}
-
 		this.dataItem = null;
 
-		var self = this;
-
-	});
+	}).extend(Controller);
 
 	UIControl.prototype.hide = function(){
 		var self = this;
@@ -81,9 +87,7 @@ definition:function(){
 		this.onDataIn(this.dataItem);
 	};
 
-	UIControl.prototype.dataOut  = Event;
-	UIControl.prototype.onDataIn = Event;
-	UIControl.prototype.onReflow = Event;
+
 
 	/**
 	 * Called by the layout manager or a parent view when container dimensions changed and
@@ -143,13 +147,13 @@ definition:function(){
 	/**
 	 * HTML Element decorator
 	 */
-	var UIElement = Class.extend(UIControl)(function UIElement(args){
+	var UIElement = Class(function UIElement(args){
 		this.super();
 		var self = this;
 		this.concrete.dom.onclick = function(){
 			self.onClick(self);
 		}
-	});
+	}).extend(UIControl);
 
 	UIElement.prototype.onClick = Event;
 
@@ -324,35 +328,37 @@ definition:function(){
 	 */
 	var KeyListener = Class(function KeyListener(){
 
-			Event.attach(window, 'onkeydown').subscribe(
-			function(args){
-				switch(args.keyCode){
-					case 27: this.onEsc(); 		break;
-					case 13: this.onEnter(); 	break;
-					case 37: this.onLeft(); 	break;
-					case 38: this.onUp();		break;
-					case 39: this.onRight(); 	break;
-					case 40: this.onDown();		break;
-				}
-			}, this);
+		event(this).attach({
+			onEsc		:	event.multicast,
+			onEnter	: event.multicast,
+			onRight : event.multicast,
+			onLeft  : event.multicast,
+			onUp		: event.multicast,
+			onDown 	: event.multicast
+		});
+
+		Event.attach(window, 'onkeydown').subscribe(
+		function(args){
+			switch(args.keyCode){
+				case 27: this.onEsc(); 		break;
+				case 13: this.onEnter(); 	break;
+				case 37: this.onLeft(); 	break;
+				case 38: this.onUp();			break;
+				case 39: this.onRight(); 	break;
+				case 40: this.onDown();		break;
+			}
+		}, this);
+
 	});
 
-	KeyListener.prototype.onEsc 	= Event;
-	KeyListener.prototype.onEnter	= Event;
-	KeyListener.prototype.onRight 	= Event;
-	KeyListener.prototype.onLeft	= Event;
-	KeyListener.prototype.onUp 		= Event;
-	KeyListener.prototype.onDown 	= Event;
 
 	//module exports
-	return {
-		UIControl:	 UIControl,
-		UIElement:	 UIElement,
-		KeyListener: KeyListener,
+	exports.module(
+		UIControl, UIElement, KeyListener,
 		//singletons
-		Positioning: Positioning,
-		DragAndDrop: DragAndDrop
-	}
+		{Positioning : Positioning},
+		{DragAndDrop : DragAndDrop}
+	);
 
 
 }});

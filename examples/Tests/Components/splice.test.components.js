@@ -40,7 +40,7 @@ definition:function(sjs){
 
   var testCheck = {checked:true};
 
-  var ComponentsTest = Class.extend(Controller)(function ComponentsTest(){
+  var ComponentsTest = Class(function ComponentsTest(){
     this.super();
 
     event(this).attach({
@@ -50,7 +50,7 @@ definition:function(sjs){
       onTestCheck         : event.multicast
     });
 
-  });
+  }).extend(Controller);
 
   ComponentsTest.prototype.initialize = function(){
     this.onDisplay.subscribe(function(){

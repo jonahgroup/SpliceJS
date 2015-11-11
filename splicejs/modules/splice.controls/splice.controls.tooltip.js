@@ -4,12 +4,14 @@ required:[
   'splice.controls.tooltip.html'
 ],
 definition:function(sjs){
+  "use strict";
 
+  var Class = sjs.Class
+  , Controller = sjs.Controller;
 
-
-  var ToolTip  = sjs.Class.extend(sjs.Controller)(function ToolTipController(){
-
-  });
+  var ToolTip  = Class(function ToolTipController(){
+    this.super();
+  }).extend(Controller);
 
 
 }})

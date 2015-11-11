@@ -12,24 +12,24 @@ definition:function(sjs){
 	var scope = this.scope
 	,	Class = sjs.Class
 	,	HttpRequest = sjs.HttpRequest;
-	
+
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 
-	var CodeEditor = Class.extend(UIControl)(function CodeEditorController(){
+	var CodeEditor = Class(function CodeEditorController(){
 		this.super();
 		var location  = this.file;
-		
+
 		var self = this;
 
 		this.lines = [];
 
 		HttpRequest.get({
 			url:location,
-			onok:function(result){ 
+			onok:function(result){
 				self.displayCode(result.text);
 			}
 		});
-	});
+	}).extend(UIControl);
 
 	CodeEditor.prototype.displayCode = function(code){
 
@@ -44,7 +44,7 @@ definition:function(sjs){
 
 	function applyTabulation(code, target){
 		//count number of tabs or spaces
-		var tabs = 0;		
+		var tabs = 0;
 		var c = code[0];
 
 		while(c == ' ' || c == '\t'){
@@ -59,9 +59,9 @@ definition:function(sjs){
 		if(!spaces || spaces  == '') return;
 		target.appendChild(document.createTextNode(spaces));
 	}
-	
+
 	function generateLines(code){
-		
+
 		var lines = [];
 
 		var classNames = ['even', 'odd' ];
@@ -74,7 +74,7 @@ definition:function(sjs){
 				accumulator = accumulator + c;
 				c = code[i++];
 			}
-			
+
 			var line = document.createElement('div');
 			line.className = 'line ' + classNames[lineNum % 2];
 

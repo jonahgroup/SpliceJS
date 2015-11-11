@@ -16,7 +16,7 @@ definition:function(sjs){
     , UIControl = scope.SpliceJS.UI.UIControl;
 
 
-	var Dial = Class.extend(UIControl)(function DialController(){
+	var Dial = Class(function DialController(){
 		this.super();
 
 	  this.dom = this.canvas = this.elements.root;
@@ -34,7 +34,7 @@ definition:function(sjs){
 		this.arcStart = 1;
 		this.arcEnd = 2*3.1415 - 1;
 		this.arcRange = this.arcEnd - this.arcStart;
-		
+
 		this.value = this.value?this.value : 80;
 		this.alpha = this.arcRange * this.value / 100 + this.arcStart;
 		this._alpha = this.alpha;
@@ -82,7 +82,7 @@ definition:function(sjs){
 		this.draw();
 		canvas.onmousedown = selectdown;
 		canvas.addEventListener( 'touchstart', selectdown,	false );
-	});
+	}).extend(UIControl);
 
 	Dial.prototype.dataIn = function(dataItem){
 	    if(!this.dataPath) return;

@@ -1,6 +1,6 @@
 sjs({
-	
-required:[ 
+
+required:[
 	{'SpliceJS.UI': '{sjshome}/modules/splice.ui.js'},
 	'splice.controls.scrollpanel.js',
 	'splice.controls.transitions.css',
@@ -12,26 +12,26 @@ definition:function(){
 
 	var scope = this.scope
 	,	Class = this.sjs.Class;
-	
+
 	var	UIControl = scope.SpliceJS.UI.UIControl;
 
 	/* DrawerPanel*/
 
-	var DrawerPanel = Class.extend(UIControl)(function DrawerPanelController(){
+	var DrawerPanel = Class(function DrawerPanelController(){
 			this.super();
-			
+
 			this.isOpen = false;
 
 			if(!this.openTo) this.openTo = 0.75;
 
 			var self = this;
 			this.elements.actuator.onclick = function(){
-				self.activateDrawer();		
+				self.activateDrawer();
 			}
-	
+
 			this.onDisplay.subscribe(this.display, this);
-			
-	});
+
+	}).extend(UIControl);
 
 
 	DrawerPanel.prototype.display = function(){
@@ -43,11 +43,11 @@ definition:function(){
 
 
 	DrawerPanel.prototype.activateDrawer = function(){
-			
-		var self = this;	
+
+		var self = this;
 
 		this.elements.drawer.style.width = this.openWidth + 'px';
-	
+
 		var width = this.elements.root.clientWidth;
 
 		var actuatorIconSize = {
@@ -70,23 +70,23 @@ definition:function(){
 			color = "#cecece";
 
 		} else {
-			
+
 			from = width * this.openTo;
 			to = 0;
 			scale = 1;
-			color = "#121212";			
+			color = "#121212";
 		}
 
 		self.isOpen = !self.isOpen;
-		
+
 		this.elements.actuator.addEventListener("transitionend", function(e){
-			
+
 		}, true);
 
-		
+
 		this.elements.body.style.color = color;
 
-		
+
 		if(self.isOpen) {
 			this.elements.drawer.style.transitionDelay = '0s';
 			this.elements.body.style.transitionDelay = '0.1s';
@@ -98,7 +98,7 @@ definition:function(){
 		}
 
 
-		
+
 		this.elements.body.style.left = to + 'px';
 
 		var actuator_to = (to - actuatorIconSize.width - 10);
@@ -108,7 +108,7 @@ definition:function(){
 	};
 
 	return {
-		
+
 	}
 
 }

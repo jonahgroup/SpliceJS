@@ -6,14 +6,15 @@ required:[
 	'splice.controls.popup.css'
 ]
 ,
-definition:function(){
+definition:function(sjs){
 
 	var scope = this.scope
+	, exports = sjs.exports
 	,	Class = this.sjs.Class;
-		
+
 	var	UIControl = scope.SpliceJS.UI.UIControl
 
-	var Popup = Class.extend(UIControl)(function PopupController(){
+	var Popup = Class(function PopupController(){
 		this.super();
 
 		this.ratio = { width: 4, height: 3 };
@@ -22,7 +23,7 @@ definition:function(){
 		this.onDisplay.subscribe(this.display,this);
 		this.onAttach.subscribe(this.attach, this);
 
-	});
+	}).extend(UIControl);
 
 
 	Popup.prototype.attach = function () {
@@ -73,9 +74,9 @@ definition:function(){
 	        mask.style.backgroundColor =  'rgba(35,35,35,0.85)';
 	    }, 1);
 	};
-	
 
-	
+
+
 
 }
 

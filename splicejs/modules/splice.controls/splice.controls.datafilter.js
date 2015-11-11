@@ -7,6 +7,7 @@ required:[
   'splice.controls.datafilter.html'
 ],
 definition:function(sjs){
+    "use strict";
 
     var scope = this.scope;
 
@@ -16,9 +17,9 @@ definition:function(sjs){
 
     var dom = scope.Doc.dom;
 
-  	var FilterList = Class.extend(Controller)(function FilterListController(){
+  	var FilterList = Class(function FilterListController(){
   		this.filterSet = [];
-  	});
+  	}).extend(Controller);
 
 
   	FilterList.prototype.dataIn = function(data){
@@ -47,14 +48,9 @@ definition:function(sjs){
 
 
 
-    var FilterListItem = Class.extend(this.scope.SpliceJS.Controls.ListItemController)(
-      function FilterListItemController(){
+    var FilterListItem = Class(function FilterListItemController(){
         this.super();
-
-        this.onClick
-
-      }
-    );
+    }).extend(this.scope.SpliceJS.Controls.ListItemController);
 
     FilterListItem.prototype.dataIn = function(item){
         this.super.dataIn.call(this,item);

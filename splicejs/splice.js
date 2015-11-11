@@ -425,6 +425,13 @@ View.prototype.display = function(target){
 	}
 };
 
+View.prototype.attr = function(attr){
+	for(var k in attr){
+		this.htmlElement.setAttribute(k,attr[k]);
+	}
+	return this;
+};
+
 View.prototype.style = function(styleString){
 	//var rules = CssTokenizer(styleString);
 	this.htmlElement.setAttribute('style',styleString)
@@ -442,15 +449,28 @@ View.prototype.parent = function(fn){
 };
 
 View.prototype.content = function(content){
-	if(typeof content === 'string'){
-		this.htmlElement.innerHTML = content;
-		return this;
+	var self = this;
+	return {
+		add:function(){
+
+			if(typeof content === 'string'){
+				self.htmlElement.appendChild( document.createTextNode(content) );
+				return self;
+			}
+			if(typeof content === 'number'){
+				self.htmlElement.appendChild( document.createTextNode(content) );
+				return self;
+			}
+			if(content instanceof View){
+				self.htmlElement.appendChild( content.htmlElement );
+				return self;
+			}
+
+
+			return self;
+		}
 	}
-	if(typeof content === 'number'){
-		this.htmlElement.innerHTML = content;
-		return this;
-	}
-	return this;
+
 };
 
 View.prototype.position = function(){
@@ -1612,33 +1632,6 @@ UrlAnalyzer.prototype = {
 		b.apply(inst,args);
 	};
 
-	Class.extend = function(base){
-		return function(_class){
-			_class.prototype = Object.create(base.prototype);
-			_class.prototype.constructor = _class;
-			_class.base = base.prototype.constructor;
-			var superMethods = mixin({},base.prototype);
-
-			_class.prototype.super = function(){
-				this.super = mixin(function(){},superMethods);
-				_super(this,_class.base, arguments);
-
-			};
-			mixin(_class.prototype.super,superMethods);
-
-			return _class;
-		}
-	};
-
-	function extend(_class, base){
-		_class.prototype = Object.create(base.prototype);
-		_class.prototype.constructor = _class;
-		_class.base = base.prototype.constructor;
-		_class.prototype.super = function(){
-			this.super = function(){};
-			_super(this,_class.base, arguments);
-		}
-	};
 
 	function prototype(_class,_proto){
 		return mixin(_class.prototype,_proto);
@@ -2214,7 +2207,9 @@ function Controller(){
 	};
 
 	Controller.prototype.initialize = function(){
-		console.warn(getFunctionName(this.constructor)+ '.initialize is not implemented');
+		var fn = getFunctionName(this.constructor)
+		if(fn === 'Controller') return;
+		console.warn(fn + '.initialize is not implemented');
 	};
 	Controller.prototype.attachViews = function(){}
 
@@ -3056,12 +3051,11 @@ function Controller(){
 /*
 			var obj = Object.create(controller.prototype);
 			obj.constructor = controller;
-			obj.__sjs_type__ = template.type;
 */
 
 			var obj = new controller(args);
 
-
+			obj.__sjs_type__ = template.type;
 			obj.ref = {};
 			obj.elements = {};
 			obj.children = [];
@@ -3195,8 +3189,8 @@ function Controller(){
 
 					if(typeof arg === 'object'){
 						var keys = Object.keys(arg);
-						for(var i=0; i < keys.length; i++){
-							scope[keys[i]] = arg[keys[i]];
+						for(var k=0; k < keys.length; k++){
+							scope[keys[k]] = arg[keys[k]];
 						}
 						continue;
 					}
@@ -3215,8 +3209,8 @@ function Controller(){
 
 					if(typeof arg === 'object'){
 						var keys = Object.keys(arg);
-						for(var i=0; i < keys.length; i++){
-							exports[keys[i]] = arg[keys[i]];
+						for(var k=0; k < keys.length; k++){
+							exports[keys[k]] = arg[keys[k]];
 						}
 						continue;
 					}
@@ -3235,27 +3229,10 @@ function Controller(){
 	 */
 	function Module(moduleDefinition){
 
-	    var scope = new Namespace(null); //our module scope
-			scope.singletons = {constructors:[], instances:[]};
-
-		var proxyClass = function(fn){
-				var nm = getFunctionName(fn);
-        fn.__sjs_type__ = nm;
-				scope[nm] = Class(fn);
-				return scope[nm];
-		};
-		proxyClass.extend = function(base){
-			return function(fn){
-				var nm = getFunctionName(fn);
-				var _base = base;
-				if(base.isComponent) _base = base.controller();
-				scope[nm] = Class.extend(_base)(fn);
-				return scope[nm];
-			}
-		};
+    var scope = new Namespace(null); //our module scope
+		scope.singletons = {constructors:[], instances:[]};
 
 		var _sjs = mixin(sjs(),{
-			Class : proxyClass,
 			exports:_exports(scope),
 			proxy : (function(){return proxy.apply(this,arguments);}).bind(scope),
 			load  : (function(filenames){
@@ -3329,7 +3306,10 @@ function Controller(){
 		 * Module has no required includes
 		 * */
 		if(!required || required.length < 1) {
-			MODULE_MAP[url] = definition.call({'sjs':_sjs,'scope':scope}, _sjs);
+			definition.call({'sjs':_sjs,'scope':scope}, _sjs);
+			if(!scope.__sjs_module_exports__)
+				scope.__sjs_module_exports__ = Object.create(null);
+			MODULE_MAP[url] = scope.__sjs_module_exports__;
 			return;
 		}
 
@@ -3351,8 +3331,10 @@ function Controller(){
 			compileTemplates(scope);
 
 			if(typeof definition === 'function') {
-				var _exports = definition.call({'sjs':_sjs,'scope':scope}, _sjs);
-				if(!_exports) _exports = Object.create(null);
+				definition.call({'sjs':_sjs,'scope':scope}, _sjs);
+
+				if(!scope.__sjs_module_exports__)
+					scope.__sjs_module_exports__ = Object.create(null);
 
 				//get only exported components
 
@@ -3366,7 +3348,7 @@ function Controller(){
 					}
 				}
 				}
-				MODULE_MAP[url] = mixin(_exports,components);
+				MODULE_MAP[url] = mixin(scope.__sjs_module_exports__,components);
 			}
 		},collectTemplates);
 	};
@@ -3501,7 +3483,7 @@ function Controller(){
 			Namespace: Namespace,
 			Class : Class,
 			Controller : Controller,
-			extend:extend,
+
 			prototype:prototype,
 
 			HttpRequest : HttpRequest,
