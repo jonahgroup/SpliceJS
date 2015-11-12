@@ -14,6 +14,7 @@ definition:function(sjs){
 	var Controller 	= this.sjs.Controller
 	,	exports = sjs.exports
 	,	event = sjs.event
+	,	display = sjs.display
 	,	Class = this.sjs.Class
 	,	scope = this.scope;
 
@@ -46,7 +47,7 @@ definition:function(sjs){
 					Subscribe to onclick instead of mousedown, because firing mousedown
 					will immediately execute event within dropDown() closing the dropdown
 			*/
-		event(this.views.root).attach({ onmousedown : event.unicast })
+		event(this.views.root).attach({ onmousedown : event.unicast.stop })
 		.onmousedown.subscribe(function(e){
 			this.dropDown();
 		},this);
@@ -61,14 +62,13 @@ definition:function(sjs){
 
 
 	DropDownController.prototype.close = function () {
-	    hide();
+	    _hide();
 	};
 
 
-	function hide() {
-	    dropDownContainer.concrete.dom.style.display = 'none';
-	    document.body.removeChild(dropDownContainer.concrete.dom);
-		dom(selectorElement).class.remove('-sjs-dropdown-open');
+	function _hide() {
+	    display.clear(dropDownContainer);
+			selectorElement.class('-sjs-dropdown-open').remove();
 	};
 
 
@@ -95,14 +95,14 @@ definition:function(sjs){
 		var left = this.elements.selector.offsetLeft
 		,	height = this.elements.selector.offsetHeight
 		,	top = height
-		,	s = dropDownContainer.concrete.dom.style
+		,	s = dropDownContainer.views.root.htmlElement.style
 		,	pos = Positioning.absPosition(this.elements.selector)
 		,	self = this
 		;
 
 		//release previous selector if any
 		if(selectorElement){
-			dom(selectorElement).class.remove('-sjs-dropdown-open');
+			selectorElement.class('-sjs-dropdown-open').remove();
 		}
 
 		//create instance of the dropdown content item
@@ -110,17 +110,13 @@ definition:function(sjs){
 			this.dropDownItemInst = new this.dropDownItem({parent:this});
 		}
 
-		dom(this.elements.selector).class.add('-sjs-dropdown-open');
-		selectorElement = this.elements.selector;
+		//keep track of the current drop down controller statically
+		selectorElement = this.views.selector.class('-sjs-dropdown-open').add();
+
 
 		//append drop down to the document root
-		document.body.appendChild(dropDownContainer.concrete.dom);
-
-		//dom api for content
-		var content = dom(this.dropDownItemInst.concrete.dom);
-
 		// add content to the content element
-		dom(dropDownContainer.elements.content).replace(content);
+		display(dropDownContainer).content({default:this.dropDownItemInst}).replace();
 
 
 		left = pos.x;
@@ -134,6 +130,13 @@ definition:function(sjs){
 		s.left = left + 'px';
 		s.top =  top + 'px';
 		s.display='block';
+
+
+		event(window).attach({
+			onmousedown	:	event.multicast
+		}).onmousedown.subscribe(function(args){
+			console.log(args);
+		})
 
 
 /*

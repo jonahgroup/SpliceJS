@@ -358,25 +358,35 @@ var sjs = (function(window, document){
 	};
 
 
-	function display(controller,target){
-		if(!target) target = document.body;
-
-		target.innerHTML = '';
-		target.appendChild(controller.concrete.dom);
-
-		controller.onAttach();
-		controller.onDisplay();
-
+	function display(view){
+		if(view instanceof Controller) {
+			document.body.appendChild(view.views.root.htmlElement);
+			view.onAttach();
+			view.onDisplay();
+			return view;
+		}
+		if(view instanceof View){
+			document.body.appendChild(view.htmlElement);
+			return view;
+		}
 	};
 
 
-	display.overlay = function(controller, target) {
-	    if (!target) target = document.body;
+	display.clear = function(view) {
 
-	    target.appendChild(controller.concrete.dom);
+		if(view instanceof Controller ){
+			document.body.removeChild(view.views.root.htmlElement);
+			return {display : display };
+		}
 
-	    controller.onAttach();
-	    controller.onDisplay();
+		if(view instanceof View ){
+			document.body.removeChild(view.htmlElement);
+			return {display : display };
+		}
+
+		document.body.innerHTML = '';
+		return {display : display };
+
 	};
 
 	function close(controller) {
@@ -389,15 +399,47 @@ var sjs = (function(window, document){
 		return false;
 	};
 
+	function _viewQueryMode(){
+		return {
+			id:function(id){
+				var d = document.getElementById(id);
+				if(d) return new View(d);
+				return null;
+			},
+			query:function(query){
+				var collection = document.querySelectorAll(query);
+				if(!collection) return null;
+				return {
+					foreach:function(fn){},
+					first:function(){
+							return new View(collection[0]);
+					}
+				}
+			}
+		}
+	}
+
+
 
 /**
 	Dom manipulation api
 */
-function View(dom){
+function View(dom, args){
 	if(typeof dom === 'string'){
-		this.htmlElement = document.createElement(dom);
+		this.htmlElement = (function(d){
+			var e = document.createElement(null);
+			e.innerHTML = d;
+			return e.children[0];
+		})(dom);
 	} else
 		this.htmlElement = dom;
+
+	if(!args || !args.simple)
+		this.contentMap = buildContentMap(this.htmlElement);
+	else {
+		this.contentMap = {'default':this.htmlElement};
+		this.isSimple = true;
+	}
 };
 
 View.prototype.class = function(className){
@@ -409,17 +451,6 @@ View.prototype.class = function(className){
 		},
 		add:function(){
 			addClass(self.htmlElement,className);
-			return self;
-		}
-	}
-};
-
-View.prototype.display = function(target){
-	var self = this;
-	return {
-		add :function(){
-			if(!target)
-				document.body.appendChild(self.htmlElement);
 			return self;
 		}
 	}
@@ -445,7 +476,10 @@ View.prototype.clear = function(){
 
 
 View.prototype.parent = function(fn){
+};
 
+View.prototype.controller = function(){
+	return this.htmlElement.__sjs_controller__;
 };
 
 View.prototype.content = function(content){
@@ -467,6 +501,10 @@ View.prototype.content = function(content){
 			}
 
 
+			return self;
+		},
+
+		replace:function(){
 			return self;
 		}
 	}
@@ -835,7 +873,7 @@ UrlAnalyzer.prototype = {
 				for(var i=0; i<keys.length; i++){
 					var evt = configuration[keys[i]];
 					if(!(evt instanceof Event) ) continue;
-					instance[keys[i]] = evt.attach(instance, keys[i]);
+					evt.attach(instance, keys[i]);
 				}
 				return instance;
 			}
@@ -888,6 +926,8 @@ UrlAnalyzer.prototype = {
 		var callbacks = [[]], instances = [[]];
 		var cleanup = {fn:null, instance:null };
 		var transformer = this.transformer;
+
+		cancelBubble = this.isStop;
 
 		var MulticastEvent = function MulticastEvent(){
 			var idx = callbacks.length-1;
@@ -1039,7 +1079,7 @@ UrlAnalyzer.prototype = {
 			if target object is a dom element
 			collect event arguments
 		*/
-		if(isHTMLElement(object)) {
+		if(isHTMLElement(object) || object === window) {
 			/*
 				wrap DOM event
 			*/
@@ -1056,7 +1096,7 @@ UrlAnalyzer.prototype = {
 
 			// expose subscribe method
 			object[property].subscribe = function(){
-				MulticastEvent.subscribe(arguments);
+				MulticastEvent.subscribe.apply(MulticastEvent,arguments);
 			}
 
 		} else if(object instanceof View){
@@ -2211,7 +2251,6 @@ function Controller(){
 		if(fn === 'Controller') return;
 		console.warn(fn + '.initialize is not implemented');
 	};
-	Controller.prototype.attachViews = function(){}
 
 	function abandonVisualParent(controller){
 		var children = controller.__sjs_visual_parent__.__sjs_visual_children__;
@@ -2245,7 +2284,7 @@ function Controller(){
 			//update visual parent
 			abandonVisualParent(content);
 			gainVisualParent(content, this);
-			return content.concrete.dom;
+			return content.views.root.htmlElement;
 		}
 
 		return null;
@@ -2256,8 +2295,37 @@ function Controller(){
 		this._lastHeight = null;
 	};
 
-	//
-	Controller.prototype.content = function(source){
+	function _controllerContentMapper(content,isReplace){
+		var view = this.views.root;
+		//no content map, simple view, default map must be present
+
+		var keys = Object.keys(view.contentMap);
+
+		for(var key in  keys){
+			var newNode = decodeContent.call(this,content[keys[key]]);
+			if(!newNode) continue;
+
+			var contentNode = this.__sjs_content_map__[keys[key]][0];
+
+			//if child node is already added, skip
+			if(contentNode.childNodes[0] == newNode)	return;
+
+			if(contentNode.childNodes[0]) {
+				contentNode.replaceChild(newNode,contentNode.childNodes[0]);
+			} else {
+				contentNode.appendChild(newNode);
+			}
+		}
+	};
+
+	//set content of the controller
+	Controller.prototype.content = function(content){
+		return {
+			replace: _controllerContentMapper.bind(this,content,true),
+			add: _controllerContentMapper.bind(this,content)
+		}
+
+/*
 			if(!this.__sjs_content_map__)
 			throw 'Unable to apply content, content map is not available, make sure "sjs-content-map" is not false for a given component';
 
@@ -2279,6 +2347,7 @@ function Controller(){
 
 				invalidateContent.call(this);
 			}
+*/
 	};
 
 	//iterate over children and release event listeners
@@ -2449,10 +2518,6 @@ function Controller(){
 		var deepClone = build.cloneNode(true);
 		deepClone.normalize();
 
-		/*build views*/
-		views.root = new View(deepClone.children[0]);
-
-
 		var instance = new Concrete(deepClone);
 		instance.controllerInstance = controllerInstance;
 
@@ -2464,7 +2529,7 @@ function Controller(){
 		if(controllerInstance)
 		for(var i=0; i< elements.length; i++){
 			element = elements[i];
-			var view = new View(element);
+			var view = new View(element,{simple:true});
 			var ref = element.getAttribute('sjs-element');
 			if(ref) {
 				//allow multiple element references to a single element
@@ -2517,7 +2582,10 @@ function Controller(){
 
 			var c_instance = new _Proxy({parent:controllerInstance, parentscope:scope});
 
-			/* no document structure to return */
+			anchors[i].parentNode.replaceChild(c_instance.views.root.htmlElement, anchors[i]);
+
+/*
+
 			if(!c_instance.concrete) {
 				anchors[i].parentNode.removeChild(anchors[i]);
 				continue;
@@ -2525,7 +2593,7 @@ function Controller(){
 
 			var exportDom = c_instance.concrete.export();
 
-			/*multiple child nodes*/
+			//multiple child nodes
 			if(exportDom instanceof Array) {
 				var parentNode = anchors[i].parentNode;
 				var child = exportDom[0];
@@ -2544,11 +2612,14 @@ function Controller(){
 				if(isHTMLElement(exportDom))
 				anchors[i].parentNode.replaceChild((exportDom), anchors[i]);
 			}
+*/
 		}
 
-		instance.breakout();
+		//instance.breakout();
+		/*build views*/
+		views.root = new View(deepClone.children[0]);
+		views.root.htmlElement.__sjs_controller__ = controllerInstance;
 		controllerInstance.views = views;
-		controllerInstance.attachViews(views);
 		return instance;
 	};
 
@@ -3073,7 +3144,7 @@ function Controller(){
 			/*
 				Auto-creating event casters
 			*/
-			linkupEvents(obj);
+			//linkupEvents(obj);
 
 
 			/*
@@ -3084,8 +3155,7 @@ function Controller(){
 			/*
 				Instantiate Template
 			*/
-			if(template)
-			obj.concrete = template.getInstance(obj, args, scope);
+ 			template.getInstance(obj, args, scope);
 
 
 			obj.initialize();
@@ -3473,7 +3543,10 @@ function Controller(){
 			propvalue : propertyValue,
 			async: runAsync,
 
-			view:function(dom){return new View(dom);},
+			view:function(d){
+				if(!d) return _viewQueryMode();
+				return new View(d);
+			},
 			timing	:	measureRuntime,
 
 			load	: include,

@@ -5,13 +5,13 @@
 </sjs-component>
 
 <sjs-component sjs-type="DropDownContainer" sjs-controller="DropDownContainerController">
-        <div class="-splicejs-dropdown-container" sjs-element="root content">@content</div>
+	<div class="-splicejs-dropdown-container" sjs-element="root content"></div>
 </sjs-component>
 
 
 <sjs-component sjs-type="DropDownContainerResizable" sjs-controller="DropDownContainerController">
 	<div class="-splicejs-dropdown-container" sjs-element="root">
-		<div sjs-element="content">@content</div>
+		<div sjs-element="content" sjs-content="default"></div>
 		<div class="resize-bottom"  sjs-element="bottomEdge"></div>
 	</div>
 </sjs-component>
