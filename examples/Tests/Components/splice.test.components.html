@@ -47,6 +47,14 @@
         css:{list: 'test-drop-down-list'}
     }
   </sjs-include>
+  <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
+    {
+        default:'Please select an item',
+        dataIn: binding('onProvinces').parent,
+        onDataItem: binding('provinceSelected').parent,
+        css:{list: 'test-drop-down-list'}
+    }
+  </sjs-include>
 </td>
 </tr>
 

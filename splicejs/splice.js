@@ -373,9 +373,11 @@ var sjs = (function(window, document){
 
 
 	display.clear = function(view) {
+		if(!view) return {display : display};
 
 		if(view instanceof Controller ){
-			document.body.removeChild(view.views.root.htmlElement);
+			if(view.views.root.htmlElement.parentNode === document.body)
+				document.body.removeChild(view.views.root.htmlElement);
 			return {display : display };
 		}
 
@@ -993,7 +995,7 @@ UrlAnalyzer.prototype = {
 			return callback_result;
 		}
 
-		MulticastEvent.SPLICE_JS_EVENT = true;
+		MulticastEvent.__sjs_event__ = true;
 
 		/*
 			"This" keyword migrates between assigments
@@ -1006,6 +1008,12 @@ UrlAnalyzer.prototype = {
 			if(!instance) instance = this;
 
 			var idx = callbacks.length-1;
+
+			for(var i=0; i<callbacks[idx].length; i++){
+				if( callbacks[idx][i].callback === callback &&
+					  instances[idx][i] === instance
+				) return object;
+			}
 
 			callbacks[idx].push({callback:callback,is_async:false});
 			instances[idx].push(instance);
@@ -1062,14 +1070,14 @@ UrlAnalyzer.prototype = {
 				instances.splice(0,1);
 			}
 		};
-
+		MulticastEvent.__sjs_event_name__ = property;
 
 		if(!object || !property) return MulticastEvent;
 
 		/* handle object and property arguments */
 		var val = object[property];
 
-		if(val && val.SPLICE_JS_EVENT) return val;
+		if(val && val.__sjs_event__) return val;
 
 		if(typeof val ===  'function') {
 			MulticastEvent.subscribe(val, object);
@@ -1090,9 +1098,11 @@ UrlAnalyzer.prototype = {
 					e.cancelBubble = true;
 					if (e.stopPropagation) e.stopPropagation();
 				}
-
-				MulticastEvent(domEventArgs(e));
-			}
+				setTimeout((function(){
+					MulticastEvent(this);
+				}).bind(domEventArgs(e)),1);
+			};
+			object[property].__sjs_event__ = true;
 
 			// expose subscribe method
 			object[property].subscribe = function(){
@@ -1110,7 +1120,10 @@ UrlAnalyzer.prototype = {
 				}
 				var eventArgs = domEventArgs(e);
 				eventArgs.view = object;
-				this[property](eventArgs);
+				setTimeout((function(){
+					this.fn(this.args);
+				}).bind({fn:this[property], args:eventArgs}),1);
+				//this[property](eventArgs);
 			}).bind(object);
 		}
 		else {
@@ -2949,8 +2962,8 @@ function Controller(){
 			If course is an event then switch to TO mode
 			unless destination is an event too
 		*/
-		if(source.value() && source.value().SPLICE_JS_EVENT &&
-		  (!dest.value() || !dest.value().SPLICE_JS_EVENT)) {
+		if(source.value() && source.value().__sjs_event__ &&
+		  (!dest.value() || !dest.value().__sjs_event__)) {
 			var _s = source;
 			source = dest;
 			dest = _s;
@@ -2960,7 +2973,7 @@ function Controller(){
 		/* Perform binding here */
 
 		/*  this is event binding only allow functions to be bound to events */
-		if(dest.value() && dest.value().SPLICE_JS_EVENT) {
+		if(dest.value() && dest.value().__sjs_event__) {
 			if(typeof source.value() !== 'function')
 				throw 'Cannot establish binding between \''+ key + '\' and \'' + binding.prop + '\'. Check that properties are of types \'function\'';
 

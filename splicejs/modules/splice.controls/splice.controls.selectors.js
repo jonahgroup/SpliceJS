@@ -26,6 +26,10 @@ definition:function(sjs){
 	var dropDownContainer = new scope.components.DropDownContainerResizable()
 	,	selectorElement = null;
 
+	function _offFocusReaper(){
+		_hide();
+	};
+
 	//
 	var DropDownController = Class(function DropDownController(args){
 		this.super(args);
@@ -134,9 +138,7 @@ definition:function(sjs){
 
 		event(window).attach({
 			onmousedown	:	event.multicast
-		}).onmousedown.subscribe(function(args){
-			console.log(args);
-		})
+		}).onmousedown.subscribe(_offFocusReaper,dropDownContainer);
 
 
 /*

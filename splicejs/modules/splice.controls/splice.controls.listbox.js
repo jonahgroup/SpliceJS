@@ -36,8 +36,8 @@ definition:function(sjs){
 
 
 	ListBoxController.prototype.initialize = function(){
-			event(this.views.root).attach({	onclick	:	event.unicast	})
-			.onclick.subscribe(_itemClick,this);
+			event(this.views.root).attach({	onmousedown	:	event.unicast.stop	})
+			.onmousedown.subscribe(_itemClick,this);
 
 			if(this.ref.contentClient) {
 				this.dom = this.ref.contentClient.views.root;
