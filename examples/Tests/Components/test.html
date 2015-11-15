@@ -8,21 +8,8 @@
 <script>
 	//sjs().debug.enable();
 	sjs().boot([
-        '{sjshome}/modules/splice.animation.js',
-	      '{sjshome}/modules/splice.network.js',
-      	'{sjshome}/modules/splice.document.js',
-        '{sjshome}/modules/splice.data.js',
-        '{sjshome}/modules/splice.text.js',
-        '{sjshome}/modules/splice.text.js',
-
-        '{sjshome}/modules/splice.ui.js',
-        '{sjshome}/modules/splice.controls/splice.controls.buttons.js',
-
-        '{sjshome}/modules/splice.controls.js',
-		    'resources/fontfaces.css',
-        {'Tests':'splice.test.components.js'}
-
-    ]);
+      {'Tests':'splice.test.components.js'}
+  ]);
 </script>
 
 <style>
@@ -51,7 +38,12 @@
 
 
 <sjs-include sjs-type="Tests.Components"></sjs-include>
+<sjs-include sjs-type="Tests.Components"></sjs-include>
+<sjs-include sjs-type="Tests.Components"></sjs-include>
+<sjs-include sjs-type="Tests.Components"></sjs-include>
+<sjs-include sjs-type="Tests.Components"></sjs-include>
 
+<div style="position:absolute; top:0px; left:0px; width:50%; height:1em;"></div>
 
 </body>
 </html>

@@ -1,14 +1,21 @@
 sjs({
 
 required:[
-    {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.listbox.js'},
-    {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.dropdownlist.js'},
-    {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.buttons.js'},
-    {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.combobox.js'},
-    {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.charts.js'},
-    {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.checklistbox.js'},
-    {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.dropdownchecklist.js'},
-    'splice.test.components.html'
+  '{sjshome}/modules/splice.animation.js',
+  '{sjshome}/modules/splice.network.js',
+  '{sjshome}/modules/splice.document.js',
+  '{sjshome}/modules/splice.data.js',
+  '{sjshome}/modules/splice.text.js',
+  '{sjshome}/modules/splice.ui.js',
+  '{sjshome}/modules/splice.controls.js',
+  {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.listbox.js'},
+  {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.dropdownlist.js'},
+  {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.buttons.js'},
+  {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.combobox.js'},
+  {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.charts.js'},
+  {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.checklistbox.js'},
+  {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.dropdownchecklist.js'},
+  'splice.test.components.html'
 ],
 
 definition:function(sjs){
@@ -38,7 +45,7 @@ definition:function(sjs){
 
   };
 
-  var testCheck = {checked:true};
+
 
   var ComponentsTest = Class(function ComponentsTest(){
     this.super();
@@ -50,6 +57,8 @@ definition:function(sjs){
       onTestCheck         : event.multicast
     });
 
+    this.sourceTestCheck = {checked:true};
+
   }).extend(Controller);
 
   ComponentsTest.prototype.initialize = function(){
@@ -57,7 +66,7 @@ definition:function(sjs){
       this.onProvinces(provinces);
       this.onChartsData(charts);
       this.onScatterChartData(scatterChart);
-      this.onTestCheck(testCheck);
+      this.onTestCheck(this.sourceTestCheck);
     }, this);
 
     // value read

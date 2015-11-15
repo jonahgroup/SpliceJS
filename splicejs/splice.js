@@ -138,11 +138,13 @@ var sjs = (function(window, document){
 
 	var tempBodyContent = '';
 	var progressLabel = null;
+	var splashScreen = null;
 	function showPreloader(){
 		if(window.SPLICE_SUPPRESS_PRELOADER) return;
-		tempBodyContent = document.body.innerHTML;
+		//tempBodyContent = document.body.innerHTML;
 
-		document.body.innerHTML =
+		splashScreen = document.createElement('div');
+		splashScreen.innerHTML =
 		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:1.2em; color:#fefefe; background-color:#222222;">'+
 		'<div style="position:relative; top:-20px">'+
 			'<div style="display:inline;"><img style="vertical-align:middle;" src="'+configuration.SPLICE_HOME+'/resources/images/bootloading.gif"/></div>'+
@@ -151,12 +153,14 @@ var sjs = (function(window, document){
 		'</div>';
 
 
-		progressLabel = document.body.querySelectorAll('span')[0];
+		progressLabel = splashScreen.querySelectorAll('span')[0];
+		document.body.appendChild(splashScreen);
 	}
 
 	function removePreloader(){
 		if(window.SPLICE_SUPPRESS_PRELOADER) return;
-		document.body.innerHTML = tempBodyContent;
+		//document.body.innerHTML = tempBodyContent;
+		document.body.removeChild(splashScreen);
 	}
 
 
@@ -1327,14 +1331,27 @@ UrlAnalyzer.prototype = {
 
 */
 
+	function _bootOptionA(){
+
+	}
+
+	function _bootOptionB(){
+
+	}
+
+	function _bootOptionC(){
+
+	}
+
+
 	function onReady(fn){	READY.callback = fn; };
 
 	window.onload = function(){
 		var start  = window.performance.now();
-
+/*
 		var mainPageHtml = document.body.innerHTML;
 		document.body.innerHTML = '';
-
+*/
 		var url = window.location.origin + window.location.pathname;
 		if(url.indexOf(configuration.APPLICATION_HOME) == 0){
 
@@ -1363,11 +1380,16 @@ UrlAnalyzer.prototype = {
 			definition:function(){
 				var scope = this.scope;
 				scope.components = new Namespace();
-				var _Template = constructTemplate(mainPageHtml);
-				_Template.type = 'MainPage';
-				_Template = compileTemplate.call(scope,_Template);
-				var t = new _Template();
-				display(t);
+				//var _Template = constructTemplate(mainPageHtml);
+				var template = new Template(document.body);
+				template.type = 'MainPage';
+				var component = compileTemplate.call(scope,template);
+				//var t = new _Template();
+				//display(t);
+				var controller = new Controller();
+				_processIncludeAnchors.call(template,document.body,controller,scope);
+				controller.onAttach();
+				controller.onDisplay();
 
 				var end  = window.performance.now();
 				console.log('Load complete: ' + (end-start) + 'ms');
@@ -1773,6 +1795,7 @@ UrlAnalyzer.prototype = {
 				logging.debug.log('File ' + filename + ' is already loaded, skipping...');
 				loader.progress--;
 				LOADER_PROGRESS.complete++;
+				watcher.update();
 				loader.loadNext(watcher)
 			},1);
 			return;
@@ -1786,7 +1809,7 @@ UrlAnalyzer.prototype = {
 		/*
 		 * Load CSS Files - global
 		 * */
-		if(endsWith(filename, FILE_EXTENSIONS.style) && !loader.cssIsLocal){
+		if(endsWith(filename, FILE_EXTENSIONS.style)){
 
 			var linkref = document.createElement('link');
 
@@ -1809,6 +1832,7 @@ UrlAnalyzer.prototype = {
 					loader.onitemloaded();
 					loader.progress--;
 					LOADER_PROGRESS.complete++;
+					watcher.update();
 					loader.loadNext(watcher);
 				}
 			};
@@ -1836,6 +1860,7 @@ UrlAnalyzer.prototype = {
 					loader.onitemloaded();
 					loader.progress--;
 					LOADER_PROGRESS.complete++;
+						watcher.update();
 					loader.loadNext(watcher);
 				}
 			};
@@ -1879,6 +1904,7 @@ UrlAnalyzer.prototype = {
 					loader.onitemloaded();
 					loader.progress--;
 					LOADER_PROGRESS.complete++;
+						watcher.update();
 					loader.loadNext(watcher);
 				}
 			});
@@ -1897,6 +1923,7 @@ UrlAnalyzer.prototype = {
 					loader.onitemloaded({ext: FILE_EXTENSIONS.template, filename:filename, data:response.text});
 					loader.progress--;
 					LOADER_PROGRESS.complete++;
+						watcher.update();
 					loader.loadNext(watcher);
 				}
 			});
@@ -1914,12 +1941,13 @@ UrlAnalyzer.prototype = {
 					loader.onitemloaded({ext: FILE_EXTENSIONS.route, filename:filename, data:response.text});
 					loader.progress--;
 					LOADER_PROGRESS.complete++;
+						watcher.update();
 					loader.loadNext(watcher);
 				}
 			});
 			return;
 		 }
-
+		 console.log('odd filename' + filename);
 	};
 
 
@@ -1953,7 +1981,12 @@ UrlAnalyzer.prototype = {
 			if(configuration.ONLOAD_DISP_SHORT_FILENAME)
 				label = getPath(current.name).name;
 
-			progressLabel.innerHTML = label;
+			progressLabel.innerHTML = LOADER_PROGRESS.complete/LOADER_PROGRESS.total + ' ' + label;
+
+		},
+
+		update:function(){
+			console.log(LOADER_PROGRESS.complete,LOADER_PROGRESS.total);
 		}
 	};
 
@@ -1963,7 +1996,6 @@ UrlAnalyzer.prototype = {
 		/*
 		 * Initial bootstrap
 		 * */
-
 		if(!LoadingWatcher.isInitialInclude) {
 			showPreloader();
 
@@ -1999,13 +2031,9 @@ UrlAnalyzer.prototype = {
 	};
 
 
-
-
-
 	function load(moduleUrls, oncomplete){
 		include(moduleUrls, oncomplete);
 	};
-
 
 
 	/*
@@ -2064,6 +2092,14 @@ UrlAnalyzer.prototype = {
 	};
 
 
+
+function isExternalType(type){
+		if(type[0] === '{') {
+			var parts = type.substring(1,type.indexOf('}')).split(':');
+			return {namespace:parts[0], filename:parts[1]}
+		}
+		return null;
+}
 
 /*
 
@@ -2509,13 +2545,39 @@ function Controller(){
 		 * templates DOMs
 		 * */
 		this.children = [];
+
 	};
 
-	Template.prototype.addChild = function(childTemplate){
-		this.children.push(childTemplate);
-		return this.children.length-1;
+	Template.prototype.addChild = function(child){
+		this.children.push(child);
+		var childId =  this.children.length-1;
+
+		var a = document.createElement('a');
+		a.setAttribute('data-sjs-tmp-anchor',child.type);
+		a.setAttribute('data-sjs-child-id',	childId);
+
+
+
+		return a;
 	};
 
+
+
+	function _processIncludeAnchors(dom, controller, scope, onInstance){
+		var anchors = dom.querySelectorAll('[data-sjs-tmp-anchor]');
+
+		for(var i=0; i < anchors.length; i++){
+
+			var childId = anchors[i].getAttribute('data-sjs-child-id');
+			var _Proxy 	= this.children[childId];
+
+			var instance = new _Proxy({parent:controller, parentscope:scope});
+			anchors[i].parentNode.replaceChild(instance.views.root.htmlElement, anchors[i]);
+			if(typeof onInstance === 'function') {
+				onInstance(instance);
+			}
+		}
+	};
 
 	/**
 	 * @param {Controller} controllerInstance  - instance of a controller class that is associated with the template
@@ -2584,49 +2646,7 @@ function Controller(){
 		 * are placeholders for included templates
 		 * Process clone and attach templates
 		 * */
-		var anchors = deepClone.querySelectorAll('[data-sjs-tmp-anchor]');
-
-
-		for(var i=0; i < anchors.length; i++){
-
-			var childId = anchors[i].getAttribute('data-sjs-child-id');
-			var _Proxy 	= this.children[childId];
-
-
-			var c_instance = new _Proxy({parent:controllerInstance, parentscope:scope});
-
-			anchors[i].parentNode.replaceChild(c_instance.views.root.htmlElement, anchors[i]);
-
-/*
-
-			if(!c_instance.concrete) {
-				anchors[i].parentNode.removeChild(anchors[i]);
-				continue;
-			}
-
-			var exportDom = c_instance.concrete.export();
-
-			//multiple child nodes
-			if(exportDom instanceof Array) {
-				var parentNode = anchors[i].parentNode;
-				var child = exportDom[0];
-
-				if(isHTMLElement(child))
-				parentNode.replaceChild(child, anchors[i]);
-
-				for( var n = 1; n < exportDom.length; n++){
-					var sibling = child.nextSibling;
-					var child = exportDom[n];
-					if(isHTMLElement(child))
-					parentNode.insertBefore(child,sibling);
-				}
-			}
-			else {
-				if(isHTMLElement(exportDom))
-				anchors[i].parentNode.replaceChild((exportDom), anchors[i]);
-			}
-*/
-		}
+		 _processIncludeAnchors.call(this,deepClone,controllerInstance,scope);
 
 		//instance.breakout();
 		/*build views*/
@@ -2871,12 +2891,7 @@ function Controller(){
 				result = proxy.call(scope,result);
 			}
 
-			var childId = template.addChild(result);
-
-			var a = document.createElement('a');
-			a.setAttribute('data-sjs-tmp-anchor',result.type);
-			a.setAttribute('data-sjs-child-id',	childId);
-
+			var a = template.addChild(result);
 			parent.replaceChild(a,node);
 		}
 	};
@@ -3040,7 +3055,6 @@ function Controller(){
 		 * Run notations and scripts to form a
 		 * final template DOM
 		 * */
-		logging.debug.log('Processing template notations for module: ');
 
 		resolveCustomElements.call(scope,template);
 
@@ -3407,7 +3421,8 @@ function Controller(){
 			if(imports.namespaces) {
 				applyImports.call(scope,imports);
 			}
-				/*
+
+			/*
 			 * Templates are compiled after module has been defined
 			 *
 			 * */
@@ -3433,6 +3448,7 @@ function Controller(){
 				}
 				MODULE_MAP[url] = mixin(scope.__sjs_module_exports__,components);
 			}
+
 		},collectTemplates);
 	};
 
