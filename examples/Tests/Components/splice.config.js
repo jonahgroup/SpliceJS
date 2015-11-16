@@ -1,16 +1,10 @@
-/* Location of SpliceJS relative to applications' URL */
-var SPLICE_HOME = '../../../splicejs';
-
-/*
- * When set to "true" preloader will not be shown
- * */
-var SPLICE_SUPPRESS_PRELOADER = false;
-var SPLICE_IS_DEBUG = true;
-
-/*
-	Plaform configuration flag
-	set to true if deploying in mobile space
- */
-var SPLICE_PLATFORM_IS_MOBILE  = false;
-
-var SPLICE_PLATFORM_IS_TOUCH_ENABLED = true;
+var sjs_config = {
+  /* Location of SpliceJS relative to applications' URL */
+  home : '../../../splicejs',
+  debug:  true,
+  platform_mobile: false,
+  platform_touch: false,
+  splash_screen_supress:false,
+  splash_screen_module: 'splash.js',
+  startup:'onload'
+};

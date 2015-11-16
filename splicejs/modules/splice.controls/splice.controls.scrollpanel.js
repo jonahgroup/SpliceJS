@@ -12,8 +12,8 @@ definition:function(sjs){
 
 	var Class 		= sjs.Class
 	,	Event 		= sjs.Event
-	, 	isTouch 	= sjs.config.platform.IS_TOUCH_ENABLED
-	, 	isMobile 	= sjs.config.platform.IS_MOBILE;
+	, 	isTouch 	= sjs.config.platform.isTouchEnabled
+	, 	isMobile 	= sjs.config.platform.isMobile;
 
 	var	select = this.scope.Doc.select
 	,	create = this.scope.Doc.create

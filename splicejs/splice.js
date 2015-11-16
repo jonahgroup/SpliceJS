@@ -33,13 +33,13 @@ var sjs = (function(window, document){
 	"use strict";
 
 	var configuration = {
-		APPLICATION_HOME: 				getPath(window.location.href).path,
-		SPLICE_HOME:         			window.SPLICE_HOME,
-		ONLOAD_DISP_SHORT_FILENAME: 	window.SPLICE_ONLOAD_DISP_SHORT_FILENAME,
-		IS_DEBUG_ENABLED:				window.SPLICE_IS_DEBUG,
-		platform: {
-			IS_MOBILE: 			window.SPLICE_PLATFORM_IS_MOBILE,
-			IS_TOUCH_ENABLED: 	window.SPLICE_PLATFORM_IS_TOUCH_ENABLED
+		app_home: 	getPath(window.location.href).path,
+		splice_home:        window.sjs_config.home,
+		debug:							window.sjs_config.debug,
+		startup:						window.sjs_config.startup,
+		platform:					 {
+				isTouchEnabled:window.sjs_config.platform_touch,
+				isMobile:	window.sjs_config.platform_mobile
 		}
 	};
 
@@ -67,7 +67,7 @@ var sjs = (function(window, document){
 	/*
 	 	Cache loading indicator
 	*/
-	new Image().src = ( configuration.SPLICE_HOME || '') + '/resources/images/bootloading.gif';
+	new Image().src = ( configuration.splice_home || '') + '/resources/images/bootloading.gif';
 
 
 	if(!window.console) {
@@ -147,7 +147,7 @@ var sjs = (function(window, document){
 		splashScreen.innerHTML =
 		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:1.2em; color:#fefefe; background-color:#222222;">'+
 		'<div style="position:relative; top:-20px">'+
-			'<div style="display:inline;"><img style="vertical-align:middle;" src="'+configuration.SPLICE_HOME+'/resources/images/bootloading.gif"/></div>'+
+			'<div style="display:inline;"><img style="vertical-align:middle;" src="'+configuration.splice_home+'/resources/images/bootloading.gif"/></div>'+
 			'<div style="display:inline; padding-left:1em;"><span></span></div>'+
 		'</div>'+
 		'</div>';
@@ -195,7 +195,7 @@ var sjs = (function(window, document){
 
 
 	function absPath(path){
-		return collapsePath(configuration.APPLICATION_HOME+'/'+path);
+		return collapsePath(configuration.app_home+'/'+path);
 	};
 
 
@@ -690,7 +690,7 @@ function Variable(name){
 	this.name = name;
 }
 function variableValue(name){
-	if(name == 'sjshome') return configuration.SPLICE_HOME;
+	if(name == 'sjshome') return configuration.splice_home;
 	return '';
 }
 
@@ -1331,6 +1331,12 @@ UrlAnalyzer.prototype = {
 
 */
 
+	function SplashScreenController(){
+
+	}
+
+
+
 	function _bootOptionA(){
 
 	}
@@ -1346,33 +1352,24 @@ UrlAnalyzer.prototype = {
 
 	function onReady(fn){	READY.callback = fn; };
 
-	window.onload = function(){
+	/**
+		Application entry point
+
+	*/
+	function start(){
 		var start  = window.performance.now();
 /*
 		var mainPageHtml = document.body.innerHTML;
 		document.body.innerHTML = '';
 */
 		var url = window.location.origin + window.location.pathname;
-		if(url.indexOf(configuration.APPLICATION_HOME) == 0){
+		if(url.indexOf(configuration.app_home) == 0){
 
-			url = url.substring(configuration.APPLICATION_HOME.length);
+			url = url.substring(configuration.app_home.length);
 			var name = getPath(url);
 			LoadingWatcher.name = name.name;
 			LoadingWatcher.url =url;
 		}
-
-		//user specified on ready handler, run it and return
-		if(typeof READY.callback === 'function'){
-			Module({
-				required:BOOT_SOURCE,
-				definition:function(){
-					removePreloader();
-					READY.callback.call(this,this.sjs);
-				}
-			});
-			return;
-		}
-
 
 		// boot module
 		Module({
@@ -1395,6 +1392,13 @@ UrlAnalyzer.prototype = {
 				console.log('Load complete: ' + (end-start) + 'ms');
 			}
 		});
+	}
+
+	//determine application startup mode
+	if(configuration.startup == 'onload') {
+		window.onload = function(){
+			start();
+		};
 	};
 
 	function boot(args){
@@ -1428,11 +1432,11 @@ UrlAnalyzer.prototype = {
 	};
 
 	function home(obj,path){
-		if(!path) path = configuration.SPLICE_HOME;
+		if(!path) path = configuration.splice_home;
 		if(!obj) return path;
 
 		if(typeof obj === 'string'){
-			if(obj.indexOf(configuration.SPLICE_HOME) === 0) return obj;
+			if(obj.indexOf(configuration.splice_home) === 0) return obj;
 			return {ishome:true, path:(path + '/' + obj)};
 		}
 
@@ -1848,7 +1852,7 @@ UrlAnalyzer.prototype = {
 		if(endsWith(filename, FILE_EXTENSIONS.javascript)) {
 
 
-			if(configuration.IS_DEBUG_ENABLED) {
+			if(configuration.debug) {
 			//document script loader
 			var script = document.createElement('script');
 			script.setAttribute("type", "text/javascript");
@@ -1890,7 +1894,7 @@ UrlAnalyzer.prototype = {
 
 
 		//function script loader
-			if(!configuration.IS_DEBUG_ENABLED){
+			if(!configuration.debug){
 			HttpRequest.get({
 				url: filename,
 				onok:function(response){
@@ -3215,7 +3219,7 @@ function Controller(){
 	};
 
 	/*
-		@path is a relative path to SPLICE_HOME
+		@path is a relative path to splice_home
 		@a is a dependency list of file names
 	*/
 	function prepareImports(a, path){
@@ -3329,7 +3333,7 @@ function Controller(){
     var scope = new Namespace(null); //our module scope
 		scope.singletons = {constructors:[], instances:[]};
 
-		var _sjs = mixin(sjs(),{
+		var _sjs = mixin(mixin({},sjs()),{
 			exports:_exports(scope),
 			proxy : (function(){return proxy.apply(this,arguments);}).bind(scope),
 			load  : (function(filenames){
@@ -3509,7 +3513,72 @@ function Controller(){
 	Core exports
 
 */
+
 	var consoleLog = console.log.bind(console);
+
+
+	var sjsExports = mixin(Object.create(null), {
+
+		debug:{
+			log : consoleLog,
+			info: logging.info,
+			enable:function(){
+				this.log = consoleLog;
+				logging.debug.log = consoleLog;
+			},
+			disable:function(){
+				this.log  = function(){}
+			}
+		},
+
+		config : configuration,
+
+		boot : boot,
+		toPath : toPath,
+		home : home,
+
+		propname: propertyName,
+		absPath : absPath,
+		getPath : getPath,
+		display : display,
+		close 	: close,
+		endswith:endsWith,
+		mixin	: mixin,
+		binding : binding,
+		proxy	: proxy,
+		propvalue : propertyValue,
+		async: runAsync,
+
+		view:function(d){
+			if(!d) return _viewQueryMode();
+			return new View(d);
+		},
+		timing	:	measureRuntime,
+
+		load	: include,
+		include : include,
+		fname:getFunctionName,
+
+		Namespace: Namespace,
+		Class : Class,
+		Controller : Controller,
+
+		prototype:prototype,
+
+		HttpRequest : HttpRequest,
+		Event : EventSingleton,
+		event:	Event,
+		Tokenizer:Tokenizer,
+		UrlAnalyzer:UrlAnalyzer,
+
+		onReady:onReady,
+
+		modules: listModules
+
+});
+	if(configuration.startup === 'user'){
+			sjsExports.start = function(){start();}
+	}
 
 
 	function sjs(m) {
@@ -3540,65 +3609,7 @@ function Controller(){
 			};
 		}
 
-		return mixin(Object.create(null), {
-
-			debug:{
-				log : consoleLog,
-				info: logging.info,
-				enable:function(){
-					this.log = consoleLog;
-					logging.debug.log = consoleLog;
-				},
-				disable:function(){
-					this.log  = function(){}
-				}
-			},
-
-			config : configuration,
-
-			boot : boot,
-			toPath : toPath,
-			home : home,
-
-			propname: propertyName,
-			absPath : absPath,
-			getPath : getPath,
-			display : display,
-			close 	: close,
-			endswith:endsWith,
-			mixin	: mixin,
-			binding : binding,
-			proxy	: proxy,
-			propvalue : propertyValue,
-			async: runAsync,
-
-			view:function(d){
-				if(!d) return _viewQueryMode();
-				return new View(d);
-			},
-			timing	:	measureRuntime,
-
-			load	: include,
-			include : include,
-			fname:getFunctionName,
-
-			Namespace: Namespace,
-			Class : Class,
-			Controller : Controller,
-
-			prototype:prototype,
-
-			HttpRequest : HttpRequest,
-			Event : EventSingleton,
-			event:	Event,
-			Tokenizer:Tokenizer,
-			UrlAnalyzer:UrlAnalyzer,
-
-			onReady:onReady,
-
-			modules: listModules
-
-	});}
+		return sjsExports;}
 	//core.debug = debug;
 	return sjs;
 
