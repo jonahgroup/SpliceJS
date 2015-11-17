@@ -40,6 +40,9 @@ var sjs = (function(window, document){
 		platform:					 {
 				isTouchEnabled:window.sjs_config.platform_touch,
 				isMobile:	window.sjs_config.platform_mobile
+		},
+		splash: { 'module': window.sjs_config.splash_screen_module,
+							'class'	:	window.sjs_config.splash_screen_class
 		}
 	};
 
@@ -136,31 +139,13 @@ var sjs = (function(window, document){
 		};
 	}
 
-	var tempBodyContent = '';
-	var progressLabel = null;
-	var splashScreen = null;
+
 	function showPreloader(){
 		if(window.SPLICE_SUPPRESS_PRELOADER) return;
-		//tempBodyContent = document.body.innerHTML;
-
-		splashScreen = document.createElement('div');
-		splashScreen.innerHTML =
-		'<div style="position:absolute; left:10%; top:50%; font-family:Arial; font-size:1.2em; color:#fefefe; background-color:#222222;">'+
-		'<div style="position:relative; top:-20px">'+
-			'<div style="display:inline;"><img style="vertical-align:middle;" src="'+configuration.splice_home+'/resources/images/bootloading.gif"/></div>'+
-			'<div style="display:inline; padding-left:1em;"><span></span></div>'+
-		'</div>'+
-		'</div>';
-
-
-		progressLabel = splashScreen.querySelectorAll('span')[0];
-		document.body.appendChild(splashScreen);
 	}
 
 	function removePreloader(){
 		if(window.SPLICE_SUPPRESS_PRELOADER) return;
-		//document.body.innerHTML = tempBodyContent;
-		document.body.removeChild(splashScreen);
 	}
 
 
@@ -511,6 +496,10 @@ View.prototype.content = function(content){
 		},
 
 		replace:function(){
+			if(typeof content === 'string'){
+				self.contentMap['default'].innerHTML = content;
+				return self;
+			}
 			return self;
 		}
 	}
@@ -1331,10 +1320,14 @@ UrlAnalyzer.prototype = {
 
 */
 
-	function SplashScreenController(){
+	var SplashScreenController = Class(function SplashScreenController(){
+		this.super();
+	}).extend(Controller);
 
+
+	SplashScreenController.prototype.update = function(total, complete, itemname){
+		throw 'SplashScreenController derived class must implement "update" method';
 	}
-
 
 
 	function _bootOptionA(){
@@ -1357,7 +1350,9 @@ UrlAnalyzer.prototype = {
 
 	*/
 	function start(){
-		var start  = window.performance.now();
+		var fn = function(){
+
+		var loadStart  = window.performance.now();
 /*
 		var mainPageHtml = document.body.innerHTML;
 		document.body.innerHTML = '';
@@ -1388,10 +1383,25 @@ UrlAnalyzer.prototype = {
 				controller.onAttach();
 				controller.onDisplay();
 
-				var end  = window.performance.now();
-				console.log('Load complete: ' + (end-start) + 'ms');
+				var loadEnd  = window.performance.now();
+				console.log('Load complete: ' + (loadEnd-loadStart) + 'ms');
 			}
 		});
+	};
+		//load and register custom spash sreen
+		if(configuration.splash.module) {
+			load([configuration.splash.module],function(){
+				var m = findModule(configuration.splash.module)
+				var screen = new (m[configuration.splash.class])();
+				display(screen);
+				LoadingWatcher.splashScreen = screen;
+				fn();
+			})
+		}
+ 		else{
+			fn();
+		}
+
 	}
 
 	//determine application startup mode
@@ -1487,13 +1497,7 @@ UrlAnalyzer.prototype = {
 		 * */
 		if(ns == null){
 			return {
-				Class:function(constructor){
 
-					var idx = (namespace + '.' + getFunctionName(constructor)).toUpperCase();
-					var newNamespace = getNamespace.call(window,namespace,true);
-					return Class.call({namespace:newNamespace, idx:idx}, constructor);
-
-				},
 
 				add:function(name, object){
 
@@ -1522,10 +1526,7 @@ UrlAnalyzer.prototype = {
 				return '__impTemplate' + (this.itc++);
 			},
 
-			Class: function(constructor){
-				var idx = (this._path + '.' + getFunctionName(constructor)).toUpperCase();
-				return Class.call({namespace:this,idx:idx},constructor);
-			},
+
 
 			place:function(obj){
 				for(var key in obj){
@@ -1671,7 +1672,7 @@ UrlAnalyzer.prototype = {
 	/**
 	 * pseudo class wrapper
 	 * */
-	var Class = function Class(_class){
+	 function Class(_class){
 		if(!_class) throw 'constructor function may not be empty';
 		if(typeof(_class) !== 'function' ) throw 'Constructor must be a function';
 
@@ -1970,6 +1971,8 @@ UrlAnalyzer.prototype = {
 
 	var LoadingWatcher = {
 
+		splashScreen : null,
+
 		getLoaderProgress : function(){
 			return LOADER_PROGRESS;
 		},
@@ -1978,19 +1981,14 @@ UrlAnalyzer.prototype = {
 			this.name = current.name;
 			this.url = current.url;
 
-			if(!progressLabel) return;
+			if(!this.splashScreen) return;
 
-			var label = current.name;
-
-			if(configuration.ONLOAD_DISP_SHORT_FILENAME)
-				label = getPath(current.name).name;
-
-			progressLabel.innerHTML = LOADER_PROGRESS.complete/LOADER_PROGRESS.total + ' ' + label;
-
+			this.splashScreen.update(LOADER_PROGRESS.total,LOADER_PROGRESS.complete,current.name);
 		},
 
 		update:function(){
-			console.log(LOADER_PROGRESS.complete,LOADER_PROGRESS.total);
+			if(!this.splashScreen) return;
+			this.splashScreen.update(LOADER_PROGRESS.total,LOADER_PROGRESS.complete);
 		}
 	};
 
@@ -3562,6 +3560,7 @@ function Controller(){
 		Namespace: Namespace,
 		Class : Class,
 		Controller : Controller,
+		SplashScreenController : SplashScreenController,
 
 		prototype:prototype,
 
