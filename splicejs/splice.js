@@ -142,10 +142,12 @@ var sjs = (function(window, document){
 
 	function showPreloader(){
 		if(window.SPLICE_SUPPRESS_PRELOADER) return;
+			display(LoadingWatcher.splashScreen);
 	}
 
 	function removePreloader(){
 		if(window.SPLICE_SUPPRESS_PRELOADER) return;
+			display.clear(LoadingWatcher.splashScreen);
 	}
 
 
@@ -1390,10 +1392,11 @@ UrlAnalyzer.prototype = {
 	};
 		//load and register custom spash sreen
 		if(configuration.splash.module) {
+
 			load([configuration.splash.module],function(){
 				var m = findModule(configuration.splash.module)
 				var screen = new (m[configuration.splash.class])();
-				display(screen);
+				LoadingWatcher.initialInclude = 1;
 				LoadingWatcher.splashScreen = screen;
 				fn();
 			})
@@ -1969,10 +1972,33 @@ UrlAnalyzer.prototype = {
 	};
 
 
+
+	var defaultSplash =(function(){
+
+			var splash = new Controller();
+			var view = new View(
+				'<div>'+
+				'<div style="position:absolute; top:0px; left:0px; height:4px; width:30%; background-color:#48F38C;"></div>'+
+				'<div style="position:absolute; top:0px; right:0px; height:4px; width:30%; background-color:#FFF360;"></div>'+
+				'</div>')
+			.style('position:absolute; top:0px; left:0px; height:4px; width:0%; background-color:#48DBEA;' +
+						 '-webkit-box-shadow: 0px 2px 11px 2px rgba(0,0,0,0.75); '+
+						 '-moz-box-shadow: 0px 2px 11px 2px rgba(0,0,0,0.75);'+
+						 ' box-shadow: 0px 2px 11px 2px rgba(0,0,0,0.75);');
+
+			splash.views = {root:view};
+			splash.update = function(total, complete, itemName){
+				  var p = Math.round(complete/total*100);
+					if(!this.progress || this.progress < p) this.progress = p;
+					this.views.root.htmlElement.style.width = this.progress + '%';
+			}
+			return splash;
+	})();
+
 	var LoadingWatcher = {
 
-		splashScreen : null,
-
+		splashScreen : defaultSplash,
+		initialInclude : 1,
 		getLoaderProgress : function(){
 			return LOADER_PROGRESS;
 		},
@@ -1993,20 +2019,24 @@ UrlAnalyzer.prototype = {
 	};
 
 
+
+
+
+
+
 	function include(resources, oncomplete, onitemloaded){
 
 		/*
 		 * Initial bootstrap
 		 * */
-		if(!LoadingWatcher.isInitialInclude) {
+		if(LoadingWatcher.initialInclude > 0) {
 			showPreloader();
-
 			var foo = oncomplete;
 			oncomplete = function(){
 				removePreloader();
 				if(typeof foo === 'function') foo();
 			};
-			LoadingWatcher.isInitialInclude = true;
+			LoadingWatcher.initialInclude = 0;
 		}
 
 		/*

@@ -9,8 +9,8 @@ sjs({
       this.percentComplete = 0;
     }).extend(sjs.SplashScreenController);
 
-    TestSplash.prototype.update = function(total, complete, itemname){
-      //this.views.label.content(itemname).replace();
+    TestSplash.prototype.update = function(total, complete, itemName){
+
       var p = Math.round(complete/total*100);
       //if(this.percentComplete < p)
       this.percentComplete = p;

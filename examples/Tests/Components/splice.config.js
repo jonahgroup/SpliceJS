@@ -5,7 +5,7 @@ var sjs_config = {
   platform_mobile: false,
   platform_touch: false,
   splash_screen_supress:false,
-  splash_screen_module: 'splash.js',
-  splash_screen_class:'SplashScreen',
+  //splash_screen_module: 'splash.js',
+  //splash_screen_class:'SplashScreen',
   startup:'onload'
 };
