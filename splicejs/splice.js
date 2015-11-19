@@ -196,6 +196,18 @@ var sjs = (function(window, document){
 		}
 	};
 
+	function setPathVar(key, value){
+		//do not allow setting sjs home variable
+		if(key === 'sjshome') return;
+
+		if(!key || !value){
+			return mixin({},PATH_VARIABLES);
+		}
+
+		PATH_VARIABLES[key] = value;
+		return setPathVar;
+	};
+
 
 	function applyPath(src){
 		var path = this.path;
@@ -427,8 +439,11 @@ function View(dom, args){
 	} else
 		this.htmlElement = dom;
 
-	if(!args || !args.simple)
+	if(!args || !args.simple){
 		this.contentMap = buildContentMap(this.htmlElement);
+		if(!this.contentMap['default'])
+			this.contentMap = {'default':this.htmlElement};
+	}
 	else {
 		this.contentMap = {'default':this.htmlElement};
 		this.isSimple = true;
@@ -466,6 +481,20 @@ View.prototype.clear = function(){
 	this.htmlElement.innerHTML = '';
 	return this;
 };
+
+View.prototype.child = function(name){
+	if(!this.childMap) {
+		this.childMap = Object.create(null);
+		var childViews =this.htmlElement.querySelectorAll('[sjs-view]');
+		for(var i=0; i<childViews.length; i++){
+			var attr = childViews[i].getAttribute('sjs-view');
+			this.childMap[attr] = new View(childViews[i]);
+			this.childMap[attr].parent = this;
+		}
+	}
+	return this.childMap[name];
+};
+
 
 
 View.prototype.parent = function(fn){
@@ -674,15 +703,14 @@ Tokenizer.prototype = {
 		return result;
 	}
 };
-function HomeVariable(){ this.name = 'sjshome';}
-function Variable(name){
-	if(name == 'sjshome') return new HomeVariable();
-	if(!(this instanceof Variable)) return new Variable(name);
-	this.name = name;
-}
-function variableValue(name){
-	if(name == 'sjshome') return configuration.splice_home;
-	return '';
+
+var PATH_VARIABLES = {
+	sjshome:configuration.splice_home
+};
+function PathVariable(key){
+	this.key = key;
+	this.value = PATH_VARIABLES[key];
+	if(key === 'sjshome') this.isHome = true;
 }
 
 function UrlAnalyzer(url){
@@ -694,7 +722,7 @@ function UrlAnalyzer(url){
 
 	while(token = t.nextToken()){
 		if(token == '{') {
-			this.parts.push(Variable(t.nextToken()));
+			this.parts.push(new PathVariable(t.nextToken()));
 			t.nextToken(); //closing bracket
 			continue;
 		}
@@ -709,9 +737,8 @@ UrlAnalyzer.prototype = {
 		for(var i=0; i < this.parts.length; i++){
 			var part = this.parts[i];
 
-			if( part instanceof Variable ||
-				part instanceof HomeVariable ){
-				url += variableValue(part.name);
+			if( part instanceof PathVariable ){
+				url += part.value;
 			} else {
 				url += part;
 			}
@@ -720,7 +747,7 @@ UrlAnalyzer.prototype = {
 	},
 
 	isHome:function(){
-		return this.parts[0] instanceof HomeVariable;
+		return this.parts[0].isHome;
 	}
 
 };
@@ -1955,7 +1982,6 @@ UrlAnalyzer.prototype = {
 			});
 			return;
 		 }
-		 console.log('odd filename' + filename);
 	};
 
 
@@ -3568,6 +3594,7 @@ function Controller(){
 		propname: propertyName,
 		absPath : absPath,
 		getPath : getPath,
+		pathvar : setPathVar,
 		display : display,
 		close 	: close,
 		endswith:endsWith,
