@@ -1,4 +1,5 @@
 sjs({
+  alias:'SpliceJS.Components.ComboBox',
   required:[
     {'SpliceJS.Controls':'splice.controls.dropdownlist.js'},
     // 'splice.controls.combobox.html'

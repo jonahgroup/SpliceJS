@@ -442,7 +442,7 @@ function View(dom, args){
 	if(!args || !args.simple){
 		this.contentMap = buildContentMap(this.htmlElement);
 		if(!this.contentMap['default'])
-			this.contentMap = {'default':this.htmlElement};
+			this.contentMap['default'] = this.htmlElement;
 	}
 	else {
 		this.contentMap = {'default':this.htmlElement};
@@ -495,11 +495,6 @@ View.prototype.child = function(name){
 	return this.childMap[name];
 };
 
-
-
-View.prototype.parent = function(fn){
-};
-
 View.prototype.controller = function(){
 	return this.htmlElement.__sjs_controller__;
 };
@@ -510,18 +505,32 @@ View.prototype.content = function(content){
 		add:function(){
 
 			if(typeof content === 'string'){
-				self.htmlElement.appendChild( document.createTextNode(content) );
+				self.contentMap['default'].appendChild( document.createTextNode(content) );
 				return self;
 			}
 			if(typeof content === 'number'){
-				self.htmlElement.appendChild( document.createTextNode(content) );
+				self.contentMap['default'].appendChild( document.createTextNode(content) );
 				return self;
 			}
 			if(content instanceof View){
-				self.htmlElement.appendChild( content.htmlElement );
+				self.contentMap['default'].appendChild( content.htmlElement );
 				return self;
 			}
+			if(content instanceof Controller ){
+				if(!content.views || content.views.root) return;
+				self.contentMap['default'].appendChild( content.views.root.htmlElement );
+				return self;
+			}
+			//apply content based on the content map
+			if(typeof content === 'object' ){
+				if(!self.contentMap) return;
 
+				var keys = Object.keys(self.contentMap);
+				for(var key in keys){
+					var dc = decodeContent(content[keys[key]]);
+				}
+				return self;
+			}
 
 			return self;
 		},
@@ -546,6 +555,9 @@ View.prototype.position = function(){
 		}
 };
 
+View.prototype.reflow = function(){
+
+};
 
 function CssTokenizer(input){
 	var t = new Tokenizer(input);
@@ -1931,7 +1943,13 @@ UrlAnalyzer.prototype = {
 				onok:function(response){
 
 					try {
-						(new Function(response.text))();
+						//(new Function(response.text))();
+						var s = document.createElement('script');
+						s.setAttribute('type','text/javascript');
+
+						s.innerHTML = response.text;
+
+						document.head.appendChild(s);
 					} catch(ex){
 						throw ex;
 					}
@@ -2003,10 +2021,7 @@ UrlAnalyzer.prototype = {
 
 			var splash = new Controller();
 			var view = new View(
-				'<div>'+
-				'<div style="position:absolute; top:0px; left:0px; height:4px; width:30%; background-color:#48F38C;"></div>'+
-				'<div style="position:absolute; top:0px; right:0px; height:4px; width:30%; background-color:#FFF360;"></div>'+
-				'</div>')
+				'<div></div>')
 			.style('position:absolute; top:0px; left:0px; height:4px; width:0%; background-color:#48DBEA;' +
 						 '-webkit-box-shadow: 0px 2px 11px 2px rgba(0,0,0,0.75); '+
 						 '-moz-box-shadow: 0px 2px 11px 2px rgba(0,0,0,0.75);'+
@@ -2389,9 +2404,9 @@ function Controller(){
 
 		if(content instanceof Controller){
 			//update visual parent
-			abandonVisualParent(content);
-			gainVisualParent(content, this);
-			return content.views.root.htmlElement;
+	//		abandonVisualParent(content);
+	//		gainVisualParent(content, this);
+			return content.views.root;
 		}
 
 		return null;
