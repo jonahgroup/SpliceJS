@@ -2427,6 +2427,10 @@ function Controller(){
 			var newNode = decodeContent.call(this,content[keys[key]]);
 			if(!newNode) continue;
 
+			if(newNode instanceof View){
+				newNode = newNode.htmlElement;
+			}
+
 			var contentNode = this.__sjs_content_map__[keys[key]][0];
 
 			//if child node is already added, skip
