@@ -100,9 +100,9 @@ definition:function(sjs){
 					item.dataIn(this.dataItem[i]);
 				}
 
-				item.concrete.dom.__sjs_item_index__ = i;
+				item.views.root.htmlElement.__sjs_item_index__ = i;
 
-				this.dom.content(sjs.view(item.concrete.dom)).add();
+				this.dom.content(item.views.root).add();
 				if(typeof item.onAttached == 'function')
 					item.onAttached();
 			}
@@ -125,17 +125,15 @@ definition:function(sjs){
 
 
 	var DefaultListItem = Class(function DefaultListItem(){
-			this.concrete =  {
-				dom : document.createElement('div')
-			};
-
-			this.concrete.dom.className = '-sjs-listbox-item';
+		this.views = {
+			root: sjs.view('<div></div>').class('-sjs-listbox-item').add()
+		}
 	});
 
 	DefaultListItem.prototype.dataIn = function(dataItem){
 		if(!dataItem) return;
 		this.dataItem = dataItem;
-		this.concrete.dom.innerHTML = dataItem.toString();
+		this.views.root.content(dataItem.toString()).replace();
 	};
 
 

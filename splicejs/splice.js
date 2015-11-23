@@ -580,7 +580,7 @@ View.prototype.content = function(content){
 					var dc = replaceContent.call(self,content[keys[key]],keys[key]);
 				}
 			} else {
-				addContent.call(self,content);
+				replaceContent.call(self,content);
 			}
 			return self;
 		}
