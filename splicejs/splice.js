@@ -442,10 +442,10 @@ function View(dom, args){
 	if(!args || !args.simple){
 		this.contentMap = buildContentMap(this.htmlElement);
 		if(!this.contentMap['default'])
-			this.contentMap['default'] = this.htmlElement;
+			this.contentMap['default'] = {source:this.htmlElement,cache:null};
 	}
 	else {
-		this.contentMap = {'default':this.htmlElement};
+		this.contentMap = {'default': {source:this.htmlElement,cache:null}};
 		this.isSimple = true;
 	}
 };
@@ -499,49 +499,92 @@ View.prototype.controller = function(){
 	return this.htmlElement.__sjs_controller__;
 };
 
+function addContent(content,key){
+	if(!key) key = 'default';
+
+	var target = this.contentMap[key].source;
+
+	if(typeof content === 'string'){
+		target.appendChild( document.createTextNode(content) );
+		return self;
+	}
+	if(typeof content === 'number'){
+		target.appendChild( document.createTextNode(content) );
+		return self;
+	}
+	if(content instanceof View){
+		target.appendChild( content.htmlElement );
+		return self;
+	}
+	if(content instanceof Controller ){
+		if(!content.views || content.views.root) return;
+		target.appendChild( content.views.root.htmlElement);
+		content.onAttach();
+		content.onDisplay();
+		return self;
+	}
+};
+
+function replaceContent(content,key){
+	if(!key) key = 'default';
+	if(typeof content === 'string' || typeof content === 'number'){
+			var target = this.contentMap[key].cache;
+			if(!target) {
+				target = document.createTextNode(content);
+				this.contentMap[key].cache = target;
+				this.contentMap[key].source.appendChild(target);
+			}
+			target.nodeValue =content;
+			return;
+	}
+
+	if(content instanceof Controller ){
+		var root = content.views.root;
+		if(!root) return;
+		this.contentMap[key].source.innerHTML = '';
+		this.contentMap[key].source.appendChild(root.htmlElement);
+		this.contentMap[key].cache = root.htmlElement;
+		content.onAttach();
+		content.onDisplay();
+	}
+};
+
+
+
 View.prototype.content = function(content){
 	var self = this;
 	return {
 		add:function(){
-
-			if(typeof content === 'string'){
-				self.contentMap['default'].appendChild( document.createTextNode(content) );
-				return self;
-			}
-			if(typeof content === 'number'){
-				self.contentMap['default'].appendChild( document.createTextNode(content) );
-				return self;
-			}
-			if(content instanceof View){
-				self.contentMap['default'].appendChild( content.htmlElement );
-				return self;
-			}
-			if(content instanceof Controller ){
-				if(!content.views || content.views.root) return;
-				self.contentMap['default'].appendChild( content.views.root.htmlElement );
-				return self;
-			}
 			//apply content based on the content map
-			if(typeof content === 'object' ){
+			if(typeof content === 'string' ||  typeof content === 'number' ||
+			 	 content instanceof View ||  content instanceof Controller){
+				addContent.call(self,content,'default');
+		  }
+			else if(typeof content === 'object' ){
 				if(!self.contentMap) return;
-
 				var keys = Object.keys(self.contentMap);
 				for(var key in keys){
-					var dc = decodeContent(content[keys[key]]);
+					var dc = addContent.call(self,content[keys[key]],keys[key]);
 				}
-				return self;
 			}
 
 			return self;
 		},
 
 		replace:function(){
-			if(typeof content === 'string'){
-				self.contentMap['default'].innerHTML = content;
-				return self;
+			//apply content based on the content map
+			if(typeof content === 'object' ){
+				if(!self.contentMap) return;
+				var keys = Object.keys(self.contentMap);
+				for(var key in keys){
+					var dc = replaceContent.call(self,content[keys[key]],keys[key]);
+				}
+			} else {
+				addContent.call(self,content);
 			}
 			return self;
 		}
+
 	}
 
 };
@@ -2313,23 +2356,23 @@ function isExternalType(type){
 		return instance;
 	};
 
+	/*
+	*	do not allow duplicate content keys
+	*/
 	function buildContentMap(element){
 		var contentNodes = element.querySelectorAll('[sjs-content]')
-		,	valueMap = {};
+		,	cMap = {};
 
 		if(!contentNodes) return;
 
 		for(var i=0; i<contentNodes.length; i++){
 			var node = contentNodes[i];
-
-			var val = node.getAttribute('sjs-content');
-			var list = 	valueMap[val];
-			if(!list) {
-				valueMap[val] = list = [];
-			}
-			list.push(node);
+			var key = node.getAttribute('sjs-content');
+			if(cMap[key]) throw 'Duplicate content map key ' + key;
+			cMap[key] = {source:node, cache:null};
 		}
-		return valueMap;
+
+		return cMap;
 	};
 
 /**
@@ -2420,28 +2463,7 @@ function Controller(){
 	function _controllerContentMapper(content,isReplace){
 		var view = this.views.root;
 		//no content map, simple view, default map must be present
-
-		var keys = Object.keys(view.contentMap);
-
-		for(var key in  keys){
-			var newNode = decodeContent.call(this,content[keys[key]]);
-			if(!newNode) continue;
-
-			if(newNode instanceof View){
-				newNode = newNode.htmlElement;
-			}
-
-			var contentNode = this.__sjs_content_map__[keys[key]][0];
-
-			//if child node is already added, skip
-			if(contentNode.childNodes[0] == newNode)	return;
-
-			if(contentNode.childNodes[0]) {
-				contentNode.replaceChild(newNode,contentNode.childNodes[0]);
-			} else {
-				contentNode.appendChild(newNode);
-			}
-		}
+		view.content(content).replace();
 	};
 
 	//set content of the controller
