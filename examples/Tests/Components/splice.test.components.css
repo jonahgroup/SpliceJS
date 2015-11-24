@@ -9,3 +9,7 @@ background-color: #00C3D8;
 -moz-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.52);
 box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.32);
 }
+.test-drop-down-list {
+
+  background-color: #222222;
+}

@@ -65,9 +65,7 @@ definition:function(sjs){
 		this.elements.root.className = '-splicejs-button-disabled';
 		this.isDisabled = true;
 		this.onDomChanged();
-	}
-
-
+	};
 
 	/**
 	 *

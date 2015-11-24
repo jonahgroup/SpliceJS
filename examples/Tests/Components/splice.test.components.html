@@ -47,22 +47,43 @@
         css:{list: 'test-drop-down-list'}
     }
   </sjs-include>
-  <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
-    {
-        default:'Please select an item',
-        dataIn: binding('onProvinces').parent,
-        onDataItem: binding('provinceSelected').parent,
-        css:{list: 'test-drop-down-list'}
-    }
-  </sjs-include>
 </td>
 </tr>
+
+<!-- Templated ComboBox-->
+<tr>
+  <td>Templated ComboBox</td>
+  <td>
+    <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
+      {
+          default:'Please select an item',
+          dataIn: binding('onProvinces').parent,
+          onDataItem: binding('provinceSelected').parent,
+          css:{list: 'test-drop-down-list'},
+          itemTemplate:<sjs-include sjs-type="ComboBoxTestItem"></sjs-include>
+      }
+    </sjs-include>
+  </td>
+</tr>
+
+
 
 <!-- Another Component -->
 <tr>
   <td>Component Name</td>
   <td>Component Include</td>
 </tr>
-</table>
 
+</table>
+</sjs-component>
+
+<sjs-component sjs-type="ComboBoxTestItem" sjs-controller="SpliceJS.Controls.ListItemController">
+  <div style="white-space:nowrap; border-bottom:1px solid #444444;">
+    <sjs-include sjs-type="SpliceJS.Controls.Button">
+      {
+        dataIn:binding('onData').parent
+      }
+    </sjs-include>
+    <div style="display:inline-block;" sjs-content="default"></div>
+  </div>
 </sjs-component>

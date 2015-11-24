@@ -15,7 +15,9 @@ required:[
   {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.charts.js'},
   {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.checklistbox.js'},
   {'SpliceJS.Controls':'{sjshome}/modules/splice.controls/splice.controls.dropdownchecklist.js'},
+  'splice.test.components.css',
   'splice.test.components.html'
+  /*,'splice.test.components.templates.html'*/
 ],
 
 definition:function(sjs){

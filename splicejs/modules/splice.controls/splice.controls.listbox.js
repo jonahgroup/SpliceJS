@@ -30,7 +30,6 @@ definition:function(sjs){
 				onResize   : event.multicast
 			});
 
-			if(!this.itemTemplate) this.itemTemplate = DefaultListItem;
 
 	}).extend(UIControl);
 
@@ -45,6 +44,8 @@ definition:function(sjs){
 			else {
 				this.dom = this.views.root;
 			}
+
+			if(!this.itemTemplate) this.itemTemplate = DefaultListItem;
 	};
 
 	/**
@@ -143,27 +144,33 @@ definition:function(sjs){
 		this.super(args);
 
 		var self = this;
+/*
 		this.concrete.dom.onclick = function(){
 			if(typeof self.onClick === 'function' )
 				self.onClick(self.dataItem);
 		};
-
+*/
 	}).extend(UIControl);
 
-
-	ListItemController.prototype.dataIn = function(dataItem){
-		this.dataItem = dataItem;
-		this.concrete.applyContent(dataItem);
-		this.dataOut(dataItem);
+	ListItemController.prototype.initialize = function(){
+		this.views.root.class('-sjs-listbox-item').add();
 	};
 
 
+	ListItemController.prototype.dataIn = function(dataItem){
+		this.views.root.content(dataItem).replace();
+		this.super(UIControl).dataIn(dataItem);
+	};
+
+
+
+	/**
+		Grouped List Item
+	*/
 	var GroupedListItem = Class(function GroupedListItem(args){
 		this.groupInstance = null;
 		this.itemInstances = [];
 	});
-
-
 
 	GroupedListItem.prototype.dataIn = function(dataItem){
 
