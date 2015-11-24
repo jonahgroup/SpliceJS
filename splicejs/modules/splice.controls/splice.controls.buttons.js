@@ -67,6 +67,11 @@ definition:function(sjs){
 		this.onDomChanged();
 	};
 
+	Button.prototype.dataIn = function(dataItem){
+		this.super(UIControl).dataIn(dataItem);
+		this.views.root.content({label:dataItem.toString()}).replace();
+	};
+
 	/**
 	 *
 	 * Check box
@@ -174,6 +179,7 @@ definition:function(sjs){
 		event(this).attach({
 			onData : event.multicast
 		});
+		this.trapMouseInput = args.trapMouseInput;
 
 	}).extend(UIControl);
 
@@ -185,7 +191,6 @@ definition:function(sjs){
 		else {
 			this.dataItem = {value:args.source.value};
 		}
-
 		this.onData(this.dataItem);
 	};
 
@@ -195,6 +200,12 @@ definition:function(sjs){
 			onkeyup		:	event.unicast,
 			onchange 	: event.unicast
 		});
+
+		if(this.trapMouseInput === true){
+			event(this.views.root).attach({
+				onmousedown : event.unicast.stop
+			});
+		}
 
 		if(this.isRealTime){
 			this.views.root.onkeyup.subscribe(_textFieldOnKey, this);

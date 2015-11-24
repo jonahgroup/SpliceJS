@@ -63,6 +63,15 @@
           itemTemplate:<sjs-include sjs-type="ComboBoxTestItem"></sjs-include>
       }
     </sjs-include>
+    <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
+      {
+          default:'Please select an item',
+          dataIn: binding('onProvinces').parent,
+          onDataItem: binding('provinceSelected').parent,
+          css:{list: 'test-drop-down-list'},
+          itemTemplate:<sjs-include sjs-type="ComboBoxTestItem2"></sjs-include>
+      }
+    </sjs-include>
   </td>
 </tr>
 
@@ -84,6 +93,16 @@
         dataIn:binding('onData').parent
       }
     </sjs-include>
-    <div style="display:inline-block;" sjs-content="default"></div>
+  </div>
+</sjs-component>
+
+<sjs-component sjs-type="ComboBoxTestItem2" sjs-controller="SpliceJS.Controls.ListItemController">
+  <div style="white-space:nowrap; border-bottom:1px solid #444444;">
+    <sjs-include sjs-type="SpliceJS.Controls.TextField">
+      {
+        dataIn:binding('onData').parent,
+        trapMouseInput:true
+      }
+    </sjs-include>
   </div>
 </sjs-component>

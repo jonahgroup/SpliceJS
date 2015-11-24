@@ -127,7 +127,7 @@ definition:function(sjs){
 
 	var DefaultListItem = Class(function DefaultListItem(){
 		this.views = {
-			root: sjs.view('<div></div>').class('-sjs-listbox-item').add()
+			root: sjs.view('<div sjs-content="default"></div>').class('-sjs-listbox-item').add()
 		}
 	});
 
@@ -160,6 +160,7 @@ definition:function(sjs){
 	ListItemController.prototype.dataIn = function(dataItem){
 		this.views.root.content(dataItem).replace();
 		this.super(UIControl).dataIn(dataItem);
+		this.onData(dataItem);
 	};
 
 

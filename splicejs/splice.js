@@ -441,11 +441,8 @@ function View(dom, args){
 
 	if(!args || !args.simple){
 		this.contentMap = buildContentMap(this.htmlElement);
-		if(!this.contentMap['default'])
-			this.contentMap['default'] = {source:this.htmlElement,cache:null};
 	}
 	else {
-		this.contentMap = {'default': {source:this.htmlElement,cache:null}};
 		this.isSimple = true;
 	}
 };
@@ -501,6 +498,7 @@ View.prototype.controller = function(){
 
 function addContent(content,key){
 	if(!key) key = 'default';
+	if(!this.contentMap[key]) return;
 
 	var target = this.contentMap[key].source;
 
@@ -527,9 +525,12 @@ function addContent(content,key){
 
 function replaceContent(content,key){
 	if(!key) key = 'default';
+	if(!this.contentMap[key]) return;
+
 	if(typeof content === 'string' || typeof content === 'number'){
 			var target = this.contentMap[key].cache;
 			if(!target) {
+				this.contentMap[key].source.innerHTML = '';
 				target = document.createTextNode(content);
 				this.contentMap[key].cache = target;
 				this.contentMap[key].source.appendChild(target);
@@ -1832,8 +1833,6 @@ UrlAnalyzer.prototype = {
 		this.oncomplete = oncomplete;
 		this.onitemloaded = onitemloaded;
 
-		//flags local css loading strategy
-		this.cssIsLocal = resources.cssIsLocal;
 
 		LOADER_PROGRESS.total += resources.length;
 
@@ -2364,12 +2363,13 @@ function isExternalType(type){
 		,	cMap = {};
 
 		if(!contentNodes) return;
+		var node = element;
+		for(var i=0; i<=contentNodes.length; i++){
 
-		for(var i=0; i<contentNodes.length; i++){
-			var node = contentNodes[i];
 			var key = node.getAttribute('sjs-content');
 			if(cMap[key]) throw 'Duplicate content map key ' + key;
 			cMap[key] = {source:node, cache:null};
+			node = contentNodes[i];
 		}
 
 		return cMap;
@@ -2716,15 +2716,11 @@ function Controller(){
 		}
 
 		//get element marked "root"
-		var rootElement = controllerInstance.elements['root'];
+		//var rootElement = controllerInstance.views.root;
 
-		//apply style
-		if(rootElement){
-			if(parameters && parameters.class)
-				rootElement.className = parameters.class + ' ' + rootElement.className;
-		}
 
-		controllerInstance.__sjs_content_map__ = buildContentMap(instance.dom);
+
+	//	controllerInstance.__sjs_content_map__ = buildContentMap(instance.dom);
 
 	   /*
 		* Handle content declaration
@@ -2739,7 +2735,6 @@ function Controller(){
 			controllerInstance.handleContent(parameters.content);
 		}
 
-
 		/*
 		 * Anchor elements with data-sjs-tmp-anchor attibute
 		 * are placeholders for included templates
@@ -2752,6 +2747,14 @@ function Controller(){
 		views.root = new View(deepClone.children[0]);
 		views.root.htmlElement.__sjs_controller__ = controllerInstance;
 		controllerInstance.views = views;
+
+		//apply style
+		if(views.root){
+			if(parameters && parameters.class)
+				views.root.class(parameters.class).add();
+		}
+
+
 		return instance;
 	};
 
