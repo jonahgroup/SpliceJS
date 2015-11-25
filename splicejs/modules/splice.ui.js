@@ -82,9 +82,10 @@ definition:function(sjs){
 			this.show();
 	};
 
-	UIControl.prototype.dataIn = function(data){
+	UIControl.prototype.dataIn = function(data, path){
 		this.dataItem = data;
-		this.onDataIn(this.dataItem);
+		this.dataPath = path;
+		this.onDataIn(this.dataItem,this.dataPath);
 	};
 
 

@@ -33,11 +33,11 @@ sjs({
 
 
 	ListController.prototype.initialize = function(){
-
-		this.onDataIn.subscribe(function(item){
-			this.onListData(item);
+/*
+		this.onDataIn.subscribe(function(item,path){
+			this.onListData(item,path);
 		},this);
-
+*/
 		this.onDataItem.subscribe(function(item){
 			this.ref.selector.close();
 		},this);
@@ -47,7 +47,8 @@ sjs({
 
 	ListController.prototype.dropDown = function(){
 		if(this.dataItem) {
-			this.onListData(this.dataItem);
+			//this.onListData(this.dataItem);
+			this.onDataIn(this.dataItem, this.dataPath);
 		}
 		this.onDropDown();
 	};

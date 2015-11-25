@@ -71,8 +71,9 @@ definition:function(sjs){
 	};
 
 
-	ListBoxController.prototype.dataIn = function(dataItem){
+	ListBoxController.prototype.dataIn = function(dataItem,dataPath){
 		this.dataItem = dataItem;
+		this.dataPath = dataPath;
 		//this.dom.clear();
 
 		var item = null;
@@ -84,7 +85,7 @@ definition:function(sjs){
 			if(this.dataPath){
 				item.dataIn(sjs.propvalue(this.dataItem[i])(this.dataPath).value);
 			} else {
-				item.dataIn(this.dataItem[i]);
+				item.dataIn(this.dataItem,i);
 			}
 		}
 
@@ -98,7 +99,7 @@ definition:function(sjs){
 				if(this.dataPath){
 					item.dataIn(sjs.propvalue(this.dataItem[i])(this.dataPath).value);
 				} else {
-					item.dataIn(this.dataItem[i]);
+					item.dataIn(this.dataItem,i);
 				}
 
 				item.views.root.htmlElement.__sjs_item_index__ = i;
@@ -113,13 +114,9 @@ definition:function(sjs){
 		if(!this.ref.scrollPanel) this.onResize(this);
 	};
 
-
-
 	ListBoxController.prototype.reflow = function(){
 		if(!this.ref.scrollPanel) return;
-
 		this.ref.scrollPanel.reflow();
-
 	};
 
 
@@ -131,10 +128,13 @@ definition:function(sjs){
 		}
 	});
 
-	DefaultListItem.prototype.dataIn = function(dataItem){
-		if(!dataItem) return;
-		this.dataItem = dataItem;
-		this.views.root.content(dataItem.toString()).replace();
+	DefaultListItem.prototype.dataIn = function(item, path){
+		if(!item) return;
+		this.dataItem = item;
+		this.dataPath = path;
+
+		var value = path == null ? item.toString() : item[path].toString();
+		this.views.root.content(value).replace();
 	};
 
 
@@ -157,10 +157,15 @@ definition:function(sjs){
 	};
 
 
-	ListItemController.prototype.dataIn = function(dataItem){
-		this.views.root.content(dataItem).replace();
-		this.super(UIControl).dataIn(dataItem);
-		this.onData(dataItem);
+	ListItemController.prototype.dataIn = function(item, path){
+		if(!item) return;
+
+		var value = path == null ? item.toString() : item[path].toString();
+		this.views.root.content(value).replace();
+
+		// call parent implementation of dataIn
+		this.super(UIControl).dataIn(item,path);
+		this.onData(item,path);
 	};
 
 

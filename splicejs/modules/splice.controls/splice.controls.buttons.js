@@ -67,9 +67,10 @@ definition:function(sjs){
 		this.onDomChanged();
 	};
 
-	Button.prototype.dataIn = function(dataItem){
-		this.super(UIControl).dataIn(dataItem);
-		this.views.root.content({label:dataItem.toString()}).replace();
+	Button.prototype.dataIn = function(item, path){
+		this.super(UIControl).dataIn(item,path);
+		var value = path == null ? item.toString() : item[path].toString();
+		this.views.root.content({label:value}).replace();
 	};
 
 	/**
@@ -185,13 +186,13 @@ definition:function(sjs){
 
 
 	function _textFieldOnKey(args){
-		if(this.dataPath) {
-			this.dataItem[self.dataPath] = args.source.value;
+		if(this.dataPath != null) {
+			this.dataItem[this.dataPath] = args.source.value;
 		}
 		else {
 			this.dataItem = {value:args.source.value};
 		}
-		this.onData(this.dataItem);
+		this.onData(this.dataItem, this.dataPath);
 	};
 
 	TextField.prototype.initialize = function(){
@@ -217,12 +218,11 @@ definition:function(sjs){
 	}
 
 
-	TextField.prototype.dataIn = function(dataItem){
-		var value = this.dataItem = dataItem;
-		if(this.dataPath) value = this.dataItem[this.dataPath];
-
-		if(value!=null && value != undefined)
-			this.elements.root.value = value;
+	TextField.prototype.dataIn = function(item, path){
+		if(!item) return;
+		var value = path == null ? item.toString() : item[path].toString();
+		this.views.root.attr({value:value});
+		this.super(UIControl).dataIn(item, path);
 	};
 
 	TextField.prototype.clear = function(){

@@ -29,7 +29,9 @@ definition:function(sjs){
   , exports = sjs.exports;
 
   var provinces = [
-    'Ontario','British Columbia', 'Alberta', 'Quebec','New Brunswick', 'Nova Scotia'
+    'Ontario','British Columbia', 'Alberta', 'Quebec','New Brunswick',
+    'Nova Scotia', 'Manitoba','Yukon','Nunavut','Northwest Territories',
+    'Saskatchewan', 'Prince Edward Island','Newfoundland'
   ];
 
   var charts = [
