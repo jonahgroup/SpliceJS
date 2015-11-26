@@ -139,7 +139,9 @@ definition:function(sjs){
 
 
 
-
+  /**
+		Container controller
+	*/
 	var ListItemController = Class(function ListItemController(args){
 		this.super(args);
 

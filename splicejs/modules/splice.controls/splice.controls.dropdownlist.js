@@ -20,7 +20,7 @@ sjs({
 		/**
 	 * Drop down list
 	 * */
-	var ListController = Class(function DropDownListController(args){
+	var DropDownListController = Class(function DropDownListController(args){
 		this.super();
 
 		event(this).attach({
@@ -32,7 +32,7 @@ sjs({
 	}).extend(UIControl);
 
 
-	ListController.prototype.initialize = function(){
+	DropDownListController.prototype.initialize = function(){
 /*
 		this.onDataIn.subscribe(function(item,path){
 			this.onListData(item,path);
@@ -45,7 +45,7 @@ sjs({
 	};
 
 
-	ListController.prototype.dropDown = function(){
+	DropDownListController.prototype.dropDown = function(){
 		if(this.dataItem) {
 			//this.onListData(this.dataItem);
 			this.onDataIn(this.dataItem, this.dataPath);
@@ -53,7 +53,7 @@ sjs({
 		this.onDropDown();
 	};
 
-	ListController.prototype.setSelectedItem = function(item){
+	DropDownListController.prototype.setSelectedItem = function(item){
 		if(this.dataPath){
 			this.ref.selector.dataIn(sjs.propvalue(item)(this.dataPath).value);
 		} else {
@@ -66,12 +66,12 @@ sjs({
 
 	/* scope exports for component consumption*/
 	exports.scope(
-		ListController
+		DropDownListController
 	);
 
 	/* module exports */
 	exports.module(
-		ListController
+		DropDownListController
 	);
 
 
