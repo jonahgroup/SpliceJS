@@ -1,3 +1,20 @@
 <sjs-component sjs-type="ComboBoxTestItem" sjs-controller="SpliceJS.Controls.ListItemController">
-<div>prefix-<div sjs-content="default"></div></div>
+  <div style="white-space:nowrap; border-bottom:1px solid #444444;">
+    <sjs-include sjs-type="SpliceJS.Controls.Button">
+      {
+        dataIn:binding('onData').parent
+      }
+    </sjs-include>
+  </div>
+</sjs-component>
+
+<sjs-component sjs-type="ComboBoxTestItem2" sjs-controller="SpliceJS.Controls.ListItemController">
+  <div style="white-space:nowrap; border-bottom:1px solid #444444;">
+    <sjs-include sjs-type="SpliceJS.Controls.TextField">
+      {
+        dataIn:binding('onData').parent,
+        trapMouseInput:true
+      }
+    </sjs-include>
+  </div>
 </sjs-component>

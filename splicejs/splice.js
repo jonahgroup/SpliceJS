@@ -2763,7 +2763,8 @@ function Controller(){
 	function extractTemplates(fileSource){
 		//var start  = window.performance.now();
 
-		this.components = new Namespace(''); //component exports
+		if(!this.components)
+			this.components = new Namespace(''); //component exports
 
 		container.innerHTML = fileSource;
 
