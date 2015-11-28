@@ -38,19 +38,19 @@ sjs({
       Check list element item
     */
     var CheckListItemController = Class(function CheckListItemController(){
-    }).extend();
+      this.super();
+    }).extend(scope.SpliceJS.Controls.ListItemController);
 
-    CheckListItemController.prototype.dataIn = function(dataItem){
-
-
+    CheckListItemController.prototype.dataIn = function(item, path){
+      if(!item) return;
       //same item, dont do anything
-      if(this.dataItem === dataItem) return;
+      if(this.dataItem === item) return;
 
-      this.dataItem = dataItem;
-
-      dom(this.concrete.dom).value({dataItem:this.dataItem});
-
+      this.dataItem = item;
+	    var value = path == null ? item.toString() : item[path].toString();
+      this.views.root.content(value).replace();
       check.call(this);
+      this.onDataOut(item,path);
     };
 
     CheckListItemController.prototype.toggle = function(dataItem){
@@ -101,9 +101,9 @@ sjs({
     // apply check mark class
     function check(){
       if(this.dataItem.ischecked === true) {
-        dom(this.concrete.dom).class.add('checked');
+        this.views.root.class('checked').add();
       } else {
-        dom(this.concrete.dom).class.remove('checked');
+        this.views.root.class('checked').remove();
       }
     }
 
