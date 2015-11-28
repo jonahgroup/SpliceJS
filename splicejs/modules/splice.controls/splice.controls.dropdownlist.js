@@ -48,7 +48,7 @@ sjs({
 	DropDownListController.prototype.dropDown = function(){
 		if(this.dataItem) {
 			//this.onListData(this.dataItem);
-			this.onDataIn(this.dataItem, this.dataPath);
+			this.onDataOut(this.dataItem, this.dataPath);
 		}
 		this.onDropDown();
 	};

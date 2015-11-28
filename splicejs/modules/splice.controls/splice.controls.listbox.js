@@ -29,8 +29,6 @@ definition:function(sjs){
 				onDataItem : event.multicast,
 				onResize   : event.multicast
 			});
-
-
 	}).extend(UIControl);
 
 
@@ -167,7 +165,7 @@ definition:function(sjs){
 
 		// call parent implementation of dataIn
 		this.super(UIControl).dataIn(item,path);
-		this.onData(item,path);
+		this.onDataOut(item,path);
 	};
 
 
@@ -217,12 +215,12 @@ definition:function(sjs){
 
 	exports.scope(
 		ListBoxController
-	)
+	);
 
 	//exporting objects
 	exports.module(
 		ListItemController, ListBoxController, ListBox
-	)
+	);
 
 }
 

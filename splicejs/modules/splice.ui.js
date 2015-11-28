@@ -27,8 +27,7 @@ definition:function(sjs){
 		this.super(args);
 
 		event(this).attach({
-			dataOut  : event.multicast,
-			onDataIn : event.multicast,
+			onDataOut  : event.multicast,
 			onReflow : event.multicast
 		});
 
@@ -85,7 +84,7 @@ definition:function(sjs){
 	UIControl.prototype.dataIn = function(data, path){
 		this.dataItem = data;
 		this.dataPath = path;
-		this.onDataIn(this.dataItem,this.dataPath);
+		this.onDataOut(this.dataItem,this.dataPath);
 	};
 
 

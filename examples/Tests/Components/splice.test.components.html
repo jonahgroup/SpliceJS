@@ -52,7 +52,7 @@
 
 <!-- Templated ComboBox-->
 <tr>
-  <td>Templated ComboBox</td>
+  <td>Templated ComboBox - Button</td>
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
       {
@@ -63,6 +63,13 @@
           itemTemplate:<sjs-include sjs-type="ComboBoxTestItem"></sjs-include>
       }
     </sjs-include>
+  </td>
+</tr>
+
+<!-- Another Component -->
+<tr>
+  <td>Templated ComboBox - Text Field</td>
+  <td>
     <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
       {
           default:'Please select an item',
@@ -75,6 +82,15 @@
   </td>
 </tr>
 
+<!-- DropDown Check List -->
+<tr>
+  <td>DropDown Check List</td>
+  <td>
+    <sjs-include sjs-type="SpliceJS.Controls.CheckListBox">{
+      dataIn: binding('onProvinces').parent,
+    }</sjs-include>
+  </td>
+</tr>
 
 
 <!-- Another Component -->

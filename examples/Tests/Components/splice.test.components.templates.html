@@ -2,7 +2,7 @@
   <div style="white-space:nowrap; border-bottom:1px solid #444444;">
     <sjs-include sjs-type="SpliceJS.Controls.Button">
       {
-        dataIn:binding('onData').parent
+        dataIn:binding('onDataOut').parent
       }
     </sjs-include>
   </div>
@@ -12,7 +12,7 @@
   <div style="white-space:nowrap; border-bottom:1px solid #444444;">
     <sjs-include sjs-type="SpliceJS.Controls.TextField">
       {
-        dataIn:binding('onData').parent,
+        dataIn:binding('onDataOut').parent,
         trapMouseInput:true
       }
     </sjs-include>

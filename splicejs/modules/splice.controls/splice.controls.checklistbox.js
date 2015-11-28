@@ -25,13 +25,12 @@ sjs({
     , dom = this.scope.Doc.dom
     , components = this.scope.components;
 
-    var ListBoxController = scope.SpliceJS.Controls.ListBoxController
-    , ListItem = scope.components.CheckListBoxItem;
+    var ListItem = scope.components.CheckListBoxItem;
 
 
     var CheckListBoxController = Class(function CheckListBoxController(args){
       this.super(args);
-    }).extend(ListBoxController);
+    }).extend(scope.SpliceJS.Controls.ListBoxController);
 
     CheckListBoxController.prototype.onSelection = Event;
 
@@ -39,7 +38,7 @@ sjs({
       Check list element item
     */
     var CheckListItemController = Class(function CheckListItemController(){
-    });
+    }).extend();
 
     CheckListItemController.prototype.dataIn = function(dataItem){
 
@@ -108,9 +107,13 @@ sjs({
       }
     }
 
+    exports.scope (
+      CheckListBox , CheckListBoxController, CheckListItemController
+    );
+
     // module exports
     exports.module (
-      CheckListBox , CheckListItemController
+      CheckListBox , CheckListBoxController, CheckListItemController
     );
 
   }
