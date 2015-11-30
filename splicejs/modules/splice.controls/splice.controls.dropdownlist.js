@@ -41,9 +41,12 @@ sjs({
 		this.onDataItem.subscribe(function(item){
 			this.ref.selector.close();
 		},this);
-
 	};
 
+
+	DropDownListController.prototype.onDataIn = function(){
+		//do nothing
+	};
 
 	DropDownListController.prototype.dropDown = function(){
 		if(this.dataItem) {

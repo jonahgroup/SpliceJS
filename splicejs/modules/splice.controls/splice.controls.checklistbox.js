@@ -19,20 +19,19 @@ sjs({
 
     var scope = this.scope
     , Class = sjs.Class
-    , Event = sjs.Event
+    , event = sjs.event
     , proxy = sjs.proxy
     , exports = sjs.exports
     , dom = this.scope.Doc.dom
     , components = this.scope.components;
 
-    var ListItem = scope.components.CheckListBoxItem;
-
 
     var CheckListBoxController = Class(function CheckListBoxController(args){
       this.super(args);
+      event(this).attach({
+        onSelection : event.multicast
+      });
     }).extend(scope.SpliceJS.Controls.ListBoxController);
-
-    CheckListBoxController.prototype.onSelection = Event;
 
     /*
       Check list element item
@@ -41,21 +40,16 @@ sjs({
       this.super();
     }).extend(scope.SpliceJS.Controls.ListItemController);
 
-    CheckListItemController.prototype.dataIn = function(item, path){
+    CheckListItemController.prototype.onDataIn = function(item){
       if(!item) return;
-      //same item, dont do anything
-      if(this.dataItem === item) return;
-
-      this.dataItem = item;
-	    var value = path == null ? item.toString() : item[path].toString();
-      this.views.root.content(value).replace();
-      check.call(this);
-      this.onDataOut(item,path);
+      this.views.root.content(item.getValue()).replace();
+      _check.call(this);
+      this.onDataOut(item);
     };
 
     CheckListItemController.prototype.toggle = function(dataItem){
       this.dataItem.ischecked = !this.dataItem.ischecked;
-      check.call(this);
+      _check.call(this);
     };
 
 
@@ -64,7 +58,7 @@ sjs({
       var listBox = null;
 
       if(!this.itemTemplate){
-        args.itemTemplate = ListItem;
+        args.itemTemplate = scope.components.CheckListBoxItem;
       } else {
         args.itemTemplate = this.itemTemplate;
       }
@@ -99,8 +93,8 @@ sjs({
     }
 
     // apply check mark class
-    function check(){
-      if(this.dataItem.ischecked === true) {
+    function _check(){
+      if(this.dataItem.getValue().ischecked === true) {
         this.views.root.class('checked').add();
       } else {
         this.views.root.class('checked').remove();

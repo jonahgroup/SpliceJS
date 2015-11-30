@@ -81,13 +81,57 @@ definition:function(sjs){
 			this.show();
 	};
 
-	UIControl.prototype.dataIn = function(data, path){
-		this.dataItem = data;
-		this.dataPath = path;
-		this.onDataOut(this.dataItem,this.dataPath);
+	UIControl.prototype.dataIn = function(item, path){
+
+		var p = null;
+		if(this.dataPath != null && path != null)
+		 	p = path + '.' + this.dataPath;
+		else if(path != null) p = path;
+		else if(this.dataPath != null) p = this.dataPath;
+
+
+		if(item instanceof DataItem) {
+			if(p != null) {
+				this.dataItem = new DataItem(item.getValue(),p);
+				this.onDataIn(this.dataItem);
+			}
+			else {
+				this.dataItem = item;
+				this.onDataIn(item); //passthrough
+			}
+			return;
+		}
+		// datapath is only set externally
+		this.dataItem = new DataItem(item, p);
+		// invode data-item handler
+		this.onDataIn(this.dataItem);
+	};
+
+	UIControl.prototype.onDataIn = function(data){
+		this.onDataOut(data);
 	};
 
 
+	var DataItem = function DataItem(data, path){
+		this.source = this.refsource = data;
+
+		if(path == null || path === '') return this;
+		var parts = path.toString().split('.');
+		for(var i=0; i<parts.length-1; i++){
+			this.refsource = this.refsource[parts[i]];
+		}
+		this.refpath = parts[parts.length-1];
+	};
+
+	DataItem.prototype.getValue = function(){
+		if(!this.refpath) return this.refsource;
+		return this.refsource[this.refpath];
+	}
+
+	DataItem.prototype.setValue = function(value){
+		if(!this.refpath) return;
+		this.refsource[this.refpath] = value;
+	}
 
 	/**
 	 * Called by the layout manager or a parent view when container dimensions changed and

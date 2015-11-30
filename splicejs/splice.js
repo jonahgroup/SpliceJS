@@ -234,6 +234,29 @@ var sjs = (function(window, document){
 		return asrc;
 	};
 
+	function valueGetter(obj, path) {
+		if(path == null) return (new Function('return this;')).bind(obj);
+		var parts = path.toString().split('.');
+    var stmnt = 'return this';
+    for(var i=0; i < parts.length; i++){
+      stmnt+='[\''+parts[i]+'\']';
+    }
+    stmnt+=';';
+    return (new Function(stmnt)).bind(obj);
+  };
+
+	function valueSetter(obj, path){
+		if(path == null) return (new Function('throw "No setter path exception"')).bind(obj);
+
+		var parts = path.toString().split('.');
+		var stmnt = 'this';
+		for(var i=0; i < parts.length; i++){
+			stmnt+='[\''+parts[i]+'\']';
+		}
+		stmnt+='=v;';
+		return (new Function('v',stmnt)).bind(obj);
+	};
+
 
 	/*
 	 * Returns function's name
@@ -2730,10 +2753,10 @@ function Controller(){
 		//instance if a concrete == template instance
 		instance.applyContent(parameters.content, controllerInstance, scope, true);
 
-
-		if(typeof controllerInstance.handleContent === 'function'){
-			controllerInstance.handleContent(parameters.content);
-		}
+		/*
+			build content map before child components are resolved
+		*/
+		var rootContentMap = buildContentMap(deepClone);
 
 		/*
 		 * Anchor elements with data-sjs-tmp-anchor attibute
@@ -2744,7 +2767,8 @@ function Controller(){
 
 		//instance.breakout();
 		/*build views*/
-		views.root = new View(deepClone.children[0]);
+		views.root = new View(deepClone.children[0],{simple:true});
+		views.root.contentMap = rootContentMap;
 		views.root.htmlElement.__sjs_controller__ = controllerInstance;
 		controllerInstance.views = views;
 
@@ -3648,7 +3672,8 @@ function Controller(){
 		proxy	: proxy,
 		propvalue : propertyValue,
 		async: runAsync,
-
+		getter: valueGetter,
+		setter: valueSetter,
 		view:function(d){
 			if(!d) return _viewQueryMode();
 			return new View(d);

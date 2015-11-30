@@ -69,12 +69,9 @@ definition:function(sjs){
 	};
 
 
-	ListBoxController.prototype.dataIn = function(dataItem,dataPath){
-		this.dataItem = dataItem;
-		this.dataPath = dataPath;
-		//this.dom.clear();
-
-		var item = null;
+	ListBoxController.prototype.onDataIn = function(inData){
+		var dataItem = inData.getValue()
+		, item = null;
 
 		// update existing items if any
 		for(var i=0; i<this.listItems.length; i++){
@@ -87,19 +84,13 @@ definition:function(sjs){
 			}
 		}
 
-
 		// add new items
 		for(var i= this.listItems.length; i<dataItem.length; i++) {
 			if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
 				this.listItems.push(item);
 
-				if(this.dataPath){
-					item.dataIn(sjs.propvalue(this.dataItem[i])(this.dataPath).value);
-				} else {
-					item.dataIn(this.dataItem,i);
-				}
-
+				item.dataIn(this.dataItem,i);
 				item.views.root.htmlElement.__sjs_item_index__ = i;
 
 				this.dom.content(item.views.root).add();
@@ -128,11 +119,7 @@ definition:function(sjs){
 
 	DefaultListItem.prototype.dataIn = function(item, path){
 		if(!item) return;
-		this.dataItem = item;
-		this.dataPath = path;
-
-		var value = path == null ? item.toString() : item[path].toString();
-		this.views.root.content(value).replace();
+		this.views.root.content(item.getValue()[path]).replace();
 	};
 
 
@@ -157,15 +144,11 @@ definition:function(sjs){
 	};
 
 
-	ListItemController.prototype.dataIn = function(item, path){
+	ListItemController.prototype.onDataIn = function(item){
 		if(!item) return;
-
-		var value = path == null ? item.toString() : item[path].toString();
-		this.views.root.content(value).replace();
-
+		this.views.root.content(item.getValue()).replace();
 		// call parent implementation of dataIn
-		this.super(UIControl).dataIn(item,path);
-		this.onDataOut(item,path);
+		this.onDataOut(item);
 	};
 
 

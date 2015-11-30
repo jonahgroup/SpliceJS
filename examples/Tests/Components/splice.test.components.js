@@ -98,6 +98,20 @@ definition:function(sjs){
   }
 
 
+  var foo = function foo(obj, path) {
+    var parts = path.split('.');
+    var stmnt = 'return this';
+    for(var i=0; i < parts.length; i++){
+      stmnt+='[\''+parts[i]+'\']';
+    }
+    stmnt+=';';
+
+    var fn = (new Function(stmnt)).bind(obj);
+    return fn;
+  };
+
+
+
   //scope exports
   exports.scope(
     ComponentsTest
@@ -105,7 +119,7 @@ definition:function(sjs){
 
   //module exports
   exports.module(
-    ComponentsTest
+    ComponentsTest, foo
   );
 
 }
