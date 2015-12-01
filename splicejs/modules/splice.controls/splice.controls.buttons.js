@@ -106,16 +106,9 @@ definition:function(sjs){
 		},this);
 	}
 
-	CheckBox.prototype.dataIn = function(dataItem){
-		this.dataItem = dataItem;
-
-		if(this.dataPath) {
-			this.isChecked = sjs.propvalue(this.dataItem)(this.dataPath).value;
-		} else {
-			this.isChecked = this.dataItem['checked'];
-		}
+	CheckBox.prototype.onDataIn = function(dataItem){
+		this.isChecked = dataItem.getValue() === true ? true : false;
 		this.check(this.isChecked);
-
 	};
 
 	CheckBox.prototype.check = function(isChecked){

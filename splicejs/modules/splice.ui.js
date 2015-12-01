@@ -399,6 +399,7 @@ definition:function(sjs){
 	//module exports
 	exports.module(
 		UIControl, UIElement, KeyListener,
+		DataItem,
 		//singletons
 		{Positioning : Positioning},
 		{DragAndDrop : DragAndDrop}

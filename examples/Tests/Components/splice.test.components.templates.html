@@ -10,8 +10,15 @@
 
 <sjs-component sjs-type="ComboBoxTestItem2" sjs-controller="SpliceJS.Controls.ListItemController">
   <div style="white-space:nowrap; border-bottom:1px solid #444444;">
-    <sjs-include sjs-type="SpliceJS.Controls.TextField">
+    <sjs-include sjs-type="SpliceJS.Controls.CheckBox" sjs-class="-vertical-align">
       {
+        dataPath:'isChecked',
+        dataIn:binding('onDataOut').parent
+      }
+    </sjs-include>
+    <sjs-include sjs-type="SpliceJS.Controls.TextField" sjs-class="-frameless-textbox">
+      {
+        dataPath:'name',
         dataIn:binding('onDataOut').parent,
         trapMouseInput:true
       }

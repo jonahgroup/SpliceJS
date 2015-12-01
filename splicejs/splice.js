@@ -548,9 +548,12 @@ function addContent(content,key){
 
 function replaceContent(content,key){
 	if(!key) key = 'default';
-	if(!this.contentMap[key]) return;
+	//coercive comparision, checks null and undefined
+	if(this.contentMap[key] == null ) return;
 
-	if(typeof content === 'string' || typeof content === 'number'){
+	if(	typeof content === 'string' ||
+			typeof content === 'number' ||
+			typeof content === 'boolean'){
 			var target = this.contentMap[key].cache;
 			if(!target) {
 				this.contentMap[key].source.innerHTML = '';

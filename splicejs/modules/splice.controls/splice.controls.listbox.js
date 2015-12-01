@@ -18,6 +18,7 @@ definition:function(sjs){
 	, 	components = this.scope.components;
 
 	var	UIControl = this.scope.SpliceJS.UI.UIControl
+	,		DataItem = this.scope.SpliceJS.UI.DataItem
 	,		dom = this.scope.Doc.dom;
 
 	var ListBoxController = Class(function ListBoxController(){
@@ -76,12 +77,10 @@ definition:function(sjs){
 		// update existing items if any
 		for(var i=0; i<this.listItems.length; i++){
 			var item = this.listItems[i];
-
-			if(this.dataPath){
-				item.dataIn(sjs.propvalue(this.dataItem[i])(this.dataPath).value);
-			} else {
-				item.dataIn(this.dataItem,i);
-			}
+			if(this.dataItemPath)
+			 item.dataIn(dataItem[i],this.dataItemPath);
+			else
+			 item.dataIn(dataItem,i);
 		}
 
 		// add new items
@@ -89,8 +88,11 @@ definition:function(sjs){
 			if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
 				this.listItems.push(item);
+				if(this.dataItemPath)
+				 	item.dataIn(dataItem[i],this.dataItemPath);
+				else
+					item.dataIn(dataItem,i);
 
-				item.dataIn(this.dataItem,i);
 				item.views.root.htmlElement.__sjs_item_index__ = i;
 
 				this.dom.content(item.views.root).add();
@@ -119,8 +121,13 @@ definition:function(sjs){
 
 	DefaultListItem.prototype.dataIn = function(item, path){
 		if(!item) return;
-		this.views.root.content(item.getValue()[path]).replace();
+		//call UIControl's implemenration os the dataIn
+		UIControl.prototype.dataIn.call(this,item,path);
 	};
+
+	DefaultListItem.prototype.onDataIn = function(item){
+		this.views.root.content(item.getValue()).replace();
+	}
 
 
 

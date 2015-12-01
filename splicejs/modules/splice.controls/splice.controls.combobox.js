@@ -15,6 +15,11 @@ sjs({
     var ComboBox = Class(function ComboBox(args){
 
         this.dropDownList = new DropDownList(args);
+
+        if(args.dataItemPath){
+          this.dropDownList.dataItemPath = args.dataItemPath;
+        }
+
         //default selection
         if(this.default){
           if(this.dataPath) {

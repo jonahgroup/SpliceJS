@@ -34,6 +34,15 @@ definition:function(sjs){
     'Saskatchewan', 'Prince Edward Island','Newfoundland'
   ];
 
+
+  var provinces2 = [
+    {name:'Ontario', isChecked:false},
+    {name:'Alberta', isChecked:true},
+    {name:'British Columbia', isChecked:true},
+    {name:'Quebec', isChecked:true}
+  ];
+
+
   var charts = [
     {plot:'Bar',name:'series1',data:[10,20,5,23]},
     {plot:'Line',name:'series1',data:[10,20,5,23]}
@@ -67,7 +76,7 @@ definition:function(sjs){
 
   ComponentsTest.prototype.initialize = function(){
     this.onDisplay.subscribe(function(){
-      this.onProvinces(provinces);
+      this.onProvinces(provinces2);
       this.onChartsData(charts);
       this.onScatterChartData(scatterChart);
       this.onTestCheck(this.sourceTestCheck);
