@@ -16,8 +16,13 @@ sjs({
 
         this.dropDownList = new DropDownList(args);
 
+        //passthrough dataItemPath
         if(args.dataItemPath){
           this.dropDownList.dataItemPath = args.dataItemPath;
+        }
+        //passthrough selector data path
+        if(args.selectorDataPath){
+          this.dropDownList.selectorDataPath = args.selectorDataPath;
         }
 
         //default selection

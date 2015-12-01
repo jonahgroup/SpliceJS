@@ -20,7 +20,8 @@ definition:function(sjs){
 
 	/* dependency imports */
 	var	Positioning = scope.SpliceJS.UI.Positioning
-	,	dom = scope.Doc.dom;
+	,	dom = scope.Doc.dom
+	,	UIControl = scope.SpliceJS.UI.UIControl;
 
 	//static single instance
 	var dropDownContainer = new scope.components.DropDownContainerResizable()
@@ -58,12 +59,14 @@ definition:function(sjs){
 
 	};
 
-	DropDownController.prototype.dataIn = function(data){
-		this.data = data;
+	DropDownController.prototype.dataIn = function(data,path){
 		if(!this.isIgnoreSelector)
-			this.elements.selector.innerHTML = data.toString();
+		UIControl.prototype.dataIn.call(this,data,path);
 	};
 
+	DropDownController.prototype.onDataIn = function(dataItem){
+		this.elements.selector.innerHTML = dataItem.getValue();
+	};
 
 	DropDownController.prototype.close = function () {
 	    _hide();

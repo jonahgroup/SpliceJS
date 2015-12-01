@@ -66,7 +66,7 @@ definition:function(sjs){
 		this.onListItem(this.listItems[idx]);
 
 		//notify on data item
-		this.onDataItem(this.dataItem[idx]);
+		this.onDataItem(this.dataItem.getValue()[idx]);
 	};
 
 

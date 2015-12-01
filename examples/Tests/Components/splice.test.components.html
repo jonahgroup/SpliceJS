@@ -76,6 +76,7 @@
     <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
       {
           default:'Please select an item',
+          selectorDataPath:'name',
           dataIn: binding('onProvinces').parent,
           onDataItem: binding('provinceSelected').parent,
           css:{list: 'test-drop-down-list'},
