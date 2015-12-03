@@ -2536,117 +2536,6 @@ function Controller(){
 	};
 
 
-	var Concrete = function Concrete(dom){
-		this.dom = dom;
-	};
-
-
-	Concrete.prototype.export = function(){
-		return this.dom;
-	};
-
-	Concrete.prototype.breakout = function(){
-		if(this.dom.children.length == 1){
-			this.dom = this.dom.children[0];
-		}
-	};
-	/**
-	 *	@param {Namespace} scope
-	 */
-	Concrete.prototype.applyContent = function(content, instance, scope, suspendNotify){
-
-		var deepClone = this.dom;
-		var controllerInstance = this.controllerInstance;
-
-		if(content instanceof Binding){
-			var targetInstance = content.getTargetInstance(instance,scope);
-			content = targetInstance.__sjs_args__.content;
-			if(content == null || !content) return;
-		}
-
-		if(!this.contentMap) {
-			var contentNodes = selectTextNodes(deepClone, function(node){
-				if(node.nodeValue.indexOf('@') === 0) //starts with
-					return node;
-				return null;
-			});
-
-			//build content nodes key map
-			if(!contentNodes) return;
-
-			this.contentMap = {};
-			for(var i=0; i < contentNodes.length; i++){
-				var key = contentNodes[i].nodeValue.substring(1);
-				this.contentMap[key] = contentNodes[i];
-			}
-		}
-
-		var contentMap = this.contentMap;
-		var keys = Object.keys(contentMap);
-		for(var i=0; i < keys.length; i++ ){
-
-			var key = keys[i];
-			var obj = content[key];
-			var newNode = null;
-
-			/* proxy object, could be another control */
-			if(typeof obj === 'function') {
-				var contentInstance = new obj({parent:controllerInstance});
-				if(contentInstance.concrete) {
-
-					newNode = contentInstance.concrete.export();
-					if(newNode instanceof Array) {
-						var parentNode = contentNodes[i].parentNode;
-						var child = newNode[0];
-
-						if(isHTMLElement(child))
-						parentNode.replaceChild(child, contentNodes[i]);
-
-						for( var n = 1; n < newNode.length; n++){
-							var sibling = child.nextSibling;
-							var child = newNode[n];
-							if(isHTMLElement(child))
-							parentNode.insertBefore(child,sibling);
-						}
-					} else {
-						contentNodes[i].parentNode.replaceChild(newNode, contentNodes[i]);
-					}
-
-					if(suspendNotify) continue;
-					if(contentInstance.onAttach) contentInstance.onAttach();
-					if(contentInstance.onDisplay) contentInstance.onDisplay();
-
-					continue;
-				}
-			} else
-
-			if(obj instanceof Controller){
-				obj.parent = controllerInstance;
-				controllerInstance.children.push(obj);
-				// resolve bindings
-
-				newNode = obj.concrete.export();
-			} else
-
-			if(typeof obj === 'string'){
-				newNode = document.createTextNode(obj);
-			} else
-
-			if(typeof obj === 'number'){
-				newNode = document.createTextNode(obj);
-			}
-
-
-
-			if(!newNode) continue;
-
-			contentMap[key].parentNode.replaceChild(newNode, contentMap[key]);
-			contentMap[key] = newNode;
-		}
-
-	};
-
-
 	function Template(dom){
 		if(!dom) throw 'Template constructor argument must be a DOM element';
 		this.dom = dom;
@@ -2718,8 +2607,6 @@ function Controller(){
 		var deepClone = build.cloneNode(true);
 		deepClone.normalize();
 
-		var instance = new Concrete(deepClone);
-		instance.controllerInstance = controllerInstance;
 
 
 		/* process dom references */
@@ -2748,14 +2635,6 @@ function Controller(){
 
 	//	controllerInstance.__sjs_content_map__ = buildContentMap(instance.dom);
 
-	   /*
-		* Handle content declaration
-		* Getcontent nodes
-		*/
-		if(parameters.content)
-		//instance if a concrete == template instance
-		instance.applyContent(parameters.content, controllerInstance, scope, true);
-
 		/*
 			build content map before child components are resolved
 		*/
@@ -2768,12 +2647,20 @@ function Controller(){
 		 * */
 		 _processIncludeAnchors.call(this,deepClone,controllerInstance,scope);
 
-		//instance.breakout();
+
 		/*build views*/
 		views.root = new View(deepClone.children[0],{simple:true});
 		views.root.contentMap = rootContentMap;
 		views.root.htmlElement.__sjs_controller__ = controllerInstance;
 		controllerInstance.views = views;
+
+		/*content applicator*/
+		/*
+	 * Handle content declaration
+	 * Getcontent nodes
+	 */
+	 if(parameters.content)
+	 controllerInstance.content(parameters.content, controllerInstance, scope, true);
 
 		//apply style
 		if(views.root){
@@ -2781,8 +2668,6 @@ function Controller(){
 				views.root.class(parameters.class).add();
 		}
 
-
-		return instance;
 	};
 
 

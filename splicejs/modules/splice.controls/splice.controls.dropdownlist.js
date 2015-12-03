@@ -33,35 +33,30 @@ sjs({
 
 
 	DropDownListController.prototype.initialize = function(){
-/*
-		this.onDataIn.subscribe(function(item,path){
-			this.onListData(item,path);
-		},this);
-*/
 		this.onDataItem.subscribe(function(item){
 			this.ref.selector.close();
 		},this);
 	};
 
-
-	DropDownListController.prototype.onDataIn = function(){
-		//do nothing
+	/**
+		Override onDataIn handler to avoid calling onDataOut event
+		DropDownList calls onDataOut event explicitry when
+		drop-down function is activated
+	*/
+	DropDownListController.prototype.onDataIn = function(item){
 	};
 
 	DropDownListController.prototype.dropDown = function(){
 		if(this.dataItem) {
-			//this.onListData(this.dataItem);
-			this.onDataOut(this.dataItem, this.dataPath);
+			this.onDataOut(this.dataItem);
 		}
 		this.onDropDown();
 	};
 
 	DropDownListController.prototype.setSelectedItem = function(item){
-		if(this.dataPath){
-			this.ref.selector.dataIn(sjs.propvalue(item)(this.dataPath).value);
-		} else {
-			this.ref.selector.dataIn(item);
-		}
+
+	this.ref.selector.dataIn(item);
+
 	};
 
 
