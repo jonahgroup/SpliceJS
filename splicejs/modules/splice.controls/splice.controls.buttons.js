@@ -41,15 +41,6 @@ definition:function(sjs){
 		if(this.isDisabled) this.disable();
 	};
 
-	Button.prototype.handleContent = function(content){
-		if(!content) return;
-
-		if(content['label']){
-			this.elements.root.value = content['label'];
-		} else {
-			this.elements.root.value = 'button';
-		}
-	};
 
 	Button.prototype.setLabel = function(label){
 		this.elements.root.value = label;
@@ -68,7 +59,7 @@ definition:function(sjs){
 	};
 
 	Button.prototype.onDataIn = function(item){
-		this.views.root.content(item.getValue()).replace();
+		this.content(item.getValue()).replace();
 	};
 
 	/**

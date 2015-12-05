@@ -38,7 +38,7 @@ definition:function(sjs){
   var provinces2 = [
     {name:'Ontario', isChecked:false},
     {name:'Alberta', isChecked:true},
-    {name:'British Columbia', isChecked:true},
+    {name:'British Columbia', isChecked:true, population:10000},
     {name:'Quebec', isChecked:true}
   ];
 

@@ -42,7 +42,7 @@ sjs({
 
     CheckListItemController.prototype.onDataIn = function(item){
       if(!item) return;
-      this.views.root.content(item.getValue()).replace();
+      this.views.root.replace(item.getValue());
       _check.call(this);
       this.onDataOut(item);
     };

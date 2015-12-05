@@ -2,6 +2,7 @@
   <div style="white-space:nowrap; border-bottom:1px solid #444444;">
     <sjs-include sjs-type="SpliceJS.Controls.Button">
       {
+        dataPath:'name',
         dataIn:binding('onDataOut').parent
       }
     </sjs-include>
@@ -24,4 +25,14 @@
       }
     </sjs-include>
   </div>
+</sjs-component>
+
+<sjs-component sjs-type="ComboBoxTestItem3" sjs-controller="SpliceJS.Controls.ListItemController">
+  <table>
+    <tr>
+      <td sjs-content="name"></td>
+      <td sjs-content="isChecked"></td>
+      <td sjs-content="population"></td>
+    </tr>
+  </table>
 </sjs-component>

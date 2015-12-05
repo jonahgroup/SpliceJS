@@ -65,7 +65,7 @@ definition:function(sjs){
 	};
 
 	DropDownController.prototype.onDataIn = function(dataItem){
-		this.elements.selector.innerHTML = dataItem.getValue();
+		this.views.root.replace(dataItem.getValue(),'selector');
 	};
 
 	DropDownController.prototype.close = function () {
@@ -123,7 +123,7 @@ definition:function(sjs){
 
 		//append drop down to the document root
 		// add content to the content element
-		display(dropDownContainer).content({default:this.dropDownItemInst}).replace();
+		display(dropDownContainer).content(this.dropDownItemInst).replace();
 
 
 		left = pos.x;

@@ -95,7 +95,7 @@ definition:function(sjs){
 
 				item.views.root.htmlElement.__sjs_item_index__ = i;
 
-				this.dom.content(item.views.root).add();
+				this.dom.add(item.views.root);
 				if(typeof item.onAttached == 'function')
 					item.onAttached();
 			}
@@ -126,7 +126,7 @@ definition:function(sjs){
 	};
 
 	DefaultListItem.prototype.onDataIn = function(item){
-		this.views.root.content(item.getValue()).replace();
+		this.views.root.replace(item.getValue());
 	}
 
 
@@ -153,7 +153,7 @@ definition:function(sjs){
 
 	ListItemController.prototype.onDataIn = function(item){
 		if(!item) return;
-		this.views.root.content(item.getValue()).replace();
+		this.content(item.getValue()).replace();
 		// call parent implementation of dataIn
 		this.onDataOut(item);
 	};

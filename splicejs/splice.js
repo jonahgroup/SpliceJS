@@ -521,35 +521,35 @@ View.prototype.controller = function(){
 
 function addContent(content,key){
 	if(!key) key = 'default';
-	if(!this.contentMap[key]) return;
+	if(!this.contentMap[key]) return this;
 
 	var target = this.contentMap[key].source;
 
 	if(typeof content === 'string'){
 		target.appendChild( document.createTextNode(content) );
-		return self;
+		return this;
 	}
 	if(typeof content === 'number'){
 		target.appendChild( document.createTextNode(content) );
-		return self;
+		return this;
 	}
 	if(content instanceof View){
 		target.appendChild( content.htmlElement );
-		return self;
+		return this;
 	}
 	if(content instanceof Controller ){
-		if(!content.views || content.views.root) return;
+		if(!content.views || content.views.root) return this;
 		target.appendChild( content.views.root.htmlElement);
 		content.onAttach();
 		content.onDisplay();
-		return self;
+		return this;
 	}
 };
 
 function replaceContent(content,key){
 	if(!key) key = 'default';
 	//coercive comparision, checks null and undefined
-	if(this.contentMap[key] == null ) return;
+	if(this.contentMap[key] == null ) return this;
 
 	if(	typeof content === 'string' ||
 			typeof content === 'number' ||
@@ -562,7 +562,7 @@ function replaceContent(content,key){
 				this.contentMap[key].source.appendChild(target);
 			}
 			target.nodeValue =content;
-			return;
+			return this;
 	}
 
 	if(content instanceof Controller ){
@@ -574,47 +574,13 @@ function replaceContent(content,key){
 		content.onAttach();
 		content.onDisplay();
 	}
+	return this;
 };
 
 
+View.prototype.add = addContent;
+View.prototype.replace = replaceContent;
 
-View.prototype.content = function(content){
-	var self = this;
-	return {
-		add:function(){
-			//apply content based on the content map
-			if(typeof content === 'string' ||  typeof content === 'number' ||
-			 	 content instanceof View ||  content instanceof Controller){
-				addContent.call(self,content,'default');
-		  }
-			else if(typeof content === 'object' ){
-				if(!self.contentMap) return;
-				var keys = Object.keys(self.contentMap);
-				for(var key in keys){
-					var dc = addContent.call(self,content[keys[key]],keys[key]);
-				}
-			}
-
-			return self;
-		},
-
-		replace:function(){
-			//apply content based on the content map
-			if(typeof content === 'object' ){
-				if(!self.contentMap) return;
-				var keys = Object.keys(self.contentMap);
-				for(var key in keys){
-					var dc = replaceContent.call(self,content[keys[key]],keys[key]);
-				}
-			} else {
-				replaceContent.call(self,content);
-			}
-			return self;
-		}
-
-	}
-
-};
 
 View.prototype.position = function(){
 		var self = this;
@@ -2486,17 +2452,30 @@ function Controller(){
 		this._lastHeight = null;
 	};
 
-	function _controllerContentMapper(content,isReplace){
+	function _controllerContentMapper(content,callback){
 		var view = this.views.root;
+		var type = typeof(content);
 		//no content map, simple view, default map must be present
-		view.content(content).replace();
+		if(content instanceof Controller || content instanceof View ||
+			 type == 'string' || type == 'number' || type == 'boolean') {
+			callback.call(view, content);
+			return this;
+		} else {
+		// composed content, represented by content object's properties
+			var keys = Object.keys(content);
+			for(var i=0; i<keys.length; i++){
+				callback.call(view,content[keys[i]], keys[i]);
+			}
+		}
+		return this;
 	};
 
 	//set content of the controller
 	Controller.prototype.content = function(content){
+		var self = this;
 		return {
-			replace: _controllerContentMapper.bind(this,content,true),
-			add: _controllerContentMapper.bind(this,content)
+			replace: function(){_controllerContentMapper.call(self,content, replaceContent)},
+			add: 		 function(){_controllerContentMapper.call(self,content, addContent)}
 		}
 
 /*
