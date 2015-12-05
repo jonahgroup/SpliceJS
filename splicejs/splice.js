@@ -2639,7 +2639,7 @@ function Controller(){
 	 * Getcontent nodes
 	 */
 	 if(parameters.content)
-	 controllerInstance.content(parameters.content, controllerInstance, scope, true);
+	 controllerInstance.content(parameters.content).replace();
 
 		//apply style
 		if(views.root){
