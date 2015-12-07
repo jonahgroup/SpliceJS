@@ -102,13 +102,25 @@
 </tr>
 
 
-<!-- DropDown Check List -->
+<!-- Check List -->
 <tr>
   <td>Check List</td>
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.CheckListBox">{
       dataIn: binding('onProvinces').parent,
     }</sjs-include>
+  </td>
+</tr>
+
+
+<!-- Another Component -->
+<tr>
+  <td>Grid Layout</td>
+  <td>
+  <div style="position:relative; width:400px; height:300px;">
+    <sjs-include sjs-type="SpliceJS.Controls.GridLayout">
+    </sjs-include>
+  </div>
   </td>
 </tr>
 

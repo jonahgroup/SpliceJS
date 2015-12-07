@@ -6,18 +6,19 @@ required:[
 	'splice.controls.gridlayout.html'
 ],
 
-definition:function(){
+definition:function(sjs){
 	var scope = this.scope
-	,	Class = this.sjs.Class
-	,	Event = this.sjs.Event
-	,	debug = this.sjs.debug
-	,	proxy = this.sjs.proxy;
+	,	exports = sjs.exports
+	,	Class = sjs.Class
+	,	event = sjs.event
+	,	debug = sjs.debug
+	,	proxy = sjs.proxy;
 
 	var UIControl = scope.SpliceJS.UI.UIControl
 	,	DragAndDrop = scope.SpliceJS.UI.DragAndDrop;
 
 
-	var Grid = function(rows,columns){
+	var Grid = function Grid(rows,columns){
 		this.rows 		= rows;
 		this.columns 	= columns;
 
@@ -76,26 +77,18 @@ definition:function(){
 	var CellContainer = Class(function CellContainerController(){
 		this.super();
 
-		//attach events to drive resizing of the cell container
-		var self = this;
-
-		Event.attach(this.elements.leftEdge,'onmousedown').subscribe(
-			function(e){self.onStartResize(e,left);}
-		);
-
-		Event.attach(this.elements.topEdge,'onmousedown').subscribe(
-			function(e){self.onStartResize(e,top);}
-		);
-
-
-		Event.attach(this.elements.rightEdge,'onmousedown').subscribe(
-			function(e){self.onStartResize(e,right);}
-		);
-
-
-		Event.attach(this.elements.bottomEdge,'onmousedown').subscribe(
-			function(e){self.onStartResize(e,bottom);}
-		);
+		event(this).attach({
+			onAdd 				: event.multicast,
+			onStartMove 	:	event.multicast,
+			onMove 	  		: event.multicast,
+			onEndMove 		: event.multicast,
+			onStartResize : event.multicast,
+			onResize 	    : event.multicast,
+			onEndResize   : event.multicast,
+			onCellSize 	  : event.multicast,
+			onRemove 			: event.multicast,
+			onMaximize 		: event.multicast
+		})
 
 		this.onStartResize.subscribe(this.startResize, this);
 		this.onResize.subscribe(this.resize, this);
@@ -104,19 +97,32 @@ definition:function(){
 
 	}).extend(UIControl);
 
-	CellContainer.prototype.onAdd 				= Event;
-	CellContainer.prototype.onStartMove   =	Event;
-	CellContainer.prototype.onMove 	  	  = Event;
-	CellContainer.prototype.onEndMove 	  = Event;
+	CellContainer.prototype.initialize = function(){
+		//initialize user interraction events
+		event(this.views.leftEdge).attach({
+			onmousedown : event.unicast
+		}).onmousedown.subscribe(
+			function(e){this.onStartResize(e,left);}, this
+		);
 
-	CellContainer.prototype.onStartResize = Event;
-	CellContainer.prototype.onResize 	    =	Event;
-	CellContainer.prototype.onEndResize   =	Event;
-	CellContainer.prototype.onCellSize 	  = Event;
+		event(this.views.topEdge).attach({
+			onmousedown : event.unicast
+		}).onmousedown.subscribe(
+			function(e){self.onStartResize(e,top);}, this
+		);
 
-	CellContainer.prototype.onRemove = Event;
-	CellContainer.prototype.onMaximize = Event;
+		event(this.views.rightEdge).attach({
+			onmousedown : event.unicast
+		}).subscribe(
+			function(e){self.onStartResize(e,right);}, this
+		);
 
+		event(this.elements.bottomEdge).attach({
+			onmousedown	:	event.unicast
+		}).subscribe(
+			function(e){self.onStartResize(e,bottom);}, this
+		);
+	};
 
 	CellContainer.prototype.startResize = function(e,direction){
 		debug.log('Resizing in ' + direction + ' direction');
@@ -163,8 +169,12 @@ definition:function(){
 	* @constructor
 	*/
 	var GridLayout = Class(function GridLayoutController(){
+		this.super();
 
-		UIControl.call(this);
+		event(this).attach({
+			onRemoveCell : event.multicast
+		});
+
 
 		/* default gap values */
 		if(!this.margin) 		this.margin = 10;
@@ -174,15 +184,7 @@ definition:function(){
 		if(!this.grid)			this.grid = {columns:2, rows:2};
 		this.grid = new Grid(this.grid.rows, this.grid.columns);
 
-		/*
-			hook into window resize event only if grid layout
-			is configured as a toplevel component
-		*/
-		if(this.attachToWindow === true ) {
-		Event.attach(window,'onresize').subscribe(function(){
-			this.reflow();}
-		,this);
-	 }
+
 
 		// a collection of cells, contained in a null object
 		this.layoutCells = Object.create(null);
@@ -193,7 +195,20 @@ definition:function(){
 
 	}).extend(UIControl);
 
-	GridLayout.prototype.onRemoveCell = Event;
+
+	GridLayout.prototype.initialize = function(){
+		/*
+			hook into window resize event only if grid layout
+			is configured as a toplevel component
+		*/
+		if(this.attachToWindow === true ) {
+			event(window).attach({
+				onresize : event.multicast}
+			).onresize.subscribe(this.reflow	,this);
+	 }
+	};
+
+
 
 	GridLayout.prototype.display = function(){
 
@@ -222,9 +237,6 @@ definition:function(){
 	}
 */
 	function addCell(content, position){
-
-
-
 		if(content instanceof CellContainer){
 			this.layoutCells[content.index] = content;
 
@@ -576,10 +588,13 @@ definition:function(){
 	};
 
 	/* module exports */
-	return  {
+	exports.scope(
+		Grid, CellContainer, GridLayout
+	);
 
-	}
-
+	exports.module(
+		Grid, CellContainer, GridLayout
+	);
 
 }
 
