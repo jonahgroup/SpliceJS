@@ -230,17 +230,16 @@ definition:function(sjs){
 	    	Returns element coordinates in
 	    	document.body coordinate space
 	    */
-	    absPosition: function(obj_element) {
-	        var n = obj_element;
-	    	var location  = new Array(0,0);
+	    abs: function(obj) {
+	      var n = obj;
+				if(obj instanceof sjs.types.View)
+					n = obj.htmlElement;
+				var location  = [0,0];
 
 	    	while (n != undefined) {
-
 	            location[0] += z(n.offsetLeft);
 	            location[1] += z(n.offsetTop);
-
 	            location[1] -= n.scrollTop;
-
 	            n = n.offsetParent;
 			}
 

@@ -64,8 +64,8 @@ definition:function(sjs){
 		UIControl.prototype.dataIn.call(this,data,path);
 	};
 
-	DropDownController.prototype.onDataIn = function(dataItem){
-		this.views.root.replace(dataItem.getValue(),'selector');
+	DropDownController.prototype.onDataIn = function(item){
+		this.views.root.replace(item.getValue(),'selector');
 	};
 
 	DropDownController.prototype.close = function () {
@@ -99,11 +99,11 @@ definition:function(sjs){
 
 	DropDownController.prototype.dropDown = function(){
 
-		var left = this.elements.selector.offsetLeft
-		,	height = this.elements.selector.offsetHeight
+		var left = this.views.selector.htmlElement.offsetLeft
+		,	height = this.views.selector.htmlElement.offsetHeight
 		,	top = height
 		,	s = dropDownContainer.views.root.htmlElement.style
-		,	pos = Positioning.absPosition(this.elements.selector)
+		,	pos = Positioning.abs(this.views.selector)
 		,	self = this
 		;
 
@@ -129,6 +129,7 @@ definition:function(sjs){
 		left = pos.x;
 		top =  height +  pos.y;
 
+		//user to adjust for screen overruns
 		this.dropDownContainerSize.left = left;
 		this.dropDownContainerSize.top = top;
 
@@ -143,21 +144,7 @@ definition:function(sjs){
 			onmousedown	:	event.multicast
 		}).onmousedown.subscribe(_offFocusReaper,dropDownContainer);
 
-
-/*
-		// !!!!!! refactor
-		this.onModalClose = event(sjs.view(document.body)).attach({
-			onmousedown : event.multicast
-		}).onmousedown;
-
-		// close on body mouse down
-		this.onModalClose.push().subscribe(hide, this).cleanup(function (event) {
-			event.unsubscribe(hide);
-			event.pop();
-		}, this);
-*/
 		this.onDropDown(this.data);
-
 
 	};
 

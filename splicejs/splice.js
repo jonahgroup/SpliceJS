@@ -3561,6 +3561,10 @@ function Controller(){
 		Class : Class,
 		Controller : Controller,
 		SplashScreenController : SplashScreenController,
+		types : {
+			View:View,
+			Controller:Controller
+		},
 
 		prototype:prototype,
 
