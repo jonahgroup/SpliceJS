@@ -34,12 +34,12 @@ definition:function(sjs){
 	var scope = this.scope;
 
 	/* imports */
-	var Class = sjs.Class
-	, 	Event = sjs.Event;
+	var Class 	= sjs.Class
+	, 	event 	= sjs.event
+	,		exports = sjs.exports;
 
 
 	var UIControl = scope.SpliceJS.UI.UIControl;
-
 
 	/*
 	 *	Image Selector
@@ -81,54 +81,54 @@ definition:function(sjs){
 		this.onClose();
 	};
 
-
+	
 	// module exports
-	return {
+	exports.module(
 		/* utility controls */
-		UIControl:			scope.SpliceJS.UI.UIControl,
-		DomIterator: 		scope.Controllers.DomIterator,
-		ImageSelector:  	ImageSelector,
+		{UIControl:			scope.SpliceJS.UI.UIControl},
+		{DomIterator: 		scope.Controllers.DomIterator},
+		{ImageSelector:  	ImageSelector},
 		/* buttons */
-		Button:				scope.Buttons.Button,
-		CheckBox:			scope.Buttons.CheckBox,
-		RadioButton:		scope.Buttons.RadioButton,
-		TextField:			scope.Buttons.TextField,
-		Slider:				scope.Buttons.Slider,
+		{Button:				scope.Buttons.Button},
+		{CheckBox:			scope.Buttons.CheckBox},
+		{RadioButton:		scope.Buttons.RadioButton},
+		{TextField:			scope.Buttons.TextField},
+		{Slider:				scope.Buttons.Slider},
 		/* panels */
 
-		DrawerPanel:		scope.Panels.DrawerPanel,
-		ViewPanel:			scope.Panels.ViewPanel,
-		ScrollPanel:		scope.Panels.ScrollPanel,
+		{DrawerPanel:		scope.Panels.DrawerPanel},
+		{ViewPanel:			scope.Panels.ViewPanel},
+		{ScrollPanel:		scope.Panels.ScrollPanel},
 		/* charts */
-		Chart:				scope.Charts.Chart,
-		Dial:				scope.Charts.Dial,
-		GridLayout:         scope.Grids.GridLayout,
-    CellContainer:      scope.Grids.CellContainer,
-		D3Canvas:			scope.Charts.D3Canvas,
-		Map:				scope.Maps.Map,
+		{Chart:				scope.Charts.Chart},
+		{Dial:				scope.Charts.Dial},
+		{GridLayout:         scope.Grids.GridLayout},
+    {CellContainer:      scope.Grids.CellContainer},
+		{D3Canvas:			scope.Charts.D3Canvas},
+		{Map:				scope.Maps.Map},
 		/* selectors */
-		DropDownSelector:	scope.Selectors.DropDownSelector,
-		DropDownList:		scope.Selectors.DropDownList,
-		DatePicker:			scope.Selectors.DatePicker,
-		Calendar:			scope.Selectors.Calendar,
+		{DropDownSelector:	scope.Selectors.DropDownSelector},
+		{DropDownList:		scope.Selectors.DropDownList},
+		{DatePicker:			scope.Selectors.DatePicker},
+		{Calendar:			scope.Selectors.Calendar},
 		/* data controls */
-		DataTable:			scope.DataControls.DataTable,
-		DataTableRow:		scope.DataControls.DataTableRow,
-		ListBox:			scope.DataControls.ListBox,
-		ListItem:			scope.DataControls.ListItem,
-		ScrollableListBox:	scope.DataControls.ScrollableListBox,
-		StretchListBox:			scope.DataControls.StretchListBox,
-		GroupedListItem:		scope.DataControls.GroupedListItem,
-		TreeView:						scope.DataControls.TreeView,
-		TreeTable:					scope.DataControls.TreeTable,
+		{DataTable:			scope.DataControls.DataTable},
+		{DataTableRow:		scope.DataControls.DataTableRow},
+		{ListBox:			scope.DataControls.ListBox},
+		{ListItem:			scope.DataControls.ListItem},
+		{ScrollableListBox:	scope.DataControls.ScrollableListBox},
+		{StretchListBox:			scope.DataControls.StretchListBox},
+		{GroupedListItem:		scope.DataControls.GroupedListItem},
+		{TreeView:						scope.DataControls.TreeView},
+		{TreeTable:					scope.DataControls.TreeTable},
 		/* Navigation */
-		Popup:					scope.Navigation.Popup,
-		PageLoader:			scope.Navigation.PageLoader,
-		ToolTip:				scope.Navigation.ToolTip,
+		{Popup:					scope.Navigation.Popup},
+		{PageLoader:			scope.Navigation.PageLoader},
+		{ToolTip:				scope.Navigation.ToolTip},
 		/* Editors */
-		CodeEditor:			scope.Editors.CodeEditor
+		{CodeEditor:			scope.Editors.CodeEditor}
 
-	}
+	);
 
 // end module definition
 }});

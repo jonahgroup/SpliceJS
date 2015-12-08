@@ -193,13 +193,13 @@ definition:function(sjs){
 	 */
 	var UIElement = Class(function UIElement(args){
 		this.super();
-		var self = this;
-		this.concrete.dom.onclick = function(){
-			self.onClick(self);
-		}
+		event(this).attach({onClick : event.multicast});
 	}).extend(UIControl);
 
-	UIElement.prototype.onClick = Event;
+	UIElement.prototype.initialize = function(){
+		event(this.views.root).attach({onclick : event.unicast})
+		.onclick.subscribe(function(){this.onClick(this);}, this);
+	};
 
 
 	/*

@@ -34,7 +34,7 @@ sjs({
 
 	DropDownListController.prototype.initialize = function(){
 		this.onDataItem.subscribe(function(item){
-			this.ref.selector.close();
+			this.children.selector.close();
 		},this);
 	};
 
@@ -54,12 +54,8 @@ sjs({
 	};
 
 	DropDownListController.prototype.setSelectedItem = function(item){
-
-	this.ref.selector.dataIn(item);
-
+		this.children.selector.dataIn(item);
 	};
-
-
 
 
 	/* scope exports for component consumption*/
@@ -71,6 +67,5 @@ sjs({
 	exports.module(
 		DropDownListController
 	);
-
 
 }});

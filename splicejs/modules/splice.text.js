@@ -1,6 +1,6 @@
-	
+
 sjs({
-definition:function(){
+definition:function(sjs){
 
 var STRINGBODY = 0
 , 	FORMAT = 1
@@ -37,10 +37,9 @@ FormatLexer.prototype.consume = function(){
 
 
 function isSpace(c){
-	if(	c === ' ' 	|| 
-		c === '\n'	||
-		c === '\r'  ||	
-		c === '\t') return true;
+	if(	c === ' ' 	||		c === '\n'	||
+		c === '\r'  ||
+	c === '\t') return true;
 };
 
 function isDigit(c){
@@ -60,16 +59,15 @@ function isLetter(c){
 
 	if(	(code >= 65 && code <= 90 ) || 	/*A-Z*/
 		(code >= 97 && code <= 122) 	/*a-z*/) return true;
-	return false;	
+	return false;
 }
 
 
 function isSymbol(c){
 	var code = c.charCodeAt();
 	if(!isLetter(c) && !isDigit(c)) return true;
-	return false;	
+	return false;
 }
-
 
 function whitespace(){
 	while(isSpace(this.c)) this.consume();
@@ -77,9 +75,9 @@ function whitespace(){
 
 function stringbody(){
 	var result = '';
-	while(this.c != '{' && !this.isEOF) { 
-	
-		result+=this.consume();
+	while(this.c != '{' && !this.isEOF) {
+
+	reult+=this.consume();
 
 		/*process escape sequence*/
 		if(this.c == '\\') {
@@ -100,7 +98,7 @@ function formatsequence(){
 	}
 
 	if(this.c != '}') throw 'Invalid format syntax, { and } must be escaped';
-	
+
 	this.consume(); // consume }
 	return [FORMAT, result];
 }
@@ -192,7 +190,7 @@ FormatLexer.prototype.nextToken = function(){
 
 
 var Fast = function Fast(input){
-	
+
 	this.lex = new FormatLexer(input,true);
 	this.consume();
 
@@ -212,27 +210,27 @@ Fast.prototype.isToken = function(value){
 
 
 Fast.prototype.exec = function(valueArgs){
-	
+
 	var result = '';
 
 	if(this.token[0] == FORMATOPTION){
-	
+
 		var argument = valueArgs[(this.token[1]*1+1)];
 
 		this.consume();
 
 		if(this.token[1] != ':') throw 'Invalid format argument posittion syntax';
-		this.consume(); 
-	} else { 
+		this.consume();
+	} else {
 		throw 'Invalid format argument posittion syntax';
 	}
 
-	
+
 
 	while(this.token != null){
 
 		var t = this.token[1];
-	
+
 
 		if(t == '#' || t == '0' || t == '('){
 			return result + numberFormat.call(this, argument);
@@ -253,16 +251,16 @@ function numberFormat(argument){
 	var padding = 0
 	, 	factoring = 0
 	,	precision = 0;
-	
+
 
 	if( this.isToken('(') ) {
 		var b = ['',''];
 		if(argument < 0) b = ['(',')'];
-		
+
 		this.consume();
-		
-		var result = b[0] + numberFormat.call(this, Math.abs(argument)) + b[1]; 
-		
+
+		var result = b[0] + numberFormat.call(this, Math.abs(argument)) + b[1];
+
 		if(this.token[1] != ')') throw 'Invalid format syntax';
 
 		return result;
@@ -283,7 +281,7 @@ function numberFormat(argument){
 		while(this.isToken('#')){
 			factoring++;
 			this.consume();
-		}		
+		}
 	}
 
 	if( this.isToken('.')){
@@ -329,7 +327,7 @@ function numberFormat(argument){
 }
 
 
-//--- Operations 
+//--- Operations
 var formatLookup = {
 	"yyyy":function(d){
 		if(!(d instanceof Date)) return '{error}';
@@ -355,23 +353,23 @@ var formatLookup = {
 	}
 
 };
-	
+
 function dateFormat(value){
 	var result = ""
 	,	token = null;
 
 	while(token = this.token){
-		var fn = formatLookup[token[1]]; 
+		var fn = formatLookup[token[1]];
 		if(fn) {
 			result += fn(value);
-			this.consume();	
+			this.consume();
 			continue;
 		}
 		result += token[1];
 		this.consume();
 	}
 
-	return result;	
+	return result;
 };
 
 
@@ -395,7 +393,7 @@ function processFormat(format, valueArgs){
 
 function format(){
 
-	if(arguments.length < 2) throw 'format(string, values) takes two arguments '; 
+	if(arguments.length < 2) throw 'format(string, values) takes two arguments ';
 
 	var input = arguments[0];
 
@@ -413,7 +411,7 @@ function format(){
 			result += token[1];
 			continue;
 		}
-		
+
 		if(token[0] == FORMAT) {
 
 			result += processFormat(token[1],arguments);
@@ -421,7 +419,7 @@ function format(){
 			nextArgument++;
 			continue;
 		}
-		
+
 		if(count++ > 10000) throw 'Something went wrong';
 	}
 
@@ -431,8 +429,8 @@ function format(){
 
 
 /**
-	* Text manupulation wrapper function	
-	* @text parameter primitive type object String, Number	
+	* Text manupulation wrapper function
+	* @text parameter primitive type object String, Number
 	* @return object supporting text manipulation API
 	*/
 var Text = function(text){
@@ -440,10 +438,10 @@ var Text = function(text){
 
 	return {
 		text:text,
-		
+
 		endswith:function(ending){
 			var matcher = new RegExp("^.+"+ending.replace(/[.]/,"\\$&")+'$');
-			var result = matcher.test(this.text); 
+			var result = matcher.test(this.text);
 			return result;
 		},
 
@@ -454,12 +452,12 @@ var Text = function(text){
 		remword:function(){
 
 			if(arguments.length < 1) return this.text;
-			
-			var parts = this.text.split(/\s/);	
 
-			// process all supplied arguments			
+			var parts = this.text.split(/\s/);
+
+			// process all supplied arguments
 			for(var i=0; i<arguments.length; i++){
-				var arg = arguments[i];		
+				var arg = arguments[i];
 
 				if(typeof arg === 'number' )
 					arg = arg.toString();
@@ -476,10 +474,10 @@ var Text = function(text){
 	/**
 	 *	Builds string by concatinating element of the array and separated
 	 *  by the delimiter. If delimiter is not provided, default delimiter is "space"
-	 */	
+	 */
 		join : function(delimiter){
 			if(!delimiter) delimiter = ' ';
-		
+
 			var runningDelimiter = '';
 			var result = '';
 			for(var i=0; i< this.text.length; i++){
@@ -492,7 +490,7 @@ var Text = function(text){
 
 	/**
 	 *	Counts number of words in the string
-	 */	
+	 */
 		wordcount : function(){
 			var parts = this.text.split(/\s/);
 			if(!parts) return 0;
@@ -511,40 +509,25 @@ var Text = function(text){
 
 		clip : function(text){
 			var index = this.match(new RegExp(text));
-			
+
 			if(!index || index == -1) return this;
 			index = index.index;
-			var result = this.substring(0, index) + this.substring(index + text.length, this.length); 
+			var result = this.substring(0, index) + this.substring(index + text.length, this.length);
 			return  result;
-			
-		},	
+
+		},
 
 	/**
 	 *	Counts number of words in the string
-	 */	
+	 */
 		format : function(){
 
-		}	
+		}
 	};
 };
 
-
-
-
-
-return {
-	format:format,
-	Text:Text
-}
+sjs.exports.module(
+	format, Text
+);
 
 }});
-
-
-
-
-
-
-
-
-
-

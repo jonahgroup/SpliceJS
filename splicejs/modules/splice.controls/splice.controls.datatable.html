@@ -1,12 +1,12 @@
 <!-- Uses native scrolling functionality and maintians static header -->
 <sjs-component  sjs-type="DefaultScrollDataTable" sjs-controller="DataTableController" sjs-export>
 	<div class="-sjs-datatable" style="position:relative;" sjs-element="root">
-		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel" sjs-ref="scrollPanel">{
+		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel" sjs-name="scrollPanel">{
 			content:{
 				scrollContent:<sjs-include  sjs-type="DataTableBody"
-											sjs-ref="binding('body').type('DefaultScrollDataTable')"></sjs-include>,
+											sjs-name="binding('body').type('DefaultScrollDataTable')"></sjs-include>,
 				staticContent:<sjs-include 	sjs-type="DataTableHeader"
-											sjs-ref="binding('head').type('DefaultScrollDataTable')"></sjs-include>
+											sjs-name="binding('head').type('DefaultScrollDataTable')"></sjs-include>
 			}
 		}</sjs-include>
 	</div>
@@ -16,12 +16,12 @@
 <!-- DataTable template to features custom scrolling implementation -->
 <sjs-component  sjs-type="CustomScrollDataTable" sjs-controller="DataTableController" sjs-export>
 	<div class="-sjs-datatable" style="position:relative;" sjs-element="root">
-		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel" sjs-ref="scrollPanel">{
+		<sjs-include sjs-type="SpliceJS.Controls.ScrollPanel" sjs-name="scrollPanel">{
 			content:{
 				scrollContent:<sjs-include  sjs-type="DataTableBody"
-											sjs-ref="binding('body').type('CustomScrollDataTable')"></sjs-include>,
+											sjs-name="binding('body').type('CustomScrollDataTable')"></sjs-include>,
 				staticContent:<sjs-include 	sjs-type="DataTableHeader"
-											sjs-ref="binding('head').type('CustomScrollDataTable')"></sjs-include>
+											sjs-name="binding('head').type('CustomScrollDataTable')"></sjs-include>
 			}
 		}</sjs-include>
 	</div>

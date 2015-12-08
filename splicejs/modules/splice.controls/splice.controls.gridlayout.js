@@ -113,13 +113,13 @@ definition:function(sjs){
 
 		event(this.views.rightEdge).attach({
 			onmousedown : event.unicast
-		}).subscribe(
+		}).onmousedown.subscribe(
 			function(e){self.onStartResize(e,right);}, this
 		);
 
 		event(this.elements.bottomEdge).attach({
 			onmousedown	:	event.unicast
-		}).subscribe(
+		}).onmousedown.subscribe(
 			function(e){self.onStartResize(e,bottom);}, this
 		);
 	};
@@ -247,8 +247,8 @@ definition:function(sjs){
 				return;
 			}
 
-
-			this.elements.root.appendChild(content.concrete.dom);
+			//add cell
+			this.content(content).add();
 
 			content.isAttached = true;
 			content.isShown = true;
@@ -493,7 +493,7 @@ definition:function(sjs){
 		var margin 		 = this.margin;
 		var outer_margin = this.outerMargin;
 
-		var DOM = this.elements.root;
+		var DOM = this.views.root.htmlElement;
 
 
 		var grid = this.grid;
@@ -510,7 +510,7 @@ definition:function(sjs){
 		var unitWidth = (workarea.clientWidth - (grid.columns - 1) * margin) / grid.columns;
 		var unitHeight = (workarea.clientHeight - (grid.rows - 1) * margin) / grid.rows;
 
-		grid.clear();
+	//	grid.clear();
 
 		var keys = null;
 
@@ -534,7 +534,7 @@ definition:function(sjs){
 			var h 	= cards[i].rowspan * unitHeight + (margin * (cards[i].rowspan - 1));
 
 			/* update grid */
-			grid.fillGrid(cards[i].row, cards[i].col, cards[i].rowspan, cards[i].colspan, cards[i]);
+		//	grid.fillGrid(cards[i].row, cards[i].col, cards[i].rowspan, cards[i].colspan, cards[i]);
 
 			cards[i].reflow({left:l,top:t},{width:w, height:h});
 		}

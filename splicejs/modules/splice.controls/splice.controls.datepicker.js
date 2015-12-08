@@ -9,11 +9,12 @@ required:[
 ]
 ,
 
-definition:function(){
+definition:function(sjs){
 
 	var scope = this.scope
 	,	Class = this.sjs.Class
-	,	Event = this.sjs.Event;
+	,	event = this.sjs.event
+	,	exports = this.sjs.exports;
 
 	var UIControl = scope.SpliceJS.UI.UIControl
 	,	format = scope.Text.format;
@@ -21,29 +22,28 @@ definition:function(){
 	var DatePicker = Class(function DatePickerController(){
 		this.super();
 
+		event(this).attach({
+			onDateSelected : event.multicast
+		});
+
 		var date = new Date();
 
 		if(this.format){
 			date = format('{0:'+this.format+'}',date);
 		}
 
-        //listen for date updates from outside
-		this.onDataIn.subscribe(function (date) {
-		    this.setDate(date);
-		}, this);
-
 	}).extend(UIControl);
 
 
-
+	DatePicker.prototype.onDataIn = function(item){
+		this.setDate(item.getValue());
+	};
 
 	DatePicker.prototype.receiveFromCalendar = function (date) {
 	    this.setDate(date);
 	    this.onData(date);
-	    this.ref.selector.close();
-	}
-
-
+	    this.children.selector.close();
+	};
 
     //sets dates and will not trigger events
 	DatePicker.prototype.setDate = function (date) {
@@ -54,15 +54,16 @@ definition:function(){
 	    }
 
 	    this.ref.selector.dataIn(date);
-	}
+	};
 
+	exports.scope (
+		DatePicker
+	);
 
-    // fires when date has been selected
-	DatePicker.prototype.onDateSelected = Event;
-	DatePicker.prototype.onData 		= Event;
+	exports.module(
+		DatePicker
+	);
 
-
-	return {};
 }
 
 });

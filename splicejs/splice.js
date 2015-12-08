@@ -538,7 +538,7 @@ function addContent(content,key){
 		return this;
 	}
 	if(content instanceof Controller ){
-		if(!content.views || content.views.root) return this;
+		if(!content.views || !content.views.root) return this;
 		target.appendChild( content.views.root.htmlElement);
 		content.onAttach();
 		content.onDisplay();
@@ -2228,6 +2228,10 @@ function isExternalType(type){
 		 * */
 		var scope = this;
 
+		if(args.__sjs_name__) {
+			console.log("sjs  name: " + args.__sjs_name__);
+		}
+
 		var Proxy = function Proxy(proxyArgs){
 			if(!(this instanceof Proxy) ) throw 'Proxy object must be invoked with [new] keyword';
 
@@ -2249,7 +2253,7 @@ function isExternalType(type){
 			var keys = Object.keys(args);
 			for(var i = 0; i < keys.length; i++ ){
 				var key = keys[i];
-				if(key == 'type' || key == 'tie') continue; /* skip type */
+				if(key == 'type') continue; /* skip type */
 				parameters[key] = args[key];
 			}
 
@@ -2284,8 +2288,8 @@ function isExternalType(type){
 		}
 
 		Proxy.type 			= args.type;
-		Proxy.ref 			= args.ref;
 		Proxy.parameters 	= args;
+		Proxy.__sjs_name__ 		= args.__sjs_name__;
 		Proxy.__sjs_isproxy__ = true;
 
 		return Proxy;
@@ -2601,7 +2605,6 @@ function Controller(){
 				//allow multiple element references to a single element
 				var parts = ref.split(' ');
 				for(var p=0; p<parts.length; p++ ) {
-					controllerInstance.elements[parts[p]] = element;
 					views[parts[p]] = view;
 				}
 			}
@@ -2708,7 +2711,7 @@ function Controller(){
 		return result;
 	};
 
-	var RESERVED_ATTRIBUTES = ["type", "ref", "singleton", "class", "width", "height", "layout", "controller"];
+	var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
 
 	function collectAttributes(node, filter){
 		if(!node) return null;
@@ -2723,6 +2726,9 @@ function Controller(){
 			var attr = attributes[i]
 			,	name = propertyName(attr.name,true);
 
+			if(name == 'name') {
+				name = '__sjs_name__';
+			}
 			if(startsWith(attr.value,'binding(')){
 				result = result + separator + name + ':' + attr.value;
 				separator = ', ';
@@ -3075,8 +3081,8 @@ function Controller(){
 		instance.__sjs_visual_parent__.__sjs_visual_children__.push(instance);
 	//	if(!args.ref) return;
 
-		if(typeof args.ref == 'string') {
-			instance.parent.ref[args.ref] = instance;
+		if(typeof args.__sjs_name__ == 'string') {
+			instance.parent.children[args.__sjs_name__] = instance;
 			return;
 		}
 
@@ -3148,8 +3154,6 @@ function Controller(){
 			var obj = new controller(args);
 
 			obj.__sjs_type__ = template.type;
-			obj.ref = {};
-			obj.elements = {};
 			obj.children = [];
 			obj.__sjs_visual_children__ = [];
 			obj.scope = scope;
