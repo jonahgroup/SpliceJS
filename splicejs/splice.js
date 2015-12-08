@@ -2726,6 +2726,8 @@ function Controller(){
 			var attr = attributes[i]
 			,	name = propertyName(attr.name,true);
 
+			if(RESERVED_ATTRIBUTES.indexOf(name) < 0) continue;
+
 			if(name == 'name') {
 				name = '__sjs_name__';
 			}
@@ -2735,7 +2737,7 @@ function Controller(){
 				continue;
 			}
 
-			if(RESERVED_ATTRIBUTES.indexOf(name) < 0) continue;
+
 
 			result = result + separator + name + ':\'' + attr.value + '\'';
 			separator = ', ';

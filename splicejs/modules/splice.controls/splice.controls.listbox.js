@@ -37,8 +37,8 @@ definition:function(sjs){
 			event(this.views.root).attach({	onmousedown	:	event.unicast.stop	})
 			.onmousedown.subscribe(_itemClick,this);
 
-			if(this.ref.contentClient) {
-				this.dom = this.ref.contentClient.views.root;
+			if(this.children.contentClient) {
+				this.dom = this.children.contentClient.views.root;
 			}
 			else {
 				this.dom = this.views.root;
@@ -102,12 +102,12 @@ definition:function(sjs){
 		}
 
 		this.reflow();
-		if(!this.ref.scrollPanel) this.onResize(this);
+		if(!this.children.scrollPanel) this.onResize(this);
 	};
 
 	ListBoxController.prototype.reflow = function(){
-		if(!this.ref.scrollPanel) return;
-		this.ref.scrollPanel.reflow();
+		if(!this.children.scrollPanel) return;
+		this.children.scrollPanel.reflow();
 	};
 
 
