@@ -53,7 +53,7 @@ definition:function(sjs){
 	        date = format('{0:' + this.format + '}', date);
 	    }
 
-	    this.ref.selector.dataIn(date);
+	    this.children.selector.dataIn(date);
 	};
 
 	exports.scope (

@@ -1,56 +1,47 @@
 sjs({
-
+version: '1.0.0'
+,
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'Doc':'{sjshome}/modules/splice.document.js'},
 	'splice.controls.scrollpanel.css',
 	'splice.controls.scrollpanel.html'
-],
-
+]
+,
 definition:function(sjs){
 
 
 	var Class 		= sjs.Class
-	,	Event 		= sjs.Event
+	,	  event 		= sjs.event
+	,		exports 	= sjs.exports
 	, 	isTouch 	= sjs.config.platform.isTouchEnabled
 	, 	isMobile 	= sjs.config.platform.isMobile;
 
 	var	select = this.scope.Doc.select
-	,	create = this.scope.Doc.create
+	,		create = this.scope.Doc.create
 	, 	UIControl 	= this.scope.SpliceJS.UI.UIControl
 	, 	DragAndDrop = this.scope.SpliceJS.UI.DragAndDrop;
 
-
-
-	var ScrollPanel = Class(function ScrollPanel(args){
-		if(!args) return;
-
+	var ScrollPanel = Class(function ScrollPanelController(args){
 		this.super(args);
+		event(this).attach({
+			onScroll : event.multicast
+		});
 
 		this.horizontalDisable = this.isDisableHorizontal;
-		this.domRoot = this.concrete.dom;
-
-		this.clippingArea = this.elements.clippingArea;
 
 		var self = this;
-
-		/* Scrollable content client */
-		this.client = this.elements.scrollClient;
-
 		/* Current scroll offset */
 		this.currentScrollTop = 0;
-
 		/* scroll content by default */
 		this.isScrollClient = true;
 
 
 		/* Setup touch events on touch enabled platforms */
 		if(isTouch && !isMobile){
-
-		this.clippingArea.addEventListener( 'touchstart', function(e){self.onTouchStart(e);},	false );
-		this.clippingArea.addEventListener( 'touchend',   function(e){self.onTouchEnd(e);}, 	false );
-		this.clippingArea.addEventListener( 'touchmove',  function(e){self.onTouchMove(e);}, 	false );
-
+			this.clippingArea.addEventListener( 'touchstart', function(e){self.onTouchStart(e);},	false );
+			this.clippingArea.addEventListener( 'touchend',   function(e){self.onTouchEnd(e);}, 	false );
+			this.clippingArea.addEventListener( 'touchmove',  function(e){self.onTouchMove(e);}, 	false );
 		}
 
 		this.onDisplay.subscribe(function(){
@@ -59,7 +50,16 @@ definition:function(sjs){
 
 	}).extend(UIControl);
 
-	ScrollPanel.prototype.onScroll = Event;
+	ScrollPanel.prototype.initialize = function(){
+		this.domRoot = this.views.root.htmlElement;
+
+		/* Scrollable content client */
+		this.client = this.views.scrollClient.htmlElement;
+		/* */
+		this.clippingArea = this.views.clippingArea.htmlElement;
+
+	};
+
 
 	ScrollPanel.prototype.display = function(){
 		this.reflow();
@@ -127,24 +127,24 @@ definition:function(sjs){
 		var scrollBar = ScrollPanel.prototype.attachScrollBars.call(
 			this,
 			this.domRoot,{
-				scrollClient:this.ref.scrollClient,
+				scrollClient:this.views.scrollClient.htmlElement,
 				horizontalDisable:this.horizontalDisable
 			}
 		);
 
 		if(scrollBar.vertical) {
 			/*
-			this.elements.scrollClient.className = 'client -splicejs-scrolling-vertical';
-			this.elements.staticContainer.className = 'static -splicejs-scrolling-vertical';
+			this.views.scrollClient.className = 'client -splicejs-scrolling-vertical';
+			this.views.staticContainer.className = 'static -splicejs-scrolling-vertical';
 			*/
-			//this.elements.clippingArea.className = 'clipping -splicejs-scrolling-vertical';
+			//this.views.clippingArea.className = 'clipping -splicejs-scrolling-vertical';
 		}
 
 		else {
-			this.elements.clippingArea.className = 'clipping';
+			this.views.clippingArea.className = 'clipping';
 			/*
-			this.elements.scrollClient.className = 'client';
-			this.elements.staticContainer.className = 'static';
+			this.views.scrollClient.className = 'client';
+			this.views.staticContainer.className = 'static';
 			*/
 		}
 
@@ -156,14 +156,14 @@ definition:function(sjs){
 
 		parent.style.overflow = 'hidden';
 		var self = this;
-		var client = this.elements.scrollClient;
-		var staticContainer = this.elements.staticContainer;
+		var client = this.views.scrollClient;
+		var staticContainer = this.views.staticContainer;
 
-		var content = select.firstNonText(client);
+		var content = this.views.scroll.htmlElement;
 
 		var size  = {	width:client.clientWidth, height:client.clientHeight};
 		var cSize = {	width:	Math.max(content.clientWidth,content.scrollWidth, content.offsetWidth),
-					 				height:Math.max(content.clientHeight, content.scrollHeight, content.offsetHeight)};
+					 				height:	Math.max(content.clientHeight, content.scrollHeight, content.offsetHeight)};
 
 		var thumb = {horizontal: 	parent._scroll_bar_horizontal,
 					  vertical:		parent._scroll_bar_vertical
@@ -350,7 +350,13 @@ definition:function(sjs){
 		return status;
 	}; //end attach scrollbars
 
+	//scope exports
+	exports.scope(
+		ScrollPanel
+	);
 	//module exports
-
+	exports.module(
+		ScrollPanel
+	);
 
 }});

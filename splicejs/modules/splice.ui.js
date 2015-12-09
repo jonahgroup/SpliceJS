@@ -20,6 +20,29 @@ definition:function(sjs){
 
 	var Animate = scope.Animation.Animate;
 
+
+	var DataItem = function DataItem(data, path){
+		this.source = this.refsource = data;
+
+		if(path == null || path === '') return this;
+		var parts = path.toString().split('.');
+		for(var i=0; i<parts.length-1; i++){
+			this.refsource = this.refsource[parts[i]];
+		}
+		this.refpath = parts[parts.length-1];
+	};
+
+	DataItem.prototype.getValue = function(){
+		if(!this.refpath) return this.refsource;
+		return this.refsource[this.refpath];
+	}
+
+	DataItem.prototype.setValue = function(value){
+		if(!this.refpath) return;
+		this.refsource[this.refpath] = value;
+	}
+
+
 	/**
 	 * Base UIControl class
 	 */
@@ -80,7 +103,7 @@ definition:function(sjs){
 		else
 			this.show();
 	};
-
+	/* Data Contract */
 	UIControl.prototype.dataIn = function(item, path){
 
 		var p = null;
@@ -112,26 +135,7 @@ definition:function(sjs){
 	};
 
 
-	var DataItem = function DataItem(data, path){
-		this.source = this.refsource = data;
 
-		if(path == null || path === '') return this;
-		var parts = path.toString().split('.');
-		for(var i=0; i<parts.length-1; i++){
-			this.refsource = this.refsource[parts[i]];
-		}
-		this.refpath = parts[parts.length-1];
-	};
-
-	DataItem.prototype.getValue = function(){
-		if(!this.refpath) return this.refsource;
-		return this.refsource[this.refpath];
-	}
-
-	DataItem.prototype.setValue = function(value){
-		if(!this.refpath) return;
-		this.refsource[this.refpath] = value;
-	}
 
 	/**
 	 * Called by the layout manager or a parent view when container dimensions changed and
@@ -140,7 +144,7 @@ definition:function(sjs){
 	 * @param {size: {width:{Number}, height:{Number}}} - parent container' dimensions
 	 * */
 	UIControl.prototype.reflow = function(position,size,bubbleup){
-		if(!this.concrete || !this.concrete.dom) return;
+		if(!this.views || !this.views.root) return;
 
 		if(bubbleup == true) {
 			this.reflowChildren(null,null,bubbleup);
@@ -152,7 +156,7 @@ definition:function(sjs){
 
 		// Get style object once and apply settings
 		if(this.layout !== 'css') {
-			var style = this.concrete.dom.style;
+			var style = this.views.root.htmlElement.style;
 
 			style.left 		= position.left +'px';
 			style.top  		= position.top + 'px';

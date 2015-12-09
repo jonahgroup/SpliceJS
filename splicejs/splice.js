@@ -521,62 +521,65 @@ View.prototype.controller = function(){
 
 function addContent(content,key){
 	if(!key) key = 'default';
-	if(!this.contentMap[key]) return this;
 
-	var target = this.contentMap[key].source;
+	var target = this.contentMap[key];
+	if(!target) return this;
 
-	if(typeof content === 'string'){
-		target.appendChild( document.createTextNode(content) );
-		return this;
-	}
-	if(typeof content === 'number'){
-		target.appendChild( document.createTextNode(content) );
-		return this;
-	}
+	var node = this.contentMap[key].source;
 	if(content instanceof View){
-		target.appendChild( content.htmlElement );
-		return this;
+		node.appendChild( content.htmlElement );
+	} else {
+		node.appendChild( document.createTextNode(content.toString()) );
 	}
-	if(content instanceof Controller ){
-		if(!content.views || !content.views.root) return this;
-		target.appendChild( content.views.root.htmlElement);
-		content.onAttach();
-		content.onDisplay();
-		return this;
-	}
+	target.n++;
 };
 
 function replaceContent(content,key){
+	if(content == null) return this;
 	if(!key) key = 'default';
 	//coercive comparision, checks null and undefined
-	if(this.contentMap[key] == null ) return this;
+	var target = this.contentMap[key];
+	if( target == null ) return this;
 
-	if(	typeof content === 'string' ||
-			typeof content === 'number' ||
-			typeof content === 'boolean'){
-			var target = this.contentMap[key].cache;
-			if(!target) {
-				this.contentMap[key].source.innerHTML = '';
-				target = document.createTextNode(content);
-				this.contentMap[key].cache = target;
-				this.contentMap[key].source.appendChild(target);
-			}
-			target.nodeValue =content;
-			return this;
+	if(content instanceof View){
+		//content is already set
+		if(target.source.children[0] == content.htmlElement) return this;
+		target.source.innerHTML = '';
+		target.cache = null;
+		target.source.appendChild(content.htmlElement);
+		target.n = 1;
+		return this;
 	}
-
-	if(content instanceof Controller ){
-		var root = content.views.root;
-		if(!root) return;
-		this.contentMap[key].source.innerHTML = '';
-		this.contentMap[key].source.appendChild(root.htmlElement);
-		this.contentMap[key].cache = root.htmlElement;
-		content.onAttach();
-		content.onDisplay();
+	else{
+		var node = target.cache;
+		if(!node) {
+			node = document.createTextNode(content.toString());
+			target.source.innerHTML = '';
+			target.cache = node;
+			target.source.appendChild(node);
+			target.n = 1;
+		}
+		node.nodeValue = content.toString();
+		return this;
 	}
 	return this;
 };
 
+function removeContent(content, key){
+	if(!key) key = 'default';
+
+	var target = this.contentMap[key];
+	if( target == null || target.n == 0 ) return this;
+
+	if(target.n == 1){
+		target.source.innerHTML = '';
+		target.cache = null;
+		target.n = 0;
+	} else {
+		//look for nodes to remove
+	}
+	var node = target.cache;
+};
 
 View.prototype.add = addContent;
 View.prototype.replace = replaceContent;
@@ -2228,10 +2231,6 @@ function isExternalType(type){
 		 * */
 		var scope = this;
 
-		if(args.__sjs_name__) {
-			console.log("sjs  name: " + args.__sjs_name__);
-		}
-
 		var Proxy = function Proxy(proxyArgs){
 			if(!(this instanceof Proxy) ) throw 'Proxy object must be invoked with [new] keyword';
 
@@ -2291,7 +2290,9 @@ function isExternalType(type){
 		Proxy.parameters 	= args;
 		Proxy.__sjs_name__ 		= args.__sjs_name__;
 		Proxy.__sjs_isproxy__ = true;
-
+		Proxy.toString = function(){
+			return 'proxy: ' + args.type;
+		}
 		return Proxy;
 
 	};
@@ -2361,13 +2362,19 @@ function isExternalType(type){
 		if(!contentNodes) return;
 		var node = element;
 		for(var i=0; i<=contentNodes.length; i++){
-
-			var key = node.getAttribute('sjs-content');
-			if(cMap[key]) throw 'Duplicate content map key ' + key;
-			cMap[key] = {source:node, cache:null};
+			var attr = node.getAttribute('sjs-content');
+			if(!attr) {
+				node = contentNodes[i];
+				continue;
+			}
+			var keys = attr.split(' ');
+			for(var k=0; k<keys.length; k++){
+				var key = keys[k];
+				if(cMap[key]) throw 'Duplicate content map key ' + key;
+				cMap[key] = {source:node, cache:null, n:0};
+			}
 			node = contentNodes[i];
 		}
-
 		return cMap;
 	};
 
@@ -2405,6 +2412,10 @@ function Controller(){
 			}
 
 		},this);
+	};
+
+	Controller.prototype.toString = function(){
+		return getFunctionName(this.constructor);
 	};
 
 	Controller.prototype.initialize = function(){
@@ -2456,21 +2467,47 @@ function Controller(){
 		this._lastHeight = null;
 	};
 
-	function _controllerContentMapper(content,callback){
+/*
+if(content instanceof Controller ){
+	var root = content.views.root;
+	if(!root) return;
+	this.contentMap[key].source.innerHTML = '';
+	this.contentMap[key].source.appendChild(root.htmlElement);
+	this.contentMap[key].cache = root.htmlElement;
+	content.onAttach();
+	content.onDisplay();
+}
+
+*/
+
+	function _applyContent(content, key, callback){
 		var view = this.views.root;
-		var type = typeof(content);
+		if(content == null) return this;
+		if(content.__sjs_isproxy__ === true ){
+			return _applyContent.call(this,new content({parent:this}), key, callback);
+		}
 		//no content map, simple view, default map must be present
-		if(content instanceof Controller || content instanceof View ||
-			 type == 'string' || type == 'number' || type == 'boolean') {
-			callback.call(view, content);
+		if(content instanceof Controller) {
+			if(!content.views || !content.views.root) return this;
+			callback.call(view,content.views.root, key);
 			return this;
-		} else {
-		// composed content, represented by content object's properties
+		}
+		callback.call(view, content, key);
+		return this;
+	}
+
+	function _controllerContentMapper(content,callback){
+		var type = typeof(content);
+ 		if( type == 'object' &&
+			 !(content instanceof Controller) && !(content instanceof View) ) {
+		  // composed content, represented by content object's properties
 			var keys = Object.keys(content);
 			for(var i=0; i<keys.length; i++){
-				callback.call(view,content[keys[i]], keys[i]);
+				_applyContent.call(this,content[keys[i]], keys[i], callback);
 			}
+			return this;
 		}
+		_applyContent.call(this,content, null, callback);
 		return this;
 	};
 
@@ -2479,32 +2516,9 @@ function Controller(){
 		var self = this;
 		return {
 			replace: function(){_controllerContentMapper.call(self,content, replaceContent)},
-			add: 		 function(){_controllerContentMapper.call(self,content, addContent)}
+			add: 		 function(){_controllerContentMapper.call(self,content, addContent)},
+			remove:  function(){}
 		}
-
-/*
-			if(!this.__sjs_content_map__)
-			throw 'Unable to apply content, content map is not available, make sure "sjs-content-map" is not false for a given component';
-
-			var keys = Object.keys(this.__sjs_content_map__);
-			for(var key in  keys){
-				var newNode = decodeContent.call(this,source[keys[key]]);
-				if(!newNode) continue;
-
-				var contentNode = this.__sjs_content_map__[keys[key]][0];
-
-				//if child node is already added, skip
-				if(contentNode.childNodes[0] == newNode)	return;
-
-				if(contentNode.childNodes[0]) {
-					contentNode.replaceChild(newNode,contentNode.childNodes[0]);
-				} else {
-					contentNode.appendChild(newNode);
-				}
-
-				invalidateContent.call(this);
-			}
-*/
 	};
 
 	//iterate over children and release event listeners
@@ -3159,7 +3173,6 @@ function Controller(){
 			obj.children = [];
 			obj.__sjs_visual_children__ = [];
 			obj.scope = scope;
-
 			obj.__sjs_args__ = args;
 
 			/*
@@ -3167,12 +3180,6 @@ function Controller(){
 			 * append to children array
 			 * */
 			configureHierarchy.call(args._includer_scope,obj,args);
-
-			/*
-				Auto-creating event casters
-			*/
-			//linkupEvents(obj);
-
 
 			/*
 			 * Bind declarative parameters

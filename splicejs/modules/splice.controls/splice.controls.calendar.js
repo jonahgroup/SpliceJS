@@ -46,7 +46,8 @@ definition:function(sjs){
 
 		var year 	= dt.getFullYear()
 		, 	month 	= dt.getMonth()
-		,	day 	= dt.getDate()
+		,		day 	= dt.getDate()
+
 		;
 
 		var monthFirst = new Date(year, month, 1, 0, 0, 0, 0);
@@ -66,13 +67,10 @@ definition:function(sjs){
 		, 	col = 0
 		;
 
-
 		var overflow = 7-start_week_day+ 7;
 
-
-		var cde = this.elements.currentDate;
-			cde.innerHTML = MONTHS_NAME[month] + ', ' + year;
-
+		this.content({currentDate:MONTHS_NAME[month] + ', ' + year}).replace();
+		//cde.innerHTML = MONTHS_NAME[month] + ', ' + year;
 
 		/*
 		 * Backtrack into a previous month
@@ -86,7 +84,7 @@ definition:function(sjs){
 				row = Math.floor(i / 7);
 				col = i % 7;
 
-				_day = i+_offset;
+				var _day = i+_offset;
 
 				var cell = getCell.call(this, row+2, col);
 				cell.xdateprev = true;
@@ -108,7 +106,7 @@ definition:function(sjs){
 			row = Math.floor(i / 7);
 			col = i % 7;
 
-			_day = ((i-start_week_day) % days)+1;
+			var _day = ((i-start_week_day) % days)+1;
 
 			var cell = getCell.call(this, row+2, col);
 
@@ -134,7 +132,7 @@ definition:function(sjs){
 
 	function getCell(row, col) {
 		try {
-		var t = this.elements.grid;
+		var t = this.views.grid.htmlElement;
 		var r = t.rows[row];
 		return r.cells[col]; } catch(e) {return null;}
 	};
@@ -195,11 +193,17 @@ definition:function(sjs){
 
 
 
-	var Class = this.sjs.Class
-	,	Event = this.sjs.Event;
+	var Class = sjs.Class
+	,	event = sjs.event
+	, exports = sjs.exports;
+
 
 	var Calendar = Class(function CalendarController(){
 		this.super();
+
+		event(this).attach({
+			onDateSelected : event.multicast
+		});
 
 		var dt = new Date();
 
@@ -209,27 +213,30 @@ definition:function(sjs){
 
 		this.selectedDate = new Date();
 
-		this.update();
+	}).extend(this.sjs.Controller);
 
-		var self = this;
-
-		Event.attach(this.elements.grid, 'onmousedown', true).subscribe(function(e){
-		    this.selectedDate = e.source.__sjs__date
-		    this.onDateSelected(this.selectedDate);
+	Calendar.prototype.initialize = function(){
+		event(this.views.grid).attach({
+			onmousedown : event.multicast.stop
+		}).onmousedown.subscribe(function(e){
+				this.selectedDate = e.source.__sjs__date
+				this.onDateSelected(this.selectedDate);
 		},this);
 
-		Event.attach(this.elements.previous, 'onmousedown', true).subscribe(function(e){
+		event(this.views.previous).attach({
+			onmousedown : event.multicast.stop
+		}).onmousedown.subscribe(function(e){
 			this.previousMonth();
 		},this);
 
-		Event.attach(this.elements.next, 'onmousedown', true).subscribe(function(e){
+		event(this.views.next).attach({
+			onmousedown : event.multicast.stop
+		}).onmousedown.subscribe(function(e){
 			this.nextMonth();
 		},this);
 
-	}).extend(this.sjs.Controller);
-
-
-	Calendar.prototype.onDateSelected = Event;
+		this.update();
+	};
 
 
 	Calendar.prototype.previousMonth = function(){
@@ -246,8 +253,8 @@ definition:function(sjs){
 		renderMonth.call(this, new Date(this.year, this.month, this.day));
 	};
 
-	return {}
+	exports.scope(
+		Calendar
+	);
 
-}
-
-});
+}});

@@ -117,7 +117,7 @@ definition:function(sjs){
 			function(e){self.onStartResize(e,right);}, this
 		);
 
-		event(this.elements.bottomEdge).attach({
+		event(this.views.bottomEdge).attach({
 			onmousedown	:	event.unicast
 		}).onmousedown.subscribe(
 			function(e){self.onStartResize(e,bottom);}, this
@@ -231,7 +231,7 @@ definition:function(sjs){
 	//	cell.onResize.subscribe(this.resizeCell, this);
 	//	cell.onRemove.subscribe(this.removeCell, this);
 		this.layoutCells[cell.index] = cell;
-		this.elements.root.appendChild(cell.concrete.dom);
+		this.views.root.appendChild(cell.concrete.dom);
 		cell.onAttach();
 		cell.onDisplay();
 	}
@@ -282,7 +282,7 @@ definition:function(sjs){
 		cell.onMaximize.subscribe(this.maximizeCell,this);
 
 		this.layoutCells[cell.index] = cell;
-		this.elements.root.appendChild(cell.concrete.dom);
+		this.views.root.appendChild(cell.concrete.dom);
 		cell.onAttach();
 		cell.onDisplay();
 		cell.onAdd(cell);
@@ -362,7 +362,7 @@ definition:function(sjs){
 					var cell = this.layoutCells[keys[key]];
 					cell.isAttached = false;
 					cell.isShown = false;
-					this.elements.root.removeChild(cell.concrete.dom);
+					this.views.root.removeChild(cell.concrete.dom);
 			}
 			this.layoutCells = Object.create(null);
 	};
@@ -383,7 +383,7 @@ definition:function(sjs){
 
 		}
 		else {
-			this.elements.root.removeChild(cell.concrete.dom);
+			this.views.root.removeChild(cell.concrete.dom);
 			cell.isAttached = false;
 		}
 
@@ -559,7 +559,7 @@ definition:function(sjs){
 		var margin 		 = this.margin;
 		var outer_margin = this.outerMargin;
 
-		var DOM = this.elements.root;
+		var DOM = this.views.root;
 
 		var offset = scope.SpliceJS.UI.Positioning.absPosition(DOM);
 

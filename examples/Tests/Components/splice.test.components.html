@@ -38,6 +38,15 @@
   </td>
 </tr>
 -->
+<!-- DatePicker -->
+<tr>
+  <td>Date Picker</td>
+  <td>
+    <sjs-include sjs-type="SpliceJS.Controls.DatePicker"></sjs-include>
+  </td>
+</tr>
+
+
 
 <!-- ComboBox -->
 <tr>
@@ -45,7 +54,7 @@
   <td>
   <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
     {
-        default:'Please select an item',
+        default:<sjs-include sjs-type="SpliceJS.Controls.Button"></sjs-include>,
         dataItemPath:'name',
         dataIn: binding('onProvinces').parent,
         onDataItem: binding('provinceSelected').parent,

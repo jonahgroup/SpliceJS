@@ -65,7 +65,7 @@ definition:function(sjs){
 	};
 
 	DropDownController.prototype.onDataIn = function(item){
-		this.views.root.replace(item.getValue(),'selector');
+		this.content(item.getValue()).replace();
 	};
 
 	DropDownController.prototype.close = function () {
