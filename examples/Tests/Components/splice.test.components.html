@@ -1,7 +1,6 @@
 <sjs-component sjs-type="Components" sjs-controller="ComponentsTest" sjs-export>
 <table class="-component-test-table">
 <!-- Button Component -->
-<!--
 <tr>
   <td>Button</td>
   <td>
@@ -10,11 +9,9 @@
     </sjs-include>
   </td>
 </tr>
--->
 
 
 <!-- CheckBox Component -->
-<!--
 <tr>
   <td>CheckBox</td>
   <td>
@@ -26,10 +23,8 @@
     </sjs-include>
   </td>
 </tr>
--->
 
 <!-- Text Field -->
-<!--
 <tr>
   <td>TextField</td>
   <td>
@@ -37,7 +32,7 @@
     </sjs-include>
   </td>
 </tr>
--->
+
 <!-- DatePicker -->
 <tr>
   <td>Date Picker</td>
@@ -45,8 +40,6 @@
     <sjs-include sjs-type="SpliceJS.Controls.DatePicker"></sjs-include>
   </td>
 </tr>
-
-
 
 <!-- ComboBox -->
 <tr>
@@ -132,8 +125,39 @@
   <td>
   <div style="position:relative; width:400px; height:300px;">
     <sjs-include sjs-type="SpliceJS.Controls.GridLayout">
+      {
+        grid: {rows:3, columns:3},
+        cells:[
+          {
+            col:0, row:0, colspan:1, rowspan:1,
+            content:'test'
+          },
+          {
+            col:2, row:2, colspan:1, rowspan:1,
+            content:
+            <sjs-include sjs-type="SpliceJS.Controls.Button">
+            </sjs-include>
+          }
+
+        ]
+      }
     </sjs-include>
   </div>
+  </td>
+</tr>
+
+
+<!-- Scroll Panel -->
+<tr>
+  <td>Scroll Panel</td>
+  <td>
+    <div style="position:relative; width:400px; height:300px;">
+      <sjs-include sjs-type="SpliceJS.Controls.ScrollPanel">
+        {
+          content:{scroll:'test'}
+        }
+      </sjs-include>
+    </div>
   </td>
 </tr>
 

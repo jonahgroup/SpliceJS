@@ -9,6 +9,7 @@ required:[
 ,	{'Charts':'splice.controls/splice.controls.charts.js'}
 ,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
 ,	{'DataControls':'splice.controls/splice.controls.treeview.js'}
+,	{'DataControls':'splice.controls/splice.controls.checklistbox.js'}
 ,	{'Panels':'splice.controls/splice.controls.drawerpanel.js'}
 ,	{'Panels':'splice.controls/splice.controls.scrollpanel.js'}
 ,	{'Panels':'splice.controls/splice.controls.viewpanel.js'}
@@ -19,6 +20,7 @@ required:[
 ,	{'Selectors':'splice.controls/splice.controls.datepicker.js'}
 ,	{'Selectors':'splice.controls/splice.controls.dropdownlist.js'}
 ,	{'Selectors':'splice.controls/splice.controls.calendar.js'}
+,	{'Selectors':'splice.controls/splice.controls.combobox.js'}
 ,	{'Navigation':'splice.controls/splice.controls.popup.js'}
 ,	{'Navigation':'splice.controls/splice.controls.pageloader.js'}
 ,	{'Navigation':'splice.controls/splice.controls.tooltip.js'}
@@ -81,13 +83,13 @@ definition:function(sjs){
 		this.onClose();
 	};
 
-	
+
 	// module exports
 	exports.module(
 		/* utility controls */
 		{UIControl:			scope.SpliceJS.UI.UIControl},
-		{DomIterator: 		scope.Controllers.DomIterator},
-		{ImageSelector:  	ImageSelector},
+		{DomIterator: 	scope.Controllers.DomIterator},
+		{ImageSelector: ImageSelector},
 		/* buttons */
 		{Button:				scope.Buttons.Button},
 		{CheckBox:			scope.Buttons.CheckBox},
@@ -100,34 +102,38 @@ definition:function(sjs){
 		{ViewPanel:			scope.Panels.ViewPanel},
 		{ScrollPanel:		scope.Panels.ScrollPanel},
 		/* charts */
-		{Chart:				scope.Charts.Chart},
-		{Dial:				scope.Charts.Dial},
-		{GridLayout:         scope.Grids.GridLayout},
-    {CellContainer:      scope.Grids.CellContainer},
-		{D3Canvas:			scope.Charts.D3Canvas},
-		{Map:				scope.Maps.Map},
+		{Chart:							scope.Charts.Chart},
+		{Dial:							scope.Charts.Dial},
+		{GridLayout:        scope.Grids.GridLayout},
+    {CellContainer:     scope.Grids.CellContainer},
+		{D3Canvas:					scope.Charts.D3Canvas},
+		{Map:								scope.Maps.Map},
 		/* selectors */
 		{DropDownSelector:	scope.Selectors.DropDownSelector},
-		{DropDownList:		scope.Selectors.DropDownList},
-		{DatePicker:			scope.Selectors.DatePicker},
-		{Calendar:			scope.Selectors.Calendar},
+		{DropDownList:			scope.Selectors.DropDownList},
+		{DatePicker:				scope.Selectors.DatePicker},
+		{Calendar:					scope.Selectors.Calendar},
+		{ComboBox:					scope.Selectors.ComboBox},
 		/* data controls */
-		{DataTable:			scope.DataControls.DataTable},
-		{DataTableRow:		scope.DataControls.DataTableRow},
-		{ListBox:			scope.DataControls.ListBox},
-		{ListItem:			scope.DataControls.ListItem},
+		{DataTable:					scope.DataControls.DataTable},
+		{DataTableRow:			scope.DataControls.DataTableRow},
+		{ListBox:						scope.DataControls.ListBox},
+		{ListItem:					scope.DataControls.ListItem},
 		{ScrollableListBox:	scope.DataControls.ScrollableListBox},
-		{StretchListBox:			scope.DataControls.StretchListBox},
+		{StretchListBox:		scope.DataControls.StretchListBox},
 		{GroupedListItem:		scope.DataControls.GroupedListItem},
-		{TreeView:						scope.DataControls.TreeView},
+		{TreeView:					scope.DataControls.TreeView},
 		{TreeTable:					scope.DataControls.TreeTable},
+		{CheckListBox:			scope.DataControls.CheckListBox},
+
 		/* Navigation */
 		{Popup:					scope.Navigation.Popup},
-		{PageLoader:			scope.Navigation.PageLoader},
+		{PageLoader:		scope.Navigation.PageLoader},
 		{ToolTip:				scope.Navigation.ToolTip},
 		/* Editors */
-		{CodeEditor:			scope.Editors.CodeEditor}
-
+		{CodeEditor:		scope.Editors.CodeEditor},
+		/* Controllers*/
+		{ListItemController:scope.DataControls.ListItemController}
 	);
 
 // end module definition

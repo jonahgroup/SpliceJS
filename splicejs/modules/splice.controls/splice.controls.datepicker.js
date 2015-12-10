@@ -50,8 +50,10 @@ definition:function(sjs){
 	    if (!date) return;
 
 	    if (this.format) {
-	        date = format('{0:' + this.format + '}', date);
-	    }
+	      date = format('{0:' + this.format + '}', date);
+	    } else {
+				date = date.toString();
+			}
 
 	    this.children.selector.dataIn(date);
 	};

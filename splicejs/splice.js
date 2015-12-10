@@ -2502,6 +2502,10 @@ if(content instanceof Controller ){
 			 !(content instanceof Controller) && !(content instanceof View) ) {
 		  // composed content, represented by content object's properties
 			var keys = Object.keys(content);
+			if(!keys || keys.length < 1) {
+				_applyContent.call(this,content.toString(), null, callback);
+				return;
+			}
 			for(var i=0; i<keys.length; i++){
 				_applyContent.call(this,content[keys[i]], keys[i], callback);
 			}

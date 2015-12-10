@@ -74,7 +74,7 @@ definition:function(sjs){
 	*	Cell container class
 	*
 	*/
-	var CellContainer = Class(function CellContainerController(){
+	var CellContainer = Class(function CellContainerController(args){
 		this.super();
 
 		event(this).attach({
@@ -108,19 +108,19 @@ definition:function(sjs){
 		event(this.views.topEdge).attach({
 			onmousedown : event.unicast
 		}).onmousedown.subscribe(
-			function(e){self.onStartResize(e,top);}, this
+			function(e){this.onStartResize(e,top);}, this
 		);
 
 		event(this.views.rightEdge).attach({
 			onmousedown : event.unicast
 		}).onmousedown.subscribe(
-			function(e){self.onStartResize(e,right);}, this
+			function(e){this.onStartResize(e,right);}, this
 		);
 
 		event(this.views.bottomEdge).attach({
 			onmousedown	:	event.unicast
 		}).onmousedown.subscribe(
-			function(e){self.onStartResize(e,bottom);}, this
+			function(e){this.onStartResize(e,bottom);}, this
 		);
 	};
 
@@ -217,8 +217,8 @@ definition:function(sjs){
 
 			for(var i=0; i< this.cells.length; i++) {
 				addCell.call(this,	this.cells[i].content,
-					this.cells[i].row, this.cells[i].col,
-					this.cells[i].rowspan, this.cells[i].colspan);
+					[this.cells[i].row, this.cells[i].col,
+					this.cells[i].rowspan, this.cells[i].colspan]);
 			}
 			this.reflow();
 		}
@@ -282,7 +282,7 @@ definition:function(sjs){
 		cell.onMaximize.subscribe(this.maximizeCell,this);
 
 		this.layoutCells[cell.index] = cell;
-		this.views.root.appendChild(cell.concrete.dom);
+		this.content(cell).add();
 		cell.onAttach();
 		cell.onDisplay();
 		cell.onAdd(cell);
