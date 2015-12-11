@@ -130,7 +130,10 @@
         cells:[
           {
             col:0, row:0, colspan:1, rowspan:1,
-            content:'test'
+            content:<div style="background-color:#343434; position:absolute;"
+                          sjs-controller = "SpliceJS.Ui.UIControl">
+              test
+            </div>
           },
           {
             col:2, row:2, colspan:1, rowspan:1,
@@ -161,6 +164,13 @@
   </td>
 </tr>
 
+<!-- Dom Iterator -->
+<tr>
+  <td>Dom Iterator</td>
+  <td><sjs-include sjs-type="SpliceJS.Controls.DomIterator">
+
+  </sjs-include></td>
+</tr>
 
 <!-- Another Component -->
 <tr>

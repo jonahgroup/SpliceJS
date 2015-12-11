@@ -6,7 +6,7 @@ required:[
   '{sjshome}/modules/splice.document.js',
   '{sjshome}/modules/splice.data.js',
   '{sjshome}/modules/splice.text.js',
-  '{sjshome}/modules/splice.ui.js',
+  {'SpliceJS.Ui':'{sjshome}/modules/splice.ui.js'},
   {'SpliceJS.Controls':'{sjshome}/modules/splice.controls.js'},
   'splice.test.components.css',
   'splice.test.components.html',

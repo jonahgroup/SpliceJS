@@ -212,76 +212,73 @@ definition:function(sjs){
 	var Positioning =  {
 
 		//@ Take mouse event object to return mouse position coordinates
-	    mousePosition:function(e){
-	        //http://www.quirksmode.org/js/events_properties.html#position
-		var posx = 0;
-		var posy = 0;
-		if (!e) var e = window.event;
-		if (e.pageX || e.pageY) 	{
-			posx = e.pageX;
-			posy = e.pageY;
-		}
-		else if (e.clientX || e.clientY) 	{
-			posx = e.clientX + document.body.scrollLeft
-				+ document.documentElement.scrollLeft;
-			posy = e.clientY + document.body.scrollTop
-				+ document.documentElement.scrollTop;
-		}
-		return {x:posx,y:posy};
-	    },
+	  mouse:function(e){
+		  //http://www.quirksmode.org/js/events_properties.html#position
+			var posx = 0;
+			var posy = 0;
+			if (!e) var e = window.event;
+			if (e.pageX || e.pageY) 	{
+				posx = e.pageX;
+				posy = e.pageY;
+			}
+			else if (e.clientX || e.clientY) 	{
+				posx = e.clientX + document.body.scrollLeft
+					+ document.documentElement.scrollLeft;
+				posy = e.clientY + document.body.scrollTop
+					+ document.documentElement.scrollTop;
+			}
+			return {x:posx,y:posy};
+	  },
 
-	    /*
-	    	Returns element coordinates in
-	    	document.body coordinate space
-	    */
-	    abs: function(obj) {
-	      var n = obj;
-				if(obj instanceof sjs.types.View)
-					n = obj.htmlElement;
-				var location  = [0,0];
+    /*
+    	Returns element coordinates in
+    	document.body coordinate space
+    */
+    abs: function(obj) {
+      var n = obj;
+			if(obj instanceof sjs.types.View)
+				n = obj.htmlElement;
+			var location  = [0,0];
 
-	    	while (n != undefined) {
-	            location[0] += z(n.offsetLeft);
-	            location[1] += z(n.offsetTop);
-	            location[1] -= n.scrollTop;
-	            n = n.offsetParent;
+    	while (n != undefined) {
+            location[0] += z(n.offsetLeft);
+            location[1] += z(n.offsetTop);
+            location[1] -= n.scrollTop;
+            n = n.offsetParent;
 			}
 
 			return {
 				x:location[0] + z(document.body.scrollLeft),
 				y:location[1] + z(document.body.scrollTop)
 			};
-	    },
+    },
 
 
-	    containsPoint:function(element,p) {
-	        pos = JSPositioning.absPosition(element);
+    containsPoint:function(element,p) {
+	    pos = this.abs(element);
 
 			pos.height = element.clientHeight;
 			pos.width = element.clientWidth;
 
 			if( p.x >= pos.x && p.x <= (pos.x + pos.width)) {
-			if(p.y >= pos.y && p.y <= pos.y + (pos.height / 2))
-	            return 1;
-			else if(p.y >= pos.y + (pos.height / 2) && p.y <= pos.y + pos.height )
-	            return -1;
+				if(p.y >= pos.y && p.y <= pos.y + (pos.height / 2))
+		    	return 1;
+				else if(p.y >= pos.y + (pos.height / 2) && p.y <= pos.y + pos.height )
+		    	return -1;
 			}
-	            return 0;
-	    },
+	    return 0;
+    },
 
-	    documentDimensions:function(){
-	        docWidth = 0;
-	        docHeight = 0;
+	  docsize:function(){
+      var docWidth = document.body.offsetWidth?document.body.offsetWidth:window.innerWidth;
+      var docHeight = document.body.offsetHeight?document.body.offsetHeight:window.innerHeight;
 
-	        docWidth = document.body.offsetWidth?document.body.offsetWidth:window.innerWidth;
-	        docHeight = document.body.offsetHeight?document.body.offsetHeight:window.innerHeight;
+      return {width:docWidth, height:docHeight};
+	  },
 
-	        return {width:docWidth, height:docHeight};
-	    },
-
-	    windowDimensions: function () {
-	        return { width: window.innerWidth, height: window.innerHeight };
-	    }
+	  windowsize: function () {
+	  	return { width: window.innerWidth, height: window.innerHeight };
+	  }
 	};
 
 
@@ -297,19 +294,18 @@ definition:function(sjs){
 		started:false,
 
 		/* contains position of the original click */
-	    offset:null,
+	  offset:null,
 
 		//array of DOM elements that track drop event
-	    trackers:null,
+	  trackers:null,
 
-	    startDrag:function(elementnode, event){
+	  startDrag:function(elementnode, event){
 
-	    	this.ondragfired = false;
-
-	    	this.disableSelection(document.body, event);
+	    this.ondragfired = false;
+			this.disableSelection(document.body, event);
 			//get original position of the trigger node
 			//p = JSPositioning.absPosition(elementnode);
-			var p = Positioning.mousePosition(event);
+			var p = Positioning.mouse(event);
 
 			this.offset = {x:p.x,y:p.y};
 
@@ -333,7 +329,7 @@ definition:function(sjs){
 		},
 
 		drag:function(e) {
-			var mousePos = Positioning.mousePosition(e);
+			var mousePos = Positioning.mouse(e);
 			this.ondrag(mousePos,DragAndDrop.offset);
 			if(this.ondragfired === false) {
 				this.onbegin();

@@ -126,7 +126,7 @@ definition:function(sjs){
 
 	CellContainer.prototype.startResize = function(e,direction){
 		debug.log('Resizing in ' + direction + ' direction');
-		DragAndDrop.startDrag();
+		DragAndDrop.startDrag(e.source, e.domEvent);
 
 		var self = this;
 		DragAndDrop.ondrag =  function(p,offset){
@@ -559,9 +559,9 @@ definition:function(sjs){
 		var margin 		 = this.margin;
 		var outer_margin = this.outerMargin;
 
-		var DOM = this.views.root;
+		var DOM = this.views.root.htmlElement;
 
-		var offset = scope.SpliceJS.UI.Positioning.absPosition(DOM);
+		var offset = scope.SpliceJS.UI.Positioning.abs(DOM);
 
 		var grid = this.grid;
 

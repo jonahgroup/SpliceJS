@@ -927,8 +927,8 @@ UrlAnalyzer.prototype = {
 	function domEventArgs(e){
 		return {
 			mouse: mousePosition(e),
-		   	source: e.srcElement,
-            e:e,     // source event
+		  source: e.srcElement,
+      domEvent:e,     // source event
 			cancel: function(){
             	this.cancelled = true;
             	e.__jsj_cancelled = true;
@@ -2383,6 +2383,8 @@ function isExternalType(type){
 */
 function Controller(){
 
+		this.views = {};
+
 		if(!this.children)	this.children = [];
 		if(!this.__sjs_visual_children__) this.__sjs_visual_children__ = [];
 
@@ -2578,7 +2580,7 @@ if(content instanceof Controller ){
 
 
 
-	function _processIncludeAnchors(dom, controller, scope, onInstance){
+	function _processIncludeAnchors(dom, controller, scope){
 		var anchors = dom.querySelectorAll('[data-sjs-tmp-anchor]');
 
 		for(var i=0; i < anchors.length; i++){
@@ -2587,10 +2589,8 @@ if(content instanceof Controller ){
 			var _Proxy 	= this.children[childId];
 
 			var instance = new _Proxy({parent:controller, parentscope:scope});
+			if(!instance.views || !instance.views.root) continue;
 			anchors[i].parentNode.replaceChild(instance.views.root.htmlElement, anchors[i]);
-			if(typeof onInstance === 'function') {
-				onInstance(instance);
-			}
 		}
 	};
 
