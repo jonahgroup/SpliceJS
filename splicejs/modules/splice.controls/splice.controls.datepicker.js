@@ -10,6 +10,7 @@ required:[
 ,
 
 definition:function(sjs){
+	"use strict";
 
 	var scope = this.scope
 	,	Class = this.sjs.Class
@@ -34,6 +35,9 @@ definition:function(sjs){
 
 	}).extend(UIControl);
 
+	DatePicker.prototype.initialize = function(){
+
+	};
 
 	DatePicker.prototype.onDataIn = function(item){
 		this.setDate(item.getValue());

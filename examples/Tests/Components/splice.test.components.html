@@ -180,7 +180,10 @@
 <tr>
   <td>Dom Iterator</td>
   <td><sjs-include sjs-type="SpliceJS.Controls.DomIterator">
-
+    {
+        dataIn: binding('onProvinces').parent,
+        element:<div sjs-content="default"></div>
+    }
   </sjs-include></td>
 </tr>
 

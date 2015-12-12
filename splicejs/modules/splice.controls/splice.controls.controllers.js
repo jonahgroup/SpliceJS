@@ -2,7 +2,8 @@
 sjs({
 
 required:[
-	{'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'}
+	{'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
+	 'splice.controls.controllers.html'
 ],
 
 
@@ -11,9 +12,11 @@ definition:function(){
 
 	var Class = sjs.Class
 	,	Controller = sjs.Controller
+	, scope = this.scope
 	,	Event = sjs.Event
 	,	exports = sjs.exports;
 
+	var UIControl = scope.SpliceJS.UI.UIControl;
 
 	var DomIterator = Class(function DomIteratorController(args){
 		this.super();
@@ -37,7 +40,6 @@ definition:function(){
 			var frm = this.from?this.from:0
 			,	seq = 0;
 
-
 			for(var i = frm; i < this.to; i++ ){
 
 				this.conc.push(new args.dom({
@@ -52,12 +54,6 @@ definition:function(){
 
 				this.nodes.push(this.conc[seq++].concrete.dom);
 			}
-			this.concrete = {
-				export:function(){
-					return self.nodes;
-				}
-			};
-
 		}
 		else {
 			this.concrete = {
@@ -69,9 +65,13 @@ definition:function(){
 
 		if(!args.dom) return;
 
-	}).extend(Controller);
+	}).extend(UIControl);
 
-	DomIterator.prototype.dataIn = function(data){
+	DomIterator.prototype.initialize = function(){
+
+	};
+
+	DomIterator.prototype.onDataIn = function(data){
 		if(this.sequential) return;
 
 		var nToUpdate = Math.min(this.conc.length, data.length);
@@ -102,11 +102,14 @@ definition:function(){
 
 	DomIterator.prototype.onStyleSelect = Event;
 
-
+	//scope exports
+	exports.scope(
+		DomIterator
+	);
 
 	//module exports
 	exports.module(
-		{DomIterator:DomIterator}
+		DomIterator
 	);
 
 }

@@ -134,6 +134,13 @@ definition:function(sjs){
 		this.onDataOut(data);
 	};
 
+	UIControl.prototype.initialize = function(){
+		var fn = sjs.fname(this.constructor)
+		if(fn === 'UIControl') return;
+		console.warn(fn + '.initialize is not implemented');
+	};
+
+
 
 
 
