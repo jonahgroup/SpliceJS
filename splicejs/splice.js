@@ -2484,22 +2484,32 @@ if(content instanceof Controller ){
 
 	function _applyContent(content, key, callback){
 		var view = this.views.root;
-		if(content == null) return this;
+		var result = 0;
+
+		if(content == null) return result;
+
+		if(key != null && view.contentMap[key] == null)
+			return result = -1;
+
+		//proxy content
 		if(content.__sjs_isproxy__ === true ){
 			return _applyContent.call(this,new content({parent:this}), key, callback);
 		}
+
 		//no content map, simple view, default map must be present
 		if(content instanceof Controller) {
 			if(!content.views || !content.views.root) return this;
 			callback.call(view,content.views.root, key);
-			return this;
+			return result;
 		}
 		callback.call(view, content, key);
-		return this;
+		return result;
 	}
 
 	function _controllerContentMapper(content,callback){
-		var type = typeof(content);
+		var type = typeof(content),
+		isContent = 0;
+
  		if( type == 'object' &&
 			 !(content instanceof Controller) && !(content instanceof View) ) {
 		  // composed content, represented by content object's properties
@@ -2509,7 +2519,10 @@ if(content instanceof Controller ){
 				return;
 			}
 			for(var i=0; i<keys.length; i++){
-				_applyContent.call(this,content[keys[i]], keys[i], callback);
+				isContent +=_applyContent.call(this,content[keys[i]], keys[i], callback);
+			}
+			if(isContent < 0){
+				_applyContent.call(this,content.toString(), null, callback);
 			}
 			return this;
 		}

@@ -79,7 +79,7 @@
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
       {
-          default:'Please select an item',
+          default:{name:'Please select an item'},
           selectorDataPath:'name',
           dataIn: binding('onProvinces').parent,
           onDataItem: binding('provinceSelected').parent,
@@ -96,12 +96,24 @@
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
       {
-          default:'Please select an item',
+          default:{name:'Please select an item'},
           selectorDataPath:'name',
           dataIn: binding('onProvinces').parent,
           onDataItem: binding('provinceSelected').parent,
           css:{list: 'test-drop-down-list'},
-          itemTemplate:<sjs-include sjs-type="ComboBoxTestItem3"></sjs-include>
+          itemTemplate:<div sjs-controller="SpliceJS.Ui.UIControl">
+           <sjs-include sjs-type="SpliceJS.Controls.Button">
+             {
+               dataPath:'name',
+               dataIn:binding('onDataOut').parent
+             }
+            </sjs-include>
+            <sjs-include sjs-type="ComboBoxTestItem3">
+              {
+              dataIn:binding('onDataOut').parent
+              }
+            </sjs-include>
+          </div>
       }
     </sjs-include>
   </td>
