@@ -5,7 +5,7 @@
   <td>Button</td>
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.Button">
-      {content: {label: 'Test Button'}}
+      {content: 'Custom Button Text'}
     </sjs-include>
   </td>
 </tr>
@@ -182,7 +182,18 @@
   <td><sjs-include sjs-type="SpliceJS.Controls.DomIterator">
     {
         dataIn: binding('onProvinces').parent,
-        element:<div sjs-content="default"></div>
+        element:<div sjs-controller="SpliceJS.Ui.UIControl"
+                     style="position:relative; width:300px; height:35px;">
+          <span sjs-content="name"></span>
+          <div style="display:inline; float:right;">
+            <sjs-include sjs-type="SpliceJS.Controls.Button">
+              {
+                dataPath: 'isChecked',
+                dataIn:binding('onDataOut').parent
+              }
+            </sjs-include>
+          </div>
+        </div>
     }
   </sjs-include></td>
 </tr>

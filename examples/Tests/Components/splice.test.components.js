@@ -99,6 +99,10 @@ definition:function(sjs){
       console.log('Selected province is:' + item);
   }
 
+  ComponentsTest.prototype.updateRecords = function(){
+    this.onProvinces(provinces2);
+  };
+
 
   var foo = function foo(obj, path) {
     var parts = path.split('.');
