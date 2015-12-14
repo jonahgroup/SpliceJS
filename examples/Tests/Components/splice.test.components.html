@@ -125,6 +125,8 @@
   <td>Check List</td>
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.CheckListBox">{
+      itemCheckPath:'isChecked',
+      dataItemPath:'name',
       dataIn: binding('onProvinces').parent,
     }</sjs-include>
   </td>
@@ -188,7 +190,7 @@
           <div style="display:inline; float:right;">
             <sjs-include sjs-type="SpliceJS.Controls.Button">
               {
-                dataPath: 'isChecked',
+                dataPath: 'office.address.street',
                 dataIn:binding('onDataOut').parent
               }
             </sjs-include>

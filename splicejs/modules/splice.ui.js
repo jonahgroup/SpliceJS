@@ -28,16 +28,19 @@ definition:function(sjs){
 		var parts = path.toString().split('.');
 		for(var i=0; i<parts.length-1; i++){
 			this.refsource = this.refsource[parts[i]];
+			if(this.refsource == null) break;
 		}
 		this.refpath = parts[parts.length-1];
 	};
 
 	DataItem.prototype.getValue = function(){
+		if(this.refsource == null) return null;
 		if(!this.refpath) return this.refsource;
 		return this.refsource[this.refpath];
 	}
 
 	DataItem.prototype.setValue = function(value){
+		if(this.refsource == null) return null;
 		if(!this.refpath) return;
 		this.refsource[this.refpath] = value;
 	}

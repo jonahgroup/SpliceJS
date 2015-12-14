@@ -2507,6 +2507,7 @@ if(content instanceof Controller ){
 	}
 
 	function _controllerContentMapper(content,callback){
+		if(content == null) return;
 		var type = typeof(content),
 		isContent = 0;
 

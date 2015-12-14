@@ -9,6 +9,7 @@
 sjs({
 
   required:[
+    {'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
     {'Doc':'{sjshome}/modules/splice.document.js'},
     {'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
     {'SpliceJS.Controls':'splice.controls.listbox.js'},
@@ -25,6 +26,7 @@ sjs({
     , dom = this.scope.Doc.dom
     , components = this.scope.components;
 
+    var DataItem = scope.SpliceJS.UI.DataItem;
 
     var CheckListBoxController = Class(function CheckListBoxController(args){
       this.super(args);
@@ -42,13 +44,18 @@ sjs({
 
     CheckListItemController.prototype.onDataIn = function(item){
       if(!item) return;
+      if(this.itemCheckPath){
+          this.dataItemCheck = new DataItem(item.refsource,this.itemCheckPath);
+      }
       this.views.root.replace(item.getValue());
       _check.call(this);
       this.onDataOut(item);
     };
 
     CheckListItemController.prototype.toggle = function(dataItem){
-      this.dataItem.ischecked = !this.dataItem.ischecked;
+      if(!this.dataItemCheck) return;
+      var value = this.dataItemCheck.getValue();
+      this.dataItemCheck.setValue(!value);
       _check.call(this);
     };
 
@@ -58,7 +65,10 @@ sjs({
       var listBox = null;
 
       if(!this.itemTemplate){
-        args.itemTemplate = scope.components.CheckListBoxItem;
+        args.itemTemplate = sjs.proxy({
+          type:'components.CheckListBoxItem',
+          itemCheckPath: args.itemCheckPath
+        });
       } else {
         args.itemTemplate = this.itemTemplate;
       }
@@ -94,7 +104,8 @@ sjs({
 
     // apply check mark class
     function _check(){
-      if(this.dataItem.getValue().ischecked === true) {
+      var value = this.dataItemCheck.getValue();
+      if(value === true) {
         this.views.root.class('checked').add();
       } else {
         this.views.root.class('checked').remove();
