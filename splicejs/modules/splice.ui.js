@@ -44,6 +44,12 @@ definition:function(sjs){
 		if(!this.refpath) return;
 		this.refsource[this.refpath] = value;
 	}
+	/**
+	return child DataItem
+	*/
+	DataItem.prototype.path = function(){
+		
+	};
 
 
 	/**

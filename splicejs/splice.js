@@ -448,6 +448,69 @@ var sjs = (function(window, document){
 	}
 
 
+function _box(element){
+
+	var css = window.getComputedStyle(element,null);
+
+	var w  = css.getPropertyValue('width')
+	,	h  = css.getPropertyValue('height')
+	,	pl = css.getPropertyValue('padding-left')
+	,	pt = css.getPropertyValue('padding-top')
+	,	pr = css.getPropertyValue('padding-right')
+	,	pb = css.getPropertyValue('padding-bottom')
+	, bl = css.getPropertyValue('border-left-width')
+	,	bt = css.getPropertyValue('border-top-width')
+	,	br = css.getPropertyValue('border-right-width')
+	,	bb = css.getPropertyValue('border-bottom-width')
+	,	ml = css.getPropertyValue('margin-left')
+	,	mt = css.getPropertyValue('margin-top')
+	,	mr = css.getPropertyValue('margin-right')
+	,	mb = css.getPropertyValue('margin-bottom');
+
+	return {
+		height:	h,
+		width:	w,
+		padding: {left:pl, top:pt, right:pr, bottom:pb},
+		border:  {left:bl, top:bt, right:br, bottom:bb},
+		margin:  {left:ml, top:mt, right:mr, bottom:mb},
+		unit:function(){return {
+				height:	+_unit(h),
+				width:	+_unit(w),
+				padding: {left: +_unit(pl), top: +_unit(pt), right: +_unit(pr), bottom: +_unit(pb)},
+				border:  {left: +_unit(bl), top: +_unit(bt), right: +_unit(br), bottom: +_unit(bb)},
+				margin:  {left: +_unit(ml), top: +_unit(mt), right: +_unit(mr), bottom: +_unit(mb)}
+			}
+		}
+	}
+};
+
+
+/**
+*/
+function ViewReflow(){
+
+}
+
+ViewReflow.prototype.default = function(){
+	return this;
+};
+
+ViewReflow.prototype.fitparent = function(){
+	return this;
+};
+
+ViewReflow.prototype.size = function(left, top, width, height){
+	var box = _box(this.htmlElement).unit()
+	, s = this.htmlElement.style;
+
+	s.width = (width - box.padding.left
+									- box.padding.right
+									- box.border.left
+									- box.border.right) + 'px';
+
+
+	return this;
+};
 
 /**
 	Dom manipulation api
@@ -468,6 +531,7 @@ function View(dom, args){
 	else {
 		this.isSimple = true;
 	}
+	this.reflow = new ViewReflow(this);
 };
 
 View.prototype.class = function(className){
@@ -518,6 +582,7 @@ View.prototype.child = function(name){
 View.prototype.controller = function(){
 	return this.htmlElement.__sjs_controller__;
 };
+
 
 function addContent(content,key){
 	if(!key) key = 'default';
@@ -1408,20 +1473,6 @@ UrlAnalyzer.prototype = {
 	SplashScreenController.prototype.update = function(total, complete, itemname){
 		throw 'SplashScreenController derived class must implement "update" method';
 	}
-
-
-	function _bootOptionA(){
-
-	}
-
-	function _bootOptionB(){
-
-	}
-
-	function _bootOptionC(){
-
-	}
-
 
 	function onReady(fn){	READY.callback = fn; };
 
