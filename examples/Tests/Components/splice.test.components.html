@@ -1,6 +1,6 @@
 <sjs-component sjs-type="Components" sjs-controller="ComponentsTest" sjs-export>
 <table class="-component-test-table">
-<!-- Button Component -->
+<!--
 <tr>
   <td>Button</td>
   <td>
@@ -11,7 +11,6 @@
 </tr>
 
 
-<!-- CheckBox Component -->
 <tr>
   <td>CheckBox</td>
   <td>
@@ -24,7 +23,6 @@
   </td>
 </tr>
 
-<!-- Text Field -->
 <tr>
   <td>TextField</td>
   <td>
@@ -33,7 +31,6 @@
   </td>
 </tr>
 
-<!-- DatePicker -->
 <tr>
   <td>Date Picker</td>
   <td>
@@ -41,7 +38,6 @@
   </td>
 </tr>
 
-<!-- ComboBox -->
 <tr>
   <td>ComboBox</td>
   <td>
@@ -56,8 +52,7 @@
   </sjs-include>
 </td>
 </tr>
-
-<!-- Templated ComboBox-->
+-->
 <tr>
   <td>Templated ComboBox - Button</td>
   <td>
@@ -73,7 +68,6 @@
   </td>
 </tr>
 
-<!-- Another Component -->
 <tr>
   <td>Templated ComboBox - Text Field</td>
   <td>
@@ -90,7 +84,6 @@
   </td>
 </tr>
 
-<!-- Another Component -->
 <tr>
   <td>Templated ComboBox - Table</td>
   <td>
@@ -120,21 +113,18 @@
 </tr>
 
 
-<!-- Check List -->
 <tr>
   <td>Check List</td>
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.CheckListBox">{
       itemCheckPath:'isChecked',
-      dataItemPath:'name',
-      dataIn: binding('onProvinces').parent,
-      onDataItem: binding('updateRecords').parent
+      itemContentPath:'name',
+      dataIn: binding('onProvinces').parent
     }</sjs-include>
   </td>
 </tr>
 
-
-<!-- Another Component -->
+<!--
 <tr>
   <td>Grid Layout</td>
   <td>
@@ -164,8 +154,7 @@
   </td>
 </tr>
 
-
-<!-- Scroll Panel -->
+Scroll Panel
 <tr>
   <td>Scroll Panel</td>
   <td>
@@ -178,6 +167,7 @@
     </div>
   </td>
 </tr>
+-->
 
 <!-- Dom Iterator -->
 <tr>

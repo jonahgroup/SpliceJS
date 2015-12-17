@@ -45,7 +45,7 @@ sjs({
     CheckListItemController.prototype.onDataIn = function(item){
       if(!item) return;
       if(this.itemCheckPath){
-          this.dataItemCheck = new DataItem(item.refsource,this.itemCheckPath);
+          this.dataItemCheck = item.path(this.itemCheckPath);
       }
       this.views.root.replace(item.getValue());
       _check.call(this);

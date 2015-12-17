@@ -19,7 +19,10 @@ definition:function(sjs){
   , Controller = sjs.Controller
   , Event = sjs.Event
   , event = sjs.event
+  , scope = this.scope
   , exports = sjs.exports;
+
+  var DataItem = scope.SpliceJS.Ui.DataItem;
 
   var provinces = [
     'Ontario','British Columbia', 'Alberta', 'Quebec','New Brunswick',
@@ -28,13 +31,14 @@ definition:function(sjs){
   ];
 
 
-  var provinces2 = [
+  var provinces2 = event(
+    new DataItem([
     {name:'Ontario', isChecked:false},
     {name:'Alberta', isChecked:true},
     {name:'British Columbia', isChecked:true, population:10000,
     office:{address:{street:'king'}}},
     {name:'Quebec', isChecked:true}
-  ];
+  ])).attach({onChanged:event.multicast});
 
 
   var charts = [
@@ -117,6 +121,23 @@ definition:function(sjs){
     return fn;
   };
 
+  var DataItem = scope.SpliceJS.Ui.DataItem;
+  var mtest = function mtest(){
+    console.log('Testing DataItem memory allocation');
+    var mb = window.performance.memory.usedJSHeapSize;
+    console.log('before: ' + mb);
+    var a = new DataItem({});
+    window.__sjs_test__ = a;
+    for(var i=0; i<1000000; i++){
+      a.path(i);
+    }
+    var ma = window.performance.memory.usedJSHeapSize;
+    console.log('after: ' + ma);
+    var md = ma - mb;
+    console.log('diff: ' + md);
+    console.log('diff K: ' + md/1024);
+
+  }
 
 
   //scope exports
@@ -126,7 +147,7 @@ definition:function(sjs){
 
   //module exports
   exports.module(
-    ComponentsTest, foo
+    ComponentsTest, foo, mtest
   );
 
 }

@@ -31,25 +31,37 @@ definition:function(){
 	DomIterator.prototype.initialize = function(){
 	};
 
-	DomIterator.prototype.onDataIn = function(data){
+	DomIterator.prototype.onDataItemChanged = function(item){
+		var i = item.fullPath().split('.')[0];
+		if(this.dataItemPath) {
+			this.elements[i].dataIn(this.dataItem.path(i+'.'+this.dataItemPath));
+		}
+		else {
+			this.elements[i].content(this.dataItem.path(i).getValue()).replace();
+			this.elements[i].dataIn(this.dataItem.path(i));
+		}
+	};
+
+	DomIterator.prototype.onDataIn = function(dataItem){
 		if(this.element == null) return;
 
-		var source = data.getValue();
+		var source = dataItem.getValue();
 		if(!(source instanceof Array)) return;
 
 		//update existing elements
 		for(var i=0; i < this.elements.length; i++){
 			var element = this.elements[i];
 			element.content(source[i]).replace();
-			element.dataIn(source,i);
+			element.dataIn(dataItem.path(i));
 		}
 
 		//create new elements
 		for(var i = this.elements.length; i < source.length; i++){
 			var element = new this.element({parent:this});
 			element.content(source[i]).replace();
-			element.dataIn(source,i);
 			this.content(element).add();
+			element.dataIn(dataItem.path(i));
+
 			//cache elements
 			this.elements.push(element);
 		}

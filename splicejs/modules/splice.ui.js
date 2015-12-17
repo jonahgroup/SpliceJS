@@ -21,36 +21,72 @@ definition:function(sjs){
 	var Animate = scope.Animation.Animate;
 
 
-	var DataItem = function DataItem(data, path){
-		this.source = this.refsource = data;
-
-		if(path == null || path === '') return this;
-		var parts = path.toString().split('.');
-		for(var i=0; i<parts.length-1; i++){
-			this.refsource = this.refsource[parts[i]];
-			if(this.refsource == null) break;
-		}
-		this.refpath = parts[parts.length-1];
+	var DataItem = function DataItem(data){
+		this.source = data;
+		this.parent = null;
+		this.pathmap = {};
 	};
 
 	DataItem.prototype.getValue = function(){
-		if(this.refsource == null) return null;
-		if(!this.refpath) return this.refsource;
-		return this.refsource[this.refpath];
+		if(this.source == null) return null;
+		if(this._path == null) return this.source;
+		return this.source[this._path];
 	}
 
 	DataItem.prototype.setValue = function(value){
-		if(this.refsource == null) return null;
-		if(!this.refpath) return;
-		this.refsource[this.refpath] = value;
+		if(this.source == null) return null;
+		if(this._path == null) return;
+		this.source[this._path] = value;
+
+		var node = this;
+		while(node != null){
+				if(node.onChanged) {
+					node.onChanged(this);
+					break;
+				}
+				node = node.parent;
+		}
 	}
 	/**
 	return child DataItem
 	*/
-	DataItem.prototype.path = function(){
-		
+	DataItem.prototype.path = function(path){
+		if(path == null || path === '') return this;
+
+		var parts = path.toString().split('.');
+/*
+		var source = this._path != null?
+								 this.source[this._path] : this.source ;
+*/
+		var parent = this;
+		for(var i=0; i < parts.length; i++){
+
+			var child = parent.pathmap[parts[i]];
+			var ref = parent._path != null?parent.source[parent._path] : parent.source;
+
+			if(ref[parts[i]] == null) return new DataItem(null);
+
+			if(child == null) {
+				child = new DataItem(ref);
+				child._path = parts[i];
+				parent.pathmap[parts[i]] = child;
+				child.parent = parent;
+			}
+			parent = child;
+		}
+		return parent;
 	};
 
+	DataItem.prototype.fullPath = function(){
+		var node = this;
+		var path = '';
+		while(node != null){
+			if(node._path != null)
+				path = node._path +'.'+ path;
+			node = node.parent;
+		}
+		return path;
+	}
 
 	/**
 	 * Base UIControl class
@@ -113,31 +149,33 @@ definition:function(sjs){
 			this.show();
 	};
 	/* Data Contract */
-	UIControl.prototype.dataIn = function(item, path){
-
-		var p = null;
-		if(this.dataPath != null && path != null)
-		 	p = path + '.' + this.dataPath;
-		else if(path != null) p = path;
-		else if(this.dataPath != null) p = this.dataPath;
-
+	UIControl.prototype.dataIn = function(item){
 
 		if(item instanceof DataItem) {
-			if(p != null) {
-				this.dataItem = new DataItem(item.getValue(),p);
+				this.dataItem = item.path(this.dataPath);
 				this.onDataIn(this.dataItem);
-			}
-			else {
-				this.dataItem = item;
-				this.onDataIn(item); //passthrough
-			}
+
+				var node = item;
+				while(node != null){
+					if(node.onChanged) {
+						node.onChanged.subscribe(this.onDataItemChanged,this);
+						break;
+					}
+					node = node.parent;
+				}
+
 			return;
 		}
 		// datapath is only set externally
-		this.dataItem = new DataItem(item, p);
+		this.dataItem = new DataItem(item, this.dataPath);
+		event(this.dataItem).attach({
+				onChanged : event.multicast
+		}).onChanged.subscribe(this.onDataItemChanged,this);
 		// invode data-item handler
 		this.onDataIn(this.dataItem);
 	};
+
+	UIControl.prototype.onDataItemChanged = function(dataItem){};
 
 	UIControl.prototype.onDataIn = function(data){
 		this.onDataOut(data);

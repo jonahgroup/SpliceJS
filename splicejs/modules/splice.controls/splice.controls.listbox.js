@@ -70,31 +70,39 @@ definition:function(sjs){
 	};
 
 
-	ListBoxController.prototype.onDataIn = function(inData){
-		var dataItem = inData.getValue()
+	ListBoxController.prototype.onDataItemChanged = function(item){
+		var i = item.fullPath().split('.')[0];
+		if(this.dataItemPath)
+			this.listItems[i].dataIn(this.dataItem.path(i+'.'+this.dataItemPath));
+		else
+			this.listItems[i].dataIn(this.dataItem.path(i));	
+	};
+
+	ListBoxController.prototype.onDataIn = function(dataItem){
+		var list = dataItem.getValue()
 		, item = null;
 
 		// update existing items if any
 		for(var i=0; i<this.listItems.length; i++){
 			var item = this.listItems[i];
-			if(this.dataItemPath)
-			 item.dataIn(dataItem[i],this.dataItemPath);
-			else
-			 item.dataIn(dataItem,i);
+			 if(this.dataItemPath)
+ 			 	item.dataIn(dataItem.path(i+'.'+this.dataItemPath));
+ 			 else
+ 			 	item.dataIn(dataItem.path(i));
 		}
 
 		// add new items
-		for(var i= this.listItems.length; i<dataItem.length; i++) {
+		for(var i= this.listItems.length; i<list.length; i++) {
 			if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
 				this.listItems.push(item);
+
 				if(this.dataItemPath)
-				 	item.dataIn(dataItem[i],this.dataItemPath);
+				 item.dataIn(dataItem.path(i+'.'+this.dataItemPath));
 				else
-					item.dataIn(dataItem,i);
+				 item.dataIn(dataItem.path(i));
 
 				item.views.root.htmlElement.__sjs_item_index__ = i;
-
 				this.dom.add(item.views.root);
 				if(typeof item.onAttached == 'function')
 					item.onAttached();
@@ -119,10 +127,10 @@ definition:function(sjs){
 		}
 	});
 
-	DefaultListItem.prototype.dataIn = function(item, path){
+	DefaultListItem.prototype.dataIn = function(item){
 		if(!item) return;
 		//call UIControl's implemenration os the dataIn
-		UIControl.prototype.dataIn.call(this,item,path);
+		UIControl.prototype.dataIn.call(this,item);
 	};
 
 	DefaultListItem.prototype.onDataIn = function(item){
