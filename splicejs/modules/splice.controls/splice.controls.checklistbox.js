@@ -44,10 +44,14 @@ sjs({
 
     CheckListItemController.prototype.onDataIn = function(item){
       if(!item) return;
-      if(this.itemCheckPath){
+      if(this.itemCheckPath != null){
           this.dataItemCheck = item.path(this.itemCheckPath);
       }
-      this.views.root.replace(item.getValue());
+      this.dataContentItem = item;
+      if(this.itemContentPath != null) {
+        this.dataContentItem = item.path(this.itemContentPath);
+      }
+      this.views.root.replace(this.dataContentItem.getValue());
       _check.call(this);
       this.onDataOut(item);
     };
@@ -67,7 +71,8 @@ sjs({
       if(!this.itemTemplate){
         args.itemTemplate = sjs.proxy({
           type:'components.CheckListBoxItem',
-          itemCheckPath: args.itemCheckPath
+          itemCheckPath: args.itemCheckPath,
+          itemContentPath: args.itemContentPath 
         });
       } else {
         args.itemTemplate = this.itemTemplate;

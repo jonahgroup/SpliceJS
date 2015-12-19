@@ -72,10 +72,25 @@ definition:function(sjs){
 
 	ListBoxController.prototype.onDataItemChanged = function(item){
 		var i = item.fullPath().split('.')[0];
+		var di = null;
 		if(this.dataItemPath)
-			this.listItems[i].dataIn(this.dataItem.path(i+'.'+this.dataItemPath));
+			di = this.dataItem.path(i+'.'+this.dataItemPath);
 		else
-			this.listItems[i].dataIn(this.dataItem.path(i));	
+			di = this.dataItem.path(i);
+
+		if(this.listItems[i]) {
+			this.listItems[i].dataIn(di);
+		} else {
+			var item = new this.itemTemplate({parent:this});
+			this.listItems.push(item);
+			item.dataIn(di);
+
+			item.views.root.htmlElement.__sjs_item_index__ = i;
+			this.dom.add(item.views.root);
+			if(typeof item.onAttached == 'function')
+				item.onAttached();
+
+		}
 	};
 
 	ListBoxController.prototype.onDataIn = function(dataItem){

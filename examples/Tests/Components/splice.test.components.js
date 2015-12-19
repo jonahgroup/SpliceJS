@@ -23,6 +23,7 @@ definition:function(sjs){
   , exports = sjs.exports;
 
   var DataItem = scope.SpliceJS.Ui.DataItem;
+  var ObservableDataItem = scope.SpliceJS.Ui.ObservableDataItem;
 
   var provinces = [
     'Ontario','British Columbia', 'Alberta', 'Quebec','New Brunswick',
@@ -31,14 +32,17 @@ definition:function(sjs){
   ];
 
 
-  var provinces2 = event(
-    new DataItem([
+  var provinces2 = ObservableDataItem([
     {name:'Ontario', isChecked:false},
     {name:'Alberta', isChecked:true},
     {name:'British Columbia', isChecked:true, population:10000,
     office:{address:{street:'king'}}},
     {name:'Quebec', isChecked:true}
-  ])).attach({onChanged:event.multicast});
+  ]).onChanged.subscribe(function(item,old){
+    console.log("changed ");
+    console.log(old);
+    console.log(item.getValue());
+  });
 
 
   var charts = [
@@ -139,6 +143,10 @@ definition:function(sjs){
 
   }
 
+  var testDataItem = function testDataItem(){
+    provinces2.append().setValue({name:'Prince Edward Island', isChecked:true});
+  };
+
 
   //scope exports
   exports.scope(
@@ -147,7 +155,7 @@ definition:function(sjs){
 
   //module exports
   exports.module(
-    ComponentsTest, foo, mtest
+    ComponentsTest, foo, mtest,testDataItem
   );
 
 }

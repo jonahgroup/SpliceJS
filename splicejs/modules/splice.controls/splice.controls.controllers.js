@@ -33,13 +33,31 @@ definition:function(){
 
 	DomIterator.prototype.onDataItemChanged = function(item){
 		var i = item.fullPath().split('.')[0];
+		var di = null;
+
+
 		if(this.dataItemPath) {
-			this.elements[i].dataIn(this.dataItem.path(i+'.'+this.dataItemPath));
+			di = this.dataItem.path(i+'.'+this.dataItemPath);
 		}
 		else {
-			this.elements[i].content(this.dataItem.path(i).getValue()).replace();
-			this.elements[i].dataIn(this.dataItem.path(i));
+			di = this.dataItem.path(i);
 		}
+
+		if(this.elements[i]){
+			this.elements[i].content(di.getValue()).replace();
+			this.elements[i].dataIn(di.path(i));
+		} else {
+			var element = new this.element({parent:this});
+			element.content(di.getValue()).replace();
+			this.content(element).add();
+			element.dataIn(di);
+
+			//cache elements
+			this.elements.push(element);
+
+
+		}
+
 	};
 
 	DomIterator.prototype.onDataIn = function(dataItem){

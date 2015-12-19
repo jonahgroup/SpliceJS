@@ -36,41 +36,42 @@ definition:function(sjs){
 	DataItem.prototype.setValue = function(value){
 		if(this.source == null) return null;
 		if(this._path == null) return;
+		var old = this.source[this._path];
+		//same value no change
+		if(old === value) return;
 		this.source[this._path] = value;
+
 
 		var node = this;
 		while(node != null){
-				if(node.onChanged) {
-					node.onChanged(this);
-					break;
-				}
-				node = node.parent;
+			if(node.onChanged) {
+				node.onChanged(this, old);
+				break;
+			}
+			node = node.parent;
 		}
 	}
 	/**
-	return child DataItem
+		returns child DataItem
 	*/
 	DataItem.prototype.path = function(path){
 		if(path == null || path === '') return this;
 
 		var parts = path.toString().split('.');
-/*
-		var source = this._path != null?
-								 this.source[this._path] : this.source ;
-*/
+
 		var parent = this;
 		for(var i=0; i < parts.length; i++){
 
 			var child = parent.pathmap[parts[i]];
 			var ref = parent._path != null?parent.source[parent._path] : parent.source;
 
-			if(ref[parts[i]] == null) return new DataItem(null);
-
-			if(child == null) {
+			if(child == null || ref[parts[i]] == null) {
 				child = new DataItem(ref);
 				child._path = parts[i];
 				parent.pathmap[parts[i]] = child;
 				child.parent = parent;
+
+				if(ref[parts[i]] == null) return child;
 			}
 			parent = child;
 		}
@@ -86,7 +87,33 @@ definition:function(sjs){
 			node = node.parent;
 		}
 		return path;
-	}
+	};
+
+	/*
+		- adds an item is source is a collection or a map
+		- throws and exception if the 'slot' is not empty
+	*/
+	DataItem.prototype.append = function(value){
+		if(!(this.source instanceof Array)) return null;
+		return this.path(this.source.length);
+	};
+
+	/*
+		- removes an item at a given key if source is a collection
+	*/
+	DataItem.prototype.remove = function(item,key){
+
+	};
+
+	/**
+	* Create a DataItem object with onChanged event
+	*/
+	var ObservableDataItem = function ObservableDataItem(data){
+		return event(new DataItem(data)).attach({
+			onChanged : event.multicast
+		});
+	};
+
 
 	/**
 	 * Base UIControl class
@@ -452,7 +479,7 @@ definition:function(sjs){
 	//module exports
 	exports.module(
 		UIControl, UIElement, KeyListener,
-		DataItem,
+		DataItem,ObservableDataItem,
 		//singletons
 		{Positioning : Positioning},
 		{DragAndDrop : DragAndDrop}
