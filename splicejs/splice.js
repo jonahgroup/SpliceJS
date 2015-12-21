@@ -3659,32 +3659,28 @@ if(content instanceof Controller ){
 			sjsExports.start = function(){start();}
 	}
 
-
 	function sjs(m) {
 		//free module definition
-		if(typeof m === 'function'){
-			return Module({definition:m});
-		}
-
+		if(typeof m === 'function') return Module({definition:m});
 		//dependent module definition
-		if( typeof m === 'object' && typeof m.definition === 'function'){
-			return Module(m);
-		}
+		if( typeof m === 'object' && typeof m.definition === 'function') return Module(m);
 
 		//lookup module
 		if(typeof m  === 'string'){
 			var mdl = findModule(m);
 			return function(callback){
 				if(mdl != null) {
-					if(typeof callback === 'function') callback(mdl);
-					return mdl;
+					if(typeof callback === 'function') {
+						callback(mdl); return;
+					}
 				}
 
 				load([m],function(){
-					if(typeof callback === 'function') callback(findModule(m));
+					if(typeof callback === 'function') {
+						var mdl = findModule(m);
+						if(mdl != null)	callback(mdl);
+					}
 				})
-
-				return mdl;
 			};
 		}
 

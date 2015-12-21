@@ -70,7 +70,7 @@ definition:function(sjs){
 	};
 
 
-	ListBoxController.prototype.onDataItemChanged = function(item){
+	ListBoxController.prototype.dataItemChanged = function(item){
 		var i = item.fullPath().split('.')[0];
 		var di = null;
 		if(this.dataItemPath)
@@ -94,6 +94,7 @@ definition:function(sjs){
 	};
 
 	ListBoxController.prototype.onDataIn = function(dataItem){
+		dataItem.subscribe(this.dataItemChanged, this);
 		var list = dataItem.getValue()
 		, item = null;
 

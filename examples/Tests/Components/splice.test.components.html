@@ -53,6 +53,28 @@
 </td>
 </tr>
 -->
+
+<tr>
+<td> Text</td>
+<td>
+  <sjs-include sjs-type="SpliceJS.Controls.TextField">
+    {
+      dataPath:'name',
+      dataIn: binding('onNewProvince').parent
+    }
+  </sjs-include>
+  <sjs-include sjs-type="SpliceJS.Controls.CheckBox">{
+    dataPath: 'isChecked',
+    dataIn: binding('onNewProvince').parent
+  }</sjs-include>
+  <sjs-include sjs-type="SpliceJS.Controls.Button">
+    {
+      content: 'Add province',
+      onClick: binding('addProvince').parent
+    }
+  </sjs-include>
+</td>
+</tr>
 <tr>
   <td>Templated ComboBox - Button</td>
   <td>
@@ -178,19 +200,15 @@ Scroll Panel
         element:<div sjs-controller="SpliceJS.Ui.UIControl"
                      style="position:relative; width:300px; height:35px;">
           <span sjs-content="name"></span>
+          <span sjs-content="isChecked"></span>
           <div style="display:inline; float:right;">
             <sjs-include sjs-type="SpliceJS.Controls.Button">
               {
-                dataPath: 'office.address.street',
-                dataIn:binding('onDataOut').parent
+                content:'Delete',
+                dataItem:binding('dataItem').parent
               }
             </sjs-include>
-            <sjs-include sjs-type="SpliceJS.Controls.Button">
-              {
-                dataPath: 'isChecked',
-                dataIn:binding('onDataOut').parent
-              }
-            </sjs-include>
+
           </div>
         </div>
     }

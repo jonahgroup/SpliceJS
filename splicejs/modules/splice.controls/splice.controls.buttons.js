@@ -79,20 +79,14 @@ definition:function(sjs){
 			onclick :	event.multicast
 		}).onclick.subscribe(function(){
 
-		var dataItem = this.dataItem;
+		this.isChecked = !this.isChecked;
 
-		if(dataItem) {
-				if(this.dataPath) {
-					sjs.propvalue(dataItem)(this.dataPath).value = this.isChecked = !dataItem[this.dataPath];
-				} else {
-					dataItem['checked'] = this.isChecked = !dataItem['checked'];
-				}
-			} else {
-				this.isChecked = !this.isChecked;
-			}
+		if(this.dataItem) {
+			this.dataItem.setValue(this.isChecked);
+		}
 
-			this.check(this.isChecked);
-			this.onChecked(dataItem);
+		this.check(this.isChecked);
+		this.onChecked(this.dataItem);
 
 		},this);
 	}

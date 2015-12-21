@@ -38,12 +38,7 @@ definition:function(sjs){
     {name:'British Columbia', isChecked:true, population:10000,
     office:{address:{street:'king'}}},
     {name:'Quebec', isChecked:true}
-  ]).onChanged.subscribe(function(item,old){
-    console.log("changed ");
-    console.log(old);
-    console.log(item.getValue());
-  });
-
+  ]);
 
   var charts = [
     {plot:'Bar',name:'series1',data:[10,20,5,23]},
@@ -60,13 +55,16 @@ definition:function(sjs){
 
   };
 
-
+  var newProvince = new ObservableDataItem({
+      name:'',isChecked:false
+  });
 
   var ComponentsTest = Class(function ComponentsTest(){
     this.super();
 
     event(this).attach({
       onProvinces         : event.multicast,
+      onNewProvince       : event.multicast,
       onChartsData        : event.multicast,
       onScatterChartData  : event.multicast,
       onTestCheck         : event.multicast
@@ -78,7 +76,9 @@ definition:function(sjs){
 
   ComponentsTest.prototype.initialize = function(){
     this.onDisplay.subscribe(function(){
+      this.onNewProvince(newProvince);
       this.onProvinces(provinces2);
+
       this.onChartsData(charts);
       this.onScatterChartData(scatterChart);
       this.onTestCheck(this.sourceTestCheck);
@@ -94,6 +94,11 @@ definition:function(sjs){
     else {
       throw 'Test fail: propvalue';
     }
+  };
+
+  ComponentsTest.prototype.addProvince = function(){
+    var p = newProvince.getValue();
+    provinces2.append().setValue({name:p.name, isChecked:p.isChecked});
   };
 
   ComponentsTest.prototype.testCheck = function(item){
@@ -126,22 +131,7 @@ definition:function(sjs){
   };
 
   var DataItem = scope.SpliceJS.Ui.DataItem;
-  var mtest = function mtest(){
-    console.log('Testing DataItem memory allocation');
-    var mb = window.performance.memory.usedJSHeapSize;
-    console.log('before: ' + mb);
-    var a = new DataItem({});
-    window.__sjs_test__ = a;
-    for(var i=0; i<1000000; i++){
-      a.path(i);
-    }
-    var ma = window.performance.memory.usedJSHeapSize;
-    console.log('after: ' + ma);
-    var md = ma - mb;
-    console.log('diff: ' + md);
-    console.log('diff K: ' + md/1024);
 
-  }
 
   var testDataItem = function testDataItem(){
     provinces2.append().setValue({name:'Prince Edward Island', isChecked:true});
@@ -155,7 +145,7 @@ definition:function(sjs){
 
   //module exports
   exports.module(
-    ComponentsTest, foo, mtest,testDataItem
+    ComponentsTest, foo, testDataItem
   );
 
 }

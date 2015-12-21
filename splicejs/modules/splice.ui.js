@@ -4,7 +4,6 @@ required:[
 	{'Animation':'{sjshome}/modules/splice.animation.js'}
 ],
 definition:function(sjs){
-
 	//enable strict mode
 	"use strict";
 
@@ -41,7 +40,6 @@ definition:function(sjs){
 		if(old === value) return;
 		this.source[this._path] = value;
 
-
 		var node = this;
 		while(node != null){
 			if(node.onChanged) {
@@ -51,6 +49,7 @@ definition:function(sjs){
 			node = node.parent;
 		}
 	}
+
 	/**
 		returns child DataItem
 	*/
@@ -89,6 +88,17 @@ definition:function(sjs){
 		return path;
 	};
 
+	DataItem.prototype.subscribe = function(handler, instance){
+		var node = this;
+		while(node != null){
+			if(node.onChanged) {
+				node.onChanged.subscribe(handler,instance);
+				break;
+			}
+			node = node.parent;
+		}
+	};
+
 	/*
 		- adds an item is source is a collection or a map
 		- throws and exception if the 'slot' is not empty
@@ -101,9 +111,10 @@ definition:function(sjs){
 	/*
 		- removes an item at a given key if source is a collection
 	*/
-	DataItem.prototype.remove = function(item,key){
+	DataItem.prototype.remove = function(key){
 
 	};
+
 
 	/**
 	* Create a DataItem object with onChanged event
@@ -176,28 +187,23 @@ definition:function(sjs){
 			this.show();
 	};
 	/* Data Contract */
+	/*!!!!! make sure to unsubscribe when data items changes */
 	UIControl.prototype.dataIn = function(item){
 
 		if(item instanceof DataItem) {
+				if(this.dataItem === item) {
+					this.onDataIn(this.dataItem);
+					return;
+				}
 				this.dataItem = item.path(this.dataPath);
 				this.onDataIn(this.dataItem);
-
-				var node = item;
-				while(node != null){
-					if(node.onChanged) {
-						node.onChanged.subscribe(this.onDataItemChanged,this);
-						break;
-					}
-					node = node.parent;
-				}
-
 			return;
 		}
 		// datapath is only set externally
 		this.dataItem = new DataItem(item, this.dataPath);
 		event(this.dataItem).attach({
 				onChanged : event.multicast
-		}).onChanged.subscribe(this.onDataItemChanged,this);
+		});
 		// invode data-item handler
 		this.onDataIn(this.dataItem);
 	};

@@ -31,7 +31,7 @@ definition:function(){
 	DomIterator.prototype.initialize = function(){
 	};
 
-	DomIterator.prototype.onDataItemChanged = function(item){
+	DomIterator.prototype.dataItemChanged = function(item){
 		var i = item.fullPath().split('.')[0];
 		var di = null;
 
@@ -45,7 +45,7 @@ definition:function(){
 
 		if(this.elements[i]){
 			this.elements[i].content(di.getValue()).replace();
-			this.elements[i].dataIn(di.path(i));
+			this.elements[i].dataIn(di);
 		} else {
 			var element = new this.element({parent:this});
 			element.content(di.getValue()).replace();
@@ -62,6 +62,8 @@ definition:function(){
 
 	DomIterator.prototype.onDataIn = function(dataItem){
 		if(this.element == null) return;
+
+		dataItem.subscribe(this.dataItemChanged, this);
 
 		var source = dataItem.getValue();
 		if(!(source instanceof Array)) return;
