@@ -641,7 +641,17 @@ function removeContent(content, key){
 		target.cache = null;
 		target.n = 0;
 	} else {
-		//look for nodes to remove
+		if(content instanceof View){
+			//look for nodes to remove
+			for(var i=0; i< target.source.childNodes.length; i++){
+				var node = target.source.childNodes[i];
+				if(node == content.htmlElement) {
+					target.source.removeChild(node);
+				}
+			}
+		} else {
+
+		}
 	}
 	var node = target.cache;
 };
