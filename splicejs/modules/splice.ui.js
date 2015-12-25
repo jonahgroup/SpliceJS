@@ -39,15 +39,7 @@ definition:function(sjs){
 		//same value no change
 		if(old === value) return;
 		this.source[this._path] = value;
-
-		var node = this;
-		while(node != null){
-			if(node.onChanged) {
-				node.onChanged(this, old);
-				break;
-			}
-			node = node.parent;
-		}
+		_dataItem_triggerOnChange.call(this, old);
 	}
 
 	/**
@@ -109,11 +101,27 @@ definition:function(sjs){
 	};
 
 	/*
-		- removes an item at a given key if source is a collection
+		- removes an item at a current path if source is a collection
+		- make sure to force-unsubscribe any listeners
 	*/
-	DataItem.prototype.remove = function(key){
-
+	DataItem.prototype.remove = function(){
+		if(!(this.source instanceof Array)) return null;
+		this.source.splice(this._path,1);
+		this.isDeleted = true;
+		_dataItem_triggerOnChange.call(this);
 	};
+
+	function _dataItem_triggerOnChange(old){
+		var node = this;
+		while(node != null){
+			if(node.onChanged) {
+				node.onChanged(this, old);
+				break;
+			}
+			node = node.parent;
+		}
+	};
+
 
 
 	/**

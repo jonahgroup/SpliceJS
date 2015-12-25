@@ -2588,7 +2588,7 @@ if(content instanceof Controller ){
 		return {
 			replace: function(){_controllerContentMapper.call(self,content, replaceContent)},
 			add: 		 function(){_controllerContentMapper.call(self,content, addContent)},
-			remove:  function(){}
+			remove:  function(){_controllerContentMapper.call(self,content, removeContent)}
 		}
 	};
 

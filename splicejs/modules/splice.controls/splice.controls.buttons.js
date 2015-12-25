@@ -59,6 +59,7 @@ definition:function(sjs){
 	};
 
 	Button.prototype.onDataIn = function(item){
+		if(!this.staticContent)
 		this.content(item.getValue()).replace();
 	};
 

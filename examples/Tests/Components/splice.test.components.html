@@ -205,7 +205,9 @@ Scroll Panel
             <sjs-include sjs-type="SpliceJS.Controls.Button">
               {
                 content:'Delete',
-                dataItem:binding('dataItem').parent
+                staticContent:true,
+                dataIn:binding('onDataOut').parent,
+                onClick:binding('deleteItem').type('Components')
               }
             </sjs-include>
 

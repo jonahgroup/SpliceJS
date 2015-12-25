@@ -113,8 +113,9 @@ definition:function(sjs){
       console.log('Selected province is:' + item);
   }
 
-  ComponentsTest.prototype.updateRecords = function(){
-    this.onProvinces(provinces2);
+  ComponentsTest.prototype.deleteItem = function(item){
+    console.log(item);
+    item.remove();
   };
 
 

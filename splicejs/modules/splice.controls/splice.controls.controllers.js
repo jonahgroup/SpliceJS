@@ -35,6 +35,11 @@ definition:function(){
 		var i = item.fullPath().split('.')[0];
 		var di = null;
 
+		//cleanup deleted elements
+		if(item.isDeleted == true){
+			this.content(this.elements[i]).remove();
+			return;
+		}
 
 		if(this.dataItemPath) {
 			di = this.dataItem.path(i+'.'+this.dataItemPath);
