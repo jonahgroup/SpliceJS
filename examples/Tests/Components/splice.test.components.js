@@ -43,9 +43,27 @@ definition:function(sjs){
   ];
 
  var scatterChart = [
-      {plot: 'Scatter',    name: 'series1', data: [[12,14], [16,12], [65,45], [165,50], [180,327], [190,365], [200,45]]},
-      {plot: 'Scatter',    name: 'series2', data: [[13,14], [13,341], [65,122], [165,12], [32,56], [234,365], [123,45]]},
-      {plot: 'ScatterLine',name:'line1',data:[[0,0],[250,370]]}
+      {plot: 'scatter',    name: 'series1', data: [
+          ['Ontario',381],['British Columbia',497],['Alberta',152],['Quebec',556],['New Brunswick',696],['Nova Scotia',209],['Manitoba',223],['Yukon',41],['Nunavut',40],['Northwest Territories',350],['Saskatchewan',396],['Prince Edward Island',640],['Newfoundland',192]
+          ]
+          },
+      {plot: 'scatter',    name: 'series2', data: [
+          ['Ontario',127],['British Columbia',487],['Alberta',527],['Quebec',390],['New Brunswick',392],['Nova Scotia',266],['Manitoba',525],['Yukon',283],['Nunavut',394],['Northwest Territories',206],['Saskatchewan',596],['Prince Edward Island',280],['Newfoundland',449]
+          ]},
+      {plot: 'scatter',name:'line1',data:[['Ontario',400],['Newfoundland',400]]},
+      {plot:'bar',name:'Province debt',data:[
+          ['Ontario',187],['British Columbia',282],['Alberta',35],['Quebec',458],['New Brunswick',166],['Nova Scotia',60],['Manitoba',402],['Yukon',497],['Nunavut',124],['Northwest Territories',308],['Saskatchewan',49],['Prince Edward Island',45],['Newfoundland',309]
+      ],
+      options:{
+          marker: {
+    color: 'rgb(158,202,225)',
+    opacity: 0.6,
+    line: {
+      color: 'rbg(8,48,107)',
+      width: 1.5
+    }
+  }
+      }},
  ];
 
   var barchart = {

@@ -209,8 +209,16 @@
 
 <!-- Another Component -->
 <tr>
-  <td>Component Name</td>
-  <td>Component Include</td>
+  <td>Plotly Chart</td>
+  <td style="position:relative; width:400px; height:300px;" ><sjs-include sjs-type="SpliceJS.Controls.PlotlyChart" >
+      { 
+        dataIn: binding('onScatterChartData').parent,
+        plotOptions:{
+            showlegend: true
+        }
+      }
+      </sjs-include>
+      </td>
 </tr>
 
 </table>

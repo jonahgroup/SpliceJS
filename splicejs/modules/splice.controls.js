@@ -7,6 +7,7 @@ required:[
 , {'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
 ,	{'Charts':'splice.controls/splice.controls.charts.js'}
+,   {'PlotlyCharts':'splice.controls/splice.controls.plotlychart.js'}
 ,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
 ,	{'DataControls':'splice.controls/splice.controls.treeview.js'}
 ,	{'DataControls':'splice.controls/splice.controls.checklistbox.js'}
@@ -108,6 +109,7 @@ definition:function(sjs){
     {CellContainer:     scope.Grids.CellContainer},
 		{D3Canvas:					scope.Charts.D3Canvas},
 		{Map:								scope.Maps.Map},
+        {PlotlyChart:       scope.PlotlyCharts.PlotlyChart},
 		/* selectors */
 		{DropDownSelector:	scope.Selectors.DropDownSelector},
 		{DropDownList:			scope.Selectors.DropDownList},
