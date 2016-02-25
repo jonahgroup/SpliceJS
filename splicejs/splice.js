@@ -27,22 +27,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-
-
 var sjs = (function(window, document){
 	"use strict";
 
+	//loggin setup
+	var log = !window.console ? {} : window.console;
+	//console log interface
+	if(!log.error) 	log.error = function(){};
+	if(!log.debug) 	log.debug = function(){};
+	if(!log.info) 	log.info  = function(){};
+	if(!log.error) 	log.error = function(){};
+
+	//global error listener
+	window.onerror = function(error,a,b,c,d,e){
+		return false;
+	}
+
+	if(!window.sjsConfig) log.warn('sjsConfig not found, using defaults');
+
 	var configuration = {
 		app_home: 	getPath(window.location.href).path,
-		splice_home:        window.sjs_config.home,
-		debug:							window.sjs_config.debug,
-		startup:						window.sjs_config.startup,
+		splice_home:        window.sjsConfig.home,
+		debug:							window.sjsConfig.debug,
+		startup:						window.sjsConfig.startup,
 		platform:					 {
-				isTouchEnabled:window.sjs_config.platform_touch,
-				isMobile:	window.sjs_config.platform_mobile
+				isTouchEnabled:window.sjsConfig.platform_touch,
+				isMobile:	window.sjsConfig.platform_mobile
 		},
-		splash: { 'module': window.sjs_config.splash_screen_module,
-							'class'	:	window.sjs_config.splash_screen_class
+		splash: { 'module': window.sjsConfig.splash_screen_module,
+							'class'	:	window.sjsConfig.splash_screen_class
 		}
 	};
 
@@ -73,14 +86,6 @@ var sjs = (function(window, document){
 	new Image().src = ( configuration.splice_home || '') + '/resources/images/bootloading.gif';
 
 
-	if(!window.console) {
-		window.console = {log:function(){}};
-	}
-
-	var logging = {
-		debug : {log:function(){}},
-		info  : console
-	};
 
 /*
 
@@ -125,10 +130,8 @@ var sjs = (function(window, document){
 		  })();
 	}
 
-
 	/* IE Object.keys fill*/
 	if(typeof Object.keys !== 'function' ){
-
 		Object.keys = function(obj){
 			if(!obj) return null;
 			var _keys = [];
@@ -138,6 +141,24 @@ var sjs = (function(window, document){
 			return _keys;
 		};
 	}
+
+	/*
+	 * Returns function's name
+	 * First tries function.name property
+	 * Next name is parsed from the function.prototype.toString output
+	 * */
+	function getFunctionName(foo){
+		if(foo.name) return foo.name;
+
+		if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
+
+		var regex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
+		var functionString = foo.toString();
+		var match = regex.exec(functionString);
+
+		if(!match)  return 'anonymous';
+		return match[1];
+	};
 
 
 	function showPreloader(){
@@ -258,23 +279,6 @@ var sjs = (function(window, document){
 	};
 
 
-	/*
-	 * Returns function's name
-	 * First tries function.name property
-	 * Next name is parsed from the function.prototype.toString output
-	 * */
-	function getFunctionName(foo){
-		if(foo.name) return foo.name;
-
-		if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
-
-		var regex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
-		var functionString = foo.toString();
-		var match = regex.exec(functionString);
-
-		if(!match)  return 'anonymous';
-		return match[1];
-	};
 
 
 	/* make this more efficient */
@@ -290,151 +294,6 @@ var sjs = (function(window, document){
 		if(a.length > 0) return a[a.length - 1];
 		return null;
 	};
-
-	function dfs(dom, target, filterFn, nodesFn){
-		if(!dom) return;
-
-
-		if(typeof filterFn === 'function') {
-			var node = filterFn(dom);
-			if(node) target.push(node);
-		} else {
-			target.push(dom);
-		}
-
-
-		var children = [];
-		if(typeof nodesFn === 'function'){
-			children = nodesFn(dom);
-		}
-		else {
-			children = dom.childNodes;
-		}
-
-		for(var i=0; i < children.length; i++){
-			var n = dom.childNodes[i];
-			dfs(n,target,filterFn, nodesFn);
-		}
-	};
-
-	function selectNodes(dom,filterFn, nodesFn){
-		var nodes = new Array();
-		dfs(dom,nodes,filterFn, nodesFn);
-		if(nodes.length < 1) nodes = null;
-		return nodes;
-	};
-
-
-	function selectTextNodes(dom,filterFn){
-		var nodes = new Array();
-		//nodeType 3 is a text node
-		dfs(dom,nodes,function(node){
-			if(node.nodeType === 3) {
-				if(typeof filterFn === 'function')	return filterFn(node);
-				return node;
-			}
-			return null;
-		});
-		if(nodes.length < 1) nodes = null;
-		return nodes;
-	};
-
-
-	function _propertyValueLocator(path){
-				var npath = path.split('.')
-				,	result = this;
-
-				//loop over path parts
-				for(var i=0; i < npath.length-1; i++ ){
-					result = result[npath[i]];
-					if(result == null) console.warn('Property ' + path + ' is not found in object ' + result);
-				}
-				var p = npath[npath.length - 1];
-				if(result && result[p] == undefined) console.warn('Property ' + path + ' is not found in object ' + result);
-
-				//hash map object
-				return Object.defineProperty(Object.create(null),'value',{
-					get:function(){
-						if(!result) return null;
-						return result[p];
-					},
-					set:function(newValue){
-						if(!result) return;
-						result[p] = newValue;
-					}
-				});
-	};
-
-	function propertyValue(obj){
-		return _propertyValueLocator.bind(obj);
-	};
-
-
-	function display(view){
-		if(view instanceof Controller) {
-			document.body.appendChild(view.views.root.htmlElement);
-			view.onAttach();
-			view.onDisplay();
-			return view;
-		}
-		if(view instanceof View){
-			document.body.appendChild(view.htmlElement);
-			return view;
-		}
-	};
-
-
-	display.clear = function(view) {
-		if(!view) return {display : display};
-
-		if(view instanceof Controller ){
-			if(view.views.root.htmlElement.parentNode === document.body)
-				document.body.removeChild(view.views.root.htmlElement);
-			return {display : display };
-		}
-
-		if(view instanceof View ){
-			document.body.removeChild(view.htmlElement);
-			return {display : display };
-		}
-
-		document.body.innerHTML = '';
-		return {display : display };
-
-	};
-
-	function close(controller) {
-	    controller.concrete.dom.parentNode.removeChild(controller.concrete.dom);
-	};
-
-	function isHTMLElement(object){
-		if(!object) return false;
-		if(object.tagName && object.tagName != '') return true;
-		return false;
-	};
-
-	function _viewQueryMode(){
-		return {
-			id:function(id){
-				var d = document.getElementById(id);
-				if(d) return new View(d);
-				return null;
-			},
-			query:function(query){
-				var collection = document.querySelectorAll(query);
-				if(!collection) return null;
-				return {
-					foreach:function(fn){},
-					first:function(){
-							return new View(collection[0]);
-					}
-				}
-			}
-		}
-	}
-
-
-
 
 
 /**
@@ -639,185 +498,6 @@ UrlAnalyzer.prototype = {
 
 	HttpRequest.get = function(config){
 		return new HttpRequest().request('GET',config);
-	};
-
-/*
-----------------------------------------------------------
-
-	Binding Model
-
-*/
-	var BINDING_TYPES = {
-			SELF 		 : 1
-		/* Look for properties within immediate instance */
-		,	PARENT 		 : 2
-		/* Look for properties within direct parent of the immediate instance*/
-		,	FIRST_PARENT : 3
-		/* Look for properties within a first parent  where property if found */
-		,	ROOT 		 : 4
-		/* Look for properties within a root of the parent chain */
-		,	TYPE 		 : 5
-		/* Indicates type lookup lookup */
-	};
-	var BINDING_DIRECTIONS = {
-			FROM : 1,
-		/* Left assignment */
-			TO: 2,
-		/*
-			determine binding based on the type of objects
-			use right assignment by default
-		*/
-			AUTO: 3
-	};
-
-	function Binding(propName, bindingType,prev){
-		this.prop = propName;
-		this.type = bindingType;
-		this.direction = BINDING_DIRECTIONS.AUTO;
-		this.prev = prev;
-	}
-
-
-	function createBinding(propName,prev){
-
-		return {
-			self:   		new Binding(propName,	BINDING_TYPES.SELF,prev),
-			parent: 		new Binding(propName,	BINDING_TYPES.PARENT,prev),
-			root:				new Binding(propName,	BINDING_TYPES.ROOT,prev),
-			'type':			function(type){
-						var b =	new Binding(propName, 	BINDING_TYPES.TYPE,prev);
-						b.vartype = type;
-						return b;
-			 }
-		}
-	}
-	/*
-	 * !!! Bidirectional bindings are junk and not allowed, use event-based data contract instead
-	 * */
-	var binding =  function binding(args){
-		 return createBinding(args);
-	 }
-
-
-	 Binding.prototype.binding = function binding(pn){
-		return createBinding(pn,this);
-	}
-
-
-	/**
-	 *	@scope|Namespace - component scope
-	 */
-	Binding.prototype.getTargetInstance = function(originInstance, scope){
-
-		switch(this.type){
-
-			case BINDING_TYPES.PARENT:
-				if(!originInstance.parent) throw 'Unable to locate parent instance';
-				return originInstance.parent;
-			break;
-
-
-			case BINDING_TYPES.TYPE:
-				/*locate var type */
-
-				var	parent = originInstance;
-				// 1. component lookup
-				var vartype = scope.components.lookup(this.vartype);
-				// 2. imports lookup
-				if(!vartype) vartype = scope.lookup(this.vartype);
-				// 3. target not found
-				if(!vartype) throw 'Unable to resolve binding target type:' + this.vartype;
-
-				while(parent) {
-					if(parent.__sjs_type__ === vartype.__sjs_type__ || (parent instanceof vartype)) return parent;
-					parent = parent.parent;
-				}
-
-			break;
-		}
-
-	};
-
-
-	Binding.findValue = function(obj, path){
-		var nPath = path.split('.'),
-			result = obj;
-
-		if (!obj) return null;
-
-		for (var i = 0; i< nPath.length; i++){
-
-			result = result[nPath[i]];
-
-			if (!result) return null;
-		}
-
-		return result;
-	}
-
-	Binding.Value = function(obj){
-
-		return {
-			set : function(value, path){
-
-				var nPath = path.split('.');
-
-				for(var i=0; i< nPath.length-1; i++){
-					obj = obj[nPath[i]];
-				}
-
-				if(obj) {
-					obj[nPath[nPath.length-1]] = value;
-				}
-			},
-
-			get : function(path){
-
-				var nPath = path.split('.'),
-					result = obj;
-
-				if(nPath.length < 1) return null;
-
-				for (var i = 0; i< nPath.length; i++){
-
-					result = result[nPath[i]];
-
-					if (!result) return null;
-				}
-
-				return result;
-			},
-
-			instance:function(path){
-
-				var nPath = path.split('.'),
-					result = obj;
-
-				for (var i = 0; i< nPath.length-1; i++){
-
-					if(typeof result._bindingRouter === 'function'){
-						result = result._bindingRouter(nPath[i]);
-					}
-					else {
-						result = result[nPath[i]];
-					}
-					if (!result) return null;
-				}
-
-				if(typeof result._bindingRouter === 'function'){
-					result = result._bindingRouter(nPath[nPath.length-1]);
-				}
-
-				return result;
-
-			},
-
-			path:function(path){
-				var nPath = path.split('.');
-				return nPath[nPath.length-1];
-			}
-		}
-
 	};
 
 /*

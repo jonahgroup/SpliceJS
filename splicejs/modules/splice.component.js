@@ -4,6 +4,185 @@ sjs({
 definition:function(){
 
 
+  /*
+  ----------------------------------------------------------
+
+  	Binding Model
+
+  */
+  	var BINDING_TYPES = {
+  			SELF 		 : 1
+  		/* Look for properties within immediate instance */
+  		,	PARENT 		 : 2
+  		/* Look for properties within direct parent of the immediate instance*/
+  		,	FIRST_PARENT : 3
+  		/* Look for properties within a first parent  where property if found */
+  		,	ROOT 		 : 4
+  		/* Look for properties within a root of the parent chain */
+  		,	TYPE 		 : 5
+  		/* Indicates type lookup lookup */
+  	};
+  	var BINDING_DIRECTIONS = {
+  			FROM : 1,
+  		/* Left assignment */
+  			TO: 2,
+  		/*
+  			determine binding based on the type of objects
+  			use right assignment by default
+  		*/
+  			AUTO: 3
+  	};
+
+  	function Binding(propName, bindingType,prev){
+  		this.prop = propName;
+  		this.type = bindingType;
+  		this.direction = BINDING_DIRECTIONS.AUTO;
+  		this.prev = prev;
+  	}
+
+
+  	function createBinding(propName,prev){
+
+  		return {
+  			self:   		new Binding(propName,	BINDING_TYPES.SELF,prev),
+  			parent: 		new Binding(propName,	BINDING_TYPES.PARENT,prev),
+  			root:				new Binding(propName,	BINDING_TYPES.ROOT,prev),
+  			'type':			function(type){
+  						var b =	new Binding(propName, 	BINDING_TYPES.TYPE,prev);
+  						b.vartype = type;
+  						return b;
+  			 }
+  		}
+  	}
+  	/*
+  	 * !!! Bidirectional bindings are junk and not allowed, use event-based data contract instead
+  	 * */
+  	var binding =  function binding(args){
+  		 return createBinding(args);
+  	 }
+
+
+  	 Binding.prototype.binding = function binding(pn){
+  		return createBinding(pn,this);
+  	}
+
+
+  	/**
+  	 *	@scope|Namespace - component scope
+  	 */
+  	Binding.prototype.getTargetInstance = function(originInstance, scope){
+
+  		switch(this.type){
+
+  			case BINDING_TYPES.PARENT:
+  				if(!originInstance.parent) throw 'Unable to locate parent instance';
+  				return originInstance.parent;
+  			break;
+
+
+  			case BINDING_TYPES.TYPE:
+  				/*locate var type */
+
+  				var	parent = originInstance;
+  				// 1. component lookup
+  				var vartype = scope.components.lookup(this.vartype);
+  				// 2. imports lookup
+  				if(!vartype) vartype = scope.lookup(this.vartype);
+  				// 3. target not found
+  				if(!vartype) throw 'Unable to resolve binding target type:' + this.vartype;
+
+  				while(parent) {
+  					if(parent.__sjs_type__ === vartype.__sjs_type__ || (parent instanceof vartype)) return parent;
+  					parent = parent.parent;
+  				}
+
+  			break;
+  		}
+
+  	};
+
+
+  	Binding.findValue = function(obj, path){
+  		var nPath = path.split('.'),
+  			result = obj;
+
+  		if (!obj) return null;
+
+  		for (var i = 0; i< nPath.length; i++){
+
+  			result = result[nPath[i]];
+
+  			if (!result) return null;
+  		}
+
+  		return result;
+  	}
+
+  	Binding.Value = function(obj){
+
+  		return {
+  			set : function(value, path){
+
+  				var nPath = path.split('.');
+
+  				for(var i=0; i< nPath.length-1; i++){
+  					obj = obj[nPath[i]];
+  				}
+
+  				if(obj) {
+  					obj[nPath[nPath.length-1]] = value;
+  				}
+  			},
+
+  			get : function(path){
+
+  				var nPath = path.split('.'),
+  					result = obj;
+
+  				if(nPath.length < 1) return null;
+
+  				for (var i = 0; i< nPath.length; i++){
+
+  					result = result[nPath[i]];
+
+  					if (!result) return null;
+  				}
+
+  				return result;
+  			},
+
+  			instance:function(path){
+
+  				var nPath = path.split('.'),
+  					result = obj;
+
+  				for (var i = 0; i< nPath.length-1; i++){
+
+  					if(typeof result._bindingRouter === 'function'){
+  						result = result._bindingRouter(nPath[i]);
+  					}
+  					else {
+  						result = result[nPath[i]];
+  					}
+  					if (!result) return null;
+  				}
+
+  				if(typeof result._bindingRouter === 'function'){
+  					result = result._bindingRouter(nPath[nPath.length-1]);
+  				}
+
+  				return result;
+
+  			},
+
+  			path:function(path){
+  				var nPath = path.split('.');
+  				return nPath[nPath.length-1];
+  			}
+  		}
+
+  	};
+
 
   /**
   	Controller class
