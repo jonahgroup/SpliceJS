@@ -43,6 +43,20 @@ var sjs = (function(window, document){
 		return false;
 	}
 
+	for(var i=0; i < document.head.childNodes.length; i++){
+		var node = document.head.childNodes[i];
+		if(!node.getAttribute) continue;
+
+		var main 		= node.getAttribute('sjs-main');
+		if(main == null) continue;
+		var src 		= node.getAttribute('src');
+		var config 	= node.getAttribute('sjs-config');
+		log.debug("main script attributes");
+	}
+
+
+
+
 	if(!window.sjsConfig) log.warn('sjsConfig not found, using defaults');
 
 	var configuration = {
@@ -90,9 +104,7 @@ var sjs = (function(window, document){
 /*
 
 ----------------------------------------------------------
-
 	Utility Functions
-
 */
 	/*
 	 * No support for bind
@@ -141,6 +153,13 @@ var sjs = (function(window, document){
 			return _keys;
 		};
 	}
+
+
+
+	function loadConfig(){
+
+	}
+
 
 	/*
 	 * Returns function's name
@@ -1298,181 +1317,6 @@ UrlAnalyzer.prototype = {
 
 
 
-function isExternalType(type){
-		if(type[0] === '{') {
-			var parts = type.substring(1,type.indexOf('}')).split(':');
-			return {namespace:parts[0], filename:parts[1]}
-		}
-		return null;
-}
-
-/*
-
-----------------------------------------------------------
-
-	Templating Engine
-
-*/
-
-	/**
-	 * Object descriptor
-	 * @type: data type of the object to be created
-	 * @parameters:	parameters to be passed to the object behind proxy
-	 * */
-	var proxy = function proxy(args){
-		/*
-		 * Scope object
-		 * Includers scope - should be used for resolving bindings
-		 * */
-		var scope = this;
-
-		var Proxy = function Proxy(proxyArgs){
-			if(!(this instanceof Proxy) ) throw 'Proxy object must be invoked with [new] keyword';
-
-			/* create instance of the proxy object
-			 * local scope lookup takes priority
-			 */
-			var obj = scope.lookup(args.type);
-
-			if(!obj) obj = scope.components.lookup(args.type);
-			/* lone template is being included */
-			if(!obj) obj = scope.templates[args.type];
-
-			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
-			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
-
-
-			/* copy args*/
-			var parameters = {};
-			var keys = Object.keys(args);
-			for(var i = 0; i < keys.length; i++ ){
-				var key = keys[i];
-				if(key == 'type') continue; /* skip type */
-				parameters[key] = args[key];
-			}
-
-			/* override proxy arguments */
-			if(proxyArgs){
-				var keys = Object.keys(proxyArgs);
-				for(var i=0; i<keys.length; i++){
-					var key = keys[i];
-					//parameters['parent'] = proxyArgs.parent;
-					parameters[key] = proxyArgs[key];
-				}
-			}
-
-
-			/**
-			*	create new in-place component
-			* 	using template and an override controller
-			*/
-			if(args.controller) {
-				obj = createComponent(args.controller, obj.template, scope);
-			}
-
-			/*
-				invoke component constructor
-			*/
-			parameters._includer_scope = scope;
-
-			if(!obj.isComponent)
-				return instantiate(obj, parameters);
-			else
-				return new obj(parameters);
-		}
-
-		Proxy.type 			= args.type;
-		Proxy.parameters 	= args;
-		Proxy.__sjs_name__ 		= args.__sjs_name__;
-		Proxy.__sjs_isproxy__ = true;
-		Proxy.toString = function(){
-			return 'proxy: ' + args.type;
-		}
-		return Proxy;
-
-	};
-
-	function linkupEvents(obj){
-		for(var key in  obj){
-			if( obj[key] instanceof Event){
-				logging.debug.log('Found event object');
-				obj[key] = obj[key].attach();
-			}
-		}
-	};
-
-
-	function bindDeclarations(parameters, instance, scope){
-		if(!parameters) return;
-
-		var keys = Object.keys(parameters);
-		for(var k=0; k< keys.length; k++) {
-
-			var key = keys[k];
-
-			if(key === 'controller') continue;
-			if(key === 'ref') 		continue;
-			if(key === 'content') 	continue; //content is processed separately
-
-			if(parameters[key] instanceof Binding) {
-				try {
-					resolveBinding(parameters[key], instance, key, scope);
-				} catch(ex){}
-
-				continue;
-			}
-
-			/* default property assignment */
-			instance[key] = parameters[key];
-		}
-	};
-
-	function instantiate(fn, parameters){
-		var instance = Object.create(fn.prototype);
-		var scope = parameters._includer_scope;
-
-		configureHierarchy.call(scope,instance,parameters);
-
-		linkupEvents(instance);
-
-
-		/*	todo: supress exceptions
-		 	ignore binding error
-		 */
-		bindDeclarations(parameters, instance, scope );
-
-		var result = fn.call(instance,parameters);
-		// constructor returns override defaults
-		if(result) return result;
-		return instance;
-	};
-
-	/*
-	*	do not allow duplicate content keys
-	*/
-	function buildContentMap(element){
-		var contentNodes = element.querySelectorAll('[sjs-content]')
-		,	cMap = {};
-
-		if(!contentNodes) return;
-		var node = element;
-		for(var i=0; i<=contentNodes.length; i++){
-			var attr = node.getAttribute('sjs-content');
-			if(!attr) {
-				node = contentNodes[i];
-				continue;
-			}
-			var keys = attr.split(' ');
-			for(var k=0; k<keys.length; k++){
-				var key = keys[k];
-				if(cMap[key]) throw 'Duplicate content map key ' + key;
-				cMap[key] = {source:node, cache:null, n:0};
-			}
-			node = contentNodes[i];
-		}
-		return cMap;
-	};
-
 
 	/*
 		@path is a relative path to splice_home
@@ -1577,7 +1421,7 @@ function isExternalType(type){
 	};
 
 	/**
-	 * Builds module and compiles late(s) from module definition.
+	 * Builds module and compiles template(s) from module definition.
 	 * The templates will be compiled recursively,
 	 * where inner templates are compiled first and then outer.
 	 * Any scripts embedded into template will be evaluated and
