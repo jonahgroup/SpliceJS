@@ -619,7 +619,7 @@ UrlAnalyzer.prototype = {
 	function Namespace(){
 		if(!(this instanceof Namespace) ) return new Namespace();
 		this.sequence = 0;
-		this.content = Object.create(null);
+		this.children = null;
 	};
 
 	Namespace.prototype = {
@@ -628,8 +628,9 @@ UrlAnalyzer.prototype = {
 				var parts = path.split(".");
 				var target = this;
 				for(var i=0; i<parts.length; i++){
-					if(target.content[parts[i]] == null) target.content[parts[i]] = new Namespace();
-					target = target.content[parts[i]];
+					if(target.children == null) target.children = Object.create(null);
+					if(target.children[parts[i]] == null) target.children[parts[i]] = new Namespace();
+					target = target.children[parts[i]];
 				}
 				target.content = obj;
 				return this;
@@ -640,7 +641,8 @@ UrlAnalyzer.prototype = {
 				var parts = path.split(".");
 				var target = this;
 				for(var i=0; i<parts.length; i++){
-					target = target.content[parts[i]];
+					if(target.children == null) return null;
+					target = target.children[parts[i]];
 					if(target == null) return null;
 				}
 				return target;
