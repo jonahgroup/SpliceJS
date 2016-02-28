@@ -38,75 +38,55 @@ var sjs = (function(window, document){
 	if(!log.info) 	log.info  = function(){};
 	if(!log.error) 	log.error = function(){};
 
-	//global error listener
-	window.onerror = function(error,a,b,c,d,e){
-		return false;
-	}
 
-	for(var i=0; i < document.head.childNodes.length; i++){
-		var node = document.head.childNodes[i];
-		if(!node.getAttribute) continue;
+	/**
+		Configuration loader, participates in application bootstrap
+	*/
+	function loadConfiguration(onLoad){
+		var main = null;
+		// cycle through all script elements in document's head
+		for(var i=0; i < document.head.childNodes.length; i++){
+			var node = document.head.childNodes[i];
+			if(!node.getAttribute) continue;
+			if(node.getAttribute('sjs-main') != null) {
+				main = node; break;
+			}
+		}
 
-		var main 		= node.getAttribute('sjs-main');
-		if(main == null) continue;
-		var src 		= node.getAttribute('src');
-		var config 	= node.getAttribute('sjs-config');
-		log.debug("main script attributes");
-	}
+		// splice js script must have sjs-main attribute
+		if(main == null) throw "SpliceJS script element must have 'sjs-main' attribute";
 
+		var config = {
+			appHome: 	getPath(window.location.href).path,
+			sjsHome:	getPath(main.getAttribute('src')).path
+		};
 
-
-
-	if(!window.sjsConfig) log.warn('sjsConfig not found, using defaults');
-
-	var configuration = {
-		app_home: 	getPath(window.location.href).path,
-		splice_home:        window.sjsConfig.home,
-		debug:							window.sjsConfig.debug,
-		startup:						window.sjsConfig.startup,
-		platform:					 {
-				isTouchEnabled:window.sjsConfig.platform_touch,
-				isMobile:	window.sjsConfig.platform_mobile
-		},
-		splash: { 'module': window.sjsConfig.splash_screen_module,
-							'class'	:	window.sjsConfig.splash_screen_class
+		var sjsConfig = node.getAttribute('sjs-config');
+		//load external configuration if available
+		if(sjsConfig == null) {
+			onLoad(config);
+		} else {
+				//async load here
 		}
 	};
 
-	var geval = eval;
-	/**
-	 *
-	 */
-	var URL_CACHE = new Array();
 
 	/**
-	  	Bootloading files
+		Merges properties of source object into target object
+		and return target object
 	*/
-	var BOOT_SOURCE = []
-	,	READY = {}
-	, 	LOADER_PROGRESS = {total:0, complete:0}
-	,	MODULE_MAP = new Object(null);
-
-	var FILE_EXTENSIONS = {
-		javascript: '.js',
-		template: 	'.html',
-		style: 		'.css',
-		route: 		'.sjsroute',
+	function mixin(target, source){
+		if(!source) return target;
+		var keys = Object.keys(source);
+		for(var i=0; i  < keys.length; i++){
+			var key = keys[i];
+			target[key] = source[key];
+		}
+		return target;
 	};
 
-	/*
-	 	Cache loading indicator
-	*/
-	new Image().src = ( configuration.splice_home || '') + '/resources/images/bootloading.gif';
 
-
-
-/*
-
-----------------------------------------------------------
-	Utility Functions
-*/
-	/*
+	/**
 	 * No support for bind
 	 * use closure to emulate
 	 * must support Function.prototype.apply()
@@ -142,6 +122,7 @@ var sjs = (function(window, document){
 		  })();
 	}
 
+
 	/* IE Object.keys fill*/
 	if(typeof Object.keys !== 'function' ){
 		Object.keys = function(obj){
@@ -155,46 +136,43 @@ var sjs = (function(window, document){
 	}
 
 
-
-	function loadConfig(){
-
-	}
-
-
-	/*
+	/**
 	 * Returns function's name
 	 * First tries function.name property
 	 * Next name is parsed from the function.prototype.toString output
 	 * */
+	var _fNameRegex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
 	function getFunctionName(foo){
 		if(foo.name) return foo.name;
 
 		if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
 
-		var regex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
 		var functionString = foo.toString();
-		var match = regex.exec(functionString);
+		var match = _fNameRegex.exec(functionString);
 
 		if(!match)  return 'anonymous';
 		return match[1];
 	};
 
 
-	function showPreloader(){
-		if(window.SPLICE_SUPPRESS_PRELOADER) return;
-			display(LoadingWatcher.splashScreen);
-	}
 
-	function removePreloader(){
-		if(window.SPLICE_SUPPRESS_PRELOADER) return;
-			display.clear(LoadingWatcher.splashScreen);
-	}
+	var _pathVarRegex = /({[^}{]+})/ig;
+	/**
+		Extracts path full resource location
+	*/
+	function getPath(path){
+		var index = path.lastIndexOf('/');
 
+		if(index < 0) return {name:path};
+		return {
+			path:path.substring(0,index),
+			name:path.substring(index+1)
+		}
+	};
 
 
 	function collapsePath(path){
 		var stack = [];
-
 		/*
 			create origin stack
 		*/
@@ -226,15 +204,111 @@ var sjs = (function(window, document){
 	};
 
 
-	function getPath(path){
-		var index = path.lastIndexOf('/');
 
-		if(index < 0) return {name:path};
-		return {
-			path:path.substring(0,index),
-			name:path.substring(index+1)
+
+	/*
+		Inheritance model
+	*/
+
+		function __super(inst,b,args){
+			if(!b) return;
+			__super(inst,b.constructor.__sjs_base__,args);
+			b.constructor.apply(inst,args);
+		};
+
+		function __invoke(inst,method,b,args){
+			if(!b) return;
+			__invoke(inst,method,b.constructor.__sjs_base__,args);
+			var method = b.constructor.prototype[method];
+			method.apply(inst,args);
 		}
+
+		/**
+			@param {prototype} p
+		*/
+		function _inheritance_map(p){
+			var map = Object.create(null);
+
+			while(p) {
+				var keys = Object.keys(p);
+				for(var i=0; i<keys.length; i++){
+					var key = keys[i];
+					if(map[key]) continue;
+					map[key] = (function(){
+						this.proto[this.key].apply(this.instance,arguments);
+					}).bind({instance:this,proto:p,key:key});
+				}
+
+				p = p.constructor.__sjs_base__;
+			}
+
+			return map;
+		};
+
+		/**
+		 * pseudo class wrapper
+		 * */
+		 function Class(_class){
+			if(!_class) throw 'constructor function may not be empty';
+			if(typeof(_class) !== 'function' ) throw 'Constructor must be a function';
+
+			_class.extend = function(base){
+				this.prototype = Object.create(base.prototype);
+				this.prototype.constructor = this;
+				/*
+					we will need to invoke base prototypes methods thus
+					constructor's base is a prototype
+				*/
+				this.__sjs_base__ = base.prototype;
+
+				this.prototype.super = function(){
+					/*
+						ensure super constructor is invoked only once
+						attach super prototype methods
+					*/
+					this.super = function(){};
+
+					__super(this,_class.__sjs_base__, arguments);
+					this.super = function(__class){
+						if(!(this instanceof __class))
+							throw 'Invalid super class "' + getFunctionName(__class) + '" of class "' + getFunctionName(_class) + '"' ;
+						return _inheritance_map.call(this,__class.prototype);
+					}
+				}
+
+				return this;
+			}
+
+			return _class;
+		};
+
+
+	var geval = eval;
+	/**
+	 *
+	 */
+	var URL_CACHE = new Array();
+
+	/**
+	  	Bootloading files
+	*/
+	var BOOT_SOURCE = []
+	,	READY = {}
+	, LOADER_PROGRESS = {total:0, complete:0}
+	,	MODULE_MAP = new Object(null);
+
+	var FILE_EXTENSIONS = {
+		javascript: '.js',
+		template: 	'.html',
+		style: 		'.css',
+		route: 		'.sjsroute',
 	};
+
+	var PATH_VARIABLES = {
+		sjshome:''
+	};
+
+
 
 	function setPathVar(key, value){
 		//do not allow setting sjs home variable
@@ -274,31 +348,6 @@ var sjs = (function(window, document){
 		return asrc;
 	};
 
-	function valueGetter(obj, path) {
-		if(path == null) return (new Function('return this;')).bind(obj);
-		var parts = path.toString().split('.');
-    var stmnt = 'return this';
-    for(var i=0; i < parts.length; i++){
-      stmnt+='[\''+parts[i]+'\']';
-    }
-    stmnt+=';';
-    return (new Function(stmnt)).bind(obj);
-  };
-
-	function valueSetter(obj, path){
-		if(path == null) return (new Function('throw "No setter path exception"')).bind(obj);
-
-		var parts = path.toString().split('.');
-		var stmnt = 'this';
-		for(var i=0; i < parts.length; i++){
-			stmnt+='[\''+parts[i]+'\']';
-		}
-		stmnt+='=v;';
-		return (new Function('v',stmnt)).bind(obj);
-	};
-
-
-
 
 	/* make this more efficient */
 	function endsWith(text, pattern){
@@ -315,73 +364,7 @@ var sjs = (function(window, document){
 	};
 
 
-/**
- *
- * 	URL analyzer
- *
- */
-function Tokenizer(input, alphanum, space){
-	if(!(this instanceof Tokenizer) ) return new Tokenizer(input, alphanum, space);
-	mixin(this, {
-		input: input,	i : 0,	c : input[0]
-	});
 
-	this.alphanum = Tokenizer.isAlphaNum;
-	if(alphanum) this.alphanum = alphanum;
-
-	this.space = Tokenizer.isSpace;
-	if(space) this.space = space;
-};
-
-
-Tokenizer.isSpace = function(c){
-		if(	c === ' ' 	||
-			c === '\n'	||
-			c === '\r'  ||
-			c === '\t') return true;
-};
-
-Tokenizer.isAlphaNum = function(c){
-		if(!c) return false;
-		var code = c.charCodeAt();
-		if(	c === '_' ||
-			(code >= 48 && code <= 57)	||	/*0-9*/
-			(code >= 65 && code <= 90 ) || 	/*A-Z*/
-			(code >= 97 && code <= 122) 	/*a-z*/ )
-		return true;
-		return false;
-};
-
-
-Tokenizer.prototype = {
-	consume : function(){
-		if(this.input.length <= this.i) return null;
-		var cons = this.c;
-		this.c = this.input[++this.i];
-		return cons;
-	},
-
-	nextToken : function(){
-
-		var c = this.c;
-		if(this.alphanum(c)) {
-			return this.identifier();
-		}
-		return this.consume();
-	},
-
-	identifier:function(){
-		var result = '';
-		while(this.alphanum(this.c)){
-			result += this.consume();
-		}
-		return result;
-	}
-};
-
-var PATH_VARIABLES = {
-	sjshome:configuration.splice_home
-};
 function PathVariable(key){
 	this.key = key;
 	this.value = PATH_VARIABLES[key];
@@ -440,25 +423,25 @@ UrlAnalyzer.prototype = {
         for (var i = 0; i < a.length; i++) {
            	this.transport = new ActiveXObject(a[i]);
         }
-        else if (window.XMLHttpRequest)   this.transport =  new XMLHttpRequest();
+      else if (window.XMLHttpRequest)   this.transport =  new XMLHttpRequest();
 	};
 
 	HttpRequest.prototype.request = function(type,config){
 
 	 	var params = ''
-        ,   separator = ''
+    ,   separator = ''
 	 	,   requestURL = config.url
 	 	,   self = this;
 
-        if (config.formData)
-        for(var d=0; d < config.formData.length; d++){
-        	params += separator + config.formData[d].name + '=' + encodeURIComponent(config.formData[d].value);
-           	separator = '&';
-        }
+    if (config.formData)
+    for(var d=0; d < config.formData.length; d++){
+    	params += separator + config.formData[d].name + '=' + encodeURIComponent(config.formData[d].value);
+      separator = '&';
+    }
 
-        if(params.length > 0 && type === 'GET'){
-        	requestURL = requestURL + "?" + params;
-        }
+    if(params.length > 0 && type === 'GET'){
+    	requestURL = requestURL + "?" + params;
+    }
 
 		this.transport.open(type,requestURL,true);
 
@@ -477,35 +460,32 @@ UrlAnalyzer.prototype = {
 		    this.transport.setRequestHeader('Content-Type', 'text/html; charset=utf-8');
 		}
 
+  	/*
+        in ie8 onreadystatechange is attached to a quasy window object
+        [this] inside handler function will refer to window object and not transport object
+    */
+    this.transport.onload = function(){
+        var transport = self.transport;
 
+        var response = {
+            text: transport.responseText,
+            xml:  transport.responseXML
+        };
 
-	    /*
-            in ie8 onreadystatechange is attached to a quasy window object
-            [this] inside handler function will refer to window object and not transport object
-        */
-        this.transport.onload = function(){
-            var transport = self.transport;
-
-            var response = {
-                text: transport.responseText,
-                xml:  transport.responseXML
-            };
-
-            switch (transport.status) {
-                case 200:
-                    if(typeof config.onok == 'function') config.onok(response);
-                    break;
-                case 400, 401, 402, 403, 404, 405, 406:
-                case 500:
-                default:
-                    if (typeof config.onfail == 'function') config.onfail(response);
-                    break;
-
-            }
+        switch (transport.status) {
+            case 200:
+                if(typeof config.onok == 'function') config.onok(response);
+                break;
+            case 400, 401, 402, 403, 404, 405, 406:
+            case 500:
+            default:
+                if (typeof config.onfail == 'function') config.onfail(response);
+                break;
 
         }
+    }
 
-        if (type == 'POST' && !params) params = config.data;
+    if (type == 'POST' && !params) params = config.data;
 
 		this.transport.send(params);
 		return this;
@@ -519,25 +499,6 @@ UrlAnalyzer.prototype = {
 		return new HttpRequest().request('GET',config);
 	};
 
-/*
-
-----------------------------------------------------------
-
-	SliceJS Core
-	Implementation
-
-*/
-
-	var SplashScreenController = Class(function SplashScreenController(){
-		this.super();
-	}).extend(Controller);
-
-
-	SplashScreenController.prototype.update = function(total, complete, itemname){
-		throw 'SplashScreenController derived class must implement "update" method';
-	}
-
-	function onReady(fn){	READY.callback = fn; };
 
 	/**
 		Application entry point
@@ -599,24 +560,6 @@ UrlAnalyzer.prototype = {
 
 	}
 
-	//determine application startup mode
-	if(configuration.startup == 'onload') {
-		window.onload = function(){
-			start();
-		};
-	};
-
-	function boot(args){
-
-		if(!args) return null;
-		if(!(args instanceof Array) ) return null;
-
-		for(var i=0; i< args.length; i++){
-			BOOT_SOURCE.push(args[i]);
-		}
-
-		return boot;
-	};
 
 
 	function toPath(obj, path){
@@ -669,248 +612,46 @@ UrlAnalyzer.prototype = {
 		return {namespace:ns, name:parts[parts.length-1]};
 	};
 
-
-
-
-	var NAMESPACE_INDEX = [];
-
 	/** Namespace object
 	 *
 	 * */
 
-	function _Namespace(namespace){
-
-		if(typeof namespace !== 'string' ) throw "Namespace(string) argument type must be a string";
-
-		var ns = getNamespace.call(window,namespace, false, false);
-
-		if(ns && !(ns instanceof Namespace))
-			throw "Namespace " + namespace + " is ocupied by an object ";
-
-		/*
-		 * return Namespace proxy with Class constructor
-		 * */
-		if(ns == null){
-			return {
-
-
-				add:function(name, object){
-
-					var idx = (namespace + '.' + name).toUpperCase();
-
-					var newNamespace = getNamespace.call(window,namespace,true);
-					NAMESPACE_INDEX[idx] = newNamespace[name] = object;
-
-				}
-			}
-		}
-
-
-		return ns;
-	}
-
-
-	function Namespace(path){
-		this.itc = 0;
+	function Namespace(){
+		if(!(this instanceof Namespace) ) return new Namespace();
+		this.sequence = 0;
+		this.content = Object.create(null);
 	};
-
 
 	Namespace.prototype = {
-
-			getNextTemplateName : function(){
-				return '__impTemplate' + (this.itc++);
-			},
-
-
-
-			place:function(obj){
-				for(var key in obj){
-					if(!Object.prototype.hasOwnProperty.call(obj,key)) continue;
-					this[key] = obj[key];
+			add : function(path, obj){
+				if(!path) return this;
+				var parts = path.split(".");
+				var target = this;
+				for(var i=0; i<parts.length; i++){
+					if(target.content[parts[i]] == null) target.content[parts[i]] = new Namespace();
+					target = target.content[parts[i]];
 				}
+				target.content = obj;
+				return this;
 			},
 
-			add:function(name, object){
-
-				var idx = (this._path + '.' + name).toUpperCase();
-				NAMESPACE_INDEX[idx] = this[name] = object;
-
-			},
-
-			lookup:function(name){
-				return getNamespace.call(this,name,false, true);
-			},
-
-			list: function(){
-
-				var fn = function(ns, collection, accumulator, separator){
-
-
-					var props = Object.keys(ns);
-
-					for(var i=0; i < props.length; i++){
-						if(! ns.propertyIsEnumerable(props[i]) ||  !ns.hasOwnProperty(props[i])) continue;
-						/*
-						 * Process children of the namespace recursively
-						 * */
-						if(ns[props[i]] instanceof Namespace)
-							fn(ns[props[i]], collection, accumulator+separator+props[i], '.');
-						else {
-
-							var type = typeof(ns[props[i]]);
-							var path = '';
-
-							if(type === 'function')
-								path = accumulator + separator + '{' + props[i] + '}';
-							else
-							if (type === 'object')
-								path = accumulator + separator + '[' + props[i] + ']';
-							else
-								path = accumulator+separator+props[i];
-
-
-							collection.push(path);
-						}
-					}
-
-					return;
+			lookup:function(path){
+				if(!path) return this;
+				var parts = path.split(".");
+				var target = this;
+				for(var i=0; i<parts.length; i++){
+					target = target.content[parts[i]];
+					if(target == null) return null;
 				}
-
-				var namespaces = [];
-				fn(this,namespaces, '','');
-
-				for(var i=0; i< namespaces.length; i++){
-					core.info.log(namespaces[i]);
-				}
-
+				return target;
+			},
+			seq:function(){
+				return this.sequence++;
 			}
 	};
 
 
 
-	/**
-	 * Public Namespace interface
-	 * returns Namespace or a namespace proxy object
-	 * */
-
-	Namespace.list = function(){
-		/*
-		 * get owened properties on the global window object
-		 * */
-		var keys = Object.keys(window);
-
-		for(var i = 0; i < keys.length; i++ ) {
-			var prop = keys[i];
-			var foo =  window[prop];
-			if(foo instanceof Namespace) {
-				var a = {};a[prop] = window[prop];
-				Namespace.prototype.list.call(a);
-			}
-		}
-	};
-
-	Namespace.listIndex = function(){
-		for(var key in NAMESPACE_INDEX){
-			if(NAMESPACE_INDEX.hasOwnProperty(key))
-				logging.debug.log(key);
-		}
-	};
-
-	Namespace.lookup = function(qualifiedName){
-		logging.debug.log('searching ' + qualifiedName);
-		return getNamespace.call(window,qualifiedName,false, true);
-	};
-
-	Namespace.lookupIndex = function(qualifiedName){
-		var idx = qualifiedName.toUpperCase();
-
-		return NAMESPACE_INDEX[idx];
-	};
-
-
-
-	function __super(inst,b,args){
-		if(!b) return;
-		__super(inst,b.constructor.__sjs_base__,args);
-		b.constructor.apply(inst,args);
-	};
-
-	function __invoke(inst,method,b,args){
-		if(!b) return;
-		__invoke(inst,method,b.constructor.__sjs_base__,args);
-		var method = b.constructor.prototype[method];
-		method.apply(inst,args);
-	}
-
-	/**
-		@param {prototype} p
-	*/
-	function _inheritance_map(p){
-		var map = Object.create(null);
-
-		while(p) {
-			var keys = Object.keys(p);
-			for(var i=0; i<keys.length; i++){
-				var key = keys[i];
-				if(map[key]) continue;
-				map[key] = (function(){
-					this.proto[this.key].apply(this.instance,arguments);
-				}).bind({instance:this,proto:p,key:key});
-			}
-
-			p = p.constructor.__sjs_base__;
-		}
-
-		return map;
-	};
-
-	/**
-	 * pseudo class wrapper
-	 * */
-	 function Class(_class){
-		if(!_class) throw 'constructor function may not be empty';
-		if(typeof(_class) !== 'function' ) throw 'Constructor must be a function';
-
-		_class.extend = function(base){
-			this.prototype = Object.create(base.prototype);
-			this.prototype.constructor = this;
-			/*
-				we will need to invoke base prototypes methods thus
-				constructor's base is a prototype
-			*/
-			this.__sjs_base__ = base.prototype;
-
-			this.prototype.super = function(){
-				/*
-					ensure super constructor is invoked only once
-					attach super prototype methods
-				*/
-				this.super = function(){};
-
-				__super(this,_class.__sjs_base__, arguments);
-				this.super = function(__class){
-					if(!(this instanceof __class))
-						throw 'Invalid super class "' + getFunctionName(__class) + '" of class "' + getFunctionName(_class) + '"' ;
-					return _inheritance_map.call(this,__class.prototype);
-				}
-			}
-
-			return this;
-		}
-
-		return _class;
-	};
-
-	function _super(inst,b,args){
-		if(!b) return;
-		_super(inst,b.base,args);
-		b.apply(inst,args);
-	};
-
-
-	function prototype(_class,_proto){
-		return mixin(_class.prototype,_proto);
-	};
 
 	function Iterator(collection){
 		this.data = collection;
@@ -1166,56 +907,6 @@ UrlAnalyzer.prototype = {
 		return cache;
 	};
 
-
-
-	var defaultSplash =(function(){
-
-			var splash = new Controller();
-			var view = new View(
-				'<div></div>')
-			.style('position:absolute; top:0px; left:0px; height:4px; width:0%; background-color:#48DBEA;' +
-						 '-webkit-box-shadow: 0px 2px 11px 2px rgba(0,0,0,0.75); '+
-						 '-moz-box-shadow: 0px 2px 11px 2px rgba(0,0,0,0.75);'+
-						 ' box-shadow: 0px 2px 11px 2px rgba(0,0,0,0.75);');
-
-			splash.views = {root:view};
-			splash.update = function(total, complete, itemName){
-				  var p = Math.round(complete/total*100);
-					if(!this.progress || this.progress < p) this.progress = p;
-					this.views.root.htmlElement.style.width = this.progress + '%';
-			}
-			return splash;
-	})();
-
-	var LoadingWatcher = {
-
-		splashScreen : defaultSplash,
-		initialInclude : 1,
-		getLoaderProgress : function(){
-			return LOADER_PROGRESS;
-		},
-
-		notify:function(current){
-			this.name = current.name;
-			this.url = current.url;
-
-			if(!this.splashScreen) return;
-
-			this.splashScreen.update(LOADER_PROGRESS.total,LOADER_PROGRESS.complete,current.name);
-		},
-
-		update:function(){
-			if(!this.splashScreen) return;
-			this.splashScreen.update(LOADER_PROGRESS.total,LOADER_PROGRESS.complete);
-		}
-	};
-
-
-
-
-
-
-
 	function include(resources, oncomplete, onitemloaded){
 
 		/*
@@ -1260,60 +951,7 @@ UrlAnalyzer.prototype = {
 	};
 
 
-	/*
-	 *
-	 * Namespace stores functions(classes) and not instances of the
-	 * objects
-	 * Returns a namespace object,
-	 * If the namespace object does not exist it is created
-	 *
-	 * Namespaces may not have common root namespace
-	 *
-	 * */
-	function getNamespace(namespace, isCreate, isLookup){
 
-		var parts = namespace.split('.');
-
-		var ns = this;
-		if(!ns) ns = window;
-
-		var last = null;
-
-
-		var separator = '', path = '';
-
-		for(var i=0; i<parts.length; i++){
-
-			path = path + separator + parts[i];
-
-			if(!ns[parts[i]]) {
-				if(isCreate === true) ns[parts[i]] = new Namespace(path);
-				else return null;
-			}
-
-			ns = ns[parts[i]];
-
-			/*
-			 * if current object is not Namespace
-			 * stop the loop
-			 * */
-			if(!(ns instanceof Namespace) ) break;
-
-			if(ns instanceof Namespace){
-				last = ns;
-			}
-
-			separator = '.';
-
-		} // end for
-
-		if(isLookup === true){
-			if(i+1 == parts.length) return ns;
-			else return null;
-		}
-
-		return ns;
-	};
 
 
 
@@ -1557,17 +1195,6 @@ UrlAnalyzer.prototype = {
 	};
 
 
-	function mixin(target, source){
-		if(!source) return target;
-		var keys = Object.keys(source);
-
-		for(var i=0; i< keys.length; i++){
-			var key = keys[i];
-			target[key] = source[key];
-		}
-		return target;
-	};
-
 
 	function listModules(){
 		return MODULE_MAP;
@@ -1580,20 +1207,6 @@ UrlAnalyzer.prototype = {
 		return end - start;
 	};
 
-	function runAsync(fn){
-		var asyncfn = function(){
-			setTimeout(1,function(){
-				fn()
-			});
-		}
-
-		asyncfn.call = function(){
-
-				fn.apply(arguments[0])
-
-		};
-		return asyncfn;
-	};
 
 	function findModule(m){
 		var mdl = null;
@@ -1605,115 +1218,12 @@ UrlAnalyzer.prototype = {
 		return mdl;
 	};
 
+	loadConfiguration(function(config){
+		new Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
+	});
 
-/*
-
---------------------------------------
-
-	Core exports
-
-*/
-
-	var consoleLog = console.log.bind(console);
-
-
-	var sjsExports = mixin(Object.create(null), {
-
-		debug:{
-			log : consoleLog,
-			info: logging.info,
-			enable:function(){
-				this.log = consoleLog;
-				logging.debug.log = consoleLog;
-			},
-			disable:function(){
-				this.log  = function(){}
-			}
-		},
-
-		config : configuration,
-
-		boot : boot,
-		toPath : toPath,
-		home : home,
-
-		propname: propertyName,
-		absPath : absPath,
-		getPath : getPath,
-		pathvar : setPathVar,
-		display : display,
-		close 	: close,
-		endswith:endsWith,
-		mixin	: mixin,
-		binding : binding,
-		proxy	: proxy,
-		propvalue : propertyValue,
-		async: runAsync,
-		getter: valueGetter,
-		setter: valueSetter,
-		view:function(d){
-			if(!d) return _viewQueryMode();
-			return new View(d);
-		},
-		timing	:	measureRuntime,
-
-		load	: include,
-		include : include,
-		fname:getFunctionName,
-
-		Namespace: Namespace,
-		Class : Class,
-		Controller : Controller,
-		SplashScreenController : SplashScreenController,
-		types : {
-			View:View,
-			Controller:Controller
-		},
-
-		prototype:prototype,
-
-		HttpRequest : HttpRequest,
-		Event : EventSingleton,
-		event:	Event,
-		Tokenizer:Tokenizer,
-		UrlAnalyzer:UrlAnalyzer,
-
-		onReady:onReady,
-
-		modules: listModules
-
-});
-	if(configuration.startup === 'user'){
-			sjsExports.start = function(){start();}
-	}
-
-	function sjs(m) {
-		//free module definition
-		if(typeof m === 'function') return Module({definition:m});
-		//dependent module definition
-		if( typeof m === 'object' && typeof m.definition === 'function') return Module(m);
-
-		//lookup module
-		if(typeof m  === 'string'){
-			var mdl = findModule(m);
-			return function(callback){
-				if(mdl != null) {
-					if(typeof callback === 'function') {
-						callback(mdl); return;
-					}
-				}
-
-				load([m],function(){
-					if(typeof callback === 'function') {
-						var mdl = findModule(m);
-						if(mdl != null)	callback(mdl);
-					}
-				})
-			};
-		}
-
-		return sjsExports;}
-	//core.debug = debug;
-	return sjs;
+return {
+	namespace: Namespace
+}
 
 })(window,document);
