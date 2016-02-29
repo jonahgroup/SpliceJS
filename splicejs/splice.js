@@ -1,5 +1,3 @@
-
-
 /*
 
 SpliceJS
@@ -42,8 +40,10 @@ var sjs = (function(window, document){
 	/**
 		Configuration loader, participates in application bootstrap
 	*/
+	var configuration = {};
 	function loadConfiguration(onLoad){
 		var main = null;
+
 		// cycle through all script elements in document's head
 		for(var i=0; i < document.head.childNodes.length; i++){
 			var node = document.head.childNodes[i];
@@ -57,13 +57,14 @@ var sjs = (function(window, document){
 		if(main == null) throw "SpliceJS script element must have 'sjs-main' attribute";
 
 		var config = {
-			appHome: 	getPath(window.location.href).path,
+			appBase: 	getPath(window.location.href).path,
 			sjsHome:	getPath(main.getAttribute('src')).path
 		};
 
 		var sjsConfig = node.getAttribute('sjs-config');
 		//load external configuration if available
-		if(sjsConfig == null) {
+		if(sjsConfig == null || !sjsConfig) {
+			mixin(configuration, config);
 			onLoad(config);
 		} else {
 				//async load here
@@ -152,11 +153,42 @@ var sjs = (function(window, document){
 
 		if(!match)  return 'anonymous';
 		return match[1];
-	};
+	}
 
+	var PATH_VARIABLES = {};
+	function setPathVar(key, value){
+		//do not allow setting sjs home variable
+		if(key === 'sjshome') return;
 
+		if(!key || !value){
+			return mixin({},PATH_VARIABLES);
+		}
+		PATH_VARIABLES[key] = value;
+		return mixin({},PATH_VARIABLES);
+	}
 
-	var _pathVarRegex = /({[^}{]+})/ig;
+	function resolveUrl(url,isAbs){
+		if(!url) return url;
+		var _pathVarRegex = /({[^}{]+})/ig;
+
+		var parts = url.split(/({[^}{]+})/);
+		var result = "";
+		for(var i=0; i<parts.length; i++){
+			var pv = PATH_VARIABLES[parts[i]];
+			if(pv != null) {
+				result = result + resolveUrl(pv);
+				continue;
+			}
+			result = result + parts[i];
+		}
+
+		if(isAbs){
+			return collapseUrl(configuration.appBase + '/' + result);
+		}
+
+		return collapseUrl(result);
+	}
+
 	/**
 		Extracts path full resource location
 	*/
@@ -170,8 +202,7 @@ var sjs = (function(window, document){
 		}
 	};
 
-
-	function collapsePath(path){
+	function collapseUrl(path){
 		var stack = [];
 		/*
 			create origin stack
@@ -197,13 +228,6 @@ var sjs = (function(window, document){
 		}
 		return cpath;
 	};
-
-
-	function absPath(path){
-		return collapsePath(configuration.app_home+'/'+path);
-	};
-
-
 
 
 	/*
@@ -281,6 +305,7 @@ var sjs = (function(window, document){
 
 			return _class;
 		};
+/* ------------------------------------------------------ */
 
 
 	var geval = eval;
@@ -304,49 +329,8 @@ var sjs = (function(window, document){
 		route: 		'.sjsroute',
 	};
 
-	var PATH_VARIABLES = {
-		sjshome:''
-	};
 
 
-
-	function setPathVar(key, value){
-		//do not allow setting sjs home variable
-		if(key === 'sjshome') return;
-
-		if(!key || !value){
-			return mixin({},PATH_VARIABLES);
-		}
-
-		PATH_VARIABLES[key] = value;
-		return setPathVar;
-	};
-
-
-	function applyPath(src){
-		var path = this.path;
-		var regex = /<img\s+src="(\S+)"\s*/igm;
-
-		var match = null;
-		var asrc = '';
-
-		var lastMatch = 0;
-
-		while(  match = regex.exec( src ) ){
-			var apath = absPath(home(match[1],path));
-
-			var left = src.substring(lastMatch, match.index);
-
-
-			asrc = asrc + left + '<img src="' + apath + '" ';
-			lastMatch += match.index + match[0].length;
-
-			logging.debug.log(apath);
-		}
-
-		asrc = asrc + src.substring(lastMatch, src.length);
-		return asrc;
-	};
 
 
 	/* make this more efficient */
@@ -1221,11 +1205,16 @@ UrlAnalyzer.prototype = {
 	};
 
 	loadConfiguration(function(config){
+		PATH_VARIABLES['{sjshome}'] = config.sjsHome;
 		new Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
 	});
 
-return {
-	namespace: Namespace
-}
+return mixin(Object.create(null),{
+	namespace : Namespace,
+	url			: resolveUrl.bind({}),
+	urlabs	: (function(url){return resolveUrl(url,true);}).bind({}),
+	pathvar	:	setPathVar,
+	'module' 	: Module
+})
 
 })(window,document);
