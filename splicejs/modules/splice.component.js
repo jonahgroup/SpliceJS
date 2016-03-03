@@ -1,17 +1,9 @@
-sjs({
+sjs.module({
 
-
-definition:function(){
-
-
-
-
+definition:function(sjs){
   /*
-
   ----------------------------------------------------------
-
   	Templating Engine
-
   */
 
   	/**
@@ -1233,7 +1225,12 @@ definition:function(){
   		return Component;
   	};
 
-
-}
-
-})
+    //component module loader
+    function component(def){
+      sjs.log.info('This is a component loader');
+      if(typeof def.definition == 'function'){
+        def.definition(sjs.core());
+      }
+    }
+    sjs.extension({component:component}).add();
+}})

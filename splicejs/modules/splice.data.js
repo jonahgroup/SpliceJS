@@ -1,5 +1,8 @@
 /* global sjs */
-sjs({
+sjs.module({
+required:[
+	'/{sjshome}/modules/splice.inheritance.js'
+],
 definition:function(sjs){
 
 	var mixin = sjs.mixin

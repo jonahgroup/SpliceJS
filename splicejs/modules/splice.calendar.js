@@ -1,8 +1,7 @@
 /* global sjs*/
-sjs({
+sjs.module({
 
 definition:function(sjs){
-
 
   function date(d){
     return {

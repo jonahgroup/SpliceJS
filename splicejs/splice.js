@@ -4,8 +4,6 @@ SpliceJS
 
 The MIT License (MIT)
 
-Copyright (c) 2015 Dmitry Rogozhkin (jonahgroup)
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -25,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-var sjs = (function(window, document){
+(function(window, document){
 	"use strict";
 
 	//loggin setup
@@ -59,7 +57,7 @@ var sjs = (function(window, document){
 		var config = {
 			appBase: 	getPath(window.location.href).path,
 			sjsHome:	getPath(main.getAttribute('src')).path,
-			sjsMain:	context().resolve(main.getAttribute('sjs-main'))
+			sjsMain:	main.getAttribute('sjs-main')
 		};
 
 		var sjsConfig = node.getAttribute('sjs-config');
@@ -139,33 +137,45 @@ var sjs = (function(window, document){
 	}
 
 	// returns URL context which allow further resolutions
+	// / - page context
+	function _spv(url){
+		var parts = url.split(/({[^}{]+})/);
+		var r = "";
+		for(var i=0; i<parts.length; i++){
+			var pv = PATH_VARIABLES[parts[i]];
+			if(pv != null) {
+				r = r + _spv(pv);
+				continue;
+			}
+			r = r + parts[i];
+		}
+		return r;
+	}
 	function context(contextUrl){
+		//content must end with /
+		var ctx = contextUrl;
+		if(ctx != null && ctx && ctx[ctx.length-1] != '/')
+		 	throw 'Context URL must end with "/"';
+
 		return {
-			resolve:function(url,isAbs){
+			resolve:function(url){
 				if(!url) return url;
-				var _pathVarRegex = /({[^}{]+})/ig;
-
-				var parts = url.split(/({[^}{]+})/);
-				var result = "";
-				for(var i=0; i<parts.length; i++){
-					var pv = PATH_VARIABLES[parts[i]];
-					if(pv != null) {
-						result = result + resolveUrl(pv);
-						continue;
-					}
-					result = result + parts[i];
+				//resolve path variables
+				var result = {url:_spv(url), aurl:''};
+				//not page context
+				if(result.url.indexOf('/') < 0 && ctx){
+					result.url = ctx + '/' + result.url;
 				}
-
-				if(isAbs){
-					//already absolute
-					if(url.startsWith('http://')) return collapseUrl(result);
-					return collapseUrl(configuration.appBase + '/' + result);
+				//not absolute
+				if( !/([a-zA-Z]+:\/\/)/.exec(result.url) ){
+					result.aurl = collapseUrl(configuration.appBase + '/' + result.url);
+				} else {
+					result.aurl = collapseUrl(result.url);
 				}
 				return result;
 			}
 		}
 	}
-
 
 	/**
 		Extracts path full resource location
@@ -218,6 +228,15 @@ var sjs = (function(window, document){
 		if(a.length > 0) return a[a.length - 1];
 		return null;
 	};
+
+	function fname(foo){
+    if(foo.name) return foo.name;
+    var _fNameRegex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
+    if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
+    var match = _fNameRegex.exec(foo.toString());
+    if(!match)  return 'anonymous';
+    return match[1];
+  }
 
 	var geval = eval;
 
@@ -305,7 +324,7 @@ var sjs = (function(window, document){
 		 * qualify filename
 		 * */
 		var relativeFileName = filename;
-		filename = resolveUrl(filename,true);
+		filename = context().resolve(filename).aurl;
 		Loader.currentFile = filename;
 		//tell Splice what is loading
 		//watcher.notify({name:relativeFileName, url:filename});
@@ -313,10 +332,10 @@ var sjs = (function(window, document){
 		if(	endsWith(filename, '.js') )
 		if(URL_CACHE[filename] === true){
 			setTimeout(function(){
-				logging.debug.log('File ' + filename + ' is already loaded, skipping...');
+				log.debug('File ' + filename + ' is already loaded, skipping...');
 				loader.progress--;
-				LOADER_PROGRESS.complete++;
-				watcher.update();
+				//LOADER_PROGRESS.complete++;
+				//watcher.update();
 				loader.loadNext(watcher)
 			},1);
 			return;
@@ -381,9 +400,8 @@ var sjs = (function(window, document){
 	/**
 	@path: is already absolute
 	*/
-	function prepareImports(a, path){
+	function prepareImports(a, ctx){
 		if(!a) return {namespaces:null, filenames:null};
-
 		var namespaces = [] , filenames = [],  p = '';
 		//loop through all required modules
 		for(var i=0; i<a.length; i++){
@@ -391,7 +409,7 @@ var sjs = (function(window, document){
 			if(typeof a[i] === 'object') {
 				for(var key in a[i]){
 					if(a[i].hasOwnProperty(key)) {
-						var p = resolveUrl(path+'/'+a[i][key]);
+						var p = ctx.resolve(a[i][key]);
 						namespaces.push({ns:key,path:p});
 						filenames.push(p);
 						break;
@@ -399,11 +417,7 @@ var sjs = (function(window, document){
 				}
 			} else {
 				//this is application context URL
-				if(a[i].startsWith('/')) {
-					filenames.push(resolveUrl(a[i]));
-				} else {
-					filenames.push(resolveUrl(path + '/' +a[i]));
-				}
+				filenames.push(ctx.resolve(a[i]).url);
 			}
 		}
 		return {namespaces:namespaces, filenames:filenames};
@@ -427,7 +441,7 @@ var sjs = (function(window, document){
 				for(var i=0; i < arguments.length; i++){
 					var arg = arguments[i];
 					if(typeof arg === 'function' ){
-						scope[getFunctionName(arg)] = arg;
+						scope[fname(arg)] = arg;
 						continue;
 					}
 
@@ -447,7 +461,7 @@ var sjs = (function(window, document){
 				for(var i=0; i < arguments.length; i++){
 					var arg = arguments[i];
 					if(typeof arg === 'function' ){
-						exports[getFunctionName(arg)] = arg;
+						exports[fname(arg)] = arg;
 						continue;
 					}
 
@@ -465,13 +479,9 @@ var sjs = (function(window, document){
 
 	var MODULE_MAP = new Object(null);
 	function Module(moduleDefinition){
-		log.info(this);
     var scope = new Namespace(null); //our module scope
 		scope.singletons = {constructors:[], instances:[]};
-
-		var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
-
-		var path = getPath(Loader.currentFile).path;
+		var path = getPath(Loader.currentFile).path + '/';
 		var url = Loader.currentFile;
 	//	var filename = LoadingWatcher.name;
 
@@ -481,7 +491,7 @@ var sjs = (function(window, document){
 		//	res:filename
 		};
 
-		var imports = prepareImports(moduleDefinition.required, path);
+		var imports = prepareImports(moduleDefinition.required, context(path));
 
 		var required 	= imports.filenames;
 		var definition  = moduleDefinition.definition;
@@ -491,10 +501,8 @@ var sjs = (function(window, document){
 
 		log.info(path);
 
-		/*
-		 * Module has no required includes
-		 * */
 		if(!required || required.length < 1) {
+			var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
 			definition.call({'sjs':_sjs,'scope':scope}, _sjs);
 			if(!scope.__sjs_module_exports__)
 				scope.__sjs_module_exports__ = Object.create(null);
@@ -502,47 +510,45 @@ var sjs = (function(window, document){
 			return;
 		}
 
-		/*
-		 * Load dependencies
-		 * */
 		 load(required, function(){
-
-			/*
-				Inject Scope Dependencies
-			 */
 			if(imports.namespaces) {
 				applyImports.call(scope,imports);
 			}
-
 			if(typeof definition === 'function') {
+				var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
 				definition.call({'sjs':_sjs,'scope':scope}, _sjs);
-
-				if(!scope.__sjs_module_exports__)
-					scope.__sjs_module_exports__ = Object.create(null);
-
-				//get only exported components
-				var components = {};
-				if(scope.components){
-				var keys = Object.keys(scope.components);
-				for(var key in keys) {
-					var comp = scope.components[keys[key]];
-					if(comp && comp.isComponent && comp.template.export) {
-						components[comp.template.export] = comp;
-					}
-				}
-				}
-				MODULE_MAP[url] = mixin(scope.__sjs_module_exports__,components);
+				MODULE_MAP[url] = scope.__sjs_module_exports__;
 			}
-
 		});
 	};
+Module.list = function(){
+	return MODULE_MAP;
+}
+
+function extension(obj){
+	return {
+		add : function(){
+			var keys = Object.keys(obj);
+			for(var key in keys) {
+				if(_core[keys[key]]) continue;
+				_core[keys[key]] = obj[keys[key]];
+			}
+		}
+	}
+}
 
 var _core = mixin(Object.create(null),{
 	namespace : Namespace,
-	pathVar :	setPathVar,
-	context : context,
-	urlCache : urlCache,
-	'module' : Module
+	pathVar 	:	setPathVar,
+	context  	: context,
+	urlCache  : urlCache,
+	mixin			: mixin,
+	'module'  : Module,
+	fname			: fname,
+	load			: load,
+	extension : extension,
+	log 			: log,
+	core		  : core,
 });
 function core(){
 	return mixin(Object.create(null),_core);
@@ -558,6 +564,6 @@ loadConfiguration(function(config){
 	}
 });
 
-return _core;
+window.sjs = _core;
 
 })(window,document);

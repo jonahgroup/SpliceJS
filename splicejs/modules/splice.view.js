@@ -1,89 +1,83 @@
+sjs.module (
+{
+definition:function(sjs){
+  function dfs(dom, target, filterFn, nodesFn){
+    if(!dom) return;
 
 
-
-definition:function(){
-
-
-  function _box(element){
-
-
-    function dfs(dom, target, filterFn, nodesFn){
-  		if(!dom) return;
+    if(typeof filterFn === 'function') {
+      var node = filterFn(dom);
+      if(node) target.push(node);
+    } else {
+      target.push(dom);
+    }
 
 
-  		if(typeof filterFn === 'function') {
-  			var node = filterFn(dom);
-  			if(node) target.push(node);
-  		} else {
-  			target.push(dom);
-  		}
+    var children = [];
+    if(typeof nodesFn === 'function'){
+      children = nodesFn(dom);
+    }
+    else {
+      children = dom.childNodes;
+    }
+
+    for(var i=0; i < children.length; i++){
+      var n = dom.childNodes[i];
+      dfs(n,target,filterFn, nodesFn);
+    }
+  };
+
+  function selectNodes(dom,filterFn, nodesFn){
+    var nodes = new Array();
+    dfs(dom,nodes,filterFn, nodesFn);
+    if(nodes.length < 1) nodes = null;
+    return nodes;
+  };
 
 
-  		var children = [];
-  		if(typeof nodesFn === 'function'){
-  			children = nodesFn(dom);
-  		}
-  		else {
-  			children = dom.childNodes;
-  		}
-
-  		for(var i=0; i < children.length; i++){
-  			var n = dom.childNodes[i];
-  			dfs(n,target,filterFn, nodesFn);
-  		}
-  	};
-
-  	function selectNodes(dom,filterFn, nodesFn){
-  		var nodes = new Array();
-  		dfs(dom,nodes,filterFn, nodesFn);
-  		if(nodes.length < 1) nodes = null;
-  		return nodes;
-  	};
+  function selectTextNodes(dom,filterFn){
+    var nodes = new Array();
+    //nodeType 3 is a text node
+    dfs(dom,nodes,function(node){
+      if(node.nodeType === 3) {
+        if(typeof filterFn === 'function')	return filterFn(node);
+        return node;
+      }
+      return null;
+    });
+    if(nodes.length < 1) nodes = null;
+    return nodes;
+  };
 
 
-  	function selectTextNodes(dom,filterFn){
-  		var nodes = new Array();
-  		//nodeType 3 is a text node
-  		dfs(dom,nodes,function(node){
-  			if(node.nodeType === 3) {
-  				if(typeof filterFn === 'function')	return filterFn(node);
-  				return node;
-  			}
-  			return null;
-  		});
-  		if(nodes.length < 1) nodes = null;
-  		return nodes;
-  	};
+	function _propertyValueLocator(path){
+				var npath = path.split('.')
+				,	result = this;
 
+				//loop over path parts
+				for(var i=0; i < npath.length-1; i++ ){
+					result = result[npath[i]];
+					if(result == null) console.warn('Property ' + path + ' is not found in object ' + result);
+				}
+				var p = npath[npath.length - 1];
+				if(result && result[p] == undefined) console.warn('Property ' + path + ' is not found in object ' + result);
 
-  	function _propertyValueLocator(path){
-  				var npath = path.split('.')
-  				,	result = this;
+				//hash map object
+				return Object.defineProperty(Object.create(null),'value',{
+					get:function(){
+						if(!result) return null;
+						return result[p];
+					},
+					set:function(newValue){
+						if(!result) return;
+						result[p] = newValue;
+					}
+				});
+	};
 
-  				//loop over path parts
-  				for(var i=0; i < npath.length-1; i++ ){
-  					result = result[npath[i]];
-  					if(result == null) console.warn('Property ' + path + ' is not found in object ' + result);
-  				}
-  				var p = npath[npath.length - 1];
-  				if(result && result[p] == undefined) console.warn('Property ' + path + ' is not found in object ' + result);
-
-  				//hash map object
-  				return Object.defineProperty(Object.create(null),'value',{
-  					get:function(){
-  						if(!result) return null;
-  						return result[p];
-  					},
-  					set:function(newValue){
-  						if(!result) return;
-  						result[p] = newValue;
-  					}
-  				});
-  	};
-
-  	function propertyValue(obj){
-  		return _propertyValueLocator.bind(obj);
-  	};
+	function propertyValue(obj){
+		return _propertyValueLocator.bind(obj);
+	};
 
 
   	function display(view){
@@ -149,10 +143,7 @@ definition:function(){
   		}
   	}
 
-
-
-
-
+  function _box(element){
 
   	var css = window.getComputedStyle(element,null);
 
@@ -471,3 +462,5 @@ definition:function(){
 
 
 }
+}
+);
