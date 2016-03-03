@@ -59,7 +59,7 @@ var sjs = (function(window, document){
 		var config = {
 			appBase: 	getPath(window.location.href).path,
 			sjsHome:	getPath(main.getAttribute('src')).path,
-			sjsMain:	resolveUrl(main.getAttribute('sjs-main'))
+			sjsMain:	context().resolve(main.getAttribute('sjs-main'))
 		};
 
 		var sjsConfig = node.getAttribute('sjs-config');
@@ -138,26 +138,34 @@ var sjs = (function(window, document){
 		return mixin({},PATH_VARIABLES);
 	}
 
-	function resolveUrl(url,isAbs){
-		if(!url) return url;
-		var _pathVarRegex = /({[^}{]+})/ig;
+	// returns URL context which allow further resolutions
+	function context(contextUrl){
+		return {
+			resolve:function(url,isAbs){
+				if(!url) return url;
+				var _pathVarRegex = /({[^}{]+})/ig;
 
-		var parts = url.split(/({[^}{]+})/);
-		var result = "";
-		for(var i=0; i<parts.length; i++){
-			var pv = PATH_VARIABLES[parts[i]];
-			if(pv != null) {
-				result = result + resolveUrl(pv);
-				continue;
+				var parts = url.split(/({[^}{]+})/);
+				var result = "";
+				for(var i=0; i<parts.length; i++){
+					var pv = PATH_VARIABLES[parts[i]];
+					if(pv != null) {
+						result = result + resolveUrl(pv);
+						continue;
+					}
+					result = result + parts[i];
+				}
+
+				if(isAbs){
+					//already absolute
+					if(url.startsWith('http://')) return collapseUrl(result);
+					return collapseUrl(configuration.appBase + '/' + result);
+				}
+				return result;
 			}
-			result = result + parts[i];
 		}
-
-		if(isAbs){
-			return collapseUrl(configuration.appBase + '/' + result);
-		}
-		return collapseUrl(result);
 	}
+
 
 	/**
 		Extracts path full resource location
@@ -370,13 +378,15 @@ var sjs = (function(window, document){
 		loader.loadNext({});
 	};
 
+	/**
+	@path: is already absolute
+	*/
 	function prepareImports(a, path){
 		if(!a) return {namespaces:null, filenames:null};
 
 		var namespaces = [] , filenames = [],  p = '';
-
+		//loop through all required modules
 		for(var i=0; i<a.length; i++){
-			var ua = null;
 			//this is a namespaced dependency
 			if(typeof a[i] === 'object') {
 				for(var key in a[i]){
@@ -388,7 +398,12 @@ var sjs = (function(window, document){
 					}
 				}
 			} else {
-				filenames.push(resolveUrl(a[i]));
+				//this is application context URL
+				if(a[i].startsWith('/')) {
+					filenames.push(resolveUrl(a[i]));
+				} else {
+					filenames.push(resolveUrl(path + '/' +a[i]));
+				}
 			}
 		}
 		return {namespaces:namespaces, filenames:filenames};
@@ -525,7 +540,7 @@ var sjs = (function(window, document){
 var _core = mixin(Object.create(null),{
 	namespace : Namespace,
 	pathVar :	setPathVar,
-	url : resolveUrl,
+	context : context,
 	urlCache : urlCache,
 	'module' : Module
 });

@@ -1,6 +1,6 @@
 sjs.module({
-required:[],
-definition:function(){
+required:['/{sjshome}/'],
+definition:function(sjs){
   function functionName(foo){
     if(foo.name) return foo.name;
     var _fNameRegex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
