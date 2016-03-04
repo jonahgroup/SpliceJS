@@ -1,5 +1,4 @@
 /*
-
 SpliceJS
 
 The MIT License (MIT)
@@ -21,11 +20,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
 */
 (function(window, document){
 	"use strict";
-
 	//loggin setup
 	var log = !window.console ? {} : window.console;
 	//console log interface
@@ -34,10 +31,6 @@ SOFTWARE.
 	if(!log.info) 	log.info  = function(){};
 	if(!log.error) 	log.error = function(){};
 
-
-	/**
-		Configuration loader, participates in application bootstrap
-	*/
 	var configuration = {};
 	function loadConfiguration(onLoad){
 		var main = null;
@@ -70,7 +63,6 @@ SOFTWARE.
 		}
 	};
 
-
 	function mixin(target, source){
 		if(!source) return target;
 		var keys = Object.keys(source);
@@ -80,7 +72,6 @@ SOFTWARE.
 		}
 		return target;
 	};
-
 
 	if(!Function.prototype.bind) {
 		if(!Function.prototype.apply) return;
@@ -177,12 +168,8 @@ SOFTWARE.
 		}
 	}
 
-	/**
-		Extracts path full resource location
-	*/
 	function getPath(path){
 		var index = path.lastIndexOf('/');
-
 		if(index < 0) return {name:path};
 		return {
 			path:path.substring(0,index),
@@ -192,7 +179,6 @@ SOFTWARE.
 
 	function collapseUrl(path){
 		var stack = [];
-
 		var parts = path.split('/');
 		for(var i=0; i<parts.length; i++){
 			if(!parts[i] && parts[i] == '') continue;
@@ -206,7 +192,6 @@ SOFTWARE.
 		var cpath = '';
 		var separator = '';
 		for(var i=0; i<stack.length; i++){
-
 			cpath = cpath + separator + stack[i];
 			if(stack[i] == 'http:') { separator = '//';  continue; }
 			if(stack[i] == 'file:') { separator = '///'; continue; }
@@ -222,7 +207,6 @@ SOFTWARE.
 		return result;
 	}
 
-
 	function peek(a){
 		if(!a) return null;
 		if(a.length > 0) return a[a.length - 1];
@@ -237,8 +221,6 @@ SOFTWARE.
     if(!match)  return 'anonymous';
     return match[1];
   }
-
-	var geval = eval;
 
 	function Namespace(){
 		if(!(this instanceof Namespace) ) return new Namespace();
@@ -299,28 +281,22 @@ SOFTWARE.
 					loader.onitemloaded();
 					loader.progress--;
 					Loader.complete++;
-//					watcher.update();
 					loader.loadNext({});
 					log.info(Loader.complete);
 				}
 			};
 			head.appendChild(script);
-
 		}
 	}
 
 	function Loader(resources, oncomplete, onitemloaded) {
-
 		if(!resources || resources.length == 0) throw 'Invalid Loader constructor';
-
 		this.iterator = new Iterator(resources);
 		this.progress = resources.length;
 		this.isActive = true;
 		this.oncomplete = oncomplete;
 		this.onitemloaded = onitemloaded;
-
 		Loader.total += resources.length;
-
 		if(!this.onitemloaded) this.onitemloaded = function(){}; //noop
 	};
 	Loader.complete = Loader.total = 0;
@@ -331,9 +307,7 @@ SOFTWARE.
 	Loader.prototype.loadNext = function(watcher){
 		if(!this.isActive) return;
 		var loader = this;
-		/*
-		 * loading is complete run oncomplete handler
-		 */
+
 		if(loader.progress <= 0) {
 			this.iterator = null; this.oncomplete(); this.oncomplete = null; this.onitemloaded = null;
 			return;
@@ -343,35 +317,23 @@ SOFTWARE.
 		if(!obj) return;
 
 		var filename = obj;
-		/*
-		 * qualify filename
-		 * */
-		var relativeFileName = filename;
+
 		filename = context().resolve(filename).aurl;
 		Loader.currentFile = filename;
-		//tell Splice what is loading
-		//watcher.notify({name:relativeFileName, url:filename});
-
-		//if(	endsWith(filename, '.js') )
 		if(URL_CACHE[filename] === true){
 			setTimeout(function(){
 				log.debug('File ' + filename + ' is already loaded, skipping...');
 				loader.progress--;
 				Loader.complete++;
-				//watcher.update();
 				loader.loadNext(watcher)
 			},1);
 			return;
 		}
 
 		log.info('Loading: ' + filename);
-		var head = document.getElementsByTagName('head')[0];
-
 		if(endsWith(filename, '.js')) {
-			//file handler goes here
 			return _fileHandlers['.js'](filename,loader);
 		}
-
 	};
 
 	var URL_CACHE = new Array();
@@ -403,15 +365,10 @@ SOFTWARE.
 		loader.loadNext({});
 	};
 
-	/**
-	@path: is already absolute
-	*/
 	function prepareImports(a, ctx){
 		if(!a) return {namespaces:null, filenames:null};
 		var namespaces = [] , filenames = [],  p = '';
-		//loop through all required modules
 		for(var i=0; i<a.length; i++){
-			//this is a namespaced dependency
 			if(typeof a[i] === 'object') {
 				for(var key in a[i]){
 					if(a[i].hasOwnProperty(key)) {
@@ -422,7 +379,6 @@ SOFTWARE.
 					}
 				}
 			} else {
-				//this is application context URL
 				filenames.push(ctx.resolve(a[i]).url);
 			}
 		}
@@ -433,7 +389,6 @@ SOFTWARE.
 		var scope = this;
 		for(var i=0; i<imports.namespaces.length; i++){
 			var ns = imports.namespaces[i];
-			//looking up exports
 			var x = MODULE_MAP[absPath(ns.path)];
 			if(!x) continue;
 			ns = getNamespace.call(scope,ns.ns,true,false);
@@ -450,7 +405,6 @@ SOFTWARE.
 						scope[fname(arg)] = arg;
 						continue;
 					}
-
 					if(typeof arg === 'object'){
 						var keys = Object.keys(arg);
 						for(var k=0; k < keys.length; k++){
@@ -460,7 +414,6 @@ SOFTWARE.
 					}
 				}
 			},
-
 			module:function(){
 				var exports = scope.__sjs_module_exports__;
 				if(!exports) exports = scope.__sjs_module_exports__ = Object.create(null);
@@ -470,7 +423,6 @@ SOFTWARE.
 						exports[fname(arg)] = arg;
 						continue;
 					}
-
 					if(typeof arg === 'object'){
 						var keys = Object.keys(arg);
 						for(var k=0; k < keys.length; k++){
@@ -489,12 +441,8 @@ SOFTWARE.
 		scope.singletons = {constructors:[], instances:[]};
 		var path = getPath(Loader.currentFile).path + '/';
 		var url = Loader.currentFile;
-	//	var filename = LoadingWatcher.name;
-
 		scope.__sjs_uri__ = {
 			path:path,
-		//	url:url,
-		//	res:filename
 		};
 
 		var imports = prepareImports(moduleDefinition.required, context(path));
