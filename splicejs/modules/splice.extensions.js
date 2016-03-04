@@ -4,6 +4,7 @@ required:[
   '/{sjshome}/modules/splice.data.js',
   '/{sjshome}/modules/splice.inheritance.js',
   '/{sjshome}/modules/splice.view.js',
+  '/{sjshome}/modules/splice.text.js',
   '/{sjshome}/modules/splice.component.js',
 ],
 definition:function(sjs){

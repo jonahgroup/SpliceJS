@@ -1,5 +1,5 @@
 
-sjs({
+sjs.module({
 definition:function(sjs){
 
 var STRINGBODY = 0
@@ -433,7 +433,7 @@ function format(){
 	* @text parameter primitive type object String, Number
 	* @return object supporting text manipulation API
 	*/
-var Text = function(text){
+var Text = function Text(text){
 	if( typeof text !=='string') return null;
 
 	return {

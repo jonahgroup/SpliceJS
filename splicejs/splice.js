@@ -285,6 +285,29 @@ SOFTWARE.
 		return this.data[++this.i];
 	};
 
+	var _fileHandlers = {
+		'.js': function(filename,loader){
+			//document script loader
+			var head = document.head;
+			var script = document.createElement('script');
+			script.setAttribute("type", "text/javascript");
+			script.setAttribute("src", filename);
+
+			script.onload = script.onreadystatechange = function(){
+				if(!script.readyState || script.readyState == 'complete' || script.readyState == 'loaded') {
+					URL_CACHE[filename] = true;
+					loader.onitemloaded();
+					loader.progress--;
+					Loader.complete++;
+//					watcher.update();
+					loader.loadNext({});
+					log.info(Loader.complete);
+				}
+			};
+			head.appendChild(script);
+
+		}
+	}
 
 	function Loader(resources, oncomplete, onitemloaded) {
 
@@ -296,11 +319,11 @@ SOFTWARE.
 		this.oncomplete = oncomplete;
 		this.onitemloaded = onitemloaded;
 
-		//LOADER_PROGRESS.total += resources.length;
+		Loader.total += resources.length;
 
 		if(!this.onitemloaded) this.onitemloaded = function(){}; //noop
 	};
-
+	Loader.complete = Loader.total = 0;
 	Loader.loaders = new Array();
 
 	Loader.prototype.disable = function(){this.isActive = false; return this;};
@@ -329,12 +352,12 @@ SOFTWARE.
 		//tell Splice what is loading
 		//watcher.notify({name:relativeFileName, url:filename});
 
-		if(	endsWith(filename, '.js') )
+		//if(	endsWith(filename, '.js') )
 		if(URL_CACHE[filename] === true){
 			setTimeout(function(){
 				log.debug('File ' + filename + ' is already loaded, skipping...');
 				loader.progress--;
-				//LOADER_PROGRESS.complete++;
+				Loader.complete++;
 				//watcher.update();
 				loader.loadNext(watcher)
 			},1);
@@ -344,28 +367,11 @@ SOFTWARE.
 		log.info('Loading: ' + filename);
 		var head = document.getElementsByTagName('head')[0];
 
-		/*
-		 * Load javascript files
-		 * */
 		if(endsWith(filename, '.js')) {
-			//document script loader
-			var script = document.createElement('script');
-			script.setAttribute("type", "text/javascript");
-			script.setAttribute("src", filename);
-
-			script.onload = script.onreadystatechange = function(){
-				if(!script.readyState || script.readyState == 'complete' || script.readyState == 'loaded') {
-					URL_CACHE[filename] = true;
-					loader.onitemloaded();
-					loader.progress--;
-//					LOADER_PROGRESS.complete++;
-//					watcher.update();
-					loader.loadNext(watcher);
-				}
-			};
-			head.appendChild(script);
-			return;
+			//file handler goes here
+			return _fileHandlers['.js'](filename,loader);
 		}
+
 	};
 
 	var URL_CACHE = new Array();
