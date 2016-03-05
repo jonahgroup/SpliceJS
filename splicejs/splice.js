@@ -201,10 +201,15 @@ SOFTWARE.
 	};
 
 	/* make this more efficient */
+/*
 	function endsWith(text, pattern){
 		var matcher = new RegExp("^.+"+pattern.replace(/[.]/,"\\$&")+'$');
 		var result = matcher.test(text);
 		return result;
+	}
+*/
+	function fileExt(f){
+		return f.substring(f.lastIndexOf('.'));
 	}
 
 	function peek(a){
@@ -287,7 +292,7 @@ SOFTWARE.
 			};
 			head.appendChild(script);
 		}
-	}
+	};
 
 	function Loader(resources, oncomplete, onitemloaded) {
 		if(!resources || resources.length == 0) throw 'Invalid Loader constructor';
@@ -331,9 +336,11 @@ SOFTWARE.
 		}
 
 		log.info('Loading: ' + filename);
-		if(endsWith(filename, '.js')) {
-			return _fileHandlers['.js'](filename,loader);
-		}
+		log.info('ext' + fileExt(filename));
+		var handler = _fileHandlers[fileExt(filename)];
+		if(!handler) return;
+		return handler(filename,loader);
+
 	};
 
 	var URL_CACHE = new Array();
@@ -479,14 +486,21 @@ Module.list = function(){
 	return MODULE_MAP;
 }
 
+function addTo(s,t){
+	var keys = Object.keys(s);
+	for(var key in keys) {
+		if(t[keys[key]]) continue;
+		t[keys[key]] = s[keys[key]];
+	}
+}
+
 function extension(obj){
 	return {
 		add : function(){
-			var keys = Object.keys(obj);
-			for(var key in keys) {
-				if(_core[keys[key]]) continue;
-				_core[keys[key]] = obj[keys[key]];
-			}
+			addTo(obj,_core);
+		},
+		loader: function(){
+			addTo(obj,_fileHandlers);
 		}
 	}
 }

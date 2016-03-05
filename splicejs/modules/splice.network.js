@@ -1,5 +1,5 @@
 /* global sjs */
-sjs({
+sjs.module({
 
 definition:function(sjs){
     "use strict";
@@ -126,7 +126,7 @@ definition:function(sjs){
 
   // module exports
 	exports.module(
-    remote 
+    remote
 	);
 
 }

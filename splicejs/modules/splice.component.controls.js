@@ -1,5 +1,5 @@
 /* global _ */
-sjs({
+sjs.component({
 
 required:[
 	{'SpliceJS.UI':'splice.ui.js'}
