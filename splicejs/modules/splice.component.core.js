@@ -1,7 +1,7 @@
 sjs.module({
 required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-  { Networking: '/{sjshome}/modules/splice.network.js'}
+  { Networking : '/{sjshome}/modules/splice.network.js'}
 ],
 definition:function(sjs){
 
@@ -58,20 +58,18 @@ definition:function(sjs){
   */
 
 
-function componentModule(definition, loader){
-  sjs.log.debug('This is a component module loader');
+  function componentModule(definition, loader){
+    sjs.log.debug('This is a component module loader');
+
+    var imports = prepareImports(definition.required, sjs.context(path));
 
 
-}
+  }
 
 
   sjs.extension.module({
     'component' : componentModule
   });
-
-
-
-
 
 
   /*

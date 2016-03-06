@@ -149,10 +149,26 @@ SOFTWARE.
 		 	throw 'Context URL must end with "/"';
 
 		return {
-			resolve:function(url){
-				if(!url) return url;
+			resolve:function(w){
+				if(!w) return null;
+				var url = null;
+				var namespace = null;
+
+				//
+				if(typeof w === 'object' ){
+					for(var key in w){
+						if(w.hasOwnProperty(key)) {
+							url = w[key];
+							namespace = key;
+							break;
+						}
+					}
+				} else if (typeof w === 'string') {
+					url = w;
+				}
+
 				//resolve path variables
-				var result = {url:_spv(url), aurl:''};
+				var result = {url:_spv(url), aurl:'', namespace : namespace};
 				//not page context
 				if(result.url.indexOf('/') != 0 && ctx){
 					result.url = ctx + '/' + result.url;
@@ -297,7 +313,8 @@ SOFTWARE.
 	Loader.prototype.enable = function(){this.isActive = true; return this;};
 	Loader.prototype.loadNext = function(watcher){
 		if(!this.isActive) return;
-		var loader = this;
+		var loader = Loader.currentLoader = this;
+
 
 		if(loader.progress <= 0) {
 			this.iterator = null; this.oncomplete(); this.oncomplete = null; this.onitemloaded = null;
@@ -310,7 +327,7 @@ SOFTWARE.
 		var filename = obj;
 
 		filename = context().resolve(filename).aurl;
-		Loader.currentFile = filename;
+		Loader.currentFile = this.currentFile = filename;
 		if(URL_CACHE[filename] === true){
 			setTimeout(function(){
 				log.debug('File ' + filename + ' is already loaded, skipping...');
@@ -357,6 +374,8 @@ SOFTWARE.
 		Loader.loaders.push(loader);
 		loader.loadNext({});
 	};
+
+
 
 	function prepareImports(a, ctx){
 		if(!a) return {namespaces:null, filenames:null};
@@ -429,10 +448,10 @@ SOFTWARE.
 
 	var MODULE_MAP = new Object(null);
 	var _moduleHandlers = {
-		'anonymous' : function(moduleDefinition){
+		'anonymous' : function anonymousModule(moduleDefinition,loader){
 			var scope = new Namespace(null); //our module scope
-			var path = getPath(Loader.currentFile).path + '/';
-			var url = Loader.currentFile;
+			var path = getPath(loader.currentFile).path + '/';
+			var url = loader.currentFile;
 			scope.__sjs_uri__ = {
 				path:path,
 			};
@@ -469,13 +488,19 @@ SOFTWARE.
 		}
 	};
 	function Module(def){
+		var loader = Loader.currentLoader;
+		if(this instanceof Loader) loader = this;
+
 		var handler = _moduleHandlers[fname(def.definition)];
-		if(handler != null) handler(def);
+		if(handler != null) handler(def, loader);
 		else throw 'Handler for "' + fname(def.definition) + '" is not found' ;
 	};
 	Module.list = function(){
 		return MODULE_MAP;
-	}
+	};
+	Module.handlers = function(){
+		return mixin({},_moduleHandlers);
+	};
 
 function addTo(s,t){
 	var keys = Object.keys(s);
