@@ -154,7 +154,7 @@ SOFTWARE.
 				//resolve path variables
 				var result = {url:_spv(url), aurl:''};
 				//not page context
-				if(result.url.indexOf('/') < 0 && ctx){
+				if(result.url.indexOf('/') != 0 && ctx){
 					result.url = ctx + '/' + result.url;
 				}
 				//not absolute
@@ -200,14 +200,7 @@ SOFTWARE.
 		return cpath;
 	};
 
-	/* make this more efficient */
-/*
-	function endsWith(text, pattern){
-		var matcher = new RegExp("^.+"+pattern.replace(/[.]/,"\\$&")+'$');
-		var result = matcher.test(text);
-		return result;
-	}
-*/
+
 	function fileExt(f){
 		return f.substring(f.lastIndexOf('.'));
 	}
@@ -217,14 +210,22 @@ SOFTWARE.
 		if(a.length > 0) return a[a.length - 1];
 		return null;
 	};
-
+	//some browsers to not support trim function on strings
+	function trim(s){return
+		if(String.prototype.trim) return s.trim();
+		s.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+	}
 	function fname(foo){
-    if(foo.name) return foo.name;
-    var _fNameRegex = /function\s+([A-Za-z_\$][A-Za-z0-9_\$]*)\(/ig;
+		if(foo.name != null) {
+			if(foo.name) return foo.name;
+			return 'anonymous';
+		}
     if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
-    var match = _fNameRegex.exec(foo.toString());
+    var match = /function(\s*[A-Za-z0-9_\$]*)\(/.exec(foo.toString());
     if(!match)  return 'anonymous';
-    return match[1];
+		var name = trim(match[1]);
+		if(!name) return 'anonymous';
+		return name;
   }
 
 	function Namespace(){
@@ -238,28 +239,13 @@ SOFTWARE.
 				if(!path) return this;
 				var parts = path.split(".");
 				var target = this;
-				for(var i=0; i<parts.length; i++){
-					if(target.children == null) target.children = Object.create(null);
-					if(target.children[parts[i]] == null) target.children[parts[i]] = new Namespace();
-					target = target.children[parts[i]];
+				for(var i=0; i<parts.length-1; i++){
+					if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
+					target = target[parts[i]];
 				}
-				target.content = obj;
+				if(target[parts[parts.length-1]] != null) throw "Namespace conflict: " + path;
+				target[parts[parts.length-1]] = obj;
 				return this;
-			},
-
-			lookup:function(path){
-				if(!path) return this;
-				var parts = path.split(".");
-				var target = this;
-				for(var i=0; i<parts.length; i++){
-					if(target.children == null) return null;
-					target = target.children[parts[i]];
-					if(target == null) return null;
-				}
-				return target;
-			},
-			seq:function(){
-				return this.sequence++;
 			}
 	};
 
@@ -381,7 +367,7 @@ SOFTWARE.
 					if(a[i].hasOwnProperty(key)) {
 						var p = ctx.resolve(a[i][key]);
 						namespaces.push({ns:key,path:p});
-						filenames.push(p);
+						filenames.push(p.url);
 						break;
 					}
 				}
@@ -396,10 +382,9 @@ SOFTWARE.
 		var scope = this;
 		for(var i=0; i<imports.namespaces.length; i++){
 			var ns = imports.namespaces[i];
-			var x = MODULE_MAP[absPath(ns.path)];
+			var x = MODULE_MAP[ns.path.aurl];
 			if(!x) continue;
-			ns = getNamespace.call(scope,ns.ns,true,false);
-			ns.place(x);
+			scope.add(ns.ns,x);
 		}
 	};
 
@@ -443,48 +428,54 @@ SOFTWARE.
 	};
 
 	var MODULE_MAP = new Object(null);
-	function Module(moduleDefinition){
-    var scope = new Namespace(null); //our module scope
-		scope.singletons = {constructors:[], instances:[]};
-		var path = getPath(Loader.currentFile).path + '/';
-		var url = Loader.currentFile;
-		scope.__sjs_uri__ = {
-			path:path,
-		};
+	var _moduleHandlers = {
+		'anonymous' : function(moduleDefinition){
+			var scope = new Namespace(null); //our module scope
+			var path = getPath(Loader.currentFile).path + '/';
+			var url = Loader.currentFile;
+			scope.__sjs_uri__ = {
+				path:path,
+			};
 
-		var imports = prepareImports(moduleDefinition.required, context(path));
+			var imports = prepareImports(moduleDefinition.required, context(path));
 
-		var required 	= imports.filenames;
-		var definition  = moduleDefinition.definition;
+			var required 	= imports.filenames;
+			var definition  = moduleDefinition.definition;
 
-		/* required collection is always an Array */
-		required = required instanceof Array ? required : null;
+			/* required collection is always an Array */
+			required = required instanceof Array ? required : null;
 
-		log.info(path);
+			log.info(path);
 
-		if(!required || required.length < 1) {
-			var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
-			definition.call({'sjs':_sjs,'scope':scope}, _sjs);
-			if(!scope.__sjs_module_exports__)
-				scope.__sjs_module_exports__ = Object.create(null);
-			MODULE_MAP[url] = scope.__sjs_module_exports__;
-			return;
-		}
-
-		 load(required, function(){
-			if(imports.namespaces) {
-				applyImports.call(scope,imports);
-			}
-			if(typeof definition === 'function') {
+			if(!required || required.length < 1) {
 				var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
 				definition.call({'sjs':_sjs,'scope':scope}, _sjs);
+				if(!scope.__sjs_module_exports__)
+					scope.__sjs_module_exports__ = Object.create(null);
 				MODULE_MAP[url] = scope.__sjs_module_exports__;
+				return;
 			}
-		});
+
+			 load(required, function(){
+				if(imports.namespaces) {
+					applyImports.call(scope,imports);
+				}
+				if(typeof definition === 'function') {
+					var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
+					definition.call({'sjs':_sjs,'scope':scope}, _sjs);
+					MODULE_MAP[url] = scope.__sjs_module_exports__;
+				}
+			});
+		}
 	};
-Module.list = function(){
-	return MODULE_MAP;
-}
+	function Module(def){
+		var handler = _moduleHandlers[fname(def.definition)];
+		if(handler != null) handler(def);
+		else throw 'Handler for "' + fname(def.definition) + '" is not found' ;
+	};
+	Module.list = function(){
+		return MODULE_MAP;
+	}
 
 function addTo(s,t){
 	var keys = Object.keys(s);
@@ -494,16 +485,17 @@ function addTo(s,t){
 	}
 }
 
-function extension(obj){
-	return {
-		add : function(){
+var extension = {
+		core : function(obj){
 			addTo(obj,_core);
 		},
-		loader: function(){
+		loader: function(obj){
 			addTo(obj,_fileHandlers);
+		},
+		module: function(obj){
+			addTo(obj,_moduleHandlers);
 		}
-	}
-}
+};
 
 var _core = mixin(Object.create(null),{
 	namespace : Namespace,

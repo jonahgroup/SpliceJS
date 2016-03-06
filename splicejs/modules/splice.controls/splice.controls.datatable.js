@@ -1,5 +1,5 @@
 /* global sjs */
-sjs({
+sjs.module({
 
 required:[
 
@@ -15,7 +15,7 @@ required:[
 	'splice.controls.datatable.html'
 ],
 
-definition:function(sjs){
+definition: function component(sjs){
 	"use strict";
 
 	function _if(obj){

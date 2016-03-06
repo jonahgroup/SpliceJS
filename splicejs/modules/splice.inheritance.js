@@ -1,5 +1,5 @@
 sjs.module({
-definition:function(){
+definition:function(sjs){
   /*
   	Inheritance model
   */
@@ -73,6 +73,9 @@ definition:function(){
 		return _class;
 	};
 
-  sjs.extension({Class: Class}).add();
+	sjs.exports.module({
+		Class
+	});
+  
 }
 });

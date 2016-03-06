@@ -2,21 +2,115 @@
 sjs.module({
 
 definition:function(sjs){
-    "use strict";
+  "use strict";
 
 	//configuration constants
-	var	SPLICE_REMOTE_ENDPOINT = sjs.config.SPLICE_REMOTE_ENDPOINT
-	,	SPLICE_REMOTE_CALL_ADAPTER = sjs.config.SPLICE_REMOTE_CALL_ADAPTER;
+	var exports = sjs.exports
+  ,   log = sjs.log;
 
-	var HttpRequest = sjs.HttpRequest
-  , exports = sjs.exports
-  ,	debug = sjs.debug;
+  /*
+  ----------------------------------------------------------
+  	HttpRequest
+  */
+	var HttpRequest = function HttpRequest(){
+		var a = Array("Msxml2.XMLHTTP","Microsoft.XMLHTTP");
+    	if (window.ActiveXObject)
+        for (var i = 0; i < a.length; i++) {
+           	this.transport = new ActiveXObject(a[i]);
+        }
+        else if (window.XMLHttpRequest)   this.transport =  new XMLHttpRequest();
+	};
+
+	HttpRequest.prototype.request = function(type,config){
+
+	 	var params = ''
+        ,   separator = ''
+	 	,   requestURL = config.url
+	 	,   self = this;
+
+    if (config.formData)
+    for(var d=0; d < config.formData.length; d++){
+    	params += separator + config.formData[d].name + '=' + encodeURIComponent(config.formData[d].value);
+       	separator = '&';
+    }
+
+    if(params.length > 0 && type === 'GET'){
+    	requestURL = requestURL + "?" + params;
+    }
+
+		this.transport.open(type,requestURL,true);
+
+	    //custom content type
+		if (config.contentType) {
+		    this.transport.setRequestHeader('Content-Type', config.contentType);
+		}
+
+	    //form url encoded data
+		else if (config.formData) {
+		    this.transport.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
+		}
+
+        //post plain text
+		else if (config.data) {
+		    this.transport.setRequestHeader('Content-Type', 'text/html; charset=utf-8');
+		}
+
+    /*
+        in ie8 onreadystatechange is attached to a quasy window object
+        [this] inside handler function will refer to window object and not transport object
+    */
+    this.transport.onload = function(){
+        var transport = self.transport;
+
+        var response = {
+            text: transport.responseText,
+            xml:  transport.responseXML
+        };
+
+        switch (transport.status) {
+            case 200:
+                if(typeof config.onok == 'function') config.onok(response);
+                break;
+            case 400, 401, 402, 403, 404, 405, 406:
+            case 500:
+            default:
+                if (typeof config.onfail == 'function') config.onfail(response);
+                break;
+        }
+    }
+
+    if (type == 'POST' && !params) params = config.data;
+		this.transport.send(params);
+		return this;
+	};
+
+	HttpRequest.post = function (config) {
+		return new HttpRequest().request('POST',config);
+	};
+
+	HttpRequest.get = function(config){
+		return new HttpRequest().request('GET',config);
+	};
+
+
+  /*
+  ----------------------------------------------------------
+  	Remote Calls interface
+  */
+  function Remote(url, adapter){
+    this.endpoint = url;
+    this.adapter = adapter;
+  };
+
+  Remote.prototype.calls = function calls(remoteCalls){
+    registerCalls.call(this,remoteCalls, this.endpoint, this.adapter);
+    return this;
+  };
+
 
 
     //arguemnt array of remote calls - array of strings,
     //or an object to receive remote call declarations
-
-
   function registerCalls(calls, endpoint, adapter) {
 
       if (!(calls instanceof Array)) calls = [calls];
@@ -103,21 +197,10 @@ definition:function(sjs){
         else
 		    json = '{"request":{"Call":"' + methodName + '","Parameters":' + JSON.stringify(args) + '}}';
 
-		debug.log(json);
+		log.debug(json);
 
 		return json;
 	};
-
-  function Remote(url, adapter){
-    this.endpoint = url;
-    this.adapter = adapter;
-  };
-
-  Remote.prototype.calls = function calls(remoteCalls){
-    registerCalls.call(this,remoteCalls, this.endpoint, this.adapter);
-    return this;
-  };
-
 
   function remote(url, adapter) {
     return new Remote(url, adapter);
@@ -126,7 +209,8 @@ definition:function(sjs){
 
   // module exports
 	exports.module(
-    remote
+    remote,
+    {http : { get:  HttpRequest.get, post: HttpRequest.post }}
 	);
 
 }

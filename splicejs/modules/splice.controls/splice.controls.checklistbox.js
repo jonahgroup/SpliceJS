@@ -16,7 +16,7 @@ sjs({
     'splice.controls.checklistbox.css',
     'splice.controls.checklistbox.html'
   ],
-  definition:function(sjs){
+  definition:function component(sjs){
 
     var scope = this.scope
     , Class = sjs.Class
@@ -72,7 +72,7 @@ sjs({
         args.itemTemplate = sjs.proxy({
           type:'components.CheckListBoxItem',
           itemCheckPath: args.itemCheckPath,
-          itemContentPath: args.itemContentPath 
+          itemContentPath: args.itemContentPath
         });
       } else {
         args.itemTemplate = this.itemTemplate;

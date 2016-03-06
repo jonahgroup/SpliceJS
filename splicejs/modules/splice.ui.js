@@ -1,24 +1,25 @@
 /*blobal sjs */
-sjs({
+sjs.module({
 required:[
-	{'Animation':'{sjshome}/modules/splice.animation.js'}
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Animation: '/{sjshome}/modules/splice.animation.js'},
+	{ Component: '/{sjshome}/modules/splice.component.core.js'}
 ],
 definition:function(sjs){
 	//enable strict mode
 	"use strict";
 
 	// importing framework features makes our code less verbose
-	var Class = this.sjs.Class
-	, Event = this.sjs.Event
+	var  Event = this.sjs.Event
 	,	debug = this.sjs.debug
-	, Controller = this.sjs.Controller
 	,	scope = this.scope;
 
 	var event = sjs.event
 	,	exports = sjs.exports;
 
-	var Animate = scope.Animation.Animate;
-
+	var Class 		= scope.Inheritance.Class
+	, Animate 		= scope.Animation.Animate
+	, Controller 	= scope.Component.Controller;
 
 	var DataItem = function DataItem(data){
 		this.source = data;

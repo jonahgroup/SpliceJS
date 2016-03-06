@@ -1,21 +1,21 @@
-/* global _ */
-sjs({
+/* global sjs */
+sjs.module({
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'Doc': '{sjshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
 	'splice.controls.buttons.html'
 ]
 ,
-definition:function(sjs){
-
+definition:function component(sjs){
 	var scope = this.scope
-	, Class = this.sjs.Class
 	,	event = sjs.event
 	,	exports = sjs.exports
 	,	debug = this.sjs.debug;
 
-	var	UIControl = scope.SpliceJS.UI.UIControl;
+	var Class = scope.Inheritance.Class
+	,	UIControl = scope.SpliceJS.UI.UIControl;
 
 	var Button = Class(function ButtonController(args){
 		this.super(args);

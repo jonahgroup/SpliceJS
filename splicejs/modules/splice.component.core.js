@@ -1,15 +1,16 @@
 sjs.module({
 required:[
-  '/{sjshome}/modules/splice.network.js'
+  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+  { Networking: '/{sjshome}/modules/splice.network.js'}
 ],
 definition:function(sjs){
-
 
   /*
   ----------------------------------------------------------
   	HTML File Handler
   */
   var htmlHandler = function(filename, loader){
+    loader.progress--;
     loader.loadNext();
   };
 
@@ -20,108 +21,150 @@ definition:function(sjs){
   var cssHandler = function(filename,loader){
     sjs.log.info('Loading css file');
 
-    var style = document.createElement('link');
-    style.setAttribute('href',filename);
+    var linkref = document.createElement('link');
 
-    document.head.appendChild(style);
-    loader.loadNext();
+		linkref.setAttribute("rel", "stylesheet");
+		linkref.setAttribute("type", "text/css");
+		linkref.setAttribute("href", filename);
+
+		//linkref.onreadystatechange
+		/*
+		 * Link ref supports onload in IE8 WTF????
+		 * as well as onreadystatechange
+		 * having an assigment to both will trigger the handler twice
+		 *
+		 * */
+		linkref.onload = function(){
+			if(!linkref.readyState || linkref.readyState == 'complete') {
+			//	URL_CACHE[filename] = true;
+				loader.onitemloaded();
+				loader.progress--;
+				loader.loadNext({});
+			}
+		};
+		document.head.appendChild(linkref);
   };
 
+  sjs.extension.loader({
+    '.css' : cssHandler,
+    '.html': htmlHandler
+  });
 
-  sjs.extension({'.css':cssHandler}).loader();
-  sjs.extension({'.html':cssHandler}).loader();
+
+
+  /*
+  ----------------------------------------------------------
+  	Component module handler
+  */
+
+
+function componentModule(definition, loader){
+  sjs.log.debug('This is a component module loader');
+
+
+}
+
+
+  sjs.extension.module({
+    'component' : componentModule
+  });
+
+
+
+
+
 
   /*
   ----------------------------------------------------------
   	Templating Engine
   */
 
-  	/**
-  	 * Object descriptor
-  	 * @type: data type of the object to be created
-  	 * @parameters:	parameters to be passed to the object behind proxy
-  	 * */
-  	var proxy = function proxy(args){
-  		/*
-  		 * Scope object
-  		 * Includers scope - should be used for resolving bindings
-  		 * */
-  		var scope = this;
+	/**
+	 * Object descriptor
+	 * @type: data type of the object to be created
+	 * @parameters:	parameters to be passed to the object behind proxy
+	 * */
+	var proxy = function proxy(args){
+		/*
+		 * Scope object
+		 * Includers scope - should be used for resolving bindings
+		 * */
+		var scope = this;
 
-  		var Proxy = function Proxy(proxyArgs){
-  			if(!(this instanceof Proxy) ) throw 'Proxy object must be invoked with [new] keyword';
+		var Proxy = function Proxy(proxyArgs){
+			if(!(this instanceof Proxy) ) throw 'Proxy object must be invoked with [new] keyword';
 
-  			/* create instance of the proxy object
-  			 * local scope lookup takes priority
-  			 */
-  			var obj = scope.lookup(args.type);
+			/* create instance of the proxy object
+			 * local scope lookup takes priority
+			 */
+			var obj = scope.lookup(args.type);
 
-  			if(!obj) obj = scope.components.lookup(args.type);
-  			/* lone template is being included */
-  			if(!obj) obj = scope.templates[args.type];
+			if(!obj) obj = scope.components.lookup(args.type);
+			/* lone template is being included */
+			if(!obj) obj = scope.templates[args.type];
 
-  			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
-  			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
-
-
-  			/* copy args*/
-  			var parameters = {};
-  			var keys = Object.keys(args);
-  			for(var i = 0; i < keys.length; i++ ){
-  				var key = keys[i];
-  				if(key == 'type') continue; /* skip type */
-  				parameters[key] = args[key];
-  			}
-
-  			/* override proxy arguments */
-  			if(proxyArgs){
-  				var keys = Object.keys(proxyArgs);
-  				for(var i=0; i<keys.length; i++){
-  					var key = keys[i];
-  					//parameters['parent'] = proxyArgs.parent;
-  					parameters[key] = proxyArgs[key];
-  				}
-  			}
+			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
+			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
 
 
-  			/**
-  			*	create new in-place component
-  			* 	using template and an override controller
-  			*/
-  			if(args.controller) {
-  				obj = createComponent(args.controller, obj.template, scope);
-  			}
+			/* copy args*/
+			var parameters = {};
+			var keys = Object.keys(args);
+			for(var i = 0; i < keys.length; i++ ){
+				var key = keys[i];
+				if(key == 'type') continue; /* skip type */
+				parameters[key] = args[key];
+			}
 
-  			/*
-  				invoke component constructor
-  			*/
-  			parameters._includer_scope = scope;
+			/* override proxy arguments */
+			if(proxyArgs){
+				var keys = Object.keys(proxyArgs);
+				for(var i=0; i<keys.length; i++){
+					var key = keys[i];
+					//parameters['parent'] = proxyArgs.parent;
+					parameters[key] = proxyArgs[key];
+				}
+			}
 
-  			if(!obj.isComponent)
-  				return instantiate(obj, parameters);
-  			else
-  				return new obj(parameters);
-  		}
 
-  		Proxy.type 			= args.type;
-  		Proxy.parameters 	= args;
-  		Proxy.__sjs_name__ 		= args.__sjs_name__;
-  		Proxy.__sjs_isproxy__ = true;
-  		Proxy.toString = function(){
-  			return 'proxy: ' + args.type;
-  		}
-  		return Proxy;
+			/**
+			*	create new in-place component
+			* 	using template and an override controller
+			*/
+			if(args.controller) {
+				obj = createComponent(args.controller, obj.template, scope);
+			}
 
-  	};
+			/*
+				invoke component constructor
+			*/
+			parameters._includer_scope = scope;
 
-  	function linkupEvents(obj){
-  		for(var key in  obj){
-  			if( obj[key] instanceof Event){
-  				logging.debug.log('Found event object');
-  				obj[key] = obj[key].attach();
-  			}
-  		}
-  	};
+			if(!obj.isComponent)
+				return instantiate(obj, parameters);
+			else
+				return new obj(parameters);
+		}
+
+		Proxy.type 			= args.type;
+		Proxy.parameters 	= args;
+		Proxy.__sjs_name__ 		= args.__sjs_name__;
+		Proxy.__sjs_isproxy__ = true;
+		Proxy.toString = function(){
+			return 'proxy: ' + args.type;
+		}
+		return Proxy;
+
+	};
+
+	function linkupEvents(obj){
+		for(var key in  obj){
+			if( obj[key] instanceof Event){
+				logging.debug.log('Found event object');
+				obj[key] = obj[key].attach();
+			}
+		}
+	};
 
 
   	function bindDeclarations(parameters, instance, scope){
@@ -1255,12 +1298,7 @@ definition:function(sjs){
   		return Component;
   	};
 
-    //component module loader
-    function component(def){
-      sjs.log.info('This is a component loader');
-      if(typeof def.definition == 'function'){
-        def.definition(sjs.core());
-      }
-    }
-    sjs.extension({component:component}).add();
+
+    sjs.exports.module(Controller);
+
 }})

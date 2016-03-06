@@ -1,5 +1,5 @@
 /* global sjs */
-sjs({
+sjs.module({
 definition:function(sjs){
 
 	var Tokenizer = sjs.Tokenizer

@@ -1,21 +1,21 @@
 /* global _*/
-sjs({
+sjs.module({
 
 required:[
-	{'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Component: '/{sjshome}/modules/splice.component.core.js'},
+	{'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
 	 'splice.controls.controllers.html'
 ],
 
-
-definition:function(){
-	var sjs = this.sjs;
+definition:function component(sjs){
 
 	var scope = this.scope
 	,	event = sjs.event
 	,	exports = sjs.exports;
 
-	var Class = sjs.Class
-	,	Controller = sjs.Controller
+	var Class = scope.Inheritance.Class
+	,	Controller = scope.Component.Controller
 	, UIControl = scope.SpliceJS.UI.UIControl;
 
 	var DomIterator = Class(function DomIteratorController(args){

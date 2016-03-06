@@ -1,13 +1,15 @@
 /* global sjs */
 sjs.module({
 required:[
-	'/{sjshome}/modules/splice.inheritance.js'
+	{Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
 ],
 definition:function(sjs){
 
 	var mixin = sjs.mixin
-	,	Class = sjs.Class
 	,	exports = sjs.exports;
+
+	var	Class = this.scope.Inheritance.Class;
+
 
 	var DataStep = function DataStep(dowork, issource){
 		mixin(this,{

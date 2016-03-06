@@ -1,5 +1,5 @@
 /* global _ */
-sjs.component({
+sjs.module({
 
 required:[
 	{'SpliceJS.UI':'splice.ui.js'}
@@ -31,7 +31,7 @@ required:[
 , 'splice.controls/splice.controls.html'
 ]
 ,
-definition:function(sjs){
+definition:function component(sjs){
 	"use strict";
 	var scope = this.scope;
 
