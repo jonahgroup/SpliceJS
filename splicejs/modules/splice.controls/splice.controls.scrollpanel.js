@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 version: '1.0.0'
 ,
 required:[
@@ -8,7 +8,7 @@ required:[
 	'splice.controls.scrollpanel.html'
 ]
 ,
-definition:function(sjs){
+definition:function component(sjs){
 
 
 	var Class 		= sjs.Class

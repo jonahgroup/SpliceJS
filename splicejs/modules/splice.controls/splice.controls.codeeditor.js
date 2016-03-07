@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},

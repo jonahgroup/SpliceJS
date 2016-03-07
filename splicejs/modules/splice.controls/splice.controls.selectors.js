@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
@@ -7,7 +7,7 @@ required:[
 	'splice.controls.selectors.html'
 ]
 ,
-definition:function(sjs){
+definition:function component(sjs){
 	"use strict";
 
 	/* framework imports */

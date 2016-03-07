@@ -327,6 +327,9 @@ SOFTWARE.
 		var filename = obj;
 
 		filename = context().resolve(filename).aurl;
+		log.info('Loading: ' + filename);
+
+
 		Loader.currentFile = this.currentFile = filename;
 		if(URL_CACHE[filename] === true){
 			setTimeout(function(){
@@ -338,8 +341,6 @@ SOFTWARE.
 			return;
 		}
 
-		log.info('Loading: ' + filename);
-		log.info('ext' + fileExt(filename));
 		var handler = _fileHandlers[fileExt(filename)];
 		if(!handler) return;
 		return handler(filename,loader);
@@ -359,6 +360,11 @@ SOFTWARE.
 	};
 
 	function load(resources, oncomplete, onitemloaded){
+		if(!resources || resources.length < 1){
+			if(typeof oncomplete != 'function') return;
+			oncomplete();
+			return;
+		}
 		log.info('Nested loading...');
 		var loader = new Loader(resources, function(){
 			Loader.loaders.pop();
@@ -376,34 +382,14 @@ SOFTWARE.
 	};
 
 
-
-	function prepareImports(a, ctx){
-		if(!a) return {namespaces:null, filenames:null};
-		var namespaces = [] , filenames = [],  p = '';
-		for(var i=0; i<a.length; i++){
-			if(typeof a[i] === 'object') {
-				for(var key in a[i]){
-					if(a[i].hasOwnProperty(key)) {
-						var p = ctx.resolve(a[i][key]);
-						namespaces.push({ns:key,path:p});
-						filenames.push(p.url);
-						break;
-					}
-				}
-			} else {
-				filenames.push(ctx.resolve(a[i]).url);
-			}
-		}
-		return {namespaces:namespaces, filenames:filenames};
-	};
-
 	function applyImports(imports){
 		var scope = this;
-		for(var i=0; i<imports.namespaces.length; i++){
-			var ns = imports.namespaces[i];
-			var x = MODULE_MAP[ns.path.aurl];
+		for(var i=0; i<imports.length; i++){
+			if(!imports[i].namespace) continue;
+			var ns = imports[i].namespace;
+			var x = MODULE_MAP[imports[i].aurl];
 			if(!x) continue;
-			scope.add(ns.ns,x);
+			scope.add(ns,x);
 		}
 	};
 
@@ -448,52 +434,48 @@ SOFTWARE.
 
 	var MODULE_MAP = new Object(null);
 	var _moduleHandlers = {
-		'anonymous' : function anonymousModule(moduleDefinition,loader){
-			var scope = new Namespace(null); //our module scope
-			var path = getPath(loader.currentFile).path + '/';
-			var url = loader.currentFile;
-			scope.__sjs_uri__ = {
-				path:path,
-			};
-
-			var imports = prepareImports(moduleDefinition.required, context(path));
-
-			var required 	= imports.filenames;
-			var definition  = moduleDefinition.definition;
-
-			/* required collection is always an Array */
-			required = required instanceof Array ? required : null;
-
-			log.info(path);
-
-			if(!required || required.length < 1) {
-				var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
-				definition.call({'sjs':_sjs,'scope':scope}, _sjs);
-				if(!scope.__sjs_module_exports__)
-					scope.__sjs_module_exports__ = Object.create(null);
-				MODULE_MAP[url] = scope.__sjs_module_exports__;
-				return;
-			}
-
-			 load(required, function(){
-				if(imports.namespaces) {
-					applyImports.call(scope,imports);
-				}
-				if(typeof definition === 'function') {
-					var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
-					definition.call({'sjs':_sjs,'scope':scope}, _sjs);
-					MODULE_MAP[url] = scope.__sjs_module_exports__;
-				}
-			});
+		'anonymous' : function anonymousModule(m, scope, _sjs){
+			m.definition.call({'scope':scope}, _sjs);
 		}
 	};
-	function Module(def){
+
+	function Module(m){
 		var loader = Loader.currentLoader;
 		if(this instanceof Loader) loader = this;
 
-		var handler = _moduleHandlers[fname(def.definition)];
-		if(handler != null) handler(def, loader);
-		else throw 'Handler for "' + fname(def.definition) + '" is not found' ;
+		var handler = _moduleHandlers[fname(m.definition)];
+		if(handler == null) throw 'Handler for "' + fname(m.definition) + '" is not found' ;
+
+		var scope = new Namespace(null); //our module scope
+		var path = getPath(loader.currentFile).path + '/';
+		var url = loader.currentFile;
+		scope.__sjs_uri__ = {
+			path:path,
+		};
+		var ctx = context(path);
+		var required = [],	imports = [];
+		if(m.required)
+		for(var i=0; i<m.required.length; i++){
+			var imp = ctx.resolve(m.required[i]);
+			required.push(imp.url); imports.push(imp);
+		}
+
+		var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
+
+		log.info(path);
+
+		load(required, function(){
+			applyImports.call(scope,imports);
+			if(typeof m.definition === 'function') {
+				handler(m, scope, _sjs);
+				MODULE_MAP[url] = scope.__sjs_module_exports__;
+			}
+		});
+
+
+
+
+
 	};
 	Module.list = function(){
 		return MODULE_MAP;
@@ -534,6 +516,7 @@ var _core = mixin(Object.create(null),{
 	extension : extension,
 	log 			: log,
 	core		  : core,
+	getPath		: getPath,
 });
 function core(){
 	return mixin(Object.create(null),_core);

@@ -1,10 +1,10 @@
-sjs({
+sjs.module({
   alias:'SpliceJS.Components.ComboBox',
   required:[
     {'SpliceJS.Controls':'splice.controls.dropdownlist.js'},
     // 'splice.controls.combobox.html'
   ],
-  definition:function(sjs){
+  definition:function component(sjs){
 
     var scope = this.scope
     , exports = sjs.exports

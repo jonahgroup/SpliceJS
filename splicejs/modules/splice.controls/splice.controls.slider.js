@@ -1,4 +1,4 @@
-﻿sjs({
+﻿sjs.module({
 
     required: [
         {'SpliceJS.UI':'../splice.ui.js'},
@@ -6,7 +6,7 @@
         'splice.controls.slider.html'
     ]
     ,
-    definition:function(sjs){
+    definition:function component(sjs){
 
         /* framework imports */
         var scope = this.scope

@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
@@ -6,7 +6,7 @@ required:[
 	'splice.controls.popup.css'
 ]
 ,
-definition:function(sjs){
+definition:function component(sjs){
 
 	var scope = this.scope
 	, exports = sjs.exports

@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 required:[
   {'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
   {'SpliceJS.Controls':'splice.controls.buttons.js'},
@@ -6,7 +6,7 @@ required:[
   {'Doc':'{sjshome}/modules/splice.document.js'},
   'splice.controls.datafilter.html'
 ],
-definition:function(sjs){
+definition:function component(sjs){
     "use strict";
 
     var scope = this.scope;

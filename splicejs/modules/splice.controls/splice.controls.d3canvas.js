@@ -1,5 +1,5 @@
 /* global d3 */
-sjs({
+sjs.module({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
@@ -7,7 +7,7 @@ required:[
 	'splice.controls.d3canvas.html'
 ],
 
-definition:function(){
+definition:function component(){
 
 	var Class = this.sjs.Class
 	,	exports = this.sjs.exports

@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 
 
 required:[
@@ -9,7 +9,7 @@ required:[
 	'splice.controls.map.html',
 ],
 
-definition:function(){
+definition:function component(){
 	var scope = this.scope
 	, 	Class = this.sjs.Class;
 

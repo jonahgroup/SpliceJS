@@ -1,11 +1,11 @@
-sjs({
+sjs.module({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.pageloader.html'
 ]
 ,
-definition:function(){
+definition:function component(){
 
 	var scope = this.scope
 	,	Class = this.sjs.Class;

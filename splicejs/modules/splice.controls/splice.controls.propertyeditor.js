@@ -1,8 +1,8 @@
-sjs({
+sjs.module({
 required:[
   'splice.controls.propertyeditor.html'
 ]
-definition:function(sjs){
+definition:function component(sjs){
 
 
 

@@ -1,12 +1,15 @@
 /* global sjs */
-sjs({
-
+sjs.module({
+required:[
+  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+]
+,
 definition:function(sjs){
 
     var scope = this.scope;
 
-    var Class = sjs.Class
-    ,   debug = sjs.debug;
+    var Class = scope.Inheritance.Class
+    ,   debug = sjs.log.debug;
 
 	var LineChart = Class(function LineChart(){
 

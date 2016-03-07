@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 
 	required:[
 		{'SpliceJS.UI':'../splice.ui.js'},
@@ -7,9 +7,9 @@ sjs({
 		'splice.controls.dropdownchecklist.html'
 	],
 
-	definition:function(sjs){
+	definition:function component(sjs){
 		"use strict";
-		
+
 	var scope = this.scope
 	,	Class = this.sjs.Class
 	,	Event = this.sjs.Event

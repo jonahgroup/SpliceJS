@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 
 required:[
 	{'SpliceJS.UI': '{sjshome}/modules/splice.ui.js'},
@@ -8,7 +8,7 @@ required:[
 	'splice.controls.drawerpanel.html'
 ],
 
-definition:function(){
+definition:function component(){
 
 	var scope = this.scope
 	,	Class = this.sjs.Class;

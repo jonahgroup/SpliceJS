@@ -5,7 +5,7 @@ required:[
 	{ Animation: '/{sjshome}/modules/splice.animation.js'},
 	{ Component: '/{sjshome}/modules/splice.component.core.js'}
 ],
-definition:function(sjs){
+definition:function component(sjs){
 	//enable strict mode
 	"use strict";
 

@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
@@ -8,7 +8,7 @@ required:[
 	'splice.controls.listbox.html'
 ],
 
-definition:function(sjs){
+definition:function component(sjs){
 
 
 	var Class = this.sjs.Class

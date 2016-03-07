@@ -1,5 +1,5 @@
 /* global JSPositioning */
-sjs({
+sjs.module({
 
 required: [
     {'SpliceJS.UI': '{sjshome}/modules/splice.ui.js'},
@@ -7,7 +7,7 @@ required: [
 	'splice.controls.charts.dial.html'
 ],
 
-definition:function(sjs){
+definition:function component(sjs){
 
     var scope = this.scope;
     var Class = sjs.Class;

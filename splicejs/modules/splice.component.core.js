@@ -57,11 +57,10 @@ definition:function(sjs){
   	Component module handler
   */
 
-
-  function componentModule(definition, loader){
+  function componentModule(_m, _scope, _sjs){
     sjs.log.debug('This is a component module loader');
 
-    var imports = prepareImports(definition.required, sjs.context(path));
+
 
 
   }

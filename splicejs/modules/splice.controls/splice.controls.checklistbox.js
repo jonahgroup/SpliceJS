@@ -6,8 +6,7 @@
   Need a way to extend components including templates
 */
 
-sjs({
-
+sjs.module({
   required:[
     {'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
     {'Doc':'{sjshome}/modules/splice.document.js'},

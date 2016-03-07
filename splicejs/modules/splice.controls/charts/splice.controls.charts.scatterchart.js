@@ -1,10 +1,15 @@
- sjs({
+sjs.module({
+required:[
+  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+]
+,
+definition: function(sjs){
+  var scope = this.scope;
 
-  definition: function(sjs){
 
-      var Class = sjs.Class,
-          debug = sjs.debug,
-          Event = sjs.Event;
+  var Class = scope.Inheritance.Class,
+      debug = sjs.log.debug,
+      Event = sjs.Event;
 
       var ScatterChart = Class(function ScatterChart(){});
 

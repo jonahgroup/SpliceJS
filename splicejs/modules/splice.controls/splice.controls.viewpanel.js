@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
@@ -6,7 +6,7 @@ required:[
 	'splice.controls.viewpanel.css'
 ],
 
-definition:function(){
+definition:function component(){
 
 	var scope = this.scope
 	,	overlay = this.sjs.display.overlay

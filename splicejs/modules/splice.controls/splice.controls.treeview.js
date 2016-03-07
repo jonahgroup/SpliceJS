@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 required:[
 		{'SpliceJS.UI':'../splice.ui.js'}
 	,	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'}
@@ -6,7 +6,7 @@ required:[
 	,	'splice.controls.treeview.html'
 ]
 ,
-definition:function(){
+definition:function component(){
 
 	var scope = this.scope
 	,	Class 		= this.sjs.Class

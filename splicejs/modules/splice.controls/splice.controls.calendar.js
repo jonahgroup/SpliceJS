@@ -1,9 +1,9 @@
-sjs({
+sjs.module({
 required:[
 	'splice.controls.calendar.html',
 	'splice.controls.calendar.css'
 	],
-definition:function(sjs){
+definition:function component(sjs){
 	"use strict"
 
 

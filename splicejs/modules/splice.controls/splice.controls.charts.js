@@ -1,4 +1,4 @@
-sjs({
+sjs.module({
 
 required:[
 
@@ -13,7 +13,7 @@ required:[
 
 ],
 
-definition:function(sjs){
+definition:function component(sjs){
 
     var	scope = this.scope
 
