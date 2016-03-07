@@ -5,13 +5,22 @@ required:[
 ],
 definition:function(sjs){
 
+  var scope = this.scope;
+  var http = scope.Networking.http;
+
   /*
   ----------------------------------------------------------
   	HTML File Handler
   */
   var htmlHandler = function(filename, loader){
-    loader.progress--;
-    loader.loadNext();
+
+    http.get({
+		    url: filename,
+				onok:function(response){
+          loader.progress--;
+          loader.loadNext();
+        }
+    });
   };
 
   /*
