@@ -1,8 +1,9 @@
-/**
- *
- * 	URL analyzer
- *
- */
+sjs.module({
+
+definition:function(sjs){
+var exports = sjs.exports
+,	mixin = sjs.mixin;
+
 function Tokenizer(input, alphanum, space){
 	if(!(this instanceof Tokenizer) ) return new Tokenizer(input, alphanum, space);
 	mixin(this, {
@@ -58,4 +59,8 @@ Tokenizer.prototype = {
 		}
 		return result;
 	}
-};
+}
+exports.module(
+	Tokenizer
+);
+}});

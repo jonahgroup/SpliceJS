@@ -1,17 +1,8 @@
-sjs({
+sjs.module({
+definition:function(sjs){
 
-
-definition:function(){
-
-
-
-  /*
-
-  ----------------------------------------------------------
-
-  	SpliceJS Event Model
-
-  */
+  var exports = sjs.exports
+  , mixin = sjs.mixin;
 
   	function mousePosition(e){
           //http://www.quirksmode.org/js/events_properties.html#position
@@ -313,18 +304,15 @@ definition:function(){
   			object[property] = MulticastEvent;
 
   		}
-
-
-
   		return MulticastEvent;
 
   	};
   	var EventSingleton = new Event(null);
 
 
-
-
-
-
+exports.module(
+    {Event:EventSingleton},
+    {'event':Event} 
+);
 
 }})

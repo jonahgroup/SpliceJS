@@ -1,7 +1,8 @@
 /* global sjs */
 sjs.module({
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
+	{ Event 			: '/{sjshome}/modules/splice.event.js' },
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'Doc': '{sjshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
@@ -10,12 +11,12 @@ required:[
 ,
 definition:function component(sjs){
 	var scope = this.scope
-	,	event = sjs.event
 	,	exports = sjs.exports
-	,	debug = this.sjs.debug;
+	,	debug = sjs.log.debug;
 
 	var Class = scope.Inheritance.Class
-	,	UIControl = scope.SpliceJS.UI.UIControl;
+	,	UIControl = scope.SpliceJS.UI.UIControl
+	, event = scope.Event.event;
 
 	var Button = Class(function ButtonController(args){
 		this.super(args);

@@ -2,24 +2,24 @@
 sjs.module({
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Animation: '/{sjshome}/modules/splice.animation.js'},
-	{ Component: '/{sjshome}/modules/splice.component.core.js'}
+	{ Animation		: '/{sjshome}/modules/splice.animation.js'},
+	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'}
 ],
 definition:function component(sjs){
 	//enable strict mode
 	"use strict";
 
 	// importing framework features makes our code less verbose
-	var  Event = this.sjs.Event
-	,	debug = this.sjs.debug
-	,	scope = this.scope;
-
-	var event = sjs.event
+	var debug = sjs.log.debug
+	,	scope = this.scope
 	,	exports = sjs.exports;
 
 	var Class 		= scope.Inheritance.Class
 	, Animate 		= scope.Animation.Animate
-	, Controller 	= scope.Component.Controller;
+	, Controller 	= scope.Component.Controller
+	,	Event 			= scope.Events.Event
+	,	event 			= scope.Events.event;
 
 	var DataItem = function DataItem(data){
 		this.source = data;

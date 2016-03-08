@@ -388,6 +388,7 @@ definition:function(sjs){
 	exports.module(
 		{style:style},
 		{select:{
+			nodes:	selectNodes,
 			setTitle:		setTitle,
 			firstNonText:	firstNonText,
 			textNodes:		selectTextNodes,

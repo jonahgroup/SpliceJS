@@ -296,14 +296,16 @@ SOFTWARE.
 		}
 	};
 
-	function Loader(resources, oncomplete, onitemloaded) {
+	function Loader(scope,resources, oncomplete, onitemloaded) {
 		if(!resources || resources.length == 0) throw 'Invalid Loader constructor';
 		this.iterator = new Iterator(resources);
 		this.progress = resources.length;
 		this.isActive = true;
 		this.oncomplete = oncomplete;
 		this.onitemloaded = onitemloaded;
+		this.scope = scope;
 		Loader.total += resources.length;
+
 		if(!this.onitemloaded) this.onitemloaded = function(){}; //noop
 	};
 	Loader.complete = Loader.total = 0;
@@ -360,13 +362,15 @@ SOFTWARE.
 	};
 
 	function load(resources, oncomplete, onitemloaded){
+		log.info(this);
 		if(!resources || resources.length < 1){
 			if(typeof oncomplete != 'function') return;
 			oncomplete();
 			return;
 		}
-		log.info('Nested loading...');
-		var loader = new Loader(resources, function(){
+
+		var loader = new Loader((this instanceof Namespace)?this:null,
+			resources, function(){
 			Loader.loaders.pop();
 			if(typeof(oncomplete)  === 'function') oncomplete();
 			var queuedLoader = 	peek(Loader.loaders);
@@ -464,7 +468,7 @@ SOFTWARE.
 
 		log.info(path);
 
-		load(required, function(){
+		load.call(scope,required, function(){
 			applyImports.call(scope,imports);
 			if(typeof m.definition === 'function') {
 				handler(m, scope, _sjs);

@@ -1,12 +1,16 @@
 sjs.module({
 required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-  { Networking : '/{sjshome}/modules/splice.network.js'}
+  { Networking  : '/{sjshome}/modules/splice.network.js'},
+  { Document    : '/{sjshome}/modules/splice.document.js'},
+  { Syntax      : '/{sjshome}/modules/splice.syntax.js'}
 ],
 definition:function(sjs){
 
   var scope = this.scope;
-  var http = scope.Networking.http;
+  var http = scope.Networking.http
+  , doc = scope.Document
+  , Tokenizer = scope.Syntax.Tokenizer;
 
   /*
   ----------------------------------------------------------
@@ -17,6 +21,7 @@ definition:function(sjs){
     http.get({
 		    url: filename,
 				onok:function(response){
+          extractTemplates.call(loader.scope,response.text);
           loader.progress--;
           loader.loadNext();
         }
@@ -68,10 +73,8 @@ definition:function(sjs){
 
   function componentModule(_m, _scope, _sjs){
     sjs.log.debug('This is a component module loader');
-
-
-
-
+    compileTemplates(_scope);
+    _m.definition.call({scope:_scope},_sjs);
   }
 
 
@@ -753,9 +756,9 @@ definition:function(sjs){
   	var container = document.createElement('span');
   	function extractTemplates(fileSource){
   		//var start  = window.performance.now();
-
+      if(!this) return;
   		if(!this.components)
-  			this.components = new Namespace(''); //component exports
+  			this.components = sjs.namespace(); //component exports
 
   		container.innerHTML = fileSource;
 
@@ -929,7 +932,7 @@ definition:function(sjs){
   		if(	dom.tagName != 'SJS-INCLUDE' &&	dom.tagName != 'SJS-ELEMENT')
   			return handle_INLINE_HTML.call(scope, dom, parent, true);
 
-  		var	elements = 	selectNodes({childNodes:dom.childNodes},
+  		var	elements = 	doc.select.nodes({childNodes:dom.childNodes},
   				function(node){
   					if(node.nodeType == 1) return node;
   				},
@@ -964,7 +967,7 @@ definition:function(sjs){
   		/* select top level includes */
   		var inclusions = [];
 
-  		var nodes = selectNodes({childNodes:template.dom.childNodes},
+  		var nodes = doc.select.nodes({childNodes:template.dom.childNodes},
   				function(node){
   					if(node.tagName == 'SJS-INCLUDE' || node.tagName == 'SJS-ELEMENT') return node;
   				},
@@ -984,7 +987,7 @@ definition:function(sjs){
   			, 	fn = new Function("var binding = arguments[0].binding; var proxy = arguments[0].proxy; " +
   								  "var scope = this; var window = null; var document = null; return " + json)
 
-  			var result = fn.call(scope,sjs());
+  			var result = fn.call(scope,{proxy:proxy, binding:binding});
 
   			if(typeof result !==  'function'){
   				result = proxy.call(scope,result);
