@@ -253,7 +253,7 @@ SOFTWARE.
 	Namespace.prototype = {
 			add : function(path, obj){
 				if(!path) return this;
-				var parts = path.split(".");
+				var parts = path.split('.');
 				var target = this;
 				for(var i=0; i<parts.length-1; i++){
 					if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
@@ -262,6 +262,17 @@ SOFTWARE.
 				if(target[parts[parts.length-1]] != null) throw "Namespace conflict: " + path;
 				target[parts[parts.length-1]] = obj;
 				return this;
+			},
+			lookup:function(path){
+				if(!path) return null;
+				var parts = path.split('.');
+				var target = this;
+				for(var i=0; i<parts.length-1; i++){
+					if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
+					target = target[parts[i]];
+					if(target == null) break;
+				}
+				return target[parts[parts.length-1]];
 			}
 	};
 
@@ -393,7 +404,10 @@ SOFTWARE.
 			var ns = imports[i].namespace;
 			var x = MODULE_MAP[imports[i].aurl];
 			if(!x) continue;
-			scope.add(ns,x);
+			var keys = Object.keys(x);
+			for(var key in keys){
+				scope.add(ns+'.'+keys[key],x[keys[key]]);
+			}
 		}
 	};
 

@@ -3,15 +3,20 @@ required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
   { Networking  : '/{sjshome}/modules/splice.network.js'},
   { Document    : '/{sjshome}/modules/splice.document.js'},
-  { Syntax      : '/{sjshome}/modules/splice.syntax.js'}
+  { Syntax      : '/{sjshome}/modules/splice.syntax.js'},
+  { Events      : '/{sjshome}/modules/splice.event.js'},
+  { Views      : '/{sjshome}/modules/splice.view.js'}
 ],
 definition:function(sjs){
 
-  var scope = this.scope;
+  var scope = this.scope
+  , exports = sjs.exports;
+
   var http = scope.Networking.http
   , doc = scope.Document
-  , Tokenizer = scope.Syntax.Tokenizer;
-
+  , Tokenizer = scope.Syntax.Tokenizer
+  , event = scope.Events.event
+  , View = scope.Views.View;
   /*
   ----------------------------------------------------------
   	HTML File Handler
@@ -456,10 +461,10 @@ definition:function(sjs){
   		if(!this.children)	this.children = [];
   		if(!this.__sjs_visual_children__) this.__sjs_visual_children__ = [];
 
-  		Event(this).attach({
-  			onAttach	:	Event.multicast,
-  			onDisplay	:	Event.multicast,
-  			onData		: Event.multicast
+  		event(this).attach({
+  			onAttach	:	event.multicast,
+  			onDisplay	:	event.multicast,
+  			onData		: event.multicast
   		});
 
   		this.onDisplay.subscribe(function(){
@@ -489,7 +494,7 @@ definition:function(sjs){
   	};
 
   	Controller.prototype.initialize = function(){
-  		var fn = getFunctionName(this.constructor)
+  		var fn = sjs.fname(this.constructor)
   		if(fn === 'Controller') return;
   		console.warn(fn + '.initialize is not implemented');
   	};
@@ -1308,6 +1313,8 @@ definition:function(sjs){
   	};
 
 
-    sjs.exports.module(Controller);
+    exports.module(
+      Controller
+    );
 
 }})

@@ -1,11 +1,13 @@
 sjs.module({
 
 required:[
-	{'SpliceJS.UI':'../splice.ui.js'}
-,	{'Text':'{sjshome}/modules/splice.text.js'}
-,	{'SpliceJS.Controls':'splice.controls.calendar.js'}
-,	{'SpliceJS.Controls':'splice.controls.selectors.js'}
-,	'splice.controls.datepicker.html'
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{'SpliceJS.UI':'../splice.ui.js'},
+	{'Text':'/{sjshome}/modules/splice.text.js'},
+	{'SpliceJS.Controls':'splice.controls.calendar.js'},
+	{'SpliceJS.Controls':'splice.controls.selectors.js'},
+	'splice.controls.datepicker.html'
 ]
 ,
 
@@ -13,12 +15,15 @@ definition:function component(sjs){
 	"use strict";
 
 	var scope = this.scope
-	,	Class = this.sjs.Class
-	,	event = this.sjs.event
-	,	exports = this.sjs.exports;
+	,	exports = sjs.exports;
+	;
 
-	var UIControl = scope.SpliceJS.UI.UIControl
-	,	format = scope.Text.format;
+	var
+		Class = scope.Inheritance.Class
+	,	event = scope.Events.event
+	, UIControl = scope.SpliceJS.UI.UIControl
+	,	format = scope.Text.format
+	;
 
 	var DatePicker = Class(function DatePickerController(){
 		this.super();

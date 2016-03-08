@@ -1,9 +1,11 @@
 sjs.module({
 
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Events      : '/{sjshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
-	{'Doc':'{sjshome}/modules/splice.document.js'},
+	{'Doc':'/{sjshome}/modules/splice.document.js'},
 	'splice.controls.listbox.css',
 	'splice.controls.listbox.html'
 ],
@@ -11,15 +13,15 @@ required:[
 definition:function component(sjs){
 
 
-	var Class = this.sjs.Class
-	,		event = sjs.event
-	,		exports = sjs.exports
-	,		debug = this.sjs.debug
+	var	exports = sjs.exports
+	,		debug =	sjs.log.debug
 	, 	components = this.scope.components;
 
 	var	UIControl = this.scope.SpliceJS.UI.UIControl
-	,		DataItem = this.scope.SpliceJS.UI.DataItem
-	,		dom = this.scope.Doc.dom;
+	,	DataItem = this.scope.SpliceJS.UI.DataItem
+	, Class = this.scope.Inheritance.Class
+	,	dom = this.scope.Doc.dom
+	,	event = this.scope.Events.event;
 
 	var ListBoxController = Class(function ListBoxController(){
 			this.super();

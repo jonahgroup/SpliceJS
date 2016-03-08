@@ -1,9 +1,12 @@
 sjs.module({
 required:[
-  {'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
+  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+  { Events      : '/{sjshome}/modules/splice.event.js'},
+  { Component		: '/{sjshome}/modules/splice.component.core.js'},
+  {'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
   {'SpliceJS.Controls':'splice.controls.buttons.js'},
   {'SpliceJS.Controls':'splice.controls.listbox.js'},
-  {'Doc':'{sjshome}/modules/splice.document.js'},
+  {'Doc':'/{sjshome}/modules/splice.document.js'},
   'splice.controls.datafilter.html'
 ],
 definition:function component(sjs){
@@ -11,9 +14,9 @@ definition:function component(sjs){
 
     var scope = this.scope;
 
-    var Class = sjs.Class
-    ,   Controller = sjs.Controller
-    ,   Event = sjs.Event;
+    var Class = scope.Inheritance.Class
+    ,   Controller = scope.Component.Controller
+    ,   Event = scope.Events.event;
 
     var dom = scope.Doc.dom;
 

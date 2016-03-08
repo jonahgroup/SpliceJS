@@ -2,6 +2,9 @@ sjs.module({
 version: '1.0.0'
 ,
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Component		: '/{sjshome}/modules/splice.component.core.js'	},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'Doc':'{sjshome}/modules/splice.document.js'},
 	'splice.controls.scrollpanel.css',
@@ -11,16 +14,17 @@ required:[
 definition:function component(sjs){
 
 
-	var Class 		= sjs.Class
-	,	  event 		= sjs.event
-	,		exports 	= sjs.exports
-	, 	isTouch 	= sjs.config.platform.isTouchEnabled
-	, 	isMobile 	= sjs.config.platform.isMobile;
+	var exports 	= sjs.exports
+	, 	isTouch 	= false
+	, 	isMobile 	= false;
 
 	var	select = this.scope.Doc.select
 	,		create = this.scope.Doc.create
 	, 	UIControl 	= this.scope.SpliceJS.UI.UIControl
-	, 	DragAndDrop = this.scope.SpliceJS.UI.DragAndDrop;
+	, 	DragAndDrop = this.scope.SpliceJS.UI.DragAndDrop
+	,		Controller = this.scope.Component.Controller
+	,		Class = this.scope.Inheritance.Class
+	,		event = this.scope.Events.event;
 
 	var ScrollPanel = Class(function ScrollPanelController(args){
 		this.super(args);

@@ -1,18 +1,23 @@
 sjs.module({
 required:[
-		{'SpliceJS.UI':'../splice.ui.js'}
-	,	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'}
-	,	'splice.controls.treeview.css'
-	,	'splice.controls.treeview.html'
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{'SpliceJS.UI':'../splice.ui.js'},
+	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
+	'splice.controls.treeview.css',
+	'splice.controls.treeview.html'
 ]
 ,
 definition:function component(){
+	var
+		scope = this.scope
+	;
 
-	var scope = this.scope
-	,	Class 		= this.sjs.Class
-	,	Event 		= this.sjs.Event;
-
-	var	UIControl 	= scope.SpliceJS.UI.UIControl;
+	var
+		Class = scope.Inheritance.Class
+	,	UIControl 	= scope.SpliceJS.UI.UIControl
+	,	Event = scope.Events.event;
+	;
 
 	var TreeView = Class( function TreeViewController(){
 		this.super();

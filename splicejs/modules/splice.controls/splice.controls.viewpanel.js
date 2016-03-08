@@ -1,18 +1,21 @@
 sjs.module({
-
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.viewpanel.html',
 	'splice.controls.viewpanel.css'
 ],
 
-definition:function component(){
+definition:function component(sjs){
 
-	var scope = this.scope
-	,	overlay = this.sjs.display.overlay
-	,	Class = this.sjs.Class;
-	var UIControl = scope.SpliceJS.UI.UIControl
-
+	var
+		scope = this.scope
+	//,	overlay = sjs.display.overlay
+	;
+	var
+		Class 		= scope.Inheritance.Class
+	, UIControl = scope.SpliceJS.UI.UIControl
+	;
 	/**
 	 *
 	 * ViewPanel

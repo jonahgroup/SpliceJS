@@ -1,31 +1,35 @@
 /*
-
   CheckListBox control is using templates copied from ListBox control
   While controller inherits from LibBoxController template declaration is
   a !!! copy/paste code !!!!
   Need a way to extend components including templates
 */
-
 sjs.module({
-  required:[
-    {'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
-    {'Doc':'{sjshome}/modules/splice.document.js'},
-    {'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
-    {'SpliceJS.Controls':'splice.controls.listbox.js'},
-    'splice.controls.checklistbox.css',
-    'splice.controls.checklistbox.html'
-  ],
+required:[
+  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+  { Component		: '/{sjshome}/modules/splice.component.core.js'},
+  { Events			: '/{sjshome}/modules/splice.event.js'},
+  {'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
+  {'Doc':'/{sjshome}/modules/splice.document.js'},
+  {'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
+  {'SpliceJS.Controls':'splice.controls.listbox.js'},
+  'splice.controls.checklistbox.css',
+  'splice.controls.checklistbox.html'
+],
   definition:function component(sjs){
 
     var scope = this.scope
-    , Class = sjs.Class
-    , event = sjs.event
-    , proxy = sjs.proxy
     , exports = sjs.exports
-    , dom = this.scope.Doc.dom
-    , components = this.scope.components;
+    ;
 
-    var DataItem = scope.SpliceJS.UI.DataItem;
+    var
+      Class = scope.Inheritance.Class
+    , event = scope.Events.event
+    , proxy = scope.Component.proxy
+    , DataItem = scope.SpliceJS.UI.DataItem
+    , dom = scope.Doc.dom
+    , components = scope.components;
+    ;
 
     var CheckListBoxController = Class(function CheckListBoxController(args){
       this.super(args);

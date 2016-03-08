@@ -1,6 +1,8 @@
-sjs.module (
-{
+sjs.module ({
 definition:function(sjs){
+
+  var exports = sjs.exports;
+
   function dfs(dom, target, filterFn, nodesFn){
     if(!dom) return;
 
@@ -115,12 +117,6 @@ definition:function(sjs){
 
   	function close(controller) {
   	    controller.concrete.dom.parentNode.removeChild(controller.concrete.dom);
-  	};
-
-  	function isHTMLElement(object){
-  		if(!object) return false;
-  		if(object.tagName && object.tagName != '') return true;
-  		return false;
   	};
 
   	function _viewQueryMode(){
@@ -460,7 +456,9 @@ definition:function(sjs){
   	element.className = clean;
   };
 
-
+  exports.module(
+    View
+  );
 }
 }
 );

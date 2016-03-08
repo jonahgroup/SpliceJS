@@ -2,18 +2,23 @@
 sjs.module({
 
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
-	'{sjshome}/lib/d3-3.5.5/d3.min.js',
+	'/{sjshome}/lib/d3-3.5.5/d3.min.js',
 	'splice.controls.d3canvas.html'
 ],
 
-definition:function component(){
+definition:function component(sjs){
 
-	var Class = this.sjs.Class
-	,	exports = this.sjs.exports
-	,	scope = this.scope;
+	var
+	 	exports = sjs.exports
+	,	scope = this.scope
+	;
 
-	var UIControl = scope.SpliceJS.UI.UIControl;
+	var
+		UIControl = scope.SpliceJS.UI.UIControl
+	,	Class = scope.Inheritance.Class
+	;
 
 	var _d3 = this.d3 = d3;
 

@@ -1,6 +1,9 @@
 sjs.module({
 
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Component		: '/{sjshome}/modules/splice.component.core.js'	},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'Doc':'{sjshome}/modules/splice.document.js'},
 	'splice.controls.selectors.css',
@@ -11,18 +14,18 @@ definition:function component(sjs){
 	"use strict";
 
 	/* framework imports */
-	var Controller 	= this.sjs.Controller
-	,	exports = sjs.exports
-	,	event = sjs.event
+	var exports = sjs.exports
 	,	display = sjs.display
-	,	Class = this.sjs.Class
 	,	scope = this.scope;
 
 	/* dependency imports */
 	var	Positioning = scope.SpliceJS.UI.Positioning
 	,	dom = scope.Doc.dom
-	,	UIControl = scope.SpliceJS.UI.UIControl;
-
+	,	UIControl = scope.SpliceJS.UI.UIControl
+	,	Class = scope.Inheritance.Class
+	, Controller = scope.Component.Controller
+	,	event = scope.Events.event
+	;
 	//static single instance
 	var dropDownContainer = new scope.components.DropDownContainerResizable()
 	,	selectorElement = null;

@@ -1,42 +1,47 @@
 sjs.module({
 
 required:[
-
-	{'Data':'{sjshome}/modules/splice.data.js'},
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Data				:	'/{sjshome}/modules/splice.data.js'},
 	{'SpliceJS.Controls' : 'splice.controls.d3canvas.js'},
-	{'Charts' : 'charts/splice.controls.charts.dial.js'},
-	{'Charts' : 'charts/splice.controls.charts.barchart.js'},
-	{'Charts' : 'charts/splice.controls.charts.linechart.js'},
-	{'Charts' : 'charts/splice.controls.charts.scatterchart.js'},
+	{Charts 			: 'charts/splice.controls.charts.dial.js'},
+	{Charts 			: 'charts/splice.controls.charts.barchart.js'},
+	{Charts 			: 'charts/splice.controls.charts.linechart.js'},
+	{Charts 			: 'charts/splice.controls.charts.scatterchart.js'},
 	'splice.controls.charts.html',
 	'splice.controls.charts.css',
-
 ],
 
 definition:function component(sjs){
 
-    var	scope = this.scope
+  var
+		scope = this.scope
+	;
 
-		var Class = sjs.Class
-		, debug = sjs.debug
-		,	exports = sjs.exports
-		,	Event = sjs.Event;
+	var
+		debug = sjs.log.debug
+	,	exports = sjs.exports
+	;
 
-	var	D3Canvas = scope.SpliceJS.Controls.D3Canvas
-    ,   data = scope.Data.data;
+	var
+		Class = scope.Inheritance.Class
+	,	D3Canvas = scope.SpliceJS.Controls.D3Canvas
+  , data = scope.Data.data
+	,	Event = scope.Events.event
+	;
 
 	var CHART_MAP = {
 		Bar:  scope.Charts.BarChart,
 		Line: scope.Charts.LineChart,
 		Scatter: scope.Charts.ScatterChart,
 		ScatterLine: scope.Charts.ScatterLineChart
-	};
-
-
-	var CHART_MARGIN = {
+	}
+	, CHART_MARGIN = {
 		left:30,top:20, right:10, bottom:20
-	};
-
+	}
+	;
 
 	var Chart = Class(function ChartController(){
 		this.super();	//call parent constructor
@@ -49,7 +54,6 @@ definition:function component(sjs){
 
 		//this.d3 is inherited from the parent SpliceJS.Controls.D3Canvas
 		this.onDataIn.subscribe(function(){
-
 			this.measureData(this.d3);
 			this.render(this.d3);
 		}, this);
@@ -60,10 +64,8 @@ definition:function component(sjs){
 			this.onChartItem({data:sourceData,name:'series1'});
 		},this);
 
-
 		//subscribe to onAttach event, update chat dimensions
 		this.onAttach.subscribe(this.attach, this);
-
 
 		//single svg node per chart
 		this.svg = this.d3.select().append('svg')
@@ -79,9 +81,6 @@ definition:function component(sjs){
 
 	Chart.prototype.attach = function(){
 
-
-
-
 		/*
 			dimensions are only valid when element is
 			attached the DOM tree
@@ -91,16 +90,11 @@ definition:function component(sjs){
 		if(!this.width) this.width = this.elements.root.clientWidth;
 		if(!this.height) this.height = this.elements.root.clientHeight;
 
-
 		this.reflow(this.width, this.height);
-
-
 	}
 
 
 	Chart.prototype.reflow = function(width, height){
-
-
 		this.width = this.elements.root.clientWidth;
 		this.height = this.elements.root.clientHeight;
 
@@ -114,7 +108,6 @@ definition:function component(sjs){
 
 		this.svg.attr('width',this.width).attr('height',this.height);
 		this.render(this.d3);
-
 	};
 
 

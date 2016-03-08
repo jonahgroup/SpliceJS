@@ -2,18 +2,22 @@
 sjs.module({
 
 required: [
-    {'SpliceJS.UI': '{sjshome}/modules/splice.ui.js'},
-	{'Animation': '{sjshome}/modules/splice.animation.js'},
+	{ Inheritance   :  '/{sjshome}/modules/splice.inheritance.js'},
+  {'SpliceJS.UI'  : '/{sjshome}/modules/splice.ui.js'},
+	{ Animation     : '/{sjshome}/modules/splice.animation.js'},
 	'splice.controls.charts.dial.html'
 ],
 
 definition:function component(sjs){
 
-    var scope = this.scope;
-    var Class = sjs.Class;
-
-    var Animation = scope.Animation
-    , UIControl = scope.SpliceJS.UI.UIControl;
+    var
+      scope = this.scope
+    ;
+    var
+      Class = scope.Inheritance.Class
+    , Animation = scope.Animation
+    , UIControl = scope.SpliceJS.UI.UIControl
+    ;
 
 
 	var Dial = Class(function DialController(){

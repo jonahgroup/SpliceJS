@@ -19,6 +19,12 @@ definition:function(sjs){
 		}
 	};
 
+	function isHTMLElement(object){
+		if(!object) return false;
+		if(object.tagName && object.tagName != '') return true;
+		return false;
+	};
+
 
 	function style(element){
 		var css = window.getComputedStyle(element,null);
@@ -386,6 +392,7 @@ definition:function(sjs){
 	}
 
 	exports.module(
+		isHTMLElement,
 		{style:style},
 		{select:{
 			nodes:	selectNodes,

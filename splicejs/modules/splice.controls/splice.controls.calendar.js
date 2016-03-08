@@ -1,8 +1,11 @@
 sjs.module({
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
 	'splice.controls.calendar.html',
 	'splice.controls.calendar.css'
-	],
+],
 definition:function component(sjs){
 	"use strict"
 
@@ -193,9 +196,16 @@ definition:function component(sjs){
 
 
 
-	var Class = sjs.Class
-	,	event = sjs.event
-	, exports = sjs.exports;
+	var
+		scope = this.scope
+	,	exports = sjs.exports
+	;
+
+	var
+		Class 	= scope.Inheritance.Class
+	,	event		= scope.Events.event
+	, Controller 	= scope.Component.Controller
+	;
 
 
 	var Calendar = Class(function CalendarController(){
@@ -213,7 +223,7 @@ definition:function component(sjs){
 
 		this.selectedDate = new Date();
 
-	}).extend(this.sjs.Controller);
+	}).extend(Controller);
 
 	Calendar.prototype.initialize = function(){
 		event(this.views.grid).attach({

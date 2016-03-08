@@ -1,19 +1,20 @@
 sjs.module({
-
-
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
-	'{sjshome}/lib/leaflet-0.7.3/leaflet.css',
-	'{sjshome}/lib/leaflet-0.7.3/leaflet-src.js',
+	'/{sjshome}/lib/leaflet-0.7.3/leaflet.css',
+	'/{sjshome}/lib/leaflet-0.7.3/leaflet-src.js',
 	'splice.controls.map.css',
 	'splice.controls.map.html',
 ],
 
 definition:function component(){
 	var scope = this.scope
-	, 	Class = this.sjs.Class;
 
-	var	UIControl = scope.SpliceJS.UI.UIControl;
+	var
+		Class 		= scope.Inheritance.Class
+	,	UIControl = scope.SpliceJS.UI.UIControl
+	;
 
 	var Map = Class(function MapController(){
 		this.super();

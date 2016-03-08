@@ -1,16 +1,18 @@
 sjs.module({
-  alias:'SpliceJS.Components.ComboBox',
   required:[
-    {'SpliceJS.Controls':'splice.controls.dropdownlist.js'},
+    { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+    {'SpliceJS.Controls':'splice.controls.dropdownlist.js'}
     // 'splice.controls.combobox.html'
   ],
   definition:function component(sjs){
 
-    var scope = this.scope
+    var
+      scope = this.scope
     , exports = sjs.exports
-    , Class = sjs.Class;
 
-    var DropDownList = scope.SpliceJS.Controls.DropDownList;
+    var
+      Class = scope.Inheritance.Class
+    , DropDownList = scope.SpliceJS.Controls.DropDownList;
 
     var ComboBox = Class(function ComboBox(args){
 

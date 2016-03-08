@@ -1,8 +1,15 @@
 sjs.module({
+required:[
+  { Document  : '/{sjshome}/modules/splice.document.js'},
+  { Views      : '/{sjshome}/modules/splice.view.js'}
+],
 definition:function(sjs){
 
   var exports = sjs.exports
   , mixin = sjs.mixin;
+
+  var doc = this.scope.Document
+  , View = this.scope.Views.View;
 
   	function mousePosition(e){
           //http://www.quirksmode.org/js/events_properties.html#position
@@ -260,7 +267,7 @@ definition:function(sjs){
   			if target object is a dom element
   			collect event arguments
   		*/
-  		if(isHTMLElement(object) || object === window) {
+  		if(doc.isHTMLElement(object) || object === window) {
   			/*
   				wrap DOM event
   			*/
@@ -312,7 +319,7 @@ definition:function(sjs){
 
 exports.module(
     {Event:EventSingleton},
-    {'event':Event} 
+    {'event':Event}
 );
 
 }})

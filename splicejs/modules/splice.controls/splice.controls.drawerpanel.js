@@ -1,6 +1,6 @@
 sjs.module({
-
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI': '{sjshome}/modules/splice.ui.js'},
 	'splice.controls.scrollpanel.js',
 	'splice.controls.transitions.css',
@@ -10,10 +10,13 @@ required:[
 
 definition:function component(){
 
-	var scope = this.scope
-	,	Class = this.sjs.Class;
+	var
+		scope = this.scope
+	;
 
-	var	UIControl = scope.SpliceJS.UI.UIControl;
+	var
+		Class 		= scope.Inheritance.Class
+	,	UIControl = scope.SpliceJS.UI.UIControl;
 
 	/* DrawerPanel*/
 

@@ -1,7 +1,10 @@
 sjs.module({
 
 required:[
-	{'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
 	'splice.controls.gridlayout.css',
 	'splice.controls.gridlayout.html'
 ],
@@ -9,13 +12,16 @@ required:[
 definition:function component(sjs){
 	var scope = this.scope
 	,	exports = sjs.exports
-	,	Class = sjs.Class
-	,	event = sjs.event
-	,	debug = sjs.debug
-	,	proxy = sjs.proxy;
+	,	debug = sjs.log.debug
+	;
 
-	var UIControl = scope.SpliceJS.UI.UIControl
-	,	DragAndDrop = scope.SpliceJS.UI.DragAndDrop;
+	var
+		Class 		= scope.Inheritance.Class
+	,	UIControl = scope.SpliceJS.UI.UIControl
+	,	DragAndDrop = scope.SpliceJS.UI.DragAndDrop
+	,	event 			= scope.Events.event
+	,	proxy 			= scope.Component.proxy
+	;
 
 
 	var Grid = function Grid(rows,columns){

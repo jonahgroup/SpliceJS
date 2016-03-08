@@ -2,14 +2,16 @@
 sjs.module({
 
 required:[
-
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.buttons.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
 	{'SpliceJS.Controls':'splice.controls.datafilter.js'},
-	{'Doc':  '{sjshome}/modules/splice.document.js'},
-	{'Data': '{sjshome}/modules/splice.data.js'},
+	{'Doc':  '/{sjshome}/modules/splice.document.js'},
+	{'Data': '/{sjshome}/modules/splice.data.js'},
 	'splice.controls.css',
 	'splice.controls.datatable.css',
 	'splice.controls.datatable.html'
@@ -24,14 +26,13 @@ definition: function component(sjs){
 	}
 
 	// import dependencies
-	var Class = this.sjs.Class
-	,	Event = this.sjs.Event
-	,	mixin = this.sjs.mixin
-	,	debug = this.sjs.debug
+	var mixin = sjs.mixin
+	,	debug = sjs.log.debug
 	,	scope = this.scope
-	,	Controller = sjs.Controller;
+	;
 
-	var	Doc 		= scope.Doc
+	var	Class 	= scope.Inheritance.Class
+	,	Doc 			= scope.Doc
 	,	create 		= scope.Doc.create
 	,	dom 			= scope.Doc.dom
 	,	cssvalue 	= scope.Doc.cssvalue
@@ -39,7 +40,10 @@ definition: function component(sjs){
 	,	fdata 		= scope.Data.data
 	,	compare 	= scope.Data.compare.default
 	,	DataStep 	= scope.Data.DataStep
-	, UIControl 	= scope.SpliceJS.UI.UIControl;
+	, UIControl = scope.SpliceJS.UI.UIControl
+	,	Event 		= scope.Events.event
+	,	Controller = scope.Component.Controller;
+	;
 
 	/**
 	 * DataTable

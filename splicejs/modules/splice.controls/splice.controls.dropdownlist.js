@@ -1,21 +1,25 @@
 sjs.module({
+required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{'SpliceJS.UI':'../splice.ui.js'},
+	{'SpliceJS.Controls':'splice.controls.selectors.js'},
+	{'SpliceJS.Controls':'splice.controls.listbox.js'},
+	'splice.controls.dropdownlist.html'
+],
 
-	required:[
-		{'SpliceJS.UI':'../splice.ui.js'},
-		{'SpliceJS.Controls':'splice.controls.selectors.js'},
-		{'SpliceJS.Controls':'splice.controls.listbox.js'},
-		'splice.controls.dropdownlist.html'
-	],
-
-	definition:function component(sjs){
-		"use strict";
+definition:function component(sjs){
+	"use strict";
 
 	var scope = this.scope
 	,	exports = sjs.exports
-	,	event = sjs.event
-	,	Class = this.sjs.Class;
+	;
 
-	var	UIControl = scope.SpliceJS.UI.UIControl;
+	var
+		Class = scope.Inheritance.Class
+	,	event = scope.Events.event
+	,	UIControl = scope.SpliceJS.UI.UIControl
+	;
 
 		/**
 	 * Drop down list
