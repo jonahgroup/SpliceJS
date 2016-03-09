@@ -1,6 +1,7 @@
 sjs.module({
 
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.popup.html',
 	'splice.controls.popup.css'
@@ -8,18 +9,20 @@ required:[
 ,
 definition:function component(sjs){
 
-	var scope = this.scope
-	, exports = sjs.exports
-	,	Class = this.sjs.Class;
+	var
+		scope = this.scope
+	, exports = sjs.exports;
 
-	var	UIControl = scope.SpliceJS.UI.UIControl
+	var
+		Class = scope.Inheritance.Class
+	,	UIControl = scope.SpliceJS.UI.UIControl
 
 	var Popup = Class(function PopupController(){
 		this.super();
 
 		this.ratio = { width: 4, height: 3 };
 
-        /* subscribe to display events */
+    /* subscribe to display events */
 		this.onDisplay.subscribe(this.display,this);
 		this.onAttach.subscribe(this.attach, this);
 

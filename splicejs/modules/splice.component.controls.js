@@ -25,7 +25,7 @@ required:[
 ,	{'Navigation':'splice.controls/splice.controls.pageloader.js'}
 ,	{'Navigation':'splice.controls/splice.controls.tooltip.js'}
 ,	{'Editors':'splice.controls/splice.controls.codeeditor.js'}
-,	{'Buttons':  'splice.controls/splice.controls.slider.js'}
+,	{'Buttons':'splice.controls/splice.controls.slider.js'}
 ,	{'DataControls':'splice.controls/splice.controls.treetable.js'}
 ,	'splice.controls/splice.controls.css'
 , 'splice.controls/splice.controls.html'

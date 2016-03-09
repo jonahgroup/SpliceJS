@@ -1,6 +1,7 @@
 sjs.module({
-
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
+	{ Networking  : '/{sjshome}/modules/splice.network.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.codeeditor.css',
 	'splice.controls.codeeditor.html'
@@ -9,11 +10,14 @@ required:[
 
 definition:function component(sjs){
 
-	var scope = this.scope
-	,	Class = sjs.Class
-	,	HttpRequest = sjs.HttpRequest;
-
-	var	UIControl = scope.SpliceJS.UI.UIControl;
+	var
+		scope = this.scope
+	;
+	var
+		Class = scope.Inheritance.Class
+	,	HttpRequest = scope.Networking.HttpRequest
+	,	UIControl = scope.SpliceJS.UI.UIControl
+	;
 
 	var CodeEditor = Class(function CodeEditorController(){
 		this.super();

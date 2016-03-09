@@ -406,12 +406,14 @@ SOFTWARE.
 			if(!x) continue;
 			var keys = Object.keys(x);
 			for(var key in keys){
+				log.debug(keys[key]);
 				scope.add(ns+'.'+keys[key],x[keys[key]]);
 			}
 		}
 	};
 
 	function _exports(scope){
+		scope.__sjs_module_exports__ = Object.create(null);
 		return {
 			scope:function(){
 				for(var i=0; i < arguments.length; i++){
@@ -431,7 +433,7 @@ SOFTWARE.
 			},
 			module:function(){
 				var exports = scope.__sjs_module_exports__;
-				if(!exports) exports = scope.__sjs_module_exports__ = Object.create(null);
+				//if(!exports) exports = scope.__sjs_module_exports__ = Object.create(null);
 				for(var i=0; i < arguments.length; i++){
 					var arg = arguments[i];
 					if(typeof arg === 'function' ){
@@ -467,8 +469,10 @@ SOFTWARE.
 		var scope = new Namespace(null); //our module scope
 		var path = getPath(loader.currentFile).path + '/';
 		var url = loader.currentFile;
+
 		scope.__sjs_uri__ = {
 			path:path,
+			url:url
 		};
 		var ctx = context(path);
 		var required = [],	imports = [];
@@ -489,11 +493,6 @@ SOFTWARE.
 				MODULE_MAP[url] = scope.__sjs_module_exports__;
 			}
 		});
-
-
-
-
-
 	};
 	Module.list = function(){
 		return MODULE_MAP;

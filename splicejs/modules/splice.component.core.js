@@ -1167,9 +1167,8 @@ definition:function(sjs){
 
   		var component = createComponent(template.controller, template, scope);
   		scope.components[template.type] = component;
-
+      scope.__sjs_module_exports__[template.type] = component;
   		return component;
-
   	};
 
 

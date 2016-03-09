@@ -1,14 +1,21 @@
 sjs.module({
 required:[
+	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
 	'splice.controls.treetable.html'
 ],
 
 definition:function component(sjs){
 
-	var UIControl = this.scope.SpliceJS.UI.UIControl;
+	var
+		scope = this.scope
+	;
 
-	var TreeTable = sjs.Class(function TreeTableController(){
+	var
+	 	Class = scope.Inheritance.Class
+	,	UIControl = scope.SpliceJS.UI.UIControl;
+
+	var TreeTable = Class(function TreeTableController(){
 		this.super();
 	}).extend(UIControl);
 
@@ -16,7 +23,4 @@ definition:function component(sjs){
 
 	};
 
-
-
-}
-})
+}})
