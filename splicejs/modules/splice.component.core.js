@@ -1154,21 +1154,22 @@ definition:function(sjs){
   	 * @param moduleName - a module where template can be located
   	 * @returns {HTMLElement|*} a DOM of the template (aka build version).
   	 */
-  	function compileTemplate(template){
+     function compileTemplate(template){
+    		var scope = this; //module scope
+    		/*
+    		 * Run notations and scripts to form a
+    		 * final template DOM
+    		 * */
+    		resolveCustomElements.call(scope,template);
 
-  		var scope = this; //module scope
-
-  		/*
-  		 * Run notations and scripts to form a
-  		 * final template DOM
-  		 * */
-
-  		resolveCustomElements.call(scope,template);
-
-  		var component = createComponent(template.controller, template, scope);
-  		scope.components[template.type] = component;
-      scope.__sjs_module_exports__[template.type] = component;
-  		return component;
+    		var component = createComponent(template.controller, template, scope);
+    		scope.components[template.type] = component;
+        // export only components and
+        if(component.isComponent && component.template.export != null)
+          scope.__sjs_module_exports__[
+              component.template.export?component.template.export:template.type
+          ] = component;
+    		return component;
   	};
 
 

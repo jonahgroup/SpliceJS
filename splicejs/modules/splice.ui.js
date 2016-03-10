@@ -15,11 +15,13 @@ definition:function component(sjs){
 	,	scope = this.scope
 	,	exports = sjs.exports;
 
-	var Class 		= scope.Inheritance.Class
+	var
+		Class 		= scope.Inheritance.Class
 	, Animate 		= scope.Animation.Animate
 	, Controller 	= scope.Component.Controller
 	,	Event 			= scope.Events.Event
-	,	event 			= scope.Events.event;
+	,	event 			= scope.Events.event
+	;
 
 	var DataItem = function DataItem(data){
 		this.source = data;

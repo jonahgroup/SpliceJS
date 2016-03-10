@@ -1,8 +1,9 @@
 /* global _ */
 sjs.module({
-
 required:[
-	{'SpliceJS.UI':'splice.ui.js'}
+  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
+,	{ Events      : '/{sjshome}/modules/splice.event.js'}
+,	{'SpliceJS.UI':'splice.ui.js'}
 ,	{'Controllers':'splice.controls/splice.controls.controllers.js'}
 , {'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
@@ -37,11 +38,14 @@ definition:function component(sjs){
 
 	/* imports */
 	var Class 	= sjs.Class
-	, 	event 	= sjs.event
-	,		exports = sjs.exports;
+	,		exports = sjs.exports
+	;
 
-
-	var UIControl = scope.SpliceJS.UI.UIControl;
+	var
+	 	Class = scope.Inheritance.Class
+	,	UIControl = scope.SpliceJS.UI.UIControl
+	, event = scope.Events.event
+	;
 
 	/*
 	 *	Image Selector
