@@ -63,14 +63,20 @@ SOFTWARE.
 		}
 	};
 
-	function mixin(target, source){
-		if(!source) return target;
-		var keys = Object.keys(source);
-		for(var i=0; i  < keys.length; i++){
-			var key = keys[i];
-			target[key] = source[key];
+	function mixin(_t, _s){
+		if(!_s) return _t;
+		var keys = Object.keys(_s);
+		if(	_s == window || _s == document ||
+				_t == window || _t == document
+				){
+			log.error("Invalid object access " + _s.toString());
+			return _t;
 		}
-		return target;
+		for(var key in keys){
+			var p = _s[keys[key]];
+			_t[keys[key]] = p;
+		}
+		return _t;
 	};
 
 	if(!Function.prototype.bind) {
@@ -340,8 +346,6 @@ SOFTWARE.
 		var filename = obj;
 
 		filename = context().resolve(filename).aurl;
-		log.info('Loading: ' + filename);
-
 
 		Loader.currentFile = this.currentFile = filename;
 		if(URL_CACHE[filename] === true){
@@ -373,7 +377,6 @@ SOFTWARE.
 	};
 
 	function load(resources, oncomplete, onitemloaded){
-		log.info(this);
 		if(!resources || resources.length < 1){
 			if(typeof oncomplete != 'function') return;
 			oncomplete();
@@ -406,7 +409,6 @@ SOFTWARE.
 			if(!x) continue;
 			var keys = Object.keys(x);
 			for(var key in keys){
-				log.debug(keys[key]);
 				scope.add(ns+'.'+keys[key],x[keys[key]]);
 			}
 		}
@@ -481,10 +483,7 @@ SOFTWARE.
 			var imp = ctx.resolve(m.required[i]);
 			required.push(imp.url); imports.push(imp);
 		}
-
 		var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
-
-		log.info(path);
 
 		load.call(scope,required, function(){
 			applyImports.call(scope,imports);

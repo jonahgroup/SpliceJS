@@ -38,8 +38,6 @@ definition:function(sjs){
   	CSS File Handler
   */
   var cssHandler = function(filename,loader){
-    sjs.log.info('Loading css file');
-
     var linkref = document.createElement('link');
 
 		linkref.setAttribute("rel", "stylesheet");
@@ -75,9 +73,7 @@ definition:function(sjs){
   ----------------------------------------------------------
   	Component module handler
   */
-
   function componentModule(_m, _scope, _sjs){
-    sjs.log.debug('This is a component module loader');
     compileTemplates(_scope);
     _m.definition.call({scope:_scope},_sjs);
   }
@@ -86,7 +82,6 @@ definition:function(sjs){
   sjs.extension.module({
     'component' : componentModule
   });
-
 
   /*
   ----------------------------------------------------------
