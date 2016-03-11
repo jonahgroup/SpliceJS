@@ -6,7 +6,8 @@ required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'Doc': '{sjshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
-	'splice.controls.buttons.html'
+	'splice.controls.buttons.html',
+	'/{sjshome}/modules/splice.component.controls.js' //circular
 ]
 ,
 definition:function component(sjs){

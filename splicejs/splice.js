@@ -318,6 +318,24 @@ SOFTWARE.
 			Loader.splashScreen.update(Loader.complete, Loader.total, Loader.currentFile);
 	}
 
+
+	function detectCircular(loader,print){
+		//examine stack of loaders to resolve cicular dependencies
+		for(var i=0; i<Loader.loaders.length; i++){
+			var l = Loader.loaders[i];
+			if(print){
+				log.debug(i + ': ' + l.currentFile);
+				continue;
+			}
+			if(l == loader) continue; //ignore current loader
+			if(loader.currentFile == l.currentFile) {
+				log.debug('----------- Loader stack -----------------')
+				detectCircular(loader,true);
+				throw "Circular module dependecy detected, please resolve";
+			}
+		}
+	}
+
 	function Loader(scope,resources, oncomplete, onitemloaded) {
 		if(!resources || resources.length == 0) throw 'Invalid Loader constructor';
 		this.iterator = new Iterator(resources);
@@ -355,6 +373,10 @@ SOFTWARE.
 		filename = context().resolve(filename).aurl;
 
 		Loader.currentFile = this.currentFile = filename;
+
+		//detect circular dependency here
+		detectCircular(this);
+
 		if(URL_CACHE[filename] === true){
 			setTimeout(function(){
 				loader.progress();
