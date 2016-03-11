@@ -34,9 +34,9 @@ SOFTWARE.
 	var configuration = {};
 	function loadConfiguration(onLoad){
 		var main = null;
-
+		var head = document.head || document.getElementsByTagName('head')[0];
 		// cycle through all script elements in document's head
-		for(var i=0; i < document.head.childNodes.length; i++){
+		for(var i=0; i < head.childNodes.length; i++){
 			var node = document.head.childNodes[i];
 			if(!node.getAttribute) continue;
 			if(node.getAttribute('sjs-main') != null) {
@@ -295,7 +295,7 @@ SOFTWARE.
 	var _fileHandlers = {
 		'.js': function(filename,loader){
 			//document script loader
-			var head = document.head;
+			var head = document.head || document.getElementsByTagName('head')[0];
 			var script = document.createElement('script');
 			script.setAttribute("type", "text/javascript");
 			script.setAttribute("src", filename);

@@ -51,6 +51,7 @@ definition:function(sjs){
 		 * having an assigment to both will trigger the handler twice
 		 *
 		 * */
+    var head = document.head || document.getElementsByTagName('head')[0];
 		linkref.onload = function(){
 			if(!linkref.readyState || linkref.readyState == 'complete') {
 			//	URL_CACHE[filename] = true;
@@ -59,7 +60,7 @@ definition:function(sjs){
 				loader.loadNext({});
 			}
 		};
-		document.head.appendChild(linkref);
+		head.appendChild(linkref);
   };
 
   sjs.extension.loader({
