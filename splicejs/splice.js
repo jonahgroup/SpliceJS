@@ -304,20 +304,24 @@ SOFTWARE.
 				if(!script.readyState || script.readyState == 'complete' || script.readyState == 'loaded') {
 					URL_CACHE[filename] = true;
 					loader.onitemloaded();
-					loader.progress--;
-					Loader.complete++;
+					loader.progress();
 					loader.loadNext({});
-					log.info(Loader.complete);
 				}
 			};
 			head.appendChild(script);
 		}
 	};
 
+	function updateSplash(){
+		if(!isSplashScreen) return;
+		if(Loader.splashScreen && typeof(Loader.splashScreen.update) == 'function')
+			Loader.splashScreen.update(Loader.complete, Loader.total, Loader.currentFile);
+	}
+
 	function Loader(scope,resources, oncomplete, onitemloaded) {
 		if(!resources || resources.length == 0) throw 'Invalid Loader constructor';
 		this.iterator = new Iterator(resources);
-		this.progress = resources.length;
+		this._progress = resources.length;
 		this.isActive = true;
 		this.oncomplete = oncomplete;
 		this.onitemloaded = onitemloaded;
@@ -329,13 +333,16 @@ SOFTWARE.
 	Loader.complete = Loader.total = 0;
 	Loader.loaders = new Array();
 
+	Loader.prototype.progress = function(){
+		this._progress--; 	Loader.complete++; 	updateSplash();
+	}
 	Loader.prototype.disable = function(){this.isActive = false; return this;};
 	Loader.prototype.enable = function(){this.isActive = true; return this;};
 	Loader.prototype.loadNext = function(watcher){
 		if(!this.isActive) return;
 		var loader = Loader.currentLoader = this;
 
-		if(loader.progress <= 0) {
+		if(loader._progress <= 0) {
 			this.iterator = null; this.oncomplete(); this.oncomplete = null; this.onitemloaded = null;
 			return;
 		}
@@ -350,9 +357,7 @@ SOFTWARE.
 		Loader.currentFile = this.currentFile = filename;
 		if(URL_CACHE[filename] === true){
 			setTimeout(function(){
-				log.debug('File ' + filename + ' is already loaded, skipping...');
-				loader.progress--;
-				Loader.complete++;
+				loader.progress();
 				loader.loadNext(watcher)
 			},1);
 			return;
@@ -384,6 +389,10 @@ SOFTWARE.
 			return;
 		}
 
+		//suspend current loader
+		var currentLoader = peek(Loader.loaders);
+		if(currentLoader) currentLoader.disable();
+
 		var loader = new Loader((this instanceof Namespace)?this:null,
 			resources, function(){
 			Loader.loaders.pop();
@@ -396,9 +405,7 @@ SOFTWARE.
 			}
 		}, onitemloaded);
 
-		//suspend current loader
-		var currentLoader = peek(Loader.loaders);
-		if(currentLoader) currentLoader.disable();
+
 
 		//setup splash screen if applicable
 		if(Loader.splashScreen != null && !isSplashScreen){
@@ -480,9 +487,6 @@ SOFTWARE.
 		var loader = Loader.currentLoader;
 		if(this instanceof Loader) loader = this;
 
-		var handler = _moduleHandlers[fname(m.definition)];
-		if(handler == null) throw 'Handler for "' + fname(m.definition) + '" is not found' ;
-
 		var scope = new Namespace(null); //our module scope
 		var path = getPath(loader.currentFile).path + '/';
 		var url = loader.currentFile;
@@ -503,6 +507,8 @@ SOFTWARE.
 		load.call(scope,required, function(){
 			applyImports.call(scope,imports);
 			if(typeof m.definition === 'function') {
+				var handler = _moduleHandlers[fname(m.definition)];
+				if(handler == null) throw 'Handler for "' + fname(m.definition) + '" is not found' ;
 				handler(m, scope, _sjs);
 				MODULE_MAP[url] = scope.__sjs_module_exports__;
 			}
@@ -548,6 +554,7 @@ var _core = mixin(Object.create(null),{
 	log 			: log,
 	core		  : core,
 	getPath		: getPath,
+	document	:	document
 });
 function core(){
 	return mixin(Object.create(null),_core);

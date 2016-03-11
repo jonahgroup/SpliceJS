@@ -3,26 +3,36 @@ definition:function splash(sjs){
 
   var document = sjs.document;
 
-  var style = 'position:absolute; top:50%; left:50%; height:33px; width:84px;' +
+  var style = "position:absolute; left:0px; top:0px; right:0px; bottom:0px; transition:opacity 0.4s;";
+
+  var wrapStyle ="position:absolute; left:0px; right:0px; top:50%; transition:opacity 0.4s;";
+
+  var spinnerStyle = 'position:absolute; left:50%; height:33px; width:84px;' +
              'margin-left:-42px;'+
              'background-image:url(\''+sjs.context().resolve('/{sjshome}/resources/images/bootloading.gif').aurl+'\');'+
              'border-bottom:1px solid #7d7d7d;'+
              'background-position:top center;'+
-             'background-repeat:no-repeat;' +
-             'transition:opacity 0.4s;';
+             'background-repeat:no-repeat;'
+  ;
 
-  var spinnerStyle = ''
 
+  var labelStyle = 'font-size:11px; text-align:center; margin-top:50px;';
 
   function Splash(){
      this.dom = document.createElement('div');
+     var wrap = document.createElement('div');
      this.label = document.createElement('div');
      var spinner = document.createElement('div');
 
-     this.dom.appendChild(spinner);
-     this.dom.appendChild(this.label);
+     wrap.appendChild(spinner);
+     wrap.appendChild(this.label);
 
+     this.dom.appendChild(wrap);
+
+     wrap.setAttribute('style',wrapStyle);
+     spinner.setAttribute('style',spinnerStyle);
      this.dom.setAttribute('style',style);
+     this.label.setAttribute('style',labelStyle);
 
      this.progress = 0;
   }
@@ -46,7 +56,7 @@ definition:function splash(sjs){
     update:function(complete,total,itemName){
       var p = Math.round(complete/total*100);
       this.progress = p;
-    //  this.label.innerHTML = itemName;
+      this.label.innerHTML = itemName.substring(itemName.lastIndexOf('/')+1);
 
     }
   };

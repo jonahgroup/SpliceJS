@@ -27,7 +27,7 @@ definition:function(sjs){
 		    url: filename,
 				onok:function(response){
           extractTemplates.call(loader.scope,response.text);
-          loader.progress--;
+          loader.progress();
           loader.loadNext();
         }
     });
@@ -55,7 +55,7 @@ definition:function(sjs){
 			if(!linkref.readyState || linkref.readyState == 'complete') {
 			//	URL_CACHE[filename] = true;
 				loader.onitemloaded();
-				loader.progress--;
+				loader.progress();
 				loader.loadNext({});
 			}
 		};
@@ -622,6 +622,8 @@ definition:function(sjs){
 
 
   	function Template(dom){
+      if(typeof dom == 'string')  dom = constructTemplate(dom);
+
   		if(!dom) throw 'Template constructor argument must be a DOM element';
   		this.dom = dom;
   		this.dom.normalize();
@@ -654,15 +656,30 @@ definition:function(sjs){
   		var a = document.createElement('a');
   		a.setAttribute('data-sjs-tmp-anchor',child.type);
   		a.setAttribute('data-sjs-child-id',	childId);
-
-
-
   		return a;
   	};
 
+    Template.prototype.compile = function(scope){
+      var template = this;
+       /*
+      * Run notations and scripts to form a
+      * final template DOM
+      * */
+     resolveCustomElements.call(scope,template);
+
+     var component = createComponent(template.controller, template, scope);
+     scope.components[template.type] = component;
+     // export only components and
+     if(component.isComponent && component.template.export != null)
+       scope.__sjs_module_exports__[
+           component.template.export?component.template.export:template.type
+       ] = component;
+     return component;
+    };
 
 
-  	function _processIncludeAnchors(dom, controller, scope){
+
+  	Template.prototype.processIncludeAnchors = function(dom, controller, scope){
   		var anchors = dom.querySelectorAll('[data-sjs-tmp-anchor]');
 
   		for(var i=0; i < anchors.length; i++){
@@ -727,7 +744,7 @@ definition:function(sjs){
   		 * are placeholders for included templates
   		 * Process clone and attach templates
   		 * */
-  		 _processIncludeAnchors.call(this,deepClone,controllerInstance,scope);
+  		 this.processIncludeAnchors(deepClone,controllerInstance,scope);
 
 
   		/*build views*/
@@ -1240,6 +1257,7 @@ definition:function(sjs){
 
   			args = args || {};
 
+/*
   			if(args._includer_scope) {
   				var idof = args._includer_scope.singletons.constructors.indexOf(this.constructor.component);
   				if(idof >=0) {
@@ -1247,7 +1265,7 @@ definition:function(sjs){
   					return inst;
   				}
   			}
-
+*/
   /*
   			var obj = Object.create(controller.prototype);
   			obj.constructor = controller;
@@ -1309,7 +1327,9 @@ definition:function(sjs){
 
 
     exports.module(
-      Controller
+      Template,
+      Controller,
+      compileTemplate
     );
 
 }})

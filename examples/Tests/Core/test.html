@@ -2,13 +2,22 @@
 <html>
 
 <head>
-<script sjs-main="main.js"
-        sjs-splash="splash.js"
-        src="../../../splicejs/splice.js"></script>
+<script src="../../../splicejs/splice.js" sjs-main="main.js" sjs-splash="splash.js"></script>
 <title>Core Test</title>
 </head>
 <body style="background-color:#232323; color:#fefefe; font-family:Arial">
-  <p>Core test</p>
-  <sjs-include sjs-type="SpliceJS.Controls.Button"></sjs-include>
+  <table>
+    <tr><td>
+      This is an example of <sjs-include sjs-type="Controls.Button"></sjs-include> the Document Application. <br>
+      Such application is using document's body as a view template.<br>
+      Included <sjs-include sjs-type="Controls.CheckBox"></sjs-include> components are resolved and injected into document tree.<br>
+      When application is loaded compnents <sjs-include sjs-type="Controls.Button"></sjs-include> will appear on this page <br>
+    while orginal content will not be altered.</td>
+      <td>
+
+      </td>
+    </tr>
+  </table>
+
 </body>
 </html>
