@@ -3,7 +3,7 @@ definition:function splash(sjs){
 
   var document = sjs.document;
 
-  var style = "position:absolute; left:0px; top:0px; right:0px; bottom:0px; transition:opacity 0.4s;";
+  var style = "position:absolute; left:0px; top:0px; right:0px; bottom:0px; transition:opacity 0.4s;     background-color: rgba(10,10,10,0.8);";
 
   var wrapStyle ="position:absolute; left:0px; right:0px; top:50%; transition:opacity 0.4s;";
 
@@ -45,6 +45,7 @@ definition:function splash(sjs){
     },
     hide:function(){
       //return;
+      //document.body.removeChild(this.dom);
       sjs.log.info('Splash screen hide');
       this.dom.style.opacity = 0;
       var dom = this.dom;
