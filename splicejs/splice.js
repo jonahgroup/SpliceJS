@@ -50,7 +50,8 @@ SOFTWARE.
 		var config = {
 			appBase: 	getPath(window.location.href).path,
 			sjsHome:	getPath(main.getAttribute('src')).path,
-			sjsMain:	main.getAttribute('sjs-main')
+			sjsMain:	main.getAttribute('sjs-main'),
+			sjsSpla:	main.getAttribute('sjs-splash')
 		};
 
 		var sjsConfig = node.getAttribute('sjs-config');
@@ -334,7 +335,6 @@ SOFTWARE.
 		if(!this.isActive) return;
 		var loader = Loader.currentLoader = this;
 
-
 		if(loader.progress <= 0) {
 			this.iterator = null; this.oncomplete(); this.oncomplete = null; this.onitemloaded = null;
 			return;
@@ -376,6 +376,7 @@ SOFTWARE.
 		return cache;
 	};
 
+	var isSplashScreen = false;
 	function load(resources, oncomplete, onitemloaded){
 		if(!resources || resources.length < 1){
 			if(typeof oncomplete != 'function') return;
@@ -389,12 +390,22 @@ SOFTWARE.
 			if(typeof(oncomplete)  === 'function') oncomplete();
 			var queuedLoader = 	peek(Loader.loaders);
 			if(queuedLoader) queuedLoader.enable().loadNext({});
+			//hide splash screen if applicable
+			if(isSplashScreen == true && this.isInitialLoader){
+				Loader.splashScreen.hide();
+			}
 		}, onitemloaded);
 
 		//suspend current loader
 		var currentLoader = peek(Loader.loaders);
 		if(currentLoader) currentLoader.disable();
 
+		//setup splash screen if applicable
+		if(Loader.splashScreen != null && !isSplashScreen){
+			loader.isInitialLoader = true;
+			isSplashScreen = true;
+			Loader.splashScreen.show();
+		}
 		Loader.loaders.push(loader);
 		loader.loadNext({});
 	};
@@ -458,6 +469,10 @@ SOFTWARE.
 	var _moduleHandlers = {
 		'anonymous' : function anonymousModule(m, scope, _sjs){
 			m.definition.call({'scope':scope}, _sjs);
+		},
+		'splash' : function splashModule(m, scope, _sjs){
+			var s = m.definition.call({'scope':scope}, _sjs);
+			if(typeof s == 'function') Loader.splashScreen = new s();
 		}
 	};
 
@@ -537,15 +552,23 @@ var _core = mixin(Object.create(null),{
 function core(){
 	return mixin(Object.create(null),_core);
 }
+function loadMain(config){
+	if(config.sjsMain != null && config.sjsMain){
+		log.info('Loading main module: ' + config.sjsMain);
+		load([config.sjsMain]);
+	}
+}
 
 loadConfiguration(function(config){
 	PATH_VARIABLES['{sjshome}'] = config.sjsHome;
 	new Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
 	//load main modules
-	if(config.sjsMain != null && config.sjsMain){
-		log.info('Loading main module: ' + config.sjsMain);
-		load([config.sjsMain]);
+	if(config.sjsSpla != null && config.sjsSpla){
+		load([config.sjsSpla], function(){
+			loadMain(config);
+		});
 	}
+	else loadMain(config);
 });
 
 window.sjs = _core;
