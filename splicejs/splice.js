@@ -134,10 +134,21 @@ SOFTWARE.
 		return mixin({},PATH_VARIABLES);
 	}
 
+	function _split(s){
+		var regEx = /({[^}{]+})/gi
+		,	parts = []
+		, match = null;
+		while(match = regEx.exec(s)){
+			log.info(match);
+		}
+		if(parts.length == 0) parts[0] = s;
+		return parts;
+	}
+
 	// returns URL context which allow further resolutions
 	// / - page context
 	function _spv(url){
-		var parts = url.split(/({[^}{]+})/);
+		var parts = _split(url);
 		var r = "";
 		for(var i=0; i<parts.length; i++){
 			var pv = PATH_VARIABLES[parts[i]];
@@ -149,6 +160,7 @@ SOFTWARE.
 		}
 		return r;
 	}
+
 	function context(contextUrl){
 		//content must end with /
 		var ctx = contextUrl;
@@ -373,6 +385,7 @@ SOFTWARE.
 		filename = context().resolve(filename).aurl;
 
 		Loader.currentFile = this.currentFile = filename;
+		updateSplash();
 
 		//detect circular dependency here
 		detectCircular(this);
