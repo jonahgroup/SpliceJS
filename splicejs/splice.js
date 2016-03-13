@@ -135,13 +135,17 @@ SOFTWARE.
 	}
 
 	function _split(s){
-		var regEx = /({[^}{]+})/gi
+		var regEx = /{[^}{]+}/
 		,	parts = []
 		, match = null;
 		while(match = regEx.exec(s)){
+			var before = s.substring(0,match.index);
+			var item = match[0];
+			s = s.substring(match.index + item.length);
+			parts.push(before); parts.push(item);
 			log.info(match);
 		}
-		if(parts.length == 0) parts[0] = s;
+		parts.push(s);
 		return parts;
 	}
 
