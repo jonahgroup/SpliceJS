@@ -51,7 +51,8 @@ SOFTWARE.
 			appBase: 	getPath(window.location.href).path,
 			sjsHome:	getPath(main.getAttribute('src')).path,
 			sjsMain:	main.getAttribute('sjs-main'),
-			sjsSpla:	main.getAttribute('sjs-splash')
+			splash:	main.getAttribute('sjs-splash'),
+			mode:			main.getAttribute('sjs-start-mode')
 		};
 
 		var sjsConfig = node.getAttribute('sjs-config');
@@ -603,17 +604,25 @@ function loadMain(config){
 		load([config.sjsMain]);
 	}
 }
-
-loadConfiguration(function(config){
-	PATH_VARIABLES['{sjshome}'] = config.sjsHome;
-	new Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
+function start(config){
 	//load main modules
-	if(config.sjsSpla != null && config.sjsSpla){
-		load([config.sjsSpla], function(){
+	if(config.splash != null && config.splash){
+		load([config.splash], function(){
 			loadMain(config);
 		});
 	}
 	else loadMain(config);
+}
+
+loadConfiguration(function(config){
+	PATH_VARIABLES['{sjshome}'] = config.sjsHome;
+	new Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
+
+	if(config.mode == 'onload'){
+		window.onload = function(){ start(config);}
+	} else {
+		_core.start = function(){start(config);}
+	}
 });
 
 window.sjs = _core;
