@@ -37,7 +37,7 @@ SOFTWARE.
 		var head = document.head || document.getElementsByTagName('head')[0];
 		// cycle through all script elements in document's head
 		for(var i=0; i < head.childNodes.length; i++){
-			var node = document.head.childNodes[i];
+			var node = head.childNodes[i];
 			if(!node.getAttribute) continue;
 			if(node.getAttribute('sjs-main') != null) {
 				main = node; break;
@@ -143,7 +143,6 @@ SOFTWARE.
 			var item = match[0];
 			s = s.substring(match.index + item.length);
 			parts.push(before); parts.push(item);
-			log.info(match);
 		}
 		parts.push(s);
 		return parts;
