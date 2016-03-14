@@ -54,15 +54,15 @@ definition:function(sjs){
 			*/
 			this.__sjs_base__ = base.prototype;
 
-			this.prototype.super = function(){
+			this.prototype.base = function(){
 			/*
 					ensure super constructor is invoked only once
 					attach super prototype methods
 			*/
-			this.super = function(){};
+			this.base = function(){};
 
 			__super(this,_class.__sjs_base__, arguments);
-			this.super = function(__class){
+			this.base = function(__class){
 					if(!(this instanceof __class))
 						throw 'Invalid super class "' + getFunctionName(__class) + '" of class "' + getFunctionName(_class) + '"' ;
 					return _inheritance_map.call(this,__class.prototype);
@@ -76,6 +76,6 @@ definition:function(sjs){
 	sjs.exports.module({
 		Class
 	});
-  
+
 }
 });

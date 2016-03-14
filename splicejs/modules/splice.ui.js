@@ -141,7 +141,7 @@ definition:function component(sjs){
 	 * Base UIControl class
 	 */
 	var UIControl = Class(function UIControl(args){
-		this.super(args);
+		this.base(args);
 
 		event(this).attach({
 			onDataOut  : event.multicast,

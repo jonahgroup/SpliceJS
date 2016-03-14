@@ -19,7 +19,7 @@ definition:function component(sjs){
 	, event = scope.Event.event;
 
 	var Button = Class(function ButtonController(args){
-		this.super(args);
+		this.base(args);
 
 		event(this).attach({
 			onClick : event.multicast
@@ -69,7 +69,7 @@ definition:function component(sjs){
 	 * Check box
 	 * */
 	var CheckBox = Class(function CheckBoxController(args){
-		this.super(args);
+		this.base(args);
 		this.isChecked = false;
 
 		event(this).attach({onChecked:event.multicast});
@@ -117,7 +117,7 @@ definition:function component(sjs){
 	 * RadioButton
 	 * */
 	var RadioButton = Class(function RadioButtonController(args){
-		this.super(arguments);
+		this.base(arguments);
 
 		var self = this;
 		this.elements.root.onclick = function(){
@@ -153,7 +153,7 @@ definition:function component(sjs){
 
 
 	var TextField = Class(function TextFieldController(args){
-		this.super(args);
+		this.base(args);
 		this.trapMouseInput = args.trapMouseInput;
 	}).extend(UIControl);
 
