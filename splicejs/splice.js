@@ -256,10 +256,14 @@ SOFTWARE.
 		return s.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
 	}
 	function fname(foo){
+		/*
+		-- support regular expression only
+		because MS Edge browser does not support the name property
 		if(foo.name != null) {
 			if(foo.name) return foo.name;
 			return 'anonymous';
 		}
+		*/
     if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
     var match = /function(\s*[A-Za-z0-9_\$]*)\(/.exec(foo.toString());
     if(!match)  return 'anonymous';
