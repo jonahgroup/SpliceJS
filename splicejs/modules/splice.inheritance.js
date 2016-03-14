@@ -73,9 +73,9 @@ definition:function(sjs){
 		return _class;
 	};
 
-	sjs.exports.module({
+	sjs.exports.module(
 		Class
-	});
+	);
 
 }
 });

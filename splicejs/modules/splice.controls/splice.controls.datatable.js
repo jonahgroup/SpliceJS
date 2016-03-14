@@ -416,7 +416,7 @@ definition: function component(sjs){
 
 		/* add columns based on the template */
 		if(!this.headRow) {
-			this.headRow = new this.headRowTemplate({parent:this,columnCount});
+			this.headRow = new this.headRowTemplate({parent:this,columnCount:columnCount});
 		}
 		//update create header row template nodes
 		this.headRow.dataIn({data:headers});
@@ -450,7 +450,7 @@ definition: function component(sjs){
 
 			//data_row = new this.bodyRowTemplate({parent:this, columnCount});
 			if(this.isTreeTable)
-				data_row = new TreeRow(new this.bodyRowTemplate({parent:this, columnCount}));
+				data_row = new TreeRow(new this.bodyRowTemplate({parent:this, columnCount:columnCount}));
 			else
 				data_row = new this.bodyRowTemplate({parent:this, columnCount});
 

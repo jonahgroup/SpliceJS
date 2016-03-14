@@ -156,9 +156,9 @@ definition:function(sjs){
 	}
 
 	//module exports
-	exports.module({
+	exports.module(
 		StoryBoard, Animation, Animate
-	});
+	);
 
 }
 });

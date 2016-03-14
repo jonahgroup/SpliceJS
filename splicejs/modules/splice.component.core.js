@@ -751,7 +751,9 @@ definition:function(sjs){
   		/*build views*/
   		views.root = new View(deepClone.children[0],{simple:true});
   		views.root.contentMap = rootContentMap;
-  		views.root.htmlElement.__sjs_controller__ = controllerInstance;
+      // what does view.root.isSimple do?????
+      if(views.root.htmlElement)
+  		  views.root.htmlElement.__sjs_controller__ = controllerInstance;
   		controllerInstance.views = views;
 
   		/*content applicator*/

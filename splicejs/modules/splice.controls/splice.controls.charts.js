@@ -228,7 +228,7 @@ definition:function component(sjs){
 					showPoints:d.showPoints,
 					pointSize:d.pointSize,
 					svg : d3.select(this),
-					scale:{x,y},
+					scale:{x:x,y:y},
 					width:width,
 					height:height}
 				,d3
