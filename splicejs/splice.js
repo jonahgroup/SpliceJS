@@ -51,7 +51,8 @@ SOFTWARE.
 			appBase: 	getPath(window.location.href).path,
 			sjsHome:	getPath(main.getAttribute('src')).path,
 			sjsMain:	main.getAttribute('sjs-main'),
-			splash:	main.getAttribute('sjs-splash'),
+			splash:		main.getAttribute('sjs-splash'),
+			version:		main.getAttribute('sjs-version'),
 			mode:			main.getAttribute('sjs-start-mode')
 		};
 
@@ -135,15 +136,15 @@ SOFTWARE.
 		return mixin({},PATH_VARIABLES);
 	}
 
-	function _split(s){
-		var regEx = /{[^}{]+}/
-		,	parts = []
+	function _split(s,regEx,skip){
+		var parts = []
 		, match = null;
 		while(match = regEx.exec(s)){
 			var before = s.substring(0,match.index);
 			var item = match[0];
 			s = s.substring(match.index + item.length);
-			parts.push(before); parts.push(item);
+			parts.push(before);
+			if(!skip)	parts.push(item);
 		}
 		parts.push(s);
 		return parts;
@@ -152,7 +153,7 @@ SOFTWARE.
 	// returns URL context which allow further resolutions
 	// / - page context
 	function _spv(url){
-		var parts = _split(url);
+		var parts = _split(url,/{[^}{]+}/);
 		var r = "";
 		for(var i=0; i<parts.length; i++){
 			var pv = PATH_VARIABLES[parts[i]];
@@ -250,9 +251,9 @@ SOFTWARE.
 		return null;
 	};
 	//some browsers to not support trim function on strings
-	function trim(s){return
+	function _trim(s){if(!s) return s;
 		if(String.prototype.trim) return s.trim();
-		s.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+		return s.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
 	}
 	function fname(foo){
 		if(foo.name != null) {
@@ -262,7 +263,7 @@ SOFTWARE.
     if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
     var match = /function(\s*[A-Za-z0-9_\$]*)\(/.exec(foo.toString());
     if(!match)  return 'anonymous';
-		var name = trim(match[1]);
+		var name = _trim(match[1]);
 		if(!name) return 'anonymous';
 		return name;
   }
@@ -511,6 +512,74 @@ SOFTWARE.
 		}
 	};
 
+	function _acopy(s,t){
+		if(!s) return;
+		if(!(s instanceof Array)) return;
+		var keys = Object.keys(s);
+		for(var key in keys){
+			t[keys[key]] = s[keys[key]];
+		}
+	}
+
+	function _vercomp(v1,v2){
+		if(v1 == '*' || v2 == '*') return 0;
+
+		v1 = _split(v1,/\./,true);
+		v2 = _split(v2,/\./,true);
+		//padd and compare version numbers
+		for(var i=0; i<3; i++){
+			//padd
+			if(v1[i] == null) v1[i] = 0;
+			if(v2[i] == null) v2[i] = 0;
+			// compare
+			var r = (+v1[i]-(+v2[i]));
+			if(r == 0) continue;
+			return r/Math.abs(r);
+		}
+		return 0;
+	}
+
+	function _required(m,ctx){
+		var r = {resources:[], imports:[]};
+		if(!m.required) return r;
+
+		var items = [];
+		//all required
+		if(m.required instanceof Array) items = m.required;
+
+		var version = _core.config.version;
+
+		//versioned required
+		if(typeof m.version == 'object' && version){
+			//extract versions
+			var versions = [];
+			var keys = Object.keys(m.version);
+			for(var key in keys){
+				var parts = _split(keys[key],/-/,true);
+				versions.push({from:_trim(parts[0]), to:_trim(parts[1]), required:m.version[keys[key]]});
+			}
+			//evaluate versions
+			for(var i=0; i<versions.length; i++){
+				var ver = versions[i];
+				//exact version
+				var pass = false;
+				if(!ver.to){
+					pass = (_vercomp(ver.from, version) == 0);
+				} else { //range is present
+					pass = (_vercomp(ver.from, version) <= 0 &&  _vercomp(ver.to, version) >= 0);
+				}
+				if(pass == true) _acopy(ver.required, items);
+			}
+		}
+
+
+		for(var i=0; i < items.length; i++){
+			var imp = ctx.resolve(items[i]);
+			r.resources.push(imp.url); r.imports.push(imp);
+		}
+		return r;
+	}
+
 	var MODULE_MAP = new Object(null);
 	var _moduleHandlers = {
 		'anonymous' : function anonymousModule(m, scope, _sjs){
@@ -535,16 +604,12 @@ SOFTWARE.
 			url:url
 		};
 		var ctx = context(path);
-		var required = [],	imports = [];
-		if(m.required)
-		for(var i=0; i<m.required.length; i++){
-			var imp = ctx.resolve(m.required[i]);
-			required.push(imp.url); imports.push(imp);
-		}
+		var	required = _required(m,ctx);
+
 		var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
 
-		load.call(scope,required, function(){
-			applyImports.call(scope,imports);
+		load.call(scope,required.resources, function(){
+			applyImports.call(scope,required.imports);
 			if(typeof m.definition === 'function') {
 				var handler = _moduleHandlers[fname(m.definition)];
 				if(handler == null) throw 'Handler for "' + fname(m.definition) + '" is not found' ;
@@ -593,6 +658,7 @@ var _core = mixin(Object.create(null),{
 	log 			: log,
 	core		  : core,
 	getPath		: getPath,
+	vercomp		: _vercomp,
 	document	:	document
 });
 function core(){
@@ -617,7 +683,7 @@ function start(config){
 loadConfiguration(function(config){
 	PATH_VARIABLES['{sjshome}'] = config.sjsHome;
 	new Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
-
+	_core.config = config;
 	if(config.mode == 'onload'){
 		window.onload = function(){ start(config);}
 	} else {
