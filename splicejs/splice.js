@@ -326,6 +326,7 @@ SOFTWARE.
 					URL_CACHE[filename] = true;
 					loader.onitemloaded();
 					loader.progress();
+					
 					loader.loadNext({});
 				}
 			};
@@ -448,8 +449,6 @@ SOFTWARE.
 				Loader.splashScreen.hide();
 			}
 		}, onitemloaded);
-
-
 
 		//setup splash screen if applicable
 		if(Loader.splashScreen != null && !isSplashScreen){
@@ -586,7 +585,7 @@ SOFTWARE.
 
 	var MODULE_MAP = new Object(null);
 	var _moduleHandlers = {
-		'anonymous' : function anonymousModule(m, scope, _sjs){
+		'default' : function anonymousModule(m, scope, _sjs){
 			m.definition.call({'scope':scope}, _sjs);
 		},
 		'splash' : function splashModule(m, scope, _sjs){
@@ -615,8 +614,8 @@ SOFTWARE.
 		load.call(scope,required.resources, function(){
 			applyImports.call(scope,required.imports);
 			if(typeof m.definition === 'function') {
-				var handler = _moduleHandlers[fname(m.definition)];
-				if(handler == null) throw 'Handler for "' + fname(m.definition) + '" is not found' ;
+				var handler = _moduleHandlers[m.type||'default'];
+				if(handler == null) throw 'Handler for "' + m.type + '" is not found' ;
 				handler(m, scope, _sjs);
 				MODULE_MAP[url] = scope.__sjs_module_exports__;
 			}

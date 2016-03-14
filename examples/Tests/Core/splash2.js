@@ -1,5 +1,7 @@
 sjs.module({
-definition:function splash(sjs){
+type:'splash'
+,  
+definition:function(sjs){
 
   var document = sjs.document;
 

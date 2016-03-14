@@ -1,4 +1,6 @@
 sjs.module({
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events			: '/{sjshome}/modules/splice.event.js'},
@@ -8,7 +10,7 @@ required:[
 	'splice.controls.treeview.html'
 ]
 ,
-definition:function component(){
+definition:function(){
 	var
 		scope = this.scope
 	;

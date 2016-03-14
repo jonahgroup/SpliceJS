@@ -1,10 +1,11 @@
 sjs.module({
+  type:'component',
   required:[
     { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
     {'SpliceJS.Controls':'splice.controls.dropdownlist.js'}
     // 'splice.controls.combobox.html'
   ],
-  definition:function component(sjs){
+  definition:function(sjs){
 
     var
       scope = this.scope

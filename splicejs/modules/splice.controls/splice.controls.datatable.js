@@ -1,6 +1,7 @@
 /* global sjs */
 sjs.module({
-
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
@@ -15,9 +16,9 @@ required:[
 	'splice.controls.css',
 	'splice.controls.datatable.css',
 	'splice.controls.datatable.html'
-],
-
-definition: function component(sjs){
+]
+,
+definition: function(sjs){
 	"use strict";
 
 	function _if(obj){

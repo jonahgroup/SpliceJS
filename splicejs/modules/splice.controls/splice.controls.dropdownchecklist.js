@@ -1,13 +1,15 @@
 sjs.module({
-
-	required:[
+type:'component'
+,
+required:[
 		{'SpliceJS.UI':'../splice.ui.js'},
 		{'SpliceJS.Controls':'splice.controls.selectors.js'},
 		{'SpliceJS.Controls':'splice.controls.checklistbox.js'},
 		'splice.controls.dropdownchecklist.html'
-	],
+]
+,
 
-	definition:function component(sjs){
+definition:function(sjs){
 		"use strict";
 
 	var scope = this.scope

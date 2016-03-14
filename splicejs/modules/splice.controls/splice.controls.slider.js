@@ -1,11 +1,14 @@
 ﻿sjs.module({
+type:'component'
+,
 required: [
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
   {'SpliceJS.UI':'../splice.ui.js'},
   'splice.controls.slider.css',
   'splice.controls.slider.html'
-],
-definition:function component(sjs){
+]
+,
+definition:function(sjs){
 
   /* framework imports */
   var

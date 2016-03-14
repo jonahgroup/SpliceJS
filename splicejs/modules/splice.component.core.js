@@ -604,9 +604,9 @@ definition:function(sjs){
   	Controller.prototype.content = function(content){
   		var self = this;
   		return {
-  			replace: function(){_controllerContentMapper.call(self,content, replaceContent)},
-  			add: 		 function(){_controllerContentMapper.call(self,content, addContent)},
-  			remove:  function(){_controllerContentMapper.call(self,content, removeContent)}
+  			replace: function(){_controllerContentMapper.call(self,content, View.replaceContent)},
+  			add: 		 function(){_controllerContentMapper.call(self,content, View.addContent)},
+  			remove:  function(){_controllerContentMapper.call(self,content, View.removeContent)}
   		}
   	};
 

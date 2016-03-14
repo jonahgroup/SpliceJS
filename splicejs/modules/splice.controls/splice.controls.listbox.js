@@ -1,5 +1,6 @@
 sjs.module({
-
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events      : '/{sjshome}/modules/splice.event.js'},
@@ -8,9 +9,9 @@ required:[
 	{'Doc':'/{sjshome}/modules/splice.document.js'},
 	'splice.controls.listbox.css',
 	'splice.controls.listbox.html'
-],
-
-definition:function component(sjs){
+]
+,
+definition:function(sjs){
 
 
 	var	exports = sjs.exports

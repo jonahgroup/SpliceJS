@@ -1,5 +1,5 @@
 sjs.module({
-version: '1.0.0'
+type:'component'
 ,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
@@ -11,7 +11,7 @@ required:[
 	'splice.controls.scrollpanel.html'
 ]
 ,
-definition:function component(sjs){
+definition:function(sjs){
 
 
 	var exports 	= sjs.exports

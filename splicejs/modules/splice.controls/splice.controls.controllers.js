@@ -1,14 +1,15 @@
 /* global _*/
 sjs.module({
-
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Component: '/{sjshome}/modules/splice.component.core.js'},
 	{'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
 	 'splice.controls.controllers.html'
-],
-
-definition:function component(sjs){
+]
+,
+definition:function(sjs){
 
 	var scope = this.scope
 	,	event = sjs.event

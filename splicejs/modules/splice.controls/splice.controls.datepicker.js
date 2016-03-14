@@ -1,5 +1,6 @@
 sjs.module({
-
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events			: '/{sjshome}/modules/splice.event.js'},
@@ -10,8 +11,7 @@ required:[
 	'splice.controls.datepicker.html'
 ]
 ,
-
-definition:function component(sjs){
+definition:function(sjs){
 	"use strict";
 
 	var scope = this.scope

@@ -1,5 +1,6 @@
 sjs.module({
-
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events			: '/{sjshome}/modules/splice.event.js'},
@@ -10,7 +11,7 @@ required:[
 	'splice.controls.selectors.html'
 ]
 ,
-definition:function component(sjs){
+definition:function(sjs){
 	"use strict";
 
 	/* framework imports */

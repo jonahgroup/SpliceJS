@@ -1,4 +1,6 @@
 sjs.module({
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events			: '/{sjshome}/modules/splice.event.js'},
@@ -6,9 +8,9 @@ required:[
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
 	{'SpliceJS.Controls':'splice.controls.listbox.js'},
 	'splice.controls.dropdownlist.html'
-],
-
-definition:function component(sjs){
+]
+,
+definition:function(sjs){
 	"use strict";
 
 	var scope = this.scope

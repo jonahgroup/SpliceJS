@@ -1,5 +1,7 @@
 /* global sjs */
 sjs.module({
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
 	{ Event 			: '/{sjshome}/modules/splice.event.js' },
@@ -9,7 +11,7 @@ required:[
 	'splice.controls.buttons.html'
 ]
 ,
-definition:function component(sjs){
+definition:function(sjs){
 	var scope = this.scope
 	,	exports = sjs.exports
 	,	debug = sjs.log.debug;

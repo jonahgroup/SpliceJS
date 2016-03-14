@@ -1,5 +1,7 @@
 /* global _ */
 sjs.module({
+type:'component'
+,
 required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
 ,	{ Events      : '/{sjshome}/modules/splice.event.js'}
@@ -32,7 +34,7 @@ required:[
 , 'splice.controls/splice.controls.html'
 ]
 ,
-definition:function component(sjs){
+definition:function(sjs){
 	"use strict";
 	var scope = this.scope;
 
@@ -101,7 +103,6 @@ definition:function component(sjs){
 		{TextField:			scope.Buttons.TextField},
 		{Slider:				scope.Buttons.Slider},
 		/* panels */
-
 		{DrawerPanel:		scope.Panels.DrawerPanel},
 		{ViewPanel:			scope.Panels.ViewPanel},
 		{ScrollPanel:		scope.Panels.ScrollPanel},
@@ -129,7 +130,6 @@ definition:function component(sjs){
 		{TreeView:					scope.DataControls.TreeView},
 		{TreeTable:					scope.DataControls.TreeTable},
 		{CheckListBox:			scope.DataControls.CheckListBox},
-
 		/* Navigation */
 		{Popup:					scope.Navigation.Popup},
 		{PageLoader:		scope.Navigation.PageLoader},

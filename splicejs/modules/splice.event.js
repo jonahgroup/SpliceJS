@@ -1,7 +1,8 @@
 sjs.module({
 required:[
   { Document  : '/{sjshome}/modules/splice.document.js'},
-  { Views      : '/{sjshome}/modules/splice.view.js'}
+  { Views     : '/{sjshome}/modules/splice.view.js'},
+  { Sync      : '/{sjshome}/modules/splice.async.js'}
 ],
 definition:function(sjs){
 
@@ -30,7 +31,6 @@ definition:function(sjs){
   		return {x:posx,y:posy};
   	};
 
-
   	function domEventArgs(e){
   		return {
   			mouse: mousePosition(e),
@@ -44,7 +44,7 @@ definition:function(sjs){
   	};
 
   	/**
-  		@param {object} instance - taget object instance to
+  		@param {object} instance - target object instance to
   		receive event configuration
   	*/
   	function Event(instance){
@@ -61,26 +61,25 @@ definition:function(sjs){
   			}
   		}
 
-
   		this.eventType = 'multicast';
   		this.isStop = false;
   	};
 
   	Event.prototype.transform = function(fn){
-  		var e = mixin(new Event(),this)
+  		var e = mixin(new Event(),this);
   		e.transformer = fn;
   		return e;
   	};
 
   	Event.prototype.stop = function(fn){
-  		var e = mixin(new Event(),this)
+  		var e = new Event();
   		e.transformer = fn;
   		e.isStop = true;
   		return e;
   	};
 
   	Event.multicast = (function(){
-  		var e = mixin(new Event(),this)
+  		var e = new Event();
   		e.eventType= 'multicast';
 
   		e.stop = mixin(new Event(),e);
@@ -90,7 +89,7 @@ definition:function(sjs){
   	})();
 
   	Event.unicast = (function(){
-  		var e = mixin(new Event(),this)
+  		var e = new Event();
   		e.eventType= 'unicast';
 
   		e.stop = mixin(new Event(),e);
@@ -98,10 +97,6 @@ definition:function(sjs){
 
   		return e;
   	})();
-
-
-
-
 
   	Event.prototype.attach = function(object, property, cancelBubble){
 

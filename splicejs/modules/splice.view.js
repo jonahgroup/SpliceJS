@@ -276,7 +276,7 @@ definition:function(sjs){
   };
 
 
-  function addContent(content,key){
+  View.addContent = function addContent(content,key){
   	if(!key) key = 'default';
 
   	var target = this.contentMap[key];
@@ -291,7 +291,7 @@ definition:function(sjs){
   	target.n++;
   };
 
-  function replaceContent(content,key){
+  View.replaceContent = function replaceContent(content,key){
   	if(content == null) return this;
   	if(!key) key = 'default';
   	//coercive comparision, checks null and undefined
@@ -322,7 +322,7 @@ definition:function(sjs){
   	return this;
   };
 
-  function removeContent(content, key){
+  View.removeContent = function removeContent(content, key){
   	if(!key) key = 'default';
 
   	var target = this.contentMap[key];
@@ -348,8 +348,8 @@ definition:function(sjs){
   	var node = target.cache;
   };
 
-  View.prototype.add = addContent;
-  View.prototype.replace = replaceContent;
+  View.prototype.add = View.addContent;
+  View.prototype.replace = View.replaceContent;
 
 
   View.prototype.position = function(){

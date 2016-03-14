@@ -1,11 +1,13 @@
 sjs.module({
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.pageloader.html'
 ]
 ,
-definition:function component(){
+definition:function(){
 
 	var
 		scope = this.scope

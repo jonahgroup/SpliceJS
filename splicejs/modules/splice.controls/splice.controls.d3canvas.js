@@ -1,14 +1,15 @@
 /* global d3 */
 sjs.module({
-
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'/{sjshome}/lib/d3-3.5.5/d3.min.js',
 	'splice.controls.d3canvas.html'
-],
-
-definition:function component(sjs){
+]
+,
+definition:function(sjs){
 
 	var
 	 	exports = sjs.exports

@@ -1,4 +1,5 @@
 sjs.module({
+type:'component',
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
 	{ Networking  : '/{sjshome}/modules/splice.network.js'},
@@ -6,10 +7,7 @@ required:[
 	'splice.controls.codeeditor.css',
 	'splice.controls.codeeditor.html'
 ],
-
-
-definition:function component(sjs){
-
+definition:function(sjs){
 	var
 		scope = this.scope
 	;

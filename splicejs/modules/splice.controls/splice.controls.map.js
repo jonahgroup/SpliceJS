@@ -1,4 +1,6 @@
 sjs.module({
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
@@ -6,9 +8,9 @@ required:[
 	'/{sjshome}/lib/leaflet-0.7.3/leaflet-src.js',
 	'splice.controls.map.css',
 	'splice.controls.map.html',
-],
-
-definition:function component(){
+]
+,
+definition:function(){
 	var scope = this.scope
 
 	var

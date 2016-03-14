@@ -1,4 +1,6 @@
 sjs.module({
+type:'component'
+,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI': '{sjshome}/modules/splice.ui.js'},
@@ -6,9 +8,9 @@ required:[
 	'splice.controls.transitions.css',
 	'splice.controls.drawerpanel.css',
 	'splice.controls.drawerpanel.html'
-],
-
-definition:function component(){
+]
+,
+definition:function(){
 
 	var
 		scope = this.scope
