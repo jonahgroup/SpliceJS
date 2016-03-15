@@ -73,8 +73,6 @@ definition:function(sjs){
 	,	right 	= 3
 	,	bottom 	= 4
 	,	move 	= 5;
-
-
 	/*
 	*
 	*	Cell container class

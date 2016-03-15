@@ -224,6 +224,7 @@ definition:function(sjs){
   	/*
   	*	do not allow duplicate content keys
   	*/
+    //!!!!!!!!!!!!!!!!!!!!! MOVE TO ANOTHER MODULE !!!!!!!!!!!!!!!!!!!!!!!!!
   	function buildContentMap(element){
   		var contentNodes = element.querySelectorAll('[sjs-content]')
   		,	cMap = {};

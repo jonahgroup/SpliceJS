@@ -4,6 +4,7 @@ type:'component'
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events      : '/{sjshome}/modules/splice.event.js'},
+	{ Views				: '/{sjshome}/modules/splice.view.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	{'Doc':'/{sjshome}/modules/splice.document.js'},
@@ -14,15 +15,21 @@ required:[
 definition:function(sjs){
 	"use strict";
 
-	var	exports = sjs.exports
-	,		debug =	sjs.log.debug
-	, 	components = this.scope.components;
+	var
+		exports = sjs.exports
+	,	debug =	sjs.log.debug
+	,	components = this.scope.components
+	,	scope = this.scope
+	;
 
 	var	UIControl = this.scope.SpliceJS.UI.UIControl
 	,	DataItem = this.scope.SpliceJS.UI.DataItem
 	, Class = this.scope.Inheritance.Class
 	,	dom = this.scope.Doc.dom
-	,	event = this.scope.Events.event;
+	,	View = scope.Views.View
+	,	event = this.scope.Events.event
+	;
+
 
 	var ListBoxController = Class(function ListBoxController(){
 			this.base();
@@ -142,7 +149,7 @@ definition:function(sjs){
 
 	var DefaultListItem = Class(function DefaultListItem(){
 		this.views = {
-			root: sjs.view('<div sjs-content="default"></div>').class('-sjs-listbox-item').add()
+			root: View('<div sjs-content="default"></div>').class('-sjs-listbox-item').add()
 		}
 	});
 

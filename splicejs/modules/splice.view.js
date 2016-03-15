@@ -187,6 +187,31 @@ definition:function(sjs){
   };
 
 
+
+  function buildContentMap(element){
+    var contentNodes = element.querySelectorAll('[sjs-content]')
+    ,	cMap = {};
+
+    if(!contentNodes) return;
+    var node = element;
+    for(var i=0; i<=contentNodes.length; i++){
+      var attr = node.getAttribute('sjs-content');
+      if(!attr) {
+        node = contentNodes[i];
+        continue;
+      }
+      var keys = attr.split(' ');
+      for(var k=0; k<keys.length; k++){
+        var key = keys[k];
+        if(cMap[key]) throw 'Duplicate content map key ' + key;
+        cMap[key] = {source:node, cache:null, n:0};
+      }
+      node = contentNodes[i];
+    }
+    return cMap;
+  };
+
+
   /**
   */
   function ViewReflow(){
@@ -219,6 +244,9 @@ definition:function(sjs){
   	Dom manipulation api
   */
   function View(dom, args){
+    if(!(this instanceof View)){
+      return new View(dom,args);
+    }
   	if(typeof dom === 'string'){
   		this.htmlElement = (function(d){
   			var e = document.createElement(null);
