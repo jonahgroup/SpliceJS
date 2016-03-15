@@ -12,7 +12,7 @@ required:[
 ]
 ,
 definition:function(sjs){
-
+	"use strict";
 
 	var	exports = sjs.exports
 	,		debug =	sjs.log.debug
@@ -162,7 +162,7 @@ definition:function(sjs){
 		Container controller
 	*/
 	var ListItemController = Class(function ListItemController(args){
-		this.super(args);
+		this.base(args);
 
 		var self = this;
 /*

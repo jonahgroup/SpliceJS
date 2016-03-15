@@ -8,9 +8,11 @@ required:[
   { Views      : '/{sjshome}/modules/splice.view.js'}
 ],
 definition:function(sjs){
-
+  "use strict";
   var scope = this.scope
-  , exports = sjs.exports;
+  , exports = sjs.exports
+  , log = sjs.log
+  ;
 
   var http = scope.Networking.http
   , doc = scope.Document
@@ -1070,7 +1072,7 @@ definition:function(sjs){
   			break;
 
   		case BINDING_TYPES.TYPE:
-  			logging.debug.log('Resolving binding to type: ' + binding.vartype);
+  			log.debug('Resolving binding to type: ' + binding.vartype);
   			var parent = instance;
 
   			//1. component lookup
@@ -1083,7 +1085,7 @@ definition:function(sjs){
 
   			while(parent) {
   				if(parent.__sjs_type__ === vartype.__sjs_type__ || (parent instanceof vartype)) {
-  					logging.debug.log('Found instance of type: ' + binding.vartype);
+  					log.debug('Found instance of type: ' + binding.vartype);
 
   					var v = Binding.Value(parent);
 
