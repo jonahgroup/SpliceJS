@@ -27,7 +27,7 @@ definition:function(sjs){
 	 * Drop down list
 	 * */
 	var DropDownListController = Class(function DropDownListController(args){
-		this.super();
+		this.base();
 
 		event(this).attach({
 			onDropDown : event.multicast,

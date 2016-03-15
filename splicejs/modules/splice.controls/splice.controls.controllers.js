@@ -5,6 +5,7 @@ type:'component'
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Component: '/{sjshome}/modules/splice.component.core.js'},
+	{ Event: '/{sjshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
 	 'splice.controls.controllers.html'
 ]
@@ -12,15 +13,17 @@ required:[
 definition:function(sjs){
 
 	var scope = this.scope
-	,	event = sjs.event
+
 	,	exports = sjs.exports;
 
 	var Class = scope.Inheritance.Class
 	,	Controller = scope.Component.Controller
-	, UIControl = scope.SpliceJS.UI.UIControl;
+	, UIControl = scope.SpliceJS.UI.UIControl
+	,	event = scope.Event.event
+	;
 
 	var DomIterator = Class(function DomIteratorController(args){
-		this.super();
+		this.base();
 		this.elements = [];
 
 		event(this).attach({

@@ -1,7 +1,18 @@
 sjs.module ({
+required:[
+    {Syntax:  '/{sjshome}/modules/splice.syntax.js'}
+]
+,
 definition:function(sjs){
 
-  var exports = sjs.exports;
+  var
+    scope = this.scope
+    exports = sjs.exports
+  ;
+
+  var
+    Tokenizer = scope.Syntax.Tokenizer
+  ;
 
   function dfs(dom, target, filterFn, nodesFn){
     if(!dom) return;
@@ -347,6 +358,8 @@ definition:function(sjs){
   	}
   	var node = target.cache;
   };
+
+  View.display = display;
 
   View.prototype.add = View.addContent;
   View.prototype.replace = View.replaceContent;

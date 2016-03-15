@@ -26,14 +26,14 @@ required:[
     var
       Class = scope.Inheritance.Class
     , event = scope.Events.event
-    , proxy = scope.Component.proxy
+    , proxy = scope.Component.Proxy
     , DataItem = scope.SpliceJS.UI.DataItem
     , dom = scope.Doc.dom
     , components = scope.components;
     ;
 
     var CheckListBoxController = Class(function CheckListBoxController(args){
-      this.super(args);
+      this.base(args);
       event(this).attach({
         onSelection : event.multicast
       });
@@ -43,7 +43,7 @@ required:[
       Check list element item
     */
     var CheckListItemController = Class(function CheckListItemController(){
-      this.super();
+      this.base();
     }).extend(scope.SpliceJS.Controls.ListItemController);
 
     CheckListItemController.prototype.onDataIn = function(item){
@@ -73,7 +73,7 @@ required:[
       var listBox = null;
 
       if(!this.itemTemplate){
-        args.itemTemplate = sjs.proxy({
+        args.itemTemplate = proxy({
           type:'components.CheckListBoxItem',
           itemCheckPath: args.itemCheckPath,
           itemContentPath: args.itemContentPath

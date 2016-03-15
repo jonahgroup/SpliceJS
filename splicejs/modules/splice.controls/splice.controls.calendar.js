@@ -210,7 +210,7 @@ definition:function(sjs){
 
 
 	var Calendar = Class(function CalendarController(){
-		this.super();
+		this.base();
 
 		event(this).attach({
 			onDateSelected : event.multicast

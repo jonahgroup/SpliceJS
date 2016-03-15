@@ -5,6 +5,7 @@ required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events			: '/{sjshome}/modules/splice.event.js'},
 	{ Component		: '/{sjshome}/modules/splice.component.core.js'	},
+	{	Views 			: '/{sjshome}/modules/splice.view.js'	},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'Doc':'{sjshome}/modules/splice.document.js'},
 	'splice.controls.selectors.css',
@@ -16,8 +17,9 @@ definition:function(sjs){
 
 	/* framework imports */
 	var exports = sjs.exports
-	,	display = sjs.display
-	,	scope = this.scope;
+
+	,	scope = this.scope
+	;
 
 	/* dependency imports */
 	var	Positioning = scope.SpliceJS.UI.Positioning
@@ -26,6 +28,7 @@ definition:function(sjs){
 	,	Class = scope.Inheritance.Class
 	, Controller = scope.Component.Controller
 	,	event = scope.Events.event
+	,	display = scope.Views.View.display
 	;
 	//static single instance
 	var dropDownContainer = new scope.components.DropDownContainerResizable()
@@ -37,7 +40,7 @@ definition:function(sjs){
 
 	//
 	var DropDownController = Class(function DropDownController(args){
-		this.super(args);
+		this.base(args);
 
 		event(this).attach({
 			onDropDown : event.multicast

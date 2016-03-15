@@ -26,7 +26,7 @@ definition:function(sjs){
 	;
 
 	var DatePicker = Class(function DatePickerController(){
-		this.super();
+		this.base();
 
 		event(this).attach({
 			onDateSelected : event.multicast

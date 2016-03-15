@@ -16,11 +16,21 @@ definition:function(sjs){
 
     var
       Class = scope.Inheritance.Class
+    , Controller = scope.Component.Controller
     ;
 
-    var MainController = Class(function MainController{
+    var MainController = Class(function MainController(){
 
-    }).extend();
+    }).extend(Controller);
+
+    MainController.prototype.buttonClick = function(item){
+      sjs.log.info('Click');
+    };
+
+
+    sjs.exports.scope(
+      MainController
+    );
 
     new this.scope.Component.DocumentApplication(this.scope).run();
 

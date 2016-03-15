@@ -1,26 +1,35 @@
-sjs({
-
+sjs.module({
+type:'component'
+,
 required:[
-  '{sjshome}/modules/splice.animation.js',
-  '{sjshome}/modules/splice.network.js',
-  '{sjshome}/modules/splice.document.js',
-  '{sjshome}/modules/splice.data.js',
-  '{sjshome}/modules/splice.text.js',
-  {'SpliceJS.Ui':'{sjshome}/modules/splice.ui.js'},
-  {'SpliceJS.Controls':'{sjshome}/modules/splice.controls.js'},
+  '/{sjshome}/modules/splice.animation.js',
+  '/{sjshome}/modules/splice.network.js',
+  '/{sjshome}/modules/splice.document.js',
+  '/{sjshome}/modules/splice.data.js',
+  '/{sjshome}/modules/splice.text.js',
+  {Inheritance: '/{sjshome}/modules/splice.inheritance.js'},
+  {Component:'/{sjshome}/modules/splice.component.js'},
+  {Events : '/{sjshome}/modules/splice.event.js'},
+  {'SpliceJS.Ui':'/{sjshome}/modules/splice.ui.js'},
+  {'SpliceJS.Controls':'/{sjshome}/modules/splice.component.controls.js'},
   'splice.test.components.css',
   'splice.test.components.html',
   'splice.test.components.templates.html'
-],
-
+]
+,
 definition:function(sjs){
 
-  var Class = sjs.Class
-  , Controller = sjs.Controller
-  , Event = sjs.Event
-  , event = sjs.event
-  , scope = this.scope
-  , exports = sjs.exports;
+  var
+    scope = this.scope
+  , exports = sjs.exports
+  ;
+
+  var
+    Class = scope.Inheritance.Class
+  , Controller = scope.Component.Controller
+  , Event = scope.Events.Event
+  , event = scope.Events.event
+  ;
 
   var DataItem = scope.SpliceJS.Ui.DataItem;
   var ObservableDataItem = scope.SpliceJS.Ui.ObservableDataItem;
@@ -60,7 +69,7 @@ definition:function(sjs){
   });
 
   var ComponentsTest = Class(function ComponentsTest(){
-    this.super();
+    this.base();
 
     event(this).attach({
       onProvinces         : event.multicast,
@@ -83,17 +92,6 @@ definition:function(sjs){
       this.onScatterChartData(scatterChart);
       this.onTestCheck(this.sourceTestCheck);
     }, this);
-
-    // value read
-    var v = sjs.propvalue(charts)('0.data.1').value;
-    // value assign
-    sjs.propvalue(charts)('0.data.1').value = v + 1;
-    if( (v+1) == sjs.propvalue(charts)('0.data.1').value){
-      console.log('Test pass: propvalue');
-    }
-    else {
-      throw 'Test fail: propvalue';
-    }
   };
 
   ComponentsTest.prototype.addProvince = function(){
@@ -149,7 +147,6 @@ definition:function(sjs){
     ComponentsTest, foo, testDataItem
   );
 
-}
+  new this.scope.Component.DocumentApplication(this.scope).run();
 
-
-});
+}});

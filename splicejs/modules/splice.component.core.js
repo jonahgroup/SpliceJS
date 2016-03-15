@@ -110,12 +110,9 @@ definition:function(sjs){
 			var obj = scope.lookup(args.type);
 
 			if(!obj) obj = scope.components.lookup(args.type);
-			/* lone template is being included */
-			if(!obj) obj = scope.templates[args.type];
 
 			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
-
 
 			/* copy args*/
 			var parameters = {};
@@ -249,11 +246,34 @@ definition:function(sjs){
   	};
 
 
+    function _propertyValueLocator(path){
+  				var npath = path.split('.')
+  				,	result = this;
 
+  				//loop over path parts
+  				for(var i=0; i < npath.length-1; i++ ){
+  					result = result[npath[i]];
+  					if(result == null) console.warn('Property ' + path + ' is not found in object ' + result);
+  				}
+  				var p = npath[npath.length - 1];
+  				if(result && result[p] == undefined) console.warn('Property ' + path + ' is not found in object ' + result);
 
+  				//hash map object
+  				return Object.defineProperty(Object.create(null),'value',{
+  					get:function(){
+  						if(!result) return null;
+  						return result[p];
+  					},
+  					set:function(newValue){
+  						if(!result) return;
+  						result[p] = newValue;
+  					}
+  				});
+  	};
 
-
-
+  	function propertyValue(obj){
+  		return _propertyValueLocator.bind(obj);
+  	};
 
 
 
@@ -911,7 +931,8 @@ definition:function(sjs){
   		var scope = this
   		,	attributes = collectAttributes(node,RESERVED_ATTRIBUTES);
 
-  		var _type = scope.getNextTemplateName()
+
+  		var _type = '__inlineTemplate__'+(scope.components.sequence++)
   		,	json = '';
 
   		if(attributes) attributes = ',' + attributes;
@@ -1332,7 +1353,8 @@ definition:function(sjs){
     exports.module(
       Template,
       Controller,
-      compileTemplate
+      compileTemplate,
+      {Proxy:proxy}
     );
 
 }})

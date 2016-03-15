@@ -4,7 +4,8 @@ required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Animation		: '/{sjshome}/modules/splice.animation.js'},
 	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'}
+	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Views				: '/{sjshome}/modules/splice.view.js'}
 ],
 definition:function component(sjs){
 	//enable strict mode
@@ -16,11 +17,12 @@ definition:function component(sjs){
 	,	exports = sjs.exports;
 
 	var
-		Class 		= scope.Inheritance.Class
+		Class 			= scope.Inheritance.Class
 	, Animate 		= scope.Animation.Animate
 	, Controller 	= scope.Component.Controller
 	,	Event 			= scope.Events.Event
 	,	event 			= scope.Events.event
+	,	View 				= scope.Views.View
 	;
 
 	var DataItem = function DataItem(data){
@@ -334,7 +336,7 @@ definition:function component(sjs){
     */
     abs: function(obj) {
       var n = obj;
-			if(obj instanceof sjs.types.View)
+			if(obj instanceof View)
 				n = obj.htmlElement;
 			var location  = [0,0];
 

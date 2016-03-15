@@ -2,15 +2,7 @@
 <html>
 
 <head>
-<script src="splice.config.js"></script>
-<script src="../../../splicejs/splice.js"></script>
-
-<script>
-	//sjs().debug.enable();
-	sjs().boot([
-      {'Tests':'splice.test.components.js'}
-  ]);
-</script>
+<script src="../../../splicejs/splice.js" sjs-main="splice.test.components.js" sjs-start-mode="onload"></script>
 
 <style>
 	body {
@@ -36,15 +28,7 @@
 </head>
 <body>
 
-<sjs-include sjs-type="Tests.Components"></sjs-include>
+<sjs-include sjs-type="Components"></sjs-include>
 
 </body>
 </html>
-<script>
-function viewTest() {
-return sjs().display(sjs().view('<div><div sjs-content="phone"></div><div sjs-content="name"></div></div>')
-.style('background-color:#444444;'))
-.content({name:'Polina',phone:'416-586-2456'})
-.replace();
-}
-</script>

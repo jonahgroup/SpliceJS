@@ -25,7 +25,7 @@ definition:function(sjs){
 	,	event = this.scope.Events.event;
 
 	var ListBoxController = Class(function ListBoxController(){
-			this.super();
+			this.base();
 			this.listItems = [];
 
 			event(this).attach({

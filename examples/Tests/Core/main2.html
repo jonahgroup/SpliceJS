@@ -3,7 +3,8 @@
   <tr><td>
     Component Application.<br><br>
     This is an example of <sjs-include sjs-type="Controls.Button">{
-      content:'Sample Button'
+      content:'Sample Button',
+      onClick:binding('buttonClick').parent
     }</sjs-include> the Document Application. <br>
     Such application is using document's body as a view template.<br>
     Included <sjs-include sjs-type="Controls.CheckBox"></sjs-include> components are resolved and injected into document tree.<br>

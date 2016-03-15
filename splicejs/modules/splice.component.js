@@ -26,11 +26,13 @@ definition:function(sjs){
   DocumentApplication.prototype.run =  function(){
     var bodyTemplate = new ComponentTemplate(sjs.document.body);
     bodyTemplate.compile(this.scope);
-    bodyTemplate.processIncludeAnchors(sjs.document.body,new Controller(),this.scope);
+    var controller = new Controller();
+    bodyTemplate.processIncludeAnchors(sjs.document.body,controller,this.scope);
+    controller.onDisplay();
   };
 
   exports.module(
-    DocumentApplication
+    DocumentApplication, Controller
   );
 
 }
