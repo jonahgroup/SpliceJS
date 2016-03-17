@@ -27,7 +27,7 @@ definition:function(sjs){
 	,		event = this.scope.Events.event;
 
 	var ScrollPanel = Class(function ScrollPanelController(args){
-		this.super(args);
+		this.base(args);
 		event(this).attach({
 			onScroll : event.multicast
 		});

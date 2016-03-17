@@ -12,7 +12,7 @@ required:[
 definition:function(sjs){
 	var scope = this.scope
 	,	exports = sjs.exports
-	,	debug = sjs.log.debug
+	,	log = sjs.log
 	;
 
 	var
@@ -20,7 +20,7 @@ definition:function(sjs){
 	,	UIControl = scope.SpliceJS.UI.UIControl
 	,	DragAndDrop = scope.SpliceJS.UI.DragAndDrop
 	,	event 			= scope.Events.event
-	,	proxy 			= scope.Component.proxy
+	, proxy 			= scope.Component.Proxy
 	;
 
 
@@ -79,7 +79,7 @@ definition:function(sjs){
 	*
 	*/
 	var CellContainer = Class(function CellContainerController(args){
-		this.super();
+		this.base();
 
 		event(this).attach({
 			onAdd 				: event.multicast,
@@ -129,7 +129,7 @@ definition:function(sjs){
 	};
 
 	CellContainer.prototype.startResize = function(e,direction){
-		debug.log('Resizing in ' + direction + ' direction');
+		log.debug('Resizing in ' + direction + ' direction');
 		DragAndDrop.startDrag(e.source, e.domEvent);
 
 		var self = this;
@@ -173,7 +173,7 @@ definition:function(sjs){
 	* @constructor
 	*/
 	var GridLayout = Class(function GridLayoutController(){
-		this.super();
+		this.base();
 
 		event(this).attach({
 			onRemoveCell : event.multicast
@@ -268,7 +268,7 @@ definition:function(sjs){
 		,	rowSpan = position[2]
 		,	colSpan = position[3];
 
-		var _CellContainer = proxy(
+		var _CellContainer = proxy.call(scope,
 		{	type:'CellContainer',
 			row:row,
 			col:col,

@@ -73,7 +73,7 @@ required:[
       var listBox = null;
 
       if(!this.itemTemplate){
-        args.itemTemplate = proxy({
+        args.itemTemplate = proxy.call(scope,{
           type:'components.CheckListBoxItem',
           itemCheckPath: args.itemCheckPath,
           itemContentPath: args.itemContentPath

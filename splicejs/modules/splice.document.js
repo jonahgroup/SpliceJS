@@ -1,9 +1,19 @@
 /* global sjs */
 sjs.module({
+required:[
+	{Syntax:'/{sjshome}/modules/splice.syntax.js'}
+]
+,
 definition:function(sjs){
 
-	var Tokenizer = sjs.Tokenizer
-	,	exports = sjs.exports;
+	var
+		scope = this.scope
+	,	exports = sjs.exports
+	;
+
+	var
+		Tokenizer = scope.Syntax.Tokenizer
+	;
 
 	function getValueUnit(value){
 		if(!value) return null;
