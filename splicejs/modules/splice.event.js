@@ -309,11 +309,9 @@ definition:function(sjs){
   		return MulticastEvent;
 
   	};
-  	var EventSingleton = new Event(null);
 
 
 exports.module(
-    {Event:EventSingleton},
     {'event':Event}
 );
 
