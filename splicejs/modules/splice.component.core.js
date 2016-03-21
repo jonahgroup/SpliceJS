@@ -256,10 +256,10 @@ definition:function(sjs){
   				//loop over path parts
   				for(var i=0; i < npath.length-1; i++ ){
   					result = result[npath[i]];
-  					if(result == null) console.warn('Property ' + path + ' is not found in object ' + result);
+  					if(result == null) log.warn('Property ' + path + ' is not found in object ' + result);
   				}
   				var p = npath[npath.length - 1];
-  				if(result && result[p] == undefined) console.warn('Property ' + path + ' is not found in object ' + result);
+  				if(result && result[p] == undefined) log.warn('Property ' + path + ' is not found in object ' + result);
 
   				//hash map object
   				return Object.defineProperty(Object.create(null),'value',{
@@ -515,7 +515,7 @@ definition:function(sjs){
   	Controller.prototype.initialize = function(){
   		var fn = sjs.fname(this.constructor)
   		if(fn === 'Controller') return;
-  		console.warn(fn + '.initialize is not implemented');
+  		log.warn(fn + '.initialize is not implemented');
   	};
 
   	function abandonVisualParent(controller){
@@ -641,7 +641,7 @@ definition:function(sjs){
   					child.dispose();
   				}
   			}// end for children
-  			console.log('releasing events');
+  			log.info('releasing events');
   	};
 
 
@@ -814,7 +814,7 @@ definition:function(sjs){
 
   		//var end = window.performance.now();
   		//perf.total += (end-start);
-  		//console.log('template collection performance step: ' +  (end-start) + ' total: ' + perf.total) ;
+  		//log.info('template collection performance step: ' +  (end-start) + ' total: ' + perf.total) ;
   		return this.components;
   	};
 
