@@ -22,3 +22,19 @@ box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.32);
 .-vertical-align {
   vertical-align: middle;
 }
+
+
+
+
+.-component-test-table td {
+  padding-top:10px;
+    border:1px solid #3e3e3e;
+}
+
+.-splicejs-chart .scatter.series1{
+  fill:red;
+}
+.-splicejs-chart .scatter.series2 {
+  fill:blue;
+}
+.line1{stroke: blue;}

@@ -249,7 +249,7 @@ definition:function(sjs){
     }
   	if(typeof dom === 'string'){
   		this.htmlElement = (function(d){
-  			var e = document.createElement(null);
+  			var e = document.createElement('span');
   			e.innerHTML = d;
   			return e.children[0];
   		})(dom);
@@ -314,6 +314,9 @@ definition:function(sjs){
   	return this.htmlElement.__sjs_controller__;
   };
 
+  View.prototype.content = function(content,key){
+    return View.addContent.call(this,content,key);
+  }
 
   View.addContent = function addContent(content,key){
   	if(!key) key = 'default';
@@ -328,6 +331,7 @@ definition:function(sjs){
   		node.appendChild( document.createTextNode(content.toString()) );
   	}
   	target.n++;
+    return this;
   };
 
   View.replaceContent = function replaceContent(content,key){

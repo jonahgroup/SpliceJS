@@ -68,7 +68,7 @@ definition:function(sjs){
 
 	DropDownController.prototype.dataIn = function(data,path){
 		if(!this.isIgnoreSelector)
-		UIControl.prototype.dataIn.call(this,data,path);
+		UIControl.prototype.dataIn.call(this,data);
 	};
 
 	DropDownController.prototype.onDataIn = function(item){

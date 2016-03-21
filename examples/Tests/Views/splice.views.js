@@ -1,11 +1,14 @@
-sjs({
-
-  definition:function(sjs){
+sjs.module({
+required:[
+  {'Views': '/{sjshome}/modules/splice.view.js'}
+]
+,
+definition:function(sjs,scope){
 
     var event = sjs.event
-    , view = sjs.view;
+    , view = scope.Views.View;
 
-    event(view('div')
+    event(view('<div></div>')
       .style('display:inline-block; width:100px; height:100px;background-color:#fefefe; color:#222222')
       .content('test')
       .display().add())

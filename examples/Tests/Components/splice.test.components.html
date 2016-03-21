@@ -22,7 +22,7 @@
     </sjs-include>
   </td>
 </tr>
-
+<!--
 <tr>
   <td>TextField</td>
   <td>
@@ -75,12 +75,14 @@
   </sjs-include>
 </td>
 </tr>
+-->
 <tr>
   <td>Templated ComboBox - Button</td>
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
       {
-          default:'Please select an item',
+          selectedItem:{name:'Please select an item'},
+          selectedItemPath:'name',
           dataIn: binding('onProvinces').parent,
           onDataItem: binding('provinceSelected').parent,
           css:{list: 'test-drop-down-list'},
@@ -96,8 +98,8 @@
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
       {
-          default:{name:'Please select an item'},
-          selectorDataPath:'name',
+          selectedItem:{name:'Please select an item'},
+          selectedItemPath:'name',
           dataIn: binding('onProvinces').parent,
           onDataItem: binding('provinceSelected').parent,
           css:{list: 'test-drop-down-list'},
@@ -113,8 +115,8 @@
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
       {
-          default:{name:'Please select an item'},
-          selectorDataPath:'name',
+          selectedItem:{name:'Please select an item'},
+          selectedItemPath:'name',
           dataIn: binding('onProvinces').parent,
           onDataItem: binding('provinceSelected').parent,
           css:{list: 'test-drop-down-list'},
@@ -135,7 +137,7 @@
     </sjs-include>
   </td>
 </tr>
-
+<!--
 
 <tr>
   <td>Check List</td>
@@ -193,7 +195,7 @@ Scroll Panel
 </tr>
 
 
-<!-- Dom Iterator -->
+
 
 <tr>
   <td>Dom Iterator</td>
@@ -220,7 +222,7 @@ Scroll Panel
   </sjs-include></td>
 </tr>
 
-<!-- Another Component -->
+-->
 <tr>
   <td>Component Name</td>
   <td>Component Include</td>

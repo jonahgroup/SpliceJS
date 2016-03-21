@@ -24,18 +24,18 @@ sjs.module({
           this.dropDownList.dataItemPath = args.dataItemPath;
         }
         //passthrough selector data path
-        if(args.selectorDataPath){
-          this.dropDownList.selectorDataPath = args.selectorDataPath;
+        if(args.selectedItemPath){
+          this.dropDownList.selectedItemPath = args.selectedItemPath;
         }
 
         //default selection
-        if(this.default){
+        if(this.selectedItem){
           if(this.dataPath) {
             var a = {};
-            a[this.dataPath] = this.default;
+            a[this.dataPath] = this.selectedItem;
             this.dropDownList.setSelectedItem(a);
           } else {
-            this.dropDownList.setSelectedItem(this.default);
+            this.dropDownList.setSelectedItem(this.selectedItem);
           }
         }
 

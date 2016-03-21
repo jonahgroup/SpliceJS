@@ -326,7 +326,7 @@ SOFTWARE.
 					URL_CACHE[filename] = true;
 					loader.onitemloaded();
 					loader.progress();
-					
+
 					loader.loadNext({});
 				}
 			};
@@ -586,10 +586,10 @@ SOFTWARE.
 	var MODULE_MAP = new Object(null);
 	var _moduleHandlers = {
 		'default' : function anonymousModule(m, scope, _sjs){
-			m.definition.call({'scope':scope}, _sjs);
+			m.definition.bind({'scope':scope}, _sjs, scope)();
 		},
 		'splash' : function splashModule(m, scope, _sjs){
-			var s = m.definition.call({'scope':scope}, _sjs);
+			var s = m.definition.bind({'scope':scope}, _sjs, scope)();
 			if(typeof s == 'function') Loader.splashScreen = new s();
 		}
 	};

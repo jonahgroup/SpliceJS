@@ -4,6 +4,7 @@ required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Animation		: '/{sjshome}/modules/splice.animation.js'},
 	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
+	{ Data				: '/{sjshome}/modules/splice.dataitem.js'},
 	{ Events			: '/{sjshome}/modules/splice.event.js'},
 	{ Views				: '/{sjshome}/modules/splice.view.js'}
 ],
@@ -13,6 +14,7 @@ definition:function component(sjs){
 
 	// importing framework features makes our code less verbose
 	var debug = sjs.log.debug
+	, log = sjs.log
 	,	scope = this.scope
 	,	exports = sjs.exports;
 
@@ -23,110 +25,8 @@ definition:function component(sjs){
 	,	Event 			= scope.Events.Event
 	,	event 			= scope.Events.event
 	,	View 				= scope.Views.View
+	,	DataItem 		= scope.Data.DataItem
 	;
-
-	var DataItem = function DataItem(data){
-		this.source = data;
-		this.parent = null;
-		this.pathmap = {};
-	};
-
-	DataItem.prototype.getValue = function(){
-		if(this.source == null) return null;
-		if(this._path == null) return this.source;
-		return this.source[this._path];
-	}
-
-	DataItem.prototype.setValue = function(value){
-		if(this.source == null) return null;
-		if(this._path == null) return;
-		var old = this.source[this._path];
-		//same value no change
-		if(old === value) return;
-		this.source[this._path] = value;
-		_dataItem_triggerOnChange.call(this, old);
-	}
-
-	/**
-		returns child DataItem
-	*/
-	DataItem.prototype.path = function(path){
-		if(path == null || path === '') return this;
-
-		var parts = path.toString().split('.');
-
-		var parent = this;
-		for(var i=0; i < parts.length; i++){
-
-			var child = parent.pathmap[parts[i]];
-			var ref = parent._path != null?parent.source[parent._path] : parent.source;
-
-			if(child == null || ref[parts[i]] == null) {
-				child = new DataItem(ref);
-				child._path = parts[i];
-				parent.pathmap[parts[i]] = child;
-				child.parent = parent;
-
-				if(ref[parts[i]] == null) return child;
-			}
-			parent = child;
-		}
-		return parent;
-	};
-
-	DataItem.prototype.fullPath = function(){
-		var node = this;
-		var path = '';
-		while(node != null){
-			if(node._path != null)
-				path = node._path +'.'+ path;
-			node = node.parent;
-		}
-		return path;
-	};
-
-	DataItem.prototype.subscribe = function(handler, instance){
-		var node = this;
-		while(node != null){
-			if(node.onChanged) {
-				node.onChanged.subscribe(handler,instance);
-				break;
-			}
-			node = node.parent;
-		}
-	};
-
-	/*
-		- adds an item is source is a collection or a map
-		- throws and exception if the 'slot' is not empty
-	*/
-	DataItem.prototype.append = function(value){
-		if(!(this.source instanceof Array)) return null;
-		return this.path(this.source.length);
-	};
-
-	/*
-		- removes an item at a current path if source is a collection
-		- make sure to force-unsubscribe any listeners
-	*/
-	DataItem.prototype.remove = function(){
-		if(!(this.source instanceof Array)) return null;
-		this.source.splice(this._path,1);
-		this.isDeleted = true;
-		_dataItem_triggerOnChange.call(this);
-	};
-
-	function _dataItem_triggerOnChange(old){
-		var node = this;
-		while(node != null){
-			if(node.onChanged) {
-				node.onChanged(this, old);
-				break;
-			}
-			node = node.parent;
-		}
-	};
-
 
 
 	/**
@@ -213,7 +113,7 @@ definition:function component(sjs){
 			return;
 		}
 		// datapath is only set externally
-		this.dataItem = new DataItem(item, this.dataPath);
+		this.dataItem = (new DataItem(item)).path(this.dataPath);
 		event(this.dataItem).attach({
 				onChanged : event.multicast
 		});

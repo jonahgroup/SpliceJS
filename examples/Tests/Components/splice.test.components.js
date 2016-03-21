@@ -147,6 +147,6 @@ definition:function(sjs){
     ComponentsTest, foo, testDataItem
   );
 
-  new this.scope.Component.DocumentApplication(this.scope).run();
+  new this.scope.Component.DocumentApplication(scope).run();
 
 }});

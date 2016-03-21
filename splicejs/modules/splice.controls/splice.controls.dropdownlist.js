@@ -60,6 +60,7 @@ definition:function(sjs){
 	};
 
 	DropDownListController.prototype.setSelectedItem = function(item){
+		this.children.selector.dataPath = this.selectedItemPath;
 		this.children.selector.dataIn(item);
 	};
 

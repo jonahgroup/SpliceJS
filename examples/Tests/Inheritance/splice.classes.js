@@ -1,5 +1,6 @@
-sjs({
-  definition:function(sjs){
+sjs.module({
+/* low level module, does not have any dependencies */  
+definition:function(sjs){
 
     var Class = sjs.Class;
 
