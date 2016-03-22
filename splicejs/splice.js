@@ -21,6 +21,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+try {
+	!require;
+} catch(ex){
+		window.require = function(m){
+			if(m == 'splice.window.js') return window;
+			if(m == 'splice.document.js') return document;
+			if(m == 'splice.js') return window.sjs;
+		}
+}
+
 (function(window, document){
 	"use strict";
 	//loggin setup
@@ -29,7 +39,7 @@ SOFTWARE.
 	if(!log.error) 	log.error = function(){};
 	if(!log.debug) 	log.debug = function(){};
 	if(!log.info) 	log.info  = function(){};
-	if(!log.error) 	log.error = function(){};
+	if(!log.warn) 	log.warn = function(){};
 
 	var configuration = {};
 	function loadConfiguration(onLoad){
@@ -45,15 +55,19 @@ SOFTWARE.
 		}
 
 		// splice js script must have sjs-main attribute
-		if(main == null) throw "SpliceJS script element must have 'sjs-main' attribute";
+		if(main == null) {
+			log.warn('Application entry point is not defined.');
+			return;
+			//throw "SpliceJS script element must have 'sjs-main' attribute";
+		}
 
 		var config = {
 			appBase: 	getPath(window.location.href).path,
 			sjsHome:	getPath(main.getAttribute('src')).path,
 			sjsMain:	main.getAttribute('sjs-main'),
 			splash:		main.getAttribute('sjs-splash'),
-			version:		main.getAttribute('sjs-version'),
-			mode:			main.getAttribute('sjs-start-mode')
+			version:	main.getAttribute('sjs-version'),
+			mode:		main.getAttribute('sjs-start-mode')
 		};
 
 		var sjsConfig = node.getAttribute('sjs-config');
@@ -343,7 +357,7 @@ SOFTWARE.
 
 	function detectCircular(loader,print){
 		//examine stack of loaders to resolve cicular dependencies
-		for(var i=0; i<Loader.loaders.length; i++){
+		for(var i=0; i < Loader.loaders.length; i++){
 			var l = Loader.loaders[i];
 			if(print){
 				log.debug(i + ': ' + l.currentFile);
@@ -685,7 +699,7 @@ function start(config){
 
 loadConfiguration(function(config){
 	PATH_VARIABLES['{sjshome}'] = config.sjsHome;
-	new Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
+	new window.Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
 	_core.config = config;
 	if(config.mode == 'onload'){
 		window.onload = function(){ start(config);}
@@ -696,4 +710,4 @@ loadConfiguration(function(config){
 
 window.sjs = _core;
 
-})(window,document);
+})( (require('splice.window.js')), (require('splice.document.js')));

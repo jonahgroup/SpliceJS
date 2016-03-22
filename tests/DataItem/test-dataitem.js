@@ -1,5 +1,5 @@
 //node.js plug
-(sjs || require('splice.js')).module({
+require('splice.js').module({
 required:[
   {'UI':'/{sjshome}/modules/splice.dataitem.js'}
 ]
