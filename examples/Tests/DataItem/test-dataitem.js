@@ -1,22 +1,25 @@
-sjs.module({
+//node.js plug
+(sjs || require('splice.js')).module({
 required:[
   {'UI':'/{sjshome}/modules/splice.dataitem.js'}
 ]
 ,
 definition: function(sjs,scope){
     "use strict";
-    var log = sjs.log;
+    var
+      log = sjs.log
+    , exports = sjs.exports
+    ;
 
     var
       DataItem = scope.UI.DataItem
+    , ArrayDataItem = scope.UI.ArrayDataItem
     ;
 
     var orders = [
       {id:1, desc:'Sample order', items:[{id:24, name:'note book', qty:1}]},
       {id:2, desc:'Sample order', items:[{id:7, name:'pencil', qty:3}]}
     ];
-
-
 
     Test_PathTree();
     Test_ValueSetter();
@@ -25,7 +28,6 @@ definition: function(sjs,scope){
     Test_AppendValue();
     Test_RemoveValue();
     Test_GetChanges();
-    Test_Delete();
     Test_LargeData();
 
     function Test_PathTree(){
@@ -42,7 +44,8 @@ definition: function(sjs,scope){
 
 
     function Test_ValueSetter(){
-      var d = new DataItem(orders);
+      var d = new ArrayDataItem(orders);
+      var d1 = d.path(1);
       var item = d.path('1').path('items.0');
       //set item id
       item.path('id').setValue(10);
@@ -84,9 +87,9 @@ definition: function(sjs,scope){
     }
 
     function Test_AppendValue(){
-      var d = new DataItem(['one','two','three']);
-      var f = d.path('4').setValue('four');
-      if(d.source[4] === 'four'){
+      var d = new ArrayDataItem(['one','two','three']);
+      var f = d.append().setValue('four');
+      if(d.source[3] === 'four'){
         log.info("Test_AppendValue: Pass");
         return true;
       }
@@ -96,8 +99,9 @@ definition: function(sjs,scope){
 
 
     function Test_RemoveValue(){
-      var d = new DataItem(['one','two','three']);
-      var f = d.path('3').remove();
+      var d = new ArrayDataItem(['one','two','three']);
+      var f = d.path('2');
+      d.remove(f);
       if(f.getValue() == null){
         log.info("Test_RemoveValue: Pass");
         return true;
@@ -119,34 +123,27 @@ definition: function(sjs,scope){
       });
     }
 
-    function Test_Delete(){
-      var d = new DataItem(['one','two','three']);
-      var item = d.path('1').remove();
-
-      d.changes(function(item){
-            log.info(item);
-      });
-
-      item.setValue('x');
-
-      d.changes(function(item){
-            log.info(item);
-      });
-
-    }
-
 
     function Test_LargeData(){
-      var bigData = new DataItem([]);
+      var bigData = new ArrayDataItem([]);
 
       for(var i=0; i<10000; i++){
-        bigData.path(i).setValue({id:i, name:'sample'+i});
+        bigData.append().setValue({id:i, name:'sample'+i});
       }
 
       log.info(bigData);
 
     }
 
-
+    exports.module(
+      Test_PathTree,
+      Test_ValueSetter,
+      Test_ValueSetterRefSource,
+      Test_ValueSetterPrimSource,
+      Test_AppendValue,
+      Test_RemoveValue,
+      Test_GetChanges,
+      Test_LargeData
+    );
 
 }})

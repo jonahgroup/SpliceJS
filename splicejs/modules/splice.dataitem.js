@@ -17,7 +17,7 @@ definition:function(sjs){
   	var EXCEPTIONS  = {
   		invalidSourceProperty : 'Invalid source property',
   		invalidPath :						'Reference data-item path is not specified',
-  		invalidPathDepth:				'Ivalid path, nested new item path',
+  		invalidPathDepth:				'Ivalid DataItem path',
   		invalidDeleteOperation:	'Invalid delete operation, on an object'
   	}
 
@@ -117,23 +117,32 @@ definition:function(sjs){
     */
     var ArrayDataItem = Class(function ArrayDataItem(data){
       this.base(data);
+      this._length = data.length;
     }).extend(DataItem);
 
-    ArrayDataItem.prototype.remove = function(){
+    ArrayDataItem.prototype.remove = function(dataItem){
       if(!(this.source instanceof Array)) throw EXCEPTIONS.invalidDeleteOperation;
       _setChangeState(this,true);
       _bubbleChange(this);
       return this;
     };
 
+    /**
+      Virtual Append, adds new element to source array
+      initial value is undefined
+    */
     ArrayDataItem.prototype.append = function(){
+      var d = new DataItem(this.source);
+      d._path = this._length++;
+      this.pathmap[d._path] = d;
+      return d;
     };
 
     ArrayDataItem.prototype.commit = function(){
     };
 
     ArrayDataItem.prototype.commit = function(){
-      
+
     };
 
 
@@ -151,8 +160,10 @@ definition:function(sjs){
         var child = parent.pathmap[parts[i]];
         var ref = parent._path != null?parent.source[parent._path] : parent.source;
 
+        if(ref[parts[i]] == null) throw EXCEPTIONS.invalidPathDepth + ': ' + path;
+
         if(child == null || ref[parts[i]] == null) {
-          if(ref instanceof Array)
+          if(ref[parts[i]] instanceof Array)
             child = new ArrayDataItem(ref);
           else
             child = new DataItem(ref);
