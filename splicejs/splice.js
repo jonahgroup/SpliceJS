@@ -224,7 +224,8 @@ try {
 
 	function getPath(path){
 		var index = path.lastIndexOf('/');
-		if(index < 0) return {name:path};
+        if(index < 0) index = path.lastIndexOf('\\');
+		if(index < 0) return {path:path};
 		return {
 			path:path.substring(0,index),
 			name:path.substring(index+1)
@@ -245,6 +246,7 @@ try {
 
 		var cpath = '';
 		var separator = '';
+        if(path[0] == '/') cpath = '/';
 		for(var i=0; i<stack.length; i++){
 			cpath = cpath + separator + stack[i];
 			if(stack[i] == 'http:') { separator = '//';  continue; }
@@ -703,7 +705,11 @@ loadConfiguration(function(config){
 	_core.config = config;
 	if(config.mode == 'onload'){
 		window.onload = function(){ start(config);}
-	} else {
+	} 
+    else if(config.mode == 'node'){
+        start(config);
+    }
+    else {
 		_core.start = function(){start(config);}
 	}
 });
