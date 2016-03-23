@@ -1,4 +1,4 @@
-sjs.module({
+global.sjs.module({
 required:[
   {Inheritance:'/{sjshome}/modules/splice.inheritance.js'}
 ]

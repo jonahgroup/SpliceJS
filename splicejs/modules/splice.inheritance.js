@@ -1,4 +1,4 @@
-(sjs || require('splice.js')).module({
+global.sjs.module({
 definition:function(sjs){
   /*
   	Inheritance model

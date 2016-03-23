@@ -27,19 +27,26 @@ try {
 		window.require = function(m){
 			if(m == 'splice.window.js') return window;
 			if(m == 'splice.document.js') return document;
-			if(m == 'splice.js') return window.sjs;
 		}
 }
 
 (function(window, document){
 	"use strict";
-	//loggin setup
+	//logging setup
 	var log = !window.console ? {} : window.console;
 	//console log interface
 	if(!log.error) 	log.error = function(){};
 	if(!log.debug) 	log.debug = function(){};
 	if(!log.info) 	log.info  = function(){};
 	if(!log.warn) 	log.warn = function(){};
+
+    //path delimiter
+    var _pd_ = window.__sjs_pd__;
+    if(!_pd_) _pd_ = '/';
+    if(_pd_!= '/' && _pd_ != '\\') _pd_ = '/';
+    //_not_pd_ is used for in-string replacement must be properly escaped
+    var _not_pd_ = _pd_ == '/'?'\\\\':'/';
+
 
 	var configuration = {};
 	function loadConfiguration(onLoad){
@@ -62,8 +69,8 @@ try {
 		}
 
 		var config = {
-			appBase: 	getPath(window.location.href).path,
-			sjsHome:	getPath(main.getAttribute('src')).path,
+			appBase: 	context(window.location.href).path,
+			sjsHome:	context(main.getAttribute('src')).path,
 			sjsMain:	main.getAttribute('sjs-main'),
 			splash:		main.getAttribute('sjs-splash'),
 			version:	main.getAttribute('sjs-version'),
@@ -182,11 +189,19 @@ try {
 
 	function context(contextUrl){
 		//content must end with /
-		var ctx = contextUrl;
-		if(ctx != null && ctx && ctx[ctx.length-1] != '/')
-		 	throw 'Context URL must end with "/"';
+		var ctx = null;
+        if(contextUrl) {
+            ctx = contextUrl.replace(new RegExp(_not_pd_,"g"),_pd_);
+            ctx = ctx.substring(0,ctx.lastIndexOf(_pd_)+1);
+        }
+
+		if(ctx != null && ctx && ctx[ctx.length-1] != _pd_)
+		 	throw 'Context URL must end with "'+ _pd_ +'"';
 
 		return {
+            
+            path:ctx?ctx:configuration.appBase,
+            
 			resolve:function(w){
 				if(!w) return null;
 				var url = null;
@@ -204,16 +219,19 @@ try {
 				} else if (typeof w === 'string') {
 					url = w;
 				}
+                url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
 
 				//resolve path variables
 				var result = {url:_spv(url), aurl:'', namespace : namespace};
 				//not page context
-				if(result.url.indexOf('/') != 0 && ctx){
-					result.url = ctx + '/' + result.url;
+				if(result.url.indexOf(_pd_) != 0 && ctx){
+					result.url = ctx + _pd_ + result.url;
 				}
 				//not absolute
-				if( !/([a-zA-Z]+:\/\/)/.exec(result.url) ){
-					result.aurl = collapseUrl(configuration.appBase + '/' + result.url);
+				if( !/([a-zA-Z]+:\/\/)/.exec(result.url) && 
+                    !/([a-zA-Z]+:\\)/.exec(result.url)
+                    ){
+					result.aurl = collapseUrl(configuration.appBase + _pd_ + result.url);
 				} else {
 					result.aurl = collapseUrl(result.url);
 				}
@@ -221,20 +239,19 @@ try {
 			}
 		}
 	}
-
+/*
 	function getPath(path){
-		var index = path.lastIndexOf('/');
-        if(index < 0) index = path.lastIndexOf('\\');
+		var index = path.lastIndexOf(_pd_);
 		if(index < 0) return {path:path};
 		return {
 			path:path.substring(0,index),
 			name:path.substring(index+1)
 		}
 	};
-
+*/
 	function collapseUrl(path){
 		var stack = [];
-		var parts = path.split('/');
+		var parts = path.split(_pd_);
 		for(var i=0; i<parts.length; i++){
 			if(!parts[i] && parts[i] == '') continue;
 			if(parts[i] === '..' && stack.length >  0) {
@@ -246,12 +263,12 @@ try {
 
 		var cpath = '';
 		var separator = '';
-        if(path[0] == '/') cpath = '/';
+      //  if(path[0] == _pd_) cpath = _pd_;
 		for(var i=0; i<stack.length; i++){
 			cpath = cpath + separator + stack[i];
 			if(stack[i] == 'http:') { separator = '//';  continue; }
 			if(stack[i] == 'file:') { separator = '///'; continue; }
-			separator = '/';
+			separator = _pd_;
 		}
 		return cpath;
 	};
@@ -615,7 +632,7 @@ try {
 		if(this instanceof Loader) loader = this;
 
 		var scope = new Namespace(null); //our module scope
-		var path = getPath(loader.currentFile).path + '/';
+		var path = context(loader.currentFile).path;
 		var url = loader.currentFile;
 
 		scope.__sjs_uri__ = {
@@ -668,15 +685,14 @@ var _core = mixin(Object.create(null),{
 	namespace : Namespace,
 	pathVar 	:	setPathVar,
 	context  	: context,
-	urlCache  : urlCache,
-	mixin			: mixin,
-	'module'  : Module,
-	fname			: fname,
-	load			: load,
-	extension : extension,
-	log 			: log,
-	core		  : core,
-	getPath		: getPath,
+	urlCache    : urlCache,
+	mixin		: mixin,
+	'module'    : Module,
+	fname		: fname,
+	load		: load,
+	extension   : extension,
+	log 		: log,
+	core		: core,
 	vercomp		: _vercomp,
 	document	:	document
 });
@@ -699,6 +715,14 @@ function start(config){
 	else loadMain(config);
 }
 
+window.sjs = _core;
+window.global = {sjs:_core};
+try {
+    global.sjs = _core;
+}catch(ex){
+}
+
+
 loadConfiguration(function(config){
 	PATH_VARIABLES['{sjshome}'] = config.sjsHome;
 	new window.Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
@@ -713,7 +737,5 @@ loadConfiguration(function(config){
 		_core.start = function(){start(config);}
 	}
 });
-
-window.sjs = _core;
 
 })( (require('splice.window.js')), (require('splice.document.js')));

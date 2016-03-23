@@ -1,5 +1,5 @@
 //node.js plug
-require('splice.js').module({
+global.sjs.module({
 required:[
   {'UI':'/{sjshome}/modules/splice.dataitem.js'}
 ]
@@ -119,7 +119,6 @@ definition: function(sjs,scope){
 
       log.info(i.getValue());
       d.changes(function(item){
-            log.info(item);
       });
     }
 
@@ -130,9 +129,6 @@ definition: function(sjs,scope){
       for(var i=0; i<10000; i++){
         bigData.append().setValue({id:i, name:'sample'+i});
       }
-
-      log.info(bigData);
-
     }
 
     exports.module(
