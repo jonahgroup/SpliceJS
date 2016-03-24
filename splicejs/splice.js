@@ -41,14 +41,18 @@ try {
 	if(!log.warn) 	log.warn = function(){};
 
     //path delimiter
-    var _pd_ = window.__sjs_pd__;
-    if(!_pd_) _pd_ = '/';
-    if(_pd_!= '/' && _pd_ != '\\') _pd_ = '/';
+    var _platform_ = window.__sjs_platform__;
+    if(!_platform_) _platform_ = 'WEB';
+    
+    var _pd_ = '/'; //WEB
+    if(_platform_ == 'UNX') _pd_ = '/';
+    else if(_platform_ == 'WIN') _pd_ = '\\';
+    
     //_not_pd_ is used for in-string replacement must be properly escaped
     var _not_pd_ = _pd_ == '/'?'\\\\':'/';
 
+    var config = {platform: _platform_};
 
-	var configuration = {};
 	function loadConfiguration(onLoad){
 		var main = null;
 		var head = document.head || document.getElementsByTagName('head')[0];
@@ -68,19 +72,19 @@ try {
 			//throw "SpliceJS script element must have 'sjs-main' attribute";
 		}
 
-		var config = {
+	    mixin(config, {
 			appBase: 	context(window.location.href).path,
 			sjsHome:	context(main.getAttribute('src')).path,
 			sjsMain:	main.getAttribute('sjs-main'),
 			splash:		main.getAttribute('sjs-splash'),
 			version:	main.getAttribute('sjs-version'),
 			mode:		main.getAttribute('sjs-start-mode')
-		};
+		});
 
 		var sjsConfig = node.getAttribute('sjs-config');
 		//load external configuration if available
 		if(sjsConfig == null || !sjsConfig) {
-			mixin(configuration, config);
+			//mixin(configuration, config);
 			onLoad(config);
 		} else {
 				//async load here
@@ -173,19 +177,34 @@ try {
 
 	// returns URL context which allow further resolutions
 	// / - page context
-	function _spv(url){
+	function spv(url){
 		var parts = _split(url,/{[^}{]+}/);
 		var r = "";
 		for(var i=0; i<parts.length; i++){
 			var pv = PATH_VARIABLES[parts[i]];
 			if(pv != null) {
-				r = r + _spv(pv);
+				r = r + spv(pv);
 				continue;
 			}
 			r = r + parts[i];
 		}
 		return r;
 	}
+
+    function isAbsUrl(url){
+        //platform specific URL 
+        if(config.platform == 'UNX'){
+            if(url.startsWith('/')) return true;
+            return false;            
+        }
+        if(config.platform == 'WIN'){
+            if(url.startsWith('[a-zA-Z]:\\\\')) return true;
+            return false;            
+        }
+        if(config.platform == 'WEB'){
+            return false;            
+        }
+    }
 
 	function context(contextUrl){
 		//content must end with /
@@ -197,10 +216,11 @@ try {
 
 		if(ctx != null && ctx && ctx[ctx.length-1] != _pd_)
 		 	throw 'Context URL must end with "'+ _pd_ +'"';
-
+     
 		return {
+            isAbs: isAbsUrl(contextUrl),
             
-            path:ctx?ctx:configuration.appBase,
+            path:ctx?ctx:config.appBase,
             
 			resolve:function(w){
 				if(!w) return null;
@@ -222,16 +242,19 @@ try {
                 url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
 
 				//resolve path variables
-				var result = {url:_spv(url), aurl:'', namespace : namespace};
+				var result = {url:spv(url), aurl:'', namespace : namespace};
 				//not page context
 				if(result.url.indexOf(_pd_) != 0 && ctx){
 					result.url = ctx + _pd_ + result.url;
 				}
+                
+                isAbsUrl(result.url);
+                
 				//not absolute
 				if( !/([a-zA-Z]+:\/\/)/.exec(result.url) && 
                     !/([a-zA-Z]+:\\)/.exec(result.url)
                     ){
-					result.aurl = collapseUrl(configuration.appBase + _pd_ + result.url);
+					result.aurl = collapseUrl(config.appBase + _pd_ + result.url);
 				} else {
 					result.aurl = collapseUrl(result.url);
 				}
@@ -682,8 +705,9 @@ var extension = {
 };
 
 var _core = mixin(Object.create(null),{
-	namespace : Namespace,
-	pathVar 	:	setPathVar,
+	config      : mixin({},config),
+    namespace   : Namespace,
+	pathVar 	: setPathVar,
 	context  	: context,
 	urlCache    : urlCache,
 	mixin		: mixin,
@@ -694,7 +718,7 @@ var _core = mixin(Object.create(null),{
 	log 		: log,
 	core		: core,
 	vercomp		: _vercomp,
-	document	:	document
+	document	: document
 });
 function core(){
 	return mixin(Object.create(null),_core);
@@ -715,27 +739,27 @@ function start(config){
 	else loadMain(config);
 }
 
-window.sjs = _core;
-window.global = {sjs:_core};
+window.sjs = core();
+window.global = {sjs:core()};
 try {
-    global.sjs = _core;
+    global.sjs = core();
 }catch(ex){
 }
 
 
 loadConfiguration(function(config){
-	PATH_VARIABLES['{sjshome}'] = config.sjsHome;
-	new window.Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
-	_core.config = config;
-	if(config.mode == 'onload'){
-		window.onload = function(){ start(config);}
-	} 
+    PATH_VARIABLES['{sjshome}'] = config.sjsHome;
+    new window.Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
+    _core.config = config;
+    if(config.mode == 'onload'){
+        window.onload = function(){ start(config);}
+    } 
     else if(config.mode == 'node'){
         start(config);
     }
     else {
-		_core.start = function(){start(config);}
-	}
+        _core.start = function(){start(config);}
+    }
 });
 
 })( (require('splice.window.js')), (require('splice.document.js')));
