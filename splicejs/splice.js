@@ -192,16 +192,18 @@ try {
 	}
 
     function isAbsUrl(url){
+        if(!url) return false;
         //platform specific URL 
         if(config.platform == 'UNX'){
             if(url.startsWith('/')) return true;
             return false;            
         }
         if(config.platform == 'WIN'){
-            if(url.startsWith('[a-zA-Z]:\\\\')) return true;
+            if(/^[a-zA-Z]:\\/.test(url)) return true;
             return false;            
         }
         if(config.platform == 'WEB'){
+            if(/^[a-zA-Z]+:\/\//.test(url)) return true;
             return false;            
         }
     }
@@ -214,64 +216,27 @@ try {
             ctx = ctx.substring(0,ctx.lastIndexOf(_pd_)+1);
         }
 
+        if(!ctx && config.appBase) ctx = config.appBase;
+
 		if(ctx != null && ctx && ctx[ctx.length-1] != _pd_)
 		 	throw 'Context URL must end with "'+ _pd_ +'"';
      
 		return {
-            isAbs: isAbsUrl(contextUrl),
-            
-            path:ctx?ctx:config.appBase,
-            
-			resolve:function(w){
-				if(!w) return null;
-				var url = null;
-				var namespace = null;
-
-				//
-				if(typeof w === 'object' ){
-					for(var key in w){
-						if(w.hasOwnProperty(key)) {
-							url = w[key];
-							namespace = key;
-							break;
-						}
-					}
-				} else if (typeof w === 'string') {
-					url = w;
-				}
+            isAbs: isAbsUrl(ctx),
+            path:ctx,
+			resolve:function(url){
+				if(!url) return null;
+				
                 url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
-
 				//resolve path variables
-				var result = {url:spv(url), aurl:'', namespace : namespace};
+				url = spv(url);
 				//not page context
-				if(result.url.indexOf(_pd_) != 0 && ctx){
-					result.url = ctx + _pd_ + result.url;
-				}
-                
-                isAbsUrl(result.url);
-                
-				//not absolute
-				if( !/([a-zA-Z]+:\/\/)/.exec(result.url) && 
-                    !/([a-zA-Z]+:\\)/.exec(result.url)
-                    ){
-					result.aurl = collapseUrl(config.appBase + _pd_ + result.url);
-				} else {
-					result.aurl = collapseUrl(result.url);
-				}
-				return result;
+                if(isAbsUrl(url)) return collapseUrl(url) ;
+                return collapseUrl(config.appBase + url); 
 			}
 		}
 	}
-/*
-	function getPath(path){
-		var index = path.lastIndexOf(_pd_);
-		if(index < 0) return {path:path};
-		return {
-			path:path.substring(0,index),
-			name:path.substring(index+1)
-		}
-	};
-*/
+
 	function collapseUrl(path){
 		var stack = [];
 		var parts = path.split(_pd_);
@@ -423,6 +388,8 @@ try {
 		this.onitemloaded = onitemloaded;
 		this.scope = scope;
 		Loader.total += resources.length;
+        
+        this.appContext = context(config.appBase);
 
 		if(!this.onitemloaded) this.onitemloaded = function(){}; //noop
 	};
@@ -447,8 +414,8 @@ try {
 		if(!obj) return;
 
 		var filename = obj;
-
-		filename = context().resolve(filename).aurl;
+        //returns absolute URL
+		filename = this.appContext.resolve(filename);
 
 		Loader.currentFile = this.currentFile = filename;
 		updateSplash();
@@ -522,7 +489,7 @@ try {
 		for(var i=0; i<imports.length; i++){
 			if(!imports[i].namespace) continue;
 			var ns = imports[i].namespace;
-			var x = MODULE_MAP[imports[i].aurl];
+			var x = MODULE_MAP[imports[i].url];
 			if(!x) continue;
 			var keys = Object.keys(x);
 			for(var key in keys){
@@ -607,6 +574,7 @@ try {
 		if(m.required instanceof Array) items = m.required;
 
 		var version = _core.config.version;
+        var appCtx = context(config.appBase);
 
 		//versioned required
 		if(typeof m.version == 'object' && version){
@@ -631,10 +599,33 @@ try {
 			}
 		}
 
-
 		for(var i=0; i < items.length; i++){
-			var imp = ctx.resolve(items[i]);
-			r.resources.push(imp.url); r.imports.push(imp);
+            var item = items[i], url = '', ns = '';
+            
+            //name space includes
+            if(typeof(item)  == 'object'){
+                for(var key in item){
+				    if(item.hasOwnProperty(key)) {
+					    url = item[key];
+						ns = key;
+						break;
+					}
+				}
+            } 
+            //no namespace includes
+            else {
+                url = item;    
+            }
+            //this means that our url is relative to application context            
+			if(url[0] == '/') {
+                url = appCtx.resolve(url.substr(1));
+            }
+            else {
+                url = ctx.resolve(url);
+            }    
+            
+			r.resources.push(url); 
+            r.imports.push({namespace:ns, url:url});
 		}
 		return r;
 	}
@@ -718,7 +709,7 @@ var _core = mixin(Object.create(null),{
 	log 		: log,
 	core		: core,
 	vercomp		: _vercomp,
-	document	: document
+	document	: document,
 });
 function core(){
 	return mixin(Object.create(null),_core);
