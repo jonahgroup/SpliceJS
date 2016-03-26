@@ -3,7 +3,7 @@ type:'component'
 ,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{'SpliceJS.UI':'{sjshome}/modules/splice.ui.js'},
+	{'SpliceJS.UI': '/{sjshome}/modules/splice.ui.js'},
 	'splice.controls.treetable.html'
 ]
 ,

@@ -258,7 +258,7 @@ try {
 				url = spv(url);
 				//not page context
                 if(isAbsUrl(url)) return collapseUrl(url) ;
-                return collapseUrl(config.appBase + url); 
+                return collapseUrl(ctx + url); 
 			}
 		}
 	}

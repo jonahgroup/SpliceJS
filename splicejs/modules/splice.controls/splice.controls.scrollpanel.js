@@ -2,11 +2,11 @@ sjs.module({
 type:'component'
 ,
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Inheritance   : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Events	    : '/{sjshome}/modules/splice.event.js'},
 	{ Component		: '/{sjshome}/modules/splice.component.core.js'	},
-	{'SpliceJS.UI':'../splice.ui.js'},
-	{'Doc':'{sjshome}/modules/splice.document.js'},
+	{'SpliceJS.UI'  : '../splice.ui.js'},
+	{'Doc'          : '/{sjshome}/modules/splice.document.js'},
 	'splice.controls.scrollpanel.css',
 	'splice.controls.scrollpanel.html'
 ]

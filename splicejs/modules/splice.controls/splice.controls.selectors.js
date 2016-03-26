@@ -2,12 +2,12 @@ sjs.module({
 type:'component'
 ,
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Inheritance   : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Events		: '/{sjshome}/modules/splice.event.js'},
 	{ Component		: '/{sjshome}/modules/splice.component.core.js'	},
-	{	Views 			: '/{sjshome}/modules/splice.view.js'	},
-	{'SpliceJS.UI':'../splice.ui.js'},
-	{'Doc':'{sjshome}/modules/splice.document.js'},
+	{ Views 		: '/{sjshome}/modules/splice.view.js'	},
+	{'SpliceJS.UI'  : '../splice.ui.js'},
+	{'Doc'          : '/{sjshome}/modules/splice.document.js'},
 	'splice.controls.selectors.css',
 	'splice.controls.selectors.html'
 ]
@@ -26,7 +26,7 @@ definition:function(sjs){
 	,	dom = scope.Doc.dom
 	,	UIControl = scope.SpliceJS.UI.UIControl
 	,	Class = scope.Inheritance.Class
-	, Controller = scope.Component.Controller
+	,   Controller = scope.Component.Controller
 	,	event = scope.Events.event
 	,	display = scope.Views.View.display
 	;
