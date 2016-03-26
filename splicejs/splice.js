@@ -180,16 +180,42 @@ try {
 	function spv(url){
 		var parts = _split(url,/{[^}{]+}/);
 		var r = "";
-		for(var i=0; i<parts.length; i++){
+		for(var i=0; i < parts.length; i++){
 			var pv = PATH_VARIABLES[parts[i]];
-			if(pv != null) {
-				r = r + spv(pv);
-				continue;
-			}
-			r = r + parts[i];
+			var s = parts[i];
+            if(pv != null) s = spv(pv);
+            
+            if(r[r.length-1] == _pd_ && s[0] == _pd_ )
+                r = r.substring(0,r.length-1) + s;
+            else 
+			    r = r + s;
 		}
 		return r;
 	}
+    
+    function collapseUrl(path){
+		var stack = [];
+		var parts = path.split(_pd_);
+		for(var i=0; i<parts.length; i++){
+			if(!parts[i] && parts[i] == '') continue;
+			if(parts[i] === '..' && stack.length >  0) {
+				stack.pop();
+				continue;
+			}
+			stack.push(parts[i]);
+		}
+
+		var cpath = '';
+		var separator = '';
+        if(path[0] == _pd_) cpath = _pd_;
+		for(var i=0; i<stack.length; i++){
+			cpath = cpath + separator + stack[i];
+			if(stack[i] == 'http:') { separator = '//';  continue; }
+			if(stack[i] == 'file:') { separator = '///'; continue; }
+			separator = _pd_;
+		}
+		return cpath;
+	};
 
     function isAbsUrl(url){
         if(!url) return false;
@@ -236,31 +262,6 @@ try {
 			}
 		}
 	}
-
-	function collapseUrl(path){
-		var stack = [];
-		var parts = path.split(_pd_);
-		for(var i=0; i<parts.length; i++){
-			if(!parts[i] && parts[i] == '') continue;
-			if(parts[i] === '..' && stack.length >  0) {
-				stack.pop();
-				continue;
-			}
-			stack.push(parts[i]);
-		}
-
-		var cpath = '';
-		var separator = '';
-      //  if(path[0] == _pd_) cpath = _pd_;
-		for(var i=0; i<stack.length; i++){
-			cpath = cpath + separator + stack[i];
-			if(stack[i] == 'http:') { separator = '//';  continue; }
-			if(stack[i] == 'file:') { separator = '///'; continue; }
-			separator = _pd_;
-		}
-		return cpath;
-	};
-
 
 	function fileExt(f){
 		return f.substring(f.lastIndexOf('.'));
