@@ -1,4 +1,4 @@
-sjs.module({
+global.sjs.module({
 type:'component'
 ,
 required:[

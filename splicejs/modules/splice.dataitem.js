@@ -13,64 +13,59 @@ definition:function(sjs){
   var
     Class = this.scope.Inheritance.Class
   ;
+  
+    var EXCEPTIONS  = {
+        invalidSourceProperty : 'Invalid source property',
+        invalidPath           :	'Reference data-item path is not specified',
+        invalidPathDepth      :	'Ivalid DataItem path',
+        invalidDeleteOperation:	'Invalid delete operation, on an object'
+    }
 
-  	var EXCEPTIONS  = {
-  		invalidSourceProperty : 'Invalid source property',
-  		invalidPath :						'Reference data-item path is not specified',
-  		invalidPathDepth:				'Ivalid DataItem path',
-  		invalidDeleteOperation:	'Invalid delete operation, on an object'
-  	}
-
-
-
-
-    //hoisted
     var DataItem = function DataItem(data){
-  		this.source = data;
-  		this.parent = null;
-  		this.pathmap = {};
-  	};
+        this.source = data;
+        this.parent = null;
+        this.pathmap = {};
+    };
 
-  	DataItem.prototype.getValue = function(){
-  		if(this._state == 'd' || this.source == null ) return null;
-  		if(this._path == null) return this.source;
-  		return this.source[this._path];
-  	}
+    DataItem.prototype.getValue = function(){
+        if(this._state == 'd' || this.source == null ) return null;
+        if(this._path == null) return this.source;
+        return this.source[this._path];
+    }
 
     /*
-      setValue must not access arbitrary object keys
-      rework and ArrayDataItem
+        setValue must not access arbitrary object keys
+        rework and ArrayDataItem
     */
+    DataItem.prototype.setValue = function(value){
+        if(this.source == null) throw EXCEPTIONS.invalidSourceProperty + ' ' +this.source;
 
-  	DataItem.prototype.setValue = function(value){
-  		if(this.source == null) throw EXCEPTIONS.invalidSourceProperty + ' ' +this.source;
+        if(typeof this.source != 'object') {
+            this.source = value;
+            this._path = null;
+            return this;
+        }
 
-  		if(typeof this.source != 'object') {
-  			this.source = value;
-  			this._path = null;
-  			return this;
-  		}
+        if(this._path == null) throw EXCEPTIONS.invalidPath + ' ' + this._path;
 
-  		if(this._path == null) throw EXCEPTIONS.invalidPath + ' ' + this._path;
+        var old = this.source[this._path];
+        //same value no change
+        if(old === value) return this;
 
-  		var old = this.source[this._path];
-  		//same value no change
-  		if(old === value) return this;
+        if(!this.source.hasOwnProperty(this._path)){
+            this._isnew = true;
+        }
 
-  		if(!this.source.hasOwnProperty(this._path)){
-  			this._isnew = true;
-  		}
+        // set value
+        this.source[this._path] = value;
 
-  		// set value
-  		this.source[this._path] = value;
-
-  		_setChangeState(this);
-  		_bubbleChange(this);
+        _setChangeState(this);
+        _bubbleChange(this);
 
 
-  		_dataItem_triggerOnChange.call(this, old);
-  		return this;
-  	}
+        _dataItem_triggerOnChange.call(this, old);
+        return this;
+    }
 
   	/**
   		returns child DataItem

@@ -78,7 +78,8 @@ try {
 			sjsMain:	main.getAttribute('sjs-main'),
 			splash:		main.getAttribute('sjs-splash'),
 			version:	main.getAttribute('sjs-version'),
-			mode:		main.getAttribute('sjs-start-mode')
+			mode:		main.getAttribute('sjs-start-mode'),
+            debug:      main.getAttribute('sjs-debug') == 'true' ? true:false
 		});
 
 		var sjsConfig = node.getAttribute('sjs-config');
@@ -642,39 +643,37 @@ try {
 		}
 	};
 
-	function Module(m){
-		var loader = Loader.currentLoader;
-		if(this instanceof Loader) loader = this;
+function _module(m){
+    var loader = Loader.currentLoader;
+    if(this instanceof Loader) loader = this;
 
-		var scope = new Namespace(null); //our module scope
-		var path = context(loader.currentFile).path;
-		var url = loader.currentFile;
+    var scope = new Namespace(null); //our module scope
+    var path = context(loader.currentFile).path;
+    var url = loader.currentFile;
 
-		scope.__sjs_uri__ = {
-			path:path,
-			url:url
-		};
-		var ctx = context(path);
-		var	required = _required(m,ctx);
+    scope.__sjs_uri__ = {
+        path:path,
+        url:url
+    };
+    var ctx = context(path);
+    var	required = _required(m,ctx);
 
-		var _sjs = mixin(mixin({},core()),{	exports:_exports(scope)});
+    var _sjs = mixin(mixin(Object.create(null),_core),{exports:_exports(scope)});
 
-		load.call(scope,required.resources, function(){
-			applyImports.call(scope,required.imports);
-			if(typeof m.definition === 'function') {
-				var handler = _moduleHandlers[m.type||'default'];
-				if(handler == null) throw 'Handler for "' + m.type + '" is not found' ;
-				handler(m, scope, _sjs);
-				MODULE_MAP[url] = scope.__sjs_module_exports__;
-			}
-		});
-	};
-	Module.list = function(){
-		return MODULE_MAP;
-	};
-	Module.handlers = function(){
-		return mixin({},_moduleHandlers);
-	};
+    load.call(scope,required.resources, function(){
+        applyImports.call(scope,required.imports);
+        if(typeof m.definition === 'function') {
+            var handler = _moduleHandlers[m.type||'default'];
+            if(handler == null) throw 'Handler for "' + m.type + '" is not found' ;
+            handler(m, scope, _sjs);
+            MODULE_MAP[url] = scope.__sjs_module_exports__;
+        }
+    });
+};
+
+_module.list= function list(){
+    return mixin({},MODULE_MAP);
+};
 
 function addTo(s,t){
 	var keys = Object.keys(s);
@@ -682,45 +681,24 @@ function addTo(s,t){
 		if(t[keys[key]]) continue;
 		t[keys[key]] = s[keys[key]];
 	}
-}
-
-var extension = {
-		core : function(obj){
-			addTo(obj,_core);
-		},
-		loader: function(obj){
-			addTo(obj,_fileHandlers);
-		},
-		module: function(obj){
-			addTo(obj,_moduleHandlers);
-		}
 };
 
-var _core = mixin(Object.create(null),{
-	config      : mixin({},config),
-    namespace   : Namespace,
-	pathVar 	: setPathVar,
-	context  	: context,
-	urlCache    : urlCache,
-	mixin		: mixin,
-	'module'    : Module,
-	fname		: fname,
-	load		: load,
-	extension   : extension,
-	log 		: log,
-	core		: core,
-	vercomp		: _vercomp,
-	document	: document,
+var extension =mixin(Object.create(null), {
+	loader: function(obj){
+		addTo(obj,_fileHandlers);
+	},
+	module: function(obj){
+		addTo(obj,_moduleHandlers);
+	}
 });
-function core(){
-	return mixin(Object.create(null),_core);
-}
+
 function loadMain(config){
 	if(config.sjsMain != null && config.sjsMain){
 		log.info('Loading main module: ' + config.sjsMain);
 		load([config.sjsMain]);
 	}
 }
+
 function start(config){
 	//load main modules
 	if(config.splash != null && config.splash){
@@ -731,10 +709,36 @@ function start(config){
 	else loadMain(config);
 }
 
-window.sjs = core();
-window.global = {sjs:core()};
+var _core = mixin(Object.create(null),{
+	config      : function() {return mixin({},config)},
+    namespace   : Namespace,
+	pathVar 	: setPathVar,
+	context  	: context,
+	mixin		: mixin,
+	'module'    : _module,
+	fname		: fname,
+	load		: load,
+	extension   : extension,
+ 	log 		: log,
+	document	: document,
+});
+
+var _debug = mixin(Object.create(null),{
+    spv :spv,
+    split:_split,
+    collapseUrl: collapseUrl,
+    isAbsUrl:isAbsUrl,
+    fileExt:fileExt,
+    peek: peek,
+    trim: _trim,
+
+});
+
+
+window.sjs = _core;
+window.global  = {sjs: window.sjs };
 try {
-    global.sjs = core();
+    global.sjs = _core;
 }catch(ex){
 }
 
@@ -742,7 +746,11 @@ try {
 loadConfiguration(function(config){
     PATH_VARIABLES['{sjshome}'] = config.sjsHome;
     new window.Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
-    _core.config = config;
+   
+    if(config.debug == true){
+       _core.debug = _debug;
+    }
+   
     if(config.mode == 'onload'){
         window.onload = function(){ start(config);}
     } 
