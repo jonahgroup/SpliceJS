@@ -1,37 +1,27 @@
-global.sjs.module(
-[
-  {'UI':'/{sjshome}/modules/splice.dataitem.js'}  
-]
-)(function(scope){
-    
-
-    
-    scope.module([{'Applets':'/{jagui_applets}/dashboard.js'}])(
+global.sjs.module({
+required: [
+  {'UI':'importmodule.js'}
+]}
+,
+function(scope){
+    scope.imports.UI.saySomething();
+    scope.load(
+        [{'Inheritance':'/{sjshome}/modules/splice.inheritance.js'}],
         function(scope){
-            var dashboard = scope.imports.Applets.Dashboard;        
+            var Class = scope.imports.Inheritance.Class;
         }
-    )
-    
-    scope.load();
-    scope.core
-    scope.imports.Dashboard
-    scope.exports            
+    );
+
+
+    function LocalClass(){}
+
+    scope.add(
+         LocalClass, 
+         {test:10}
+    );
+
+
+    scope.LocalClass;
+
 });
-
-scope.load = 
-
-
-function loadcomponent(m){
-    return function(fn){
-        scope.module(m)(function(scope){
-            compileTemplates();
-            fn();
-        });    
-    }
-}
-
-
-
-
-
 

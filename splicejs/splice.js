@@ -43,11 +43,11 @@ try {
     //path delimiter
     var _platform_ = window.__sjs_platform__;
     if(!_platform_) _platform_ = 'WEB';
-    
+
     var _pd_ = '/'; //WEB
     if(_platform_ == 'UNX') _pd_ = '/';
     else if(_platform_ == 'WIN') _pd_ = '\\';
-    
+
     //_not_pd_ is used for in-string replacement must be properly escaped
     var _not_pd_ = _pd_ == '/'?'\\\\':'/';
 
@@ -185,15 +185,15 @@ try {
 			var pv = PATH_VARIABLES[parts[i]];
 			var s = parts[i];
             if(pv != null) s = spv(pv);
-            
+
             if(r[r.length-1] == _pd_ && s[0] == _pd_ )
                 r = r.substring(0,r.length-1) + s;
-            else 
+            else
 			    r = r + s;
 		}
 		return r;
 	}
-    
+
     function collapseUrl(path){
 		var stack = [];
 		var parts = path.split(_pd_);
@@ -220,18 +220,18 @@ try {
 
     function isAbsUrl(url){
         if(!url) return false;
-        //platform specific URL 
+        //platform specific URL
         if(config.platform == 'UNX'){
             if(url.startsWith('/')) return true;
-            return false;            
+            return false;
         }
         if(config.platform == 'WIN'){
             if(/^[a-zA-Z]:\\/.test(url)) return true;
-            return false;            
+            return false;
         }
         if(config.platform == 'WEB'){
             if(/^[a-zA-Z]+:\/\//.test(url)) return true;
-            return false;            
+            return false;
         }
     }
 
@@ -247,19 +247,19 @@ try {
 
 		if(ctx != null && ctx && ctx[ctx.length-1] != _pd_)
 		 	throw 'Context URL must end with "'+ _pd_ +'"';
-     
+
 		return {
             isAbs: isAbsUrl(ctx),
             path:ctx,
 			resolve:function(url){
 				if(!url) return null;
-				
+
                 url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
 				//resolve path variables
 				url = spv(url);
 				//not page context
                 if(isAbsUrl(url)) return collapseUrl(url) ;
-                return collapseUrl(ctx + url); 
+                return collapseUrl(ctx + url);
 			}
 		}
 	}
@@ -298,20 +298,51 @@ try {
 	function Namespace(){
 		if(!(this instanceof Namespace) ) return new Namespace();
 		this.sequence = 0;
+        this.__sjs_seal__ = {};
 		this.children = null;
 	};
 
+
+    function _namespaceAdd(path,obj,isSealed){
+        if(!path) return this;
+        if(this.__sjs_seal__[path]) throw 'Namespace ' +path +' is sealed';
+        var parts = path.split('.');
+        var target = this;
+        for(var i=0; i<parts.length-1; i++){
+            if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
+            target = target[parts[i]];
+        }
+        if(target[parts[parts.length-1]] != null) throw "Namespace conflict: " + path;
+        target[parts[parts.length-1]] = obj;
+
+        if(isSealed == true) this.__sjs_seal__[path] = true;
+    }
+    
 	Namespace.prototype = {
-			add : function(path, obj){
-				if(!path) return this;
-				var parts = path.split('.');
-				var target = this;
-				for(var i=0; i<parts.length-1; i++){
-					if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
-					target = target[parts[i]];
-				}
-				if(target[parts[parts.length-1]] != null) throw "Namespace conflict: " + path;
-				target[parts[parts.length-1]] = obj;
+			add : function(path, obj, isSealed){
+	            if(typeof(path)=='object' || typeof(path) == 'function'){
+                    for(var i=0; i < arguments.length; i++){
+                        var arg = arguments[i];
+                                
+                        if(typeof arg === 'function' ){
+						    _namespaceAdd.call(this, fname(arg),arg,isSealed);
+						    continue;
+					    }                                                   
+                                            
+                        if(typeof arg == 'object') {                                            
+                            var keys = Object.keys(arg);
+                            for(var key in keys){
+                                _namespaceAdd.call(this, keys[key],arg[keys[key]],isSealed);
+                            }
+                            continue;
+                        }
+                    }
+                 return this;   
+                }			
+
+                if(typeof(path) == 'string'){
+                    _namespaceAdd.call(this, path,obj,isSealed);
+                }
 				return this;
 			},
 			lookup:function(path){
@@ -390,7 +421,7 @@ try {
 		this.onitemloaded = onitemloaded;
 		this.scope = scope;
 		Loader.total += resources.length;
-        
+
         this.appContext = context(config.appBase);
 
 		if(!this.onitemloaded) this.onitemloaded = function(){}; //noop
@@ -495,31 +526,15 @@ try {
 			if(!x) continue;
 			var keys = Object.keys(x);
 			for(var key in keys){
-				scope.add(ns+'.'+keys[key],x[keys[key]]);
+				scope.add('imports.'+ns+'.'+keys[key],x[keys[key]]);
 			}
 		}
 	};
 
 	function _exports(scope){
 		scope.__sjs_module_exports__ = Object.create(null);
-		return {
-			scope:function(){
-				for(var i=0; i < arguments.length; i++){
-					var arg = arguments[i];
-					if(typeof arg === 'function' ){
-						scope[fname(arg)] = arg;
-						continue;
-					}
-					if(typeof arg === 'object'){
-						var keys = Object.keys(arg);
-						for(var k=0; k < keys.length; k++){
-							scope[keys[k]] = arg[keys[k]];
-						}
-						continue;
-					}
-				}
-			},
-			module:function(){
+ 
+        return function(){
 				var exports = scope.__sjs_module_exports__;
 				//if(!exports) exports = scope.__sjs_module_exports__ = Object.create(null);
 				for(var i=0; i < arguments.length; i++){
@@ -537,7 +552,7 @@ try {
 					}
 				}
 			}
-		}
+
 	};
 
 	function _acopy(s,t){
@@ -569,7 +584,7 @@ try {
 
 	function _required(m,ctx){
 		var r = {resources:[], imports:[]};
-		if(!m.required) return r;
+        if(!m || !m.required) return r;
 
 		var items = [];
 		//all required
@@ -603,7 +618,7 @@ try {
 
 		for(var i=0; i < items.length; i++){
             var item = items[i], url = '', ns = '';
-            
+
             //name space includes
             if(typeof(item)  == 'object'){
                 for(var key in item){
@@ -613,20 +628,20 @@ try {
 						break;
 					}
 				}
-            } 
+            }
             //no namespace includes
             else {
-                url = item;    
+                url = item;
             }
-            //this means that our url is relative to application context            
+            //this means that our url is relative to application context
 			if(url[0] == '/') {
                 url = appCtx.resolve(url.substr(1));
             }
             else {
                 url = ctx.resolve(url);
-            }    
-            
-			r.resources.push(url); 
+            }
+
+			r.resources.push(url);
             r.imports.push({namespace:ns, url:url});
 		}
 		return r;
@@ -634,16 +649,35 @@ try {
 
 	var MODULE_MAP = new Object(null);
 	var _moduleHandlers = {
-		'default' : function anonymousModule(m, scope, _sjs){
-			m.definition.bind({'scope':scope}, _sjs, scope)();
+		'default' : function anonymousModule(scope, fn){
+			fn.bind(scope)(scope);
 		},
-		'splash' : function splashModule(m, scope, _sjs){
-			var s = m.definition.bind({'scope':scope}, _sjs, scope)();
+		'splash' : function splashModule(scope, fn){
+			var s = fn.bind(scope)(scope);
 			if(typeof s == 'function') Loader.splashScreen = new s();
 		}
 	};
 
-function _module(m){
+
+function loadModule(m, scope,url,def){
+    if(typeof(def) != 'function'){
+        throw 'Invalid module defintion "'+ typeof(def) + '" in ' + url;        
+    }
+    
+    var	required = _required(m,scope.context);
+    load.call(scope,required.resources, function(){
+        applyImports.call(scope,required.imports);
+           
+        var handler = _moduleHandlers[(m!=null?m.type:null)||'default'];
+        if(handler == null) throw 'Handler for "' + m.type + '" is not found' ;
+        
+        handler(scope, def);
+        if(url != null) MODULE_MAP[url] = scope.__sjs_module_exports__;
+    });
+    
+}
+
+function _module(m,def){
     var loader = Loader.currentLoader;
     if(this instanceof Loader) loader = this;
 
@@ -651,24 +685,19 @@ function _module(m){
     var path = context(loader.currentFile).path;
     var url = loader.currentFile;
 
-    scope.__sjs_uri__ = {
-        path:path,
-        url:url
-    };
-    var ctx = context(path);
-    var	required = _required(m,ctx);
-
-    var _sjs = mixin(mixin(Object.create(null),_core),{exports:_exports(scope)});
-
-    load.call(scope,required.resources, function(){
-        applyImports.call(scope,required.imports);
-        if(typeof m.definition === 'function') {
-            var handler = _moduleHandlers[m.type||'default'];
-            if(handler == null) throw 'Handler for "' + m.type + '" is not found' ;
-            handler(m, scope, _sjs);
-            MODULE_MAP[url] = scope.__sjs_module_exports__;
-        }
-    });
+    scope.__sjs_uri__ = {path:path, url:url };
+    scope.add('__sjs_file__',url);
+	scope.add('sjs',mixin(Object.create(null),_core),true);
+    scope.add('exports',_exports(scope));
+    scope.add('context',context(path));
+    
+    scope.add('load',(function load(m,d){
+        return loadModule({required:m},this,null,d);
+    }).bind(scope) ,true)
+    
+    if(typeof(m) == 'function')
+        return loadModule(null,scope,url,m);
+    return loadModule(m,scope,url,def);        
 };
 
 _module.list= function list(){
@@ -745,15 +774,15 @@ try {
 
 loadConfiguration(function(config){
     PATH_VARIABLES['{sjshome}'] = config.sjsHome;
-    new window.Image().src = ( config.sjsHome || '') + '/resources/images/bootloading.gif';
-   
+    new window.Image().src = context().resolve('resources/images/bootloading.gif');
+
     if(config.debug == true){
        _core.debug = _debug;
     }
-   
+
     if(config.mode == 'onload'){
         window.onload = function(){ start(config);}
-    } 
+    }
     else if(config.mode == 'node'){
         start(config);
     }

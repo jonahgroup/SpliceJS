@@ -1,5 +1,5 @@
-global.sjs.module({
-definition:function(sjs){
+global.sjs.module(
+function(scope){
   /*
   	Inheritance model
   */
@@ -73,9 +73,8 @@ definition:function(sjs){
 		return _class;
 	};
 
-	sjs.exports.module(
+	scope.exports(
 		Class
 	);
 
-}
 });
