@@ -3,8 +3,8 @@ required:[
   { Document  : '/{sjshome}/modules/splice.document.js'},
   { Views     : '/{sjshome}/modules/splice.view.js'},
   { Sync      : '/{sjshome}/modules/splice.async.js'}
-]},
-function(scope){
+],
+definition:function(scope){
     "use strict";
   var 
     sjs = scope.sjs
@@ -317,8 +317,8 @@ function(scope){
   	};
 
 
-scope.exports(
-    {'event':Event}
-);
-
-})
+    scope.exports(
+        {'event':Event}
+    );
+}
+});

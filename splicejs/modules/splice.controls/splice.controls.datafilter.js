@@ -12,16 +12,20 @@ required:[
   'splice.controls.datafilter.html'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
     "use strict";
 
-    var scope = this.scope;
+    var
+        sjs = scope.sjs
+    ,   imports = scope.imports
+    ;
 
-    var Class = scope.Inheritance.Class
-    ,   Controller = scope.Component.Controller
-    ,   Event = scope.Events.event;
-
-    var dom = scope.Doc.dom;
+    var Class = imports.Inheritance.Class
+    ,   Controller = imports.Component.Controller
+    ,   Event = imports.Events.event
+    ,   dom = imports.Doc.dom
+    ,   ListItemController = imports.SpliceJS.Controls.ListItemController
+    ;
 
   	var FilterList = Class(function FilterListController(){
   		this.filterSet = [];
@@ -56,7 +60,7 @@ definition:function(sjs){
 
     var FilterListItem = Class(function FilterListItemController(){
         this.super();
-    }).extend(this.scope.SpliceJS.Controls.ListItemController);
+    }).extend(ListItemController);
 
     FilterListItem.prototype.dataIn = function(item){
         this.super.dataIn.call(this,item);
@@ -71,7 +75,5 @@ definition:function(sjs){
       dom(this.elements.root).class.add('selected');
     };
 
-
-
-  }
+}
 });

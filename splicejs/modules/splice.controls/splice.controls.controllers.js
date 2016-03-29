@@ -8,9 +8,9 @@ required:[
 	{ Event: '/{sjshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
 	 'splice.controls.controllers.html'
-]}
+]
 ,
-function(scope){
+definition:function(scope){
     "use strict";
 	var 
         sjs = scope.sjs
@@ -109,4 +109,4 @@ function(scope){
 	);
 
 }
-) //module declaration end
+}) //module declaration end

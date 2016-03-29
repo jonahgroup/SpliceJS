@@ -1,11 +1,11 @@
-sjs.module(// this function causes stack overflow
+sjs.module({// this function causes stack overflow
 /*
 function AnimationLoop(callback){
 	if(!callback()) return;
 	window.requestAnimationFrame(AnimationLoop(callback));
 }
 */
-function(scope){
+definition:function(scope){
 	"use strict";
 
 	//extends the instance of the library
@@ -157,4 +157,4 @@ function(scope){
 	scope.exports(
 		StoryBoard, Animation, Animate
 	);
-});
+}});

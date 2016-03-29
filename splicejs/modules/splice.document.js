@@ -2,9 +2,9 @@
 sjs.module({
 required:[
 	{Syntax:'/{sjshome}/modules/splice.syntax.js'}
-]}
+]
 ,
-function(scope){
+definition:function(scope){
     "use strict";
     var 
         sjs = scope.sjs
@@ -426,5 +426,5 @@ function(scope){
 		{cssvalue : _unit}
 
 	);
-
+}
 });

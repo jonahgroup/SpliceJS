@@ -10,15 +10,16 @@ required:[
 	'splice.controls.drawerpanel.html'
 ]
 ,
-definition:function(){
+definition:function(scope){
 
 	var
-		scope = this.scope
+		sjs = scope.sjs
+    ,   imports = scope.imports
 	;
 
 	var
-		Class 		= scope.Inheritance.Class
-	,	UIControl = scope.SpliceJS.UI.UIControl;
+		Class 	  = imports.Inheritance.Class
+	,	UIControl = imports.SpliceJS.UI.UIControl;
 
 	/* DrawerPanel*/
 
@@ -112,13 +113,7 @@ definition:function(){
 		this.elements.actuator.style.left = actuator_to + 'px';
 	};
 
-	return {
-
-	}
+	
 
 }
-
-
-
-
 });

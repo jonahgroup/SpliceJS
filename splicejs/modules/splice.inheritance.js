@@ -1,5 +1,5 @@
-global.sjs.module(
-function(scope){
+global.sjs.module({
+definition:function(scope){
   /*
   	Inheritance model
   */
@@ -77,4 +77,4 @@ function(scope){
 		Class
 	);
 
-});
+}});

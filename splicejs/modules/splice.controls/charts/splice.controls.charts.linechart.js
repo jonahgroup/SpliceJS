@@ -4,12 +4,15 @@ required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
 
-    var scope = this.scope;
+    var sjs = scope.sjs
+    ,   imports = scope.imports
+    ;
 
-    var Class = scope.Inheritance.Class
-    ,   debug = sjs.log.debug;
+    var Class = imports.Inheritance.Class
+    ,   debug = sjs.log.debug
+    ;
 
 	var LineChart = Class(function LineChart(){
 
@@ -128,10 +131,9 @@ definition:function(sjs){
 	};
 
 
-	return {
+	scope.exports(
+		LineChart
+    );
 
-		LineChart:LineChart
-
-	}
-
-}});
+}
+});

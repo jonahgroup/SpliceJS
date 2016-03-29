@@ -7,14 +7,15 @@ required:[
 	'splice.controls.codeeditor.css',
 	'splice.controls.codeeditor.html'
 ],
-definition:function(sjs){
+definition:function(scope){
 	var
-		scope = this.scope
+        sjs = scope.sjs
+		imports = scope.imports
 	;
 	var
-		Class = scope.Inheritance.Class
-	,	HttpRequest = scope.Networking.HttpRequest
-	,	UIControl = scope.SpliceJS.UI.UIControl
+		Class = imports.Inheritance.Class
+	,	HttpRequest = imports.Networking.HttpRequest
+	,	UIControl = imports.SpliceJS.UI.UIControl
 	;
 
 	var CodeEditor = Class(function CodeEditorController(){

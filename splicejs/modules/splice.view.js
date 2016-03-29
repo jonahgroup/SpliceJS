@@ -1,9 +1,9 @@
 sjs.module ({
 required:[
     {Syntax:  '/{sjshome}/modules/splice.syntax.js'}
-]}
+]
 ,
-function(scope){
+definition:function(scope){
 
   var
     sjs = scope.sjs
@@ -503,4 +503,5 @@ function(scope){
   scope.exports(
     View
   );
+}
 });

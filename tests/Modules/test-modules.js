@@ -1,9 +1,9 @@
 global.sjs.module({
 required: [
   {'UI':'importmodule.js'}
-]}
+]
 ,
-function(scope){
+definition:function(scope){
     scope.imports.UI.saySomething();
     scope.load(
         [{'Inheritance':'/{sjshome}/modules/splice.inheritance.js'}],
@@ -23,5 +23,5 @@ function(scope){
 
     scope.LocalClass;
 
-});
+}});
 

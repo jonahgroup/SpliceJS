@@ -14,29 +14,29 @@ required:[
 	'splice.controls.charts.css',
 ],
 
-definition:function(sjs){
+definition:function(scope){
 
-  var
-		scope = this.scope
-	;
+    var
+        sjs = scope.sjs
+    ,   imports = scope.imports
+    ;
+    
+    var
+        debug = sjs.log.debug
+    ;
 
 	var
-		debug = sjs.log.debug
-	,	exports = sjs.exports
-	;
-
-	var
-		Class = scope.Inheritance.Class
-	,	D3Canvas = scope.SpliceJS.Controls.D3Canvas
-  , data = scope.Data.data
-	,	Event = scope.Events.event
+		Class = imports.Inheritance.Class
+	,	D3Canvas = imports.SpliceJS.Controls.D3Canvas
+    ,   data = imports.Data.data
+	,	Event = imports.Events.event
 	;
 
 	var CHART_MAP = {
-		Bar:  scope.Charts.BarChart,
-		Line: scope.Charts.LineChart,
-		Scatter: scope.Charts.ScatterChart,
-		ScatterLine: scope.Charts.ScatterLineChart
+		Bar:  imports.Charts.BarChart,
+		Line: imports.Charts.LineChart,
+		Scatter: imports.Charts.ScatterChart,
+		ScatterLine: imports.Charts.ScatterLineChart
 	}
 	, CHART_MARGIN = {
 		left:30,top:20, right:10, bottom:20
@@ -296,8 +296,8 @@ definition:function(sjs){
 	};
 
     //end definition
-   exports.module(
-		{Dial:scope.Charts.Dial}
+   scope.exports(
+		{Dial:imports.Charts.Dial}
 	);
 }
 

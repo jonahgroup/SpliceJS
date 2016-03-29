@@ -2,11 +2,12 @@ sjs.module({
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
 ],
-definition:function(sjs){
-	var scope = this.scope;
+definition:function(scope){
+	var sjs = scope.sjs
+    ,   imports = scope.imports
+    ;
 
-	var Class = scope.Inheritance.Class
-	,	exports = sjs.exports
+	var Class = imports.Inheritance.Class
 	,	debug = sjs.log.debug;
 
 	var BarChart = Class(function BarChart(){
@@ -76,7 +77,7 @@ definition:function(sjs){
 	};
 
 
-	exports.module(
+	scope.exports(
 		BarChart
 	);
 

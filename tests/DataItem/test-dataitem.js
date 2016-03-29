@@ -2,9 +2,9 @@
 global.sjs.module({
 required:[
   {'UI':'/{sjshome}/modules/splice.dataitem.js'}
-]}
+]
 ,
-function(scope){
+definition:function(scope){
     "use strict";
     var
       log = scope.sjs.log
@@ -141,4 +141,4 @@ function(scope){
       Test_LargeData
     );
 
-})
+}})

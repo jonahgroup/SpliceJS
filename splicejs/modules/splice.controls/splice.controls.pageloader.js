@@ -7,15 +7,15 @@ required:[
 	'splice.controls.pageloader.html'
 ]
 ,
-definition:function(){
+definition:function(scope){
 
 	var
-		scope = this.scope
+		imports = scope.imports
 	;
 
 	var
-		Class = scope.Inheritance.Class
-	,	UIControl = scope.SpliceJS.UI.UIControl
+		Class = imports.Inheritance.Class
+	,	UIControl = imports.SpliceJS.UI.UIControl
 	;
 
 
@@ -23,6 +23,10 @@ definition:function(){
 		this.super();
 	}).extend(UIControl);
 
-}
 
+    scope.exports(
+        PageLoader
+    );
+
+}
 })

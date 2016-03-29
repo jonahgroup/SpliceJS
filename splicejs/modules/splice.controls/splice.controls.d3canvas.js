@@ -9,16 +9,16 @@ required:[
 	'splice.controls.d3canvas.html'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
 
 	var
-	 	exports = sjs.exports
-	,	scope = this.scope
+	    sjs = scope.sjs
+    ,   imports = scope.imports 	
 	;
 
 	var
-		UIControl = scope.SpliceJS.UI.UIControl
-	,	Class = scope.Inheritance.Class
+		UIControl   = imports.SpliceJS.UI.UIControl
+	,	Class       = imports.Inheritance.Class
 	;
 
 	var _d3 = this.d3 = d3;
@@ -57,9 +57,10 @@ definition:function(sjs){
 	}).extend(UIControl);
 
 	d3 = null;
-	exports.module(
+    
+	scope.exports(
 		D3CanvasController
 	);
-}
 
+}
 });

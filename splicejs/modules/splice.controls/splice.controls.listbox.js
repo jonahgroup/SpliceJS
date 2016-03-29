@@ -12,22 +12,22 @@ required:[
 	'splice.controls.listbox.html'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
 	"use strict";
 
 	var
-		exports = sjs.exports
-	,	debug =	sjs.log.debug
-	,	components = this.scope.components
-	,	scope = this.scope
-	;
+		sjs = scope.sjs
+	,	debug =	scope.sjs.log.debug
+	,	components = scope.components
+	,   imports = scope.imports
+    ;
 
-	var	UIControl = this.scope.SpliceJS.UI.UIControl
-	,	DataItem = this.scope.SpliceJS.UI.DataItem
-	, Class = this.scope.Inheritance.Class
-	,	dom = this.scope.Doc.dom
-	,	View = scope.Views.View
-	,	event = this.scope.Events.event
+	var	UIControl   = imports.SpliceJS.UI.UIControl
+	,	DataItem    = imports.SpliceJS.UI.DataItem
+	,   Class       = imports.Inheritance.Class
+	,	dom         = imports.Doc.dom
+	,	View        = imports.Views.View
+	,	event       = imports.Events.event
 	;
 
 
@@ -237,12 +237,12 @@ definition:function(sjs){
 
 
 
-	exports.scope(
+	scope.add(
 		ListBoxController
 	);
 
 	//exporting objects
-	exports.module(
+	scope.exports(
 		ListItemController, ListBoxController, ListBox
 	);
 

@@ -16,9 +16,9 @@ required:[
 	'splice.controls.css',
 	'splice.controls.datatable.css',
 	'splice.controls.datatable.html'
-]}
+]
 ,
-function(scope){
+definition:function(scope){
 	"use strict";
 
 	function _if(obj){
@@ -773,4 +773,5 @@ function(scope){
     );
 
 // end module definition
+}
 });

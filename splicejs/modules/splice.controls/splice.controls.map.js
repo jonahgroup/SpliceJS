@@ -10,12 +10,15 @@ required:[
 	'splice.controls.map.html',
 ]
 ,
-definition:function(){
-	var scope = this.scope
+definition:function(scope){
+	var 
+        sjs = scope.sjs
+        imports = scope.imports
+    ;
 
 	var
-		Class 		= scope.Inheritance.Class
-	,	UIControl = scope.SpliceJS.UI.UIControl
+		Class 	    = imports.Inheritance.Class
+	,	UIControl   = imports.SpliceJS.UI.UIControl
 	;
 
 	var Map = Class(function MapController(){
@@ -46,8 +49,7 @@ definition:function(){
 
 	};
 
-	//any class exports go here
-	return {};
+	
 
 }
 });

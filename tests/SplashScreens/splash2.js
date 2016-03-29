@@ -1,5 +1,6 @@
-global.sjs.module({type:'splash'},
-function(scope){
+global.sjs.module({
+type:'splash',
+definition:function(scope){
   var document = scope.sjs.document;
   
   var style = "position:absolute; left:0px; top:0px; right:0px; bottom:0px; transition:opacity 0.4s;     background-color: rgba(10,10,10,0.8);";
@@ -62,4 +63,4 @@ function(scope){
   };
 
   return Splash;
-});
+}});

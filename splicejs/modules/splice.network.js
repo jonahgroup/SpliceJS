@@ -1,6 +1,6 @@
 /* global sjs */
-sjs.module(
-function(scope){
+sjs.module({
+definition:function(scope){
   "use strict";
 
 	//configuration constants
@@ -212,4 +212,5 @@ function(scope){
     remote,
     {http : { get:  HttpRequest.get, post: HttpRequest.post }}
 	);
+}
 });

@@ -1,6 +1,6 @@
 
-sjs.module(
-function(scope){
+sjs.module({
+definition:function(scope){
 
 var STRINGBODY = 0
 , 	FORMAT = 1
@@ -530,4 +530,5 @@ scope.exports(
 	format, Text
 );
 
+}
 });

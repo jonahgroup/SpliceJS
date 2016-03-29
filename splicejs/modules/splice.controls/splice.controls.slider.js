@@ -8,18 +8,18 @@ required: [
   'splice.controls.slider.html'
 ]
 ,
-definition:function(sjs){
-
+definition:function(scope){
+  "use strict";
   /* framework imports */
   var
-    scope = this.scope
-  , exports = sjs.exports
+    sjs = scope.sjs
+  , imports = scope.imports
   ;
 
   var
-    Class = scope.Inheritance.Class
-  , UIControl = scope.SpliceJS.UI.UIControl
-  , DragAndDrop = scope.SpliceJS.UI.DragAndDrop
+    Class = imports.Inheritance.Class
+  , UIControl = imports.SpliceJS.UI.UIControl
+  , DragAndDrop = imports.SpliceJS.UI.DragAndDrop
   ;
 
 

@@ -10,15 +10,16 @@ required:[
 	'splice.controls.treeview.html'
 ]
 ,
-definition:function(){
+definition:function(scope){
 	var
-		scope = this.scope
+		sjs = scope.sjs
+    ,   imports = scope.imports
 	;
 
 	var
-		Class = scope.Inheritance.Class
-	,	UIControl 	= scope.SpliceJS.UI.UIControl
-	,	Event = scope.Events.event;
+		Class       = imports.Inheritance.Class
+	,	UIControl 	= imports.SpliceJS.UI.UIControl
+	,	Event       = imports.Events.event;
 	;
 
 	var TreeView = Class( function TreeViewController(){
@@ -85,8 +86,7 @@ definition:function(){
 		return str;
 	}
 
-	//applicable class exports
-	return {};
+	
 }
 
 

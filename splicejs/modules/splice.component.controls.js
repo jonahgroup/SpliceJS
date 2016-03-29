@@ -32,9 +32,9 @@ required:[
 ,	{'DataControls':'splice.controls/splice.controls.treetable.js'}
 ,	'splice.controls/splice.controls.css'
 ,   'splice.controls/splice.controls.html'
-]}
+]
 ,
-function(scope){
+definition:function(scope){
 	"use strict";
 
 	/* imports */
@@ -140,4 +140,5 @@ function(scope){
 	);
 
 // end module definition
+}
 });

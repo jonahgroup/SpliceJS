@@ -2,8 +2,8 @@
 sjs.module({
 required:[
 	{Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
-]},
-function(scope){
+],
+definition:function(scope){
     "use strict";
 	var 
 		sjs = scope.sjs
@@ -887,4 +887,4 @@ function _objectToMap(onitem){
 		{compare: {'default':defaultComparator} }
 	);
 }
-);
+});

@@ -7,9 +7,12 @@ required:[
 	'splice.controls.calendar.html',
 	'splice.controls.calendar.css'
 ],
-definition:function(sjs){
+definition:function(scope){
 	"use strict"
-
+    var 
+        sjs = scope.sjs
+        imports = scope.imports
+    ;
 
 	var	DAYS_MONTH = [
 		/* non leap year*/ 	 [31,28,31,30,31,30,31,31,30,31,30,31],
@@ -197,15 +200,11 @@ definition:function(sjs){
 
 
 
+	
 	var
-		scope = this.scope
-	,	exports = sjs.exports
-	;
-
-	var
-		Class 	= scope.Inheritance.Class
-	,	event		= scope.Events.event
-	, Controller 	= scope.Component.Controller
+		Class 	    = imports.Inheritance.Class
+	,	event		= imports.Events.event
+	, Controller 	= imports.Component.Controller
 	;
 
 
@@ -264,7 +263,7 @@ definition:function(sjs){
 		renderMonth.call(this, new Date(this.year, this.month, this.day));
 	};
 
-	exports.scope(
+	scope.exports(
 		Calendar
 	);
 

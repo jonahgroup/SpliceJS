@@ -1,15 +1,19 @@
 sjs.module({
 required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+  { Events      : '/{sjshome}/modules/splice.event.js'},
 ]
 ,
-definition: function(sjs){
-  var scope = this.scope;
+definition: function(scope){
+  var   sjs = scope.sjs
+  ,     imports = scope.imports
+  ;
 
 
-  var Class = scope.Inheritance.Class,
-      debug = sjs.log.debug,
-      Event = sjs.Event;
+  var Class = imports.Inheritance.Class
+  ,   debug = sjs.log.debug
+  ,   Event = imports.Events.Event
+  ;
 
       var ScatterChart = Class(function ScatterChart(){});
 
@@ -112,10 +116,9 @@ definition: function(sjs){
 
       };
 
-      return {
-        ScatterChart     : ScatterChart ,
-        ScatterLineChart : ScatterLineChart
-      }
-  }
-
+      scope.exports ( 
+          ScatterChart,
+          ScatterLineChart
+      );
+ }
  });

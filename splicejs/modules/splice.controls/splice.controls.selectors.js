@@ -12,23 +12,23 @@ required:[
 	'splice.controls.selectors.html'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
 	"use strict";
 
 	/* framework imports */
-	var exports = sjs.exports
-
-	,	scope = this.scope
+	var 
+        sjs = scope.sjs
+    ,   imports = scope.imports
 	;
 
 	/* dependency imports */
-	var	Positioning = scope.SpliceJS.UI.Positioning
-	,	dom = scope.Doc.dom
-	,	UIControl = scope.SpliceJS.UI.UIControl
-	,	Class = scope.Inheritance.Class
-	,   Controller = scope.Component.Controller
-	,	event = scope.Events.event
-	,	display = scope.Views.View.display
+	var	Positioning = imports.SpliceJS.UI.Positioning
+	,	dom         = imports.Doc.dom
+	,	UIControl   = imports.SpliceJS.UI.UIControl
+	,	Class       = imports.Inheritance.Class
+	,   Controller  = imports.Component.Controller
+	,	event       = imports.Events.event
+	,	display     = imports.Views.View.display
 	;
 	//static single instance
 	var dropDownContainer = new scope.components.DropDownContainerResizable()
@@ -160,12 +160,12 @@ definition:function(sjs){
 
 
 	/* scope exports for template consumption*/
-	exports.scope(
+	scope.add(
 		DropDownController, DropDownContainerController
 	);
 
 	/* module exports */
-	exports.module(
+	scope.exports(
 		DropDownController
 	)
 

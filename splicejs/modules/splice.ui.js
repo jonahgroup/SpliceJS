@@ -7,8 +7,8 @@ required:[
 	{ Data			: '/{sjshome}/modules/splice.dataitem.js'},
 	{ Events		: '/{sjshome}/modules/splice.event.js'},
 	{ Views			: '/{sjshome}/modules/splice.view.js'}
-]},
-function component(scope){
+],
+definition:function component(scope){
 	//enable strict mode
 	"use strict";
 
@@ -403,4 +403,5 @@ function component(scope){
 		{Positioning : Positioning},
 		{DragAndDrop : DragAndDrop}
 	);
+}
 });

@@ -2,29 +2,29 @@
 sjs.module({
 
 required: [
-	{ Inheritance   :  '/{sjshome}/modules/splice.inheritance.js'},
-  {'SpliceJS.UI'  : '/{sjshome}/modules/splice.ui.js'},
+    { Inheritance   :  '/{sjshome}/modules/splice.inheritance.js'},
+    {'SpliceJS.UI'  : '/{sjshome}/modules/splice.ui.js'},
 	{ Animation     : '/{sjshome}/modules/splice.animation.js'},
 	'splice.controls.charts.dial.html'
 ],
 
-definition:function component(sjs){
+definition:function(scope){
 
     var
-      scope = this.scope
+        sjs = scope.sjs
+    ,   imports = scope.imports  
     ;
     var
-      Class = scope.Inheritance.Class
-    , Animation = scope.Animation
-    , UIControl = scope.SpliceJS.UI.UIControl
+      Class     = imports.Inheritance.Class
+    , Animation = imports.Animation
+    , UIControl = imports.SpliceJS.UI.UIControl
     ;
-
 
 	var Dial = Class(function DialController(){
-		this.super();
+	    this.base();
 
-	  this.dom = this.canvas = this.elements.root;
-		var canvas = this.canvas;
+	    this.dom = this.canvas = this.elements.root;
+	    var canvas = this.canvas;
 
 	  var scale = this.scale ? this.scale : 1;
 

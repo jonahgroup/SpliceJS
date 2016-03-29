@@ -1,5 +1,5 @@
-sjs.module(
-function(scope){
+sjs.module({
+definition:function(scope){
 var 
     mixin = scope.sjs.mixin
 ;
@@ -63,4 +63,5 @@ Tokenizer.prototype = {
 scope.exports(
 	Tokenizer
 );
+}
 });

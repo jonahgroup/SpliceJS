@@ -9,9 +9,9 @@ required:[
 	{'Doc': '{sjshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
 	'splice.controls.buttons.html'
-]}
+]
 ,
-function(scope){
+definition:function(scope){
 	var 	
         imports = scope.imports
     ,	debug = scope.sjs.log.debug
@@ -220,4 +220,4 @@ function(scope){
 	);
 
 }
-);
+});

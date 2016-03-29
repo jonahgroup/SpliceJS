@@ -5,15 +5,15 @@ sjs.module({
     {'SpliceJS.Controls':'splice.controls.dropdownlist.js'}
     // 'splice.controls.combobox.html'
   ],
-  definition:function(sjs){
+  definition:function(scope){
 
     var
-      scope = this.scope
-    , exports = sjs.exports
+      sjs = scope.sjs
+    , imports = scope.imports
 
     var
-      Class = scope.Inheritance.Class
-    , DropDownList = scope.SpliceJS.Controls.DropDownList;
+      Class = imports.Inheritance.Class
+    , DropDownList = imports.SpliceJS.Controls.DropDownList;
 
     var ComboBox = Class(function ComboBox(args){
 
@@ -51,7 +51,7 @@ sjs.module({
 
 
 
-    exports.module(
+    scope.exports(
       ComboBox
     );
   }

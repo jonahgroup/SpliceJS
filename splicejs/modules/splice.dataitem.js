@@ -1,9 +1,9 @@
 global.sjs.module({
 required:[
   {Inheritance:'/{sjshome}/modules/splice.inheritance.js'}
-]}
+]
 ,
-function(scope){
+definition:function(scope){
   "use strict";
 
 
@@ -206,4 +206,4 @@ function(scope){
     DataItem, ArrayDataItem
     );
 
-})
+}})

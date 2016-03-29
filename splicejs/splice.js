@@ -519,6 +519,7 @@ try {
 
 	function applyImports(imports){
 		var scope = this;
+        scope.add('imports',new Namespace());
 		for(var i=0; i<imports.length; i++){
 			if(!imports[i].namespace) continue;
 			var ns = imports[i].namespace;
@@ -649,20 +650,21 @@ try {
 
 	var MODULE_MAP = new Object(null);
 	var _moduleHandlers = {
-		'default' : function anonymousModule(scope, fn){
-			fn.bind(scope)(scope);
+		'default' : function anonymousModule(m,scope){
+			m.definition.bind(scope)(scope);
 		},
-		'splash' : function splashModule(scope, fn){
-			var s = fn.bind(scope)(scope);
+		'splash' : function splashModule(m,scope){
+			var s = m.definition.bind(scope)(scope);
 			if(typeof s == 'function') Loader.splashScreen = new s();
 		}
 	};
 
 
-function loadModule(m, scope,url,def){
-    if(typeof(def) != 'function'){
-        throw 'Invalid module defintion "'+ typeof(def) + '" in ' + url;        
-    }
+function loadModule(m, scope,url){
+    if(!m)
+        throw 'Invalid module defintion "'+ m + '" in ' + url; 
+    if(typeof(m.definition) != 'function')
+        throw 'Invalid module defintion "'+ typeof(m.definition) + '" in ' + url;        
     
     var	required = _required(m,scope.context);
     load.call(scope,required.resources, function(){
@@ -671,13 +673,12 @@ function loadModule(m, scope,url,def){
         var handler = _moduleHandlers[(m!=null?m.type:null)||'default'];
         if(handler == null) throw 'Handler for "' + m.type + '" is not found' ;
         
-        handler(scope, def);
+        handler(m,scope);
         if(url != null) MODULE_MAP[url] = scope.__sjs_module_exports__;
     });
-    
 }
 
-function _module(m,def){
+function _module(m){
     var loader = Loader.currentLoader;
     if(this instanceof Loader) loader = this;
 
@@ -691,13 +692,11 @@ function _module(m,def){
     scope.add('exports',_exports(scope));
     scope.add('context',context(path));
     
-    scope.add('load',(function load(m,d){
-        return loadModule({required:m},this,null,d);
+    scope.add('load',(function load(r,c){
+        return loadModule({required:r, definition:c},this,null);
     }).bind(scope) ,true)
-    
-    if(typeof(m) == 'function')
-        return loadModule(null,scope,url,m);
-    return loadModule(m,scope,url,def);        
+ 
+    return loadModule(m,scope,url);        
 };
 
 _module.list= function list(){
@@ -712,7 +711,7 @@ function addTo(s,t){
 	}
 };
 
-var extension =mixin(Object.create(null), {
+var extension = mixin(Object.create(null), {
 	loader: function(obj){
 		addTo(obj,_fileHandlers);
 	},

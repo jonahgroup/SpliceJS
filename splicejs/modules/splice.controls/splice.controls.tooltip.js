@@ -8,20 +8,24 @@ required:[
   'splice.controls.tooltip.html'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
   "use strict";
   var
-    scope = this.scope
+    imports = scope.imports
   ;
 
   var
-    Class = scope.Inheritance.Class
-  , Controller = scope.Component.Controller
+    Class = imports.Inheritance.Class
+  , Controller = imports.Component.Controller
   ;
 
   var ToolTip  = Class(function ToolTipController(){
-    this.super();
+    this.base();
   }).extend(Controller);
+
+  scope.exports(
+      ToolTip
+  );
 
 
 }})

@@ -8,15 +8,16 @@ required:[
 	'splice.controls.viewpanel.css'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
 
 	var
-		scope = this.scope
+		sjs = scope.sjs
+    ,   imports = scope.imports
 	//,	overlay = sjs.display.overlay
 	;
 	var
-		Class 		= scope.Inheritance.Class
-	, UIControl = scope.SpliceJS.UI.UIControl
+	    Class 	    = imports.Inheritance.Class
+	,   UIControl   = imports.SpliceJS.UI.UIControl
 	;
 	/**
 	 *
@@ -111,8 +112,6 @@ definition:function(sjs){
 
 	};
 
-	return {}
-
+	
 }
-
 });

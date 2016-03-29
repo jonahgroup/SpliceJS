@@ -6,8 +6,8 @@ required:[
   { Syntax      : '/{sjshome}/modules/splice.syntax.js'},
   { Events      : '/{sjshome}/modules/splice.event.js'},
   { Views      : '/{sjshome}/modules/splice.view.js'}
-]},
-function(scope){
+],
+definition:function(scope){
   "use strict";
   var 
     imports = scope.imports
@@ -77,9 +77,9 @@ function(scope){
   ----------------------------------------------------------
   	Component module handler
   */
-  function componentModule(_scope, _fn){
+  function componentModule(_module,_scope){
     compileTemplates(_scope);
-    _fn.bind(_scope)(_scope);
+    _module.definition.bind(_scope)(_scope);
   }
 
 
@@ -110,9 +110,14 @@ function(scope){
 			/* create instance of the proxy object
 			 * local scope lookup takes priority
 			 */
+            
+            //look in root scope
 			var obj = scope.lookup(args.type);
-
+            //look in the inmports
+            if(!obj) obj = scope.imports.lookup(args.type);
+            // looks in the components
 			if(!obj) obj = scope.components.lookup(args.type);
+
 
 			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
@@ -1278,7 +1283,14 @@ function(scope){
   			if(!(this instanceof Component)) throw 'Component function must be invoked with [new] keyword';
 
   			/* lookup controller */
-  			var controller =  _controller?scope.lookup(_controller):null;
+  			var controller = null; 
+            if(_controller) {
+                controller = scope.lookup(_controller);
+                if(!controller)
+                controller = scope.imports.lookup(_controller);    
+            }
+            
+                                     
   			/* assign default */
   			if(!controller) controller = Controller;
   			if(controller.isComponent) controller = controller.controller();
@@ -1361,4 +1373,5 @@ function(scope){
       {Proxy:proxy}
     );
 
-})
+}
+});

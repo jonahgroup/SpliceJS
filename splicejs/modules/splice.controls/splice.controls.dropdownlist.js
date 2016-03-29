@@ -10,17 +10,17 @@ required:[
 	'splice.controls.dropdownlist.html'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
 	"use strict";
 
-	var scope = this.scope
-	,	exports = sjs.exports
+	var sjs = scope.sjs
+	,	imports = scope.imports
 	;
 
 	var
-		Class = scope.Inheritance.Class
-	,	event = scope.Events.event
-	,	UIControl = scope.SpliceJS.UI.UIControl
+		Class = imports.Inheritance.Class
+	,	event = imports.Events.event
+	,	UIControl = imports.SpliceJS.UI.UIControl
 	;
 
 		/**
@@ -66,12 +66,12 @@ definition:function(sjs){
 
 
 	/* scope exports for component consumption*/
-	exports.scope(
+	scope.add(
 		DropDownListController
 	);
 
 	/* module exports */
-	exports.module(
+	scope.exports(
 		DropDownListController
 	);
 

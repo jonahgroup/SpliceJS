@@ -7,8 +7,8 @@ required:[
   '/{sjshome}/modules/splice.text.js',
   '/{sjshome}/modules/splice.network.js',
   '/{sjshome}/modules/splice.component.js',
-]},
-function(scope){
+],
+definition:function(scope){
   //aggregation module
 }
-);
+});

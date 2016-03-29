@@ -11,18 +11,18 @@ required:[
 	'splice.controls.datepicker.html'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
 	"use strict";
 
-	var scope = this.scope
-	,	exports = sjs.exports;
+	var sjs = scope.sjs
+	,	imports = scope.imports
 	;
 
 	var
-		Class = scope.Inheritance.Class
-	,	event = scope.Events.event
-	, UIControl = scope.SpliceJS.UI.UIControl
-	,	format = scope.Text.format
+		Class       = imports.Inheritance.Class
+	,	event       = imports.Events.event
+	,   UIControl   = imports.SpliceJS.UI.UIControl
+	,	format      = imports.Text.format
 	;
 
 	var DatePicker = Class(function DatePickerController(){
@@ -67,11 +67,11 @@ definition:function(sjs){
 	    this.children.selector.dataIn(date);
 	};
 
-	exports.scope (
+	scope.add (
 		DatePicker
 	);
 
-	exports.module(
+	scope.exports(
 		DatePicker
 	);
 

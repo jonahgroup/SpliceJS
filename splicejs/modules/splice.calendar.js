@@ -1,7 +1,6 @@
 /* global sjs*/
-sjs.module(
-function(scope){
-
+sjs.module({
+definition:function(scope){
   function date(d){
     return {
       reverseUTC:function(){
@@ -16,6 +15,4 @@ function(scope){
       date:d
     }
   }
-
-
-});
+}});

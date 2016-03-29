@@ -7,15 +7,15 @@ required:[
 	'splice.controls.treetable.html'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
 
 	var
-		scope = this.scope
+		imports = scope.imports
 	;
 
 	var
-	 	Class = scope.Inheritance.Class
-	,	UIControl = scope.SpliceJS.UI.UIControl;
+	 	Class = imports.Inheritance.Class
+	,	UIControl = imports.SpliceJS.UI.UIControl;
 
 	var TreeTable = Class(function TreeTableController(){
 		this.super();
@@ -24,5 +24,9 @@ definition:function(sjs){
 	TreeTable.prototype.dataIn = function(){
 
 	};
+
+    scope.exports(
+      TreeTable  
+    );
 
 }})

@@ -9,18 +9,18 @@ required:[
 	'splice.controls.gridlayout.html'
 ]
 ,
-definition:function(sjs){
-	var scope = this.scope
-	,	exports = sjs.exports
-	,	log = sjs.log
+definition:function(scope){
+	var sjs = scope.sjs
+	,	log = scope.sjs.log
+    ,   imports = scope.imports
 	;
 
 	var
-		Class 		= scope.Inheritance.Class
-	,	UIControl = scope.SpliceJS.UI.UIControl
-	,	DragAndDrop = scope.SpliceJS.UI.DragAndDrop
-	,	event 			= scope.Events.event
-	, proxy 			= scope.Component.Proxy
+		Class 		= imports.Inheritance.Class
+	,	UIControl   = imports.SpliceJS.UI.UIControl
+	,	DragAndDrop = imports.SpliceJS.UI.DragAndDrop
+	,	event 		= imports.Events.event
+	,   proxy 		= imports.Component.Proxy
 	;
 
 
@@ -82,15 +82,15 @@ definition:function(sjs){
 		this.base();
 
 		event(this).attach({
-			onAdd 				: event.multicast,
-			onStartMove 	:	event.multicast,
+			onAdd 			: event.multicast,
+			onStartMove 	: event.multicast,
 			onMove 	  		: event.multicast,
 			onEndMove 		: event.multicast,
-			onStartResize : event.multicast,
+			onStartResize   : event.multicast,
 			onResize 	    : event.multicast,
-			onEndResize   : event.multicast,
-			onCellSize 	  : event.multicast,
-			onRemove 			: event.multicast,
+			onEndResize     : event.multicast,
+			onCellSize 	    : event.multicast,
+			onRemove 		: event.multicast,
 			onMaximize 		: event.multicast
 		})
 
@@ -592,11 +592,11 @@ definition:function(sjs){
 	};
 
 	/* module exports */
-	exports.scope(
+	scope.add(
 		Grid, CellContainer, GridLayout
 	);
 
-	exports.module(
+	scope.exports(
 		Grid, CellContainer, GridLayout
 	);
 

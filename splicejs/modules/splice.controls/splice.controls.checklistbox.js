@@ -17,18 +17,21 @@ required:[
   'splice.controls.checklistbox.css',
   'splice.controls.checklistbox.html'
 ],
-  definition:function(sjs){
+  definition:function(scope){
 
-    var scope = this.scope
-    , exports = sjs.exports
+    var 
+        sjs = scope.sjs
+    ,   imports = scope.imports
     ;
 
     var
-      Class = scope.Inheritance.Class
-    , event = scope.Events.event
-    , proxy = scope.Component.Proxy
-    , DataItem = scope.SpliceJS.UI.DataItem
-    , dom = scope.Doc.dom
+      Class      = imports.Inheritance.Class
+    , event      = imports.Events.event
+    , proxy      = imports.Component.Proxy
+    , DataItem   = imports.SpliceJS.UI.DataItem
+    , dom        = imports.Doc.dom
+    , ListBoxController = imports.SpliceJS.Controls.ListBoxController
+    , ListItemController = imports.SpliceJS.Controls.ListItemController
     , components = scope.components;
     ;
 
@@ -37,14 +40,14 @@ required:[
       event(this).attach({
         onSelection : event.multicast
       });
-    }).extend(scope.SpliceJS.Controls.ListBoxController);
+    }).extend(ListBoxController);
 
     /*
       Check list element item
     */
     var CheckListItemController = Class(function CheckListItemController(){
       this.base();
-    }).extend(scope.SpliceJS.Controls.ListItemController);
+    }).extend(ListItemController);
 
     CheckListItemController.prototype.onDataIn = function(item){
       if(!item) return;
@@ -121,12 +124,12 @@ required:[
       }
     }
 
-    exports.scope (
+    scope.add (
       CheckListBox , CheckListBoxController, CheckListItemController
     );
 
     // module exports
-    exports.module (
+    scope.exports (
       CheckListBox , CheckListBoxController, CheckListItemController
     );
 

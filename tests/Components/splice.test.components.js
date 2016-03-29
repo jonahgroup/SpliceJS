@@ -15,9 +15,9 @@ required:[
   'splice.test.components.css',
   'splice.test.components.html',
   'splice.test.components.templates.html'
-]}
+]
 ,
-function(scope){
+definition:function(scope){
 
   var
     sjs = scope.sjs
@@ -129,7 +129,7 @@ function(scope){
     return fn;
   };
 
-  var DataItem = scope.SpliceJS.Ui.DataItem;
+  var DataItem = imports.SpliceJS.Ui.DataItem;
 
 
   var testDataItem = function testDataItem(){
@@ -147,6 +147,6 @@ function(scope){
     ComponentsTest, foo, testDataItem
   );
 
-  new this.scope.Component.DocumentApplication(scope).run();
+  new imports.Component.DocumentApplication(scope).run();
 
-});
+}});

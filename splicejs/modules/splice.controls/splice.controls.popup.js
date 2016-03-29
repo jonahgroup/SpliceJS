@@ -8,15 +8,15 @@ required:[
 	'splice.controls.popup.css'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
+    "use strict";
+	var
+		sjs = scope.sjs
+	,   imports = scope.imports;
 
 	var
-		scope = this.scope
-	, exports = sjs.exports;
-
-	var
-		Class = scope.Inheritance.Class
-	,	UIControl = scope.SpliceJS.UI.UIControl
+		Class = imports.Inheritance.Class
+	,	UIControl = imports.SpliceJS.UI.UIControl
 
 	var Popup = Class(function PopupController(){
 		this.super();
@@ -79,7 +79,13 @@ definition:function(sjs){
 	    }, 1);
 	};
 
+    scope.add(
+        Popup         
+    );
 
+    scope.exports(
+        Popup    
+    );
 
 
 }
