@@ -1,8 +1,8 @@
-sjs.module({
-
-definition:function(sjs){
-var exports = sjs.exports
-,	mixin = sjs.mixin;
+sjs.module(
+function(scope){
+var 
+    mixin = scope.sjs.mixin
+;
 
 function Tokenizer(input, alphanum, space){
 	if(!(this instanceof Tokenizer) ) return new Tokenizer(input, alphanum, space);
@@ -60,7 +60,7 @@ Tokenizer.prototype = {
 		return result;
 	}
 }
-exports.module(
+scope.exports(
 	Tokenizer
 );
-}});
+});

@@ -3,14 +3,20 @@ required:[
   { Document  : '/{sjshome}/modules/splice.document.js'},
   { Views     : '/{sjshome}/modules/splice.view.js'},
   { Sync      : '/{sjshome}/modules/splice.async.js'}
-],
-definition:function(sjs){
+]},
+function(scope){
+    "use strict";
+  var 
+    sjs = scope.sjs
+  ,  imports = scope.imports
+  ; 
+  
+  var 
+    mixin = sjs.mixin
+  ;
 
-  var exports = sjs.exports
-  , mixin = sjs.mixin;
-
-  var doc = this.scope.Document
-  , View = this.scope.Views.View;
+  var doc = imports.Document
+  , View = imports.Views.View;
 
   	function mousePosition(e){
           //http://www.quirksmode.org/js/events_properties.html#position
@@ -311,8 +317,8 @@ definition:function(sjs){
   	};
 
 
-exports.module(
+scope.exports(
     {'event':Event}
 );
 
-}})
+})

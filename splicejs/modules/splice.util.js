@@ -1,4 +1,4 @@
-sjs.module({
-definition:function(sjs){
+sjs.module(
+function(sjs){
 }
-});
+);

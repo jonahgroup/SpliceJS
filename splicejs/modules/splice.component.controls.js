@@ -32,21 +32,20 @@ required:[
 ,	{'DataControls':'splice.controls/splice.controls.treetable.js'}
 ,	'splice.controls/splice.controls.css'
 ,   'splice.controls/splice.controls.html'
-]
+]}
 ,
-definition:function(sjs){
+function(scope){
 	"use strict";
-	var scope = this.scope;
 
 	/* imports */
-	var Class 	= sjs.Class
-	,		exports = sjs.exports
-	;
-
 	var
-	 	Class = scope.Inheritance.Class
-	,	UIControl = scope.SpliceJS.UI.UIControl
-	, event = scope.Events.event
+        imports = scope.imports
+    ;
+    
+    var
+        Class = imports.Inheritance.Class
+	,	UIControl = imports.SpliceJS.UI.UIControl
+	,   event = imports.Events.event
 	;
 
 	/*
@@ -91,54 +90,54 @@ definition:function(sjs){
 
 
 	// module exports
-	exports.module(
+	scope.exports(
 		/* utility controls */
-		{UIControl:			scope.SpliceJS.UI.UIControl},
-		{DomIterator: 	scope.Controllers.DomIterator},
-		{ImageSelector: ImageSelector},
+		{UIControl:		    imports.SpliceJS.UI.UIControl},
+		{DomIterator: 	    imports.Controllers.DomIterator},
+		{ImageSelector:     ImageSelector},
 		/* buttons */
-		{Button:				scope.Buttons.Button},
-		{CheckBox:			scope.Buttons.CheckBox},
-		{RadioButton:		scope.Buttons.RadioButton},
-		{TextField:			scope.Buttons.TextField},
-		{Slider:				scope.Buttons.Slider},
+		{Button:			imports.Buttons.Button},
+		{CheckBox:			imports.Buttons.CheckBox},
+		{RadioButton:		imports.Buttons.RadioButton},
+		{TextField:			imports.Buttons.TextField},
+		{Slider:			imports.Buttons.Slider},
 		/* panels */
-		{DrawerPanel:		scope.Panels.DrawerPanel},
-		{ViewPanel:			scope.Panels.ViewPanel},
-		{ScrollPanel:		scope.Panels.ScrollPanel},
+		{DrawerPanel:		imports.Panels.DrawerPanel},
+		{ViewPanel:			imports.Panels.ViewPanel},
+		{ScrollPanel:		imports.Panels.ScrollPanel},
 		/* charts */
-		{Chart:							scope.Charts.Chart},
-		{Dial:							scope.Charts.Dial},
-		{GridLayout:        scope.Grids.GridLayout},
-    {CellContainer:     scope.Grids.CellContainer},
-		{D3Canvas:					scope.Charts.D3Canvas},
-		{Map:								scope.Maps.Map},
+		{Chart:				imports.Charts.Chart},
+		{Dial:				imports.Charts.Dial},
+		{GridLayout:        imports.Grids.GridLayout},
+        {CellContainer:     imports.Grids.CellContainer},
+		{D3Canvas:			imports.Charts.D3Canvas},
+		{Map:				imports.Maps.Map},
 		/* selectors */
-		{DropDownSelector:	scope.Selectors.DropDownSelector},
-		{DropDownList:			scope.Selectors.DropDownList},
-		{DatePicker:				scope.Selectors.DatePicker},
-		{Calendar:					scope.Selectors.Calendar},
-		{ComboBox:					scope.Selectors.ComboBox},
+		{DropDownSelector:	imports.Selectors.DropDownSelector},
+		{DropDownList:		imports.Selectors.DropDownList},
+		{DatePicker:		imports.Selectors.DatePicker},
+		{Calendar:			imports.Selectors.Calendar},
+		{ComboBox:			imports.Selectors.ComboBox},
 		/* data controls */
-		{DataTable:					scope.DataControls.DataTable},
-		{DataTableRow:			scope.DataControls.DataTableRow},
-		{ListBox:						scope.DataControls.ListBox},
-		{ListItem:					scope.DataControls.ListItem},
-		{ScrollableListBox:	scope.DataControls.ScrollableListBox},
-		{StretchListBox:		scope.DataControls.StretchListBox},
-		{GroupedListItem:		scope.DataControls.GroupedListItem},
-		{TreeView:					scope.DataControls.TreeView},
-		{TreeTable:					scope.DataControls.TreeTable},
-		{CheckListBox:			scope.DataControls.CheckListBox},
+		{DataTable:			imports.DataControls.DataTable},
+		{DataTableRow:		imports.DataControls.DataTableRow},
+		{ListBox:			imports.DataControls.ListBox},
+		{ListItem:			imports.DataControls.ListItem},
+		{ScrollableListBox:	imports.DataControls.ScrollableListBox},
+		{StretchListBox:	imports.DataControls.StretchListBox},
+		{GroupedListItem:	imports.DataControls.GroupedListItem},
+		{TreeView:			imports.DataControls.TreeView},
+		{TreeTable:			imports.DataControls.TreeTable},
+		{CheckListBox:		imports.DataControls.CheckListBox},
 		/* Navigation */
-		{Popup:					scope.Navigation.Popup},
-		{PageLoader:		scope.Navigation.PageLoader},
-		{ToolTip:				scope.Navigation.ToolTip},
+		{Popup:				imports.Navigation.Popup},
+		{PageLoader:		imports.Navigation.PageLoader},
+		{ToolTip:			imports.Navigation.ToolTip},
 		/* Editors */
-		{CodeEditor:		scope.Editors.CodeEditor},
+		{CodeEditor:		imports.Editors.CodeEditor},
 		/* Controllers*/
-		{ListItemController:scope.DataControls.ListItemController}
+		{ListItemController:imports.DataControls.ListItemController}
 	);
 
 // end module definition
-}});
+});

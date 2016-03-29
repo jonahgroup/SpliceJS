@@ -1,12 +1,12 @@
 /* global sjs */
-sjs.module({
-
-definition:function(sjs){
+sjs.module(
+function(scope){
   "use strict";
 
 	//configuration constants
-	var exports = sjs.exports
-  ,   log = sjs.log;
+	var
+    log = scope.sjs.log
+    ;
 
   /*
   ----------------------------------------------------------
@@ -208,10 +208,8 @@ definition:function(sjs){
 
 
   // module exports
-	exports.module(
+	scope.exports(
     remote,
     {http : { get:  HttpRequest.get, post: HttpRequest.post }}
 	);
-
-}
 });

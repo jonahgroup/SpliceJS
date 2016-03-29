@@ -6,19 +6,20 @@ required:[
   { Syntax      : '/{sjshome}/modules/splice.syntax.js'},
   { Events      : '/{sjshome}/modules/splice.event.js'},
   { Views      : '/{sjshome}/modules/splice.view.js'}
-],
-definition:function(sjs){
+]},
+function(scope){
   "use strict";
-  var scope = this.scope
-  , exports = sjs.exports
-  , log = sjs.log
+  var 
+    imports = scope.imports
+  , log = scope.sjs.log
+  , sjs = scope.sjs
   ;
 
-  var http = scope.Networking.http
-  , doc = scope.Document
-  , Tokenizer = scope.Syntax.Tokenizer
-  , event = scope.Events.event
-  , View = scope.Views.View;
+  var http = imports.Networking.http
+  , doc = imports.Document
+  , Tokenizer = imports.Syntax.Tokenizer
+  , event = imports.Events.event
+  , View = imports.Views.View;
   /*
   ----------------------------------------------------------
   	HTML File Handler
@@ -76,9 +77,9 @@ definition:function(sjs){
   ----------------------------------------------------------
   	Component module handler
   */
-  function componentModule(_m, _scope, _sjs){
+  function componentModule(_scope, _fn){
     compileTemplates(_scope);
-    _m.definition.call({scope:_scope},_sjs);
+    _fn.bind(_scope)(_scope);
   }
 
 
@@ -362,8 +363,8 @@ definition:function(sjs){
 
   			case BINDING_TYPES.PARENT:
   				if(!originInstance.parent) throw 'Unable to locate parent instance';
-  				return originInstance.parent;
-  			break;
+  			return originInstance.parent;
+  			
 
 
   			case BINDING_TYPES.TYPE:
@@ -1353,11 +1354,11 @@ definition:function(sjs){
   	};
 
 
-    exports.module(
+    scope.exports(
       Template,
       Controller,
       compileTemplate,
       {Proxy:proxy}
     );
 
-}})
+})

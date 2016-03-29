@@ -2,18 +2,17 @@
 global.sjs.module({
 required:[
   {'UI':'/{sjshome}/modules/splice.dataitem.js'}
-]
+]}
 ,
-definition: function(sjs,scope){
+function(scope){
     "use strict";
     var
-      log = sjs.log
-    , exports = sjs.exports
+      log = scope.sjs.log
     ;
 
     var
-      DataItem = scope.UI.DataItem
-    , ArrayDataItem = scope.UI.ArrayDataItem
+      DataItem = scope.imports.UI.DataItem
+    , ArrayDataItem = scope.imports.UI.ArrayDataItem
     ;
 
     var orders = [
@@ -131,7 +130,7 @@ definition: function(sjs,scope){
       }
     }
 
-    exports.module(
+    scope.exports(
       Test_PathTree,
       Test_ValueSetter,
       Test_ValueSetterRefSource,
@@ -142,4 +141,4 @@ definition: function(sjs,scope){
       Test_LargeData
     );
 
-}})
+})

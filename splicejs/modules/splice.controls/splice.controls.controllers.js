@@ -8,18 +8,19 @@ required:[
 	{ Event: '/{sjshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
 	 'splice.controls.controllers.html'
-]
+]}
 ,
-definition:function(sjs){
+function(scope){
+    "use strict";
+	var 
+        sjs = scope.sjs
+    ,   imports = scope.imports
+    ;
 
-	var scope = this.scope
-
-	,	exports = sjs.exports;
-
-	var Class = scope.Inheritance.Class
-	,	Controller = scope.Component.Controller
-	, UIControl = scope.SpliceJS.UI.UIControl
-	,	event = scope.Event.event
+	var Class = imports.Inheritance.Class
+	,	Controller = imports.Component.Controller
+	,   UIControl = imports.SpliceJS.UI.UIControl
+	,	event = imports.Event.event
 	;
 
 	var DomIterator = Class(function DomIteratorController(args){
@@ -98,15 +99,14 @@ definition:function(sjs){
 
 
 	//scope exports
-	exports.scope(
+	scope.add(
 		DomIterator
 	);
 
 	//module exports
-	exports.module(
+	scope.exports(
 		DomIterator
 	);
 
 }
-
-}); //module declaration end
+) //module declaration end

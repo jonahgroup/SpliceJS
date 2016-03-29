@@ -2,17 +2,17 @@
 sjs.module({
 required:[
 	{Syntax:'/{sjshome}/modules/splice.syntax.js'}
-]
+]}
 ,
-definition:function(sjs){
+function(scope){
+    "use strict";
+    var 
+        sjs = scope.sjs
+    ,   imports = scope.imports
+    ;
 
 	var
-		scope = this.scope
-	,	exports = sjs.exports
-	;
-
-	var
-		Tokenizer = scope.Syntax.Tokenizer
+		Tokenizer = imports.Syntax.Tokenizer
 	;
 
 	function getValueUnit(value){
@@ -253,7 +253,7 @@ definition:function(sjs){
 		,	pt = css.getPropertyValue('padding-top')
 		,	pr = css.getPropertyValue('padding-right')
 		,	pb = css.getPropertyValue('padding-bottom')
-		, bl = css.getPropertyValue('border-left-width')
+		,   bl = css.getPropertyValue('border-left-width')
 		,	bt = css.getPropertyValue('border-top-width')
 		,	br = css.getPropertyValue('border-right-width')
 		,	bb = css.getPropertyValue('border-bottom-width')
@@ -401,7 +401,7 @@ definition:function(sjs){
 		return window.innerHeight;
 	}
 
-	exports.module(
+	scope.exports(
 		isHTMLElement,
 		{style:style},
 		{select:{
@@ -427,4 +427,4 @@ definition:function(sjs){
 
 	);
 
-}});
+});

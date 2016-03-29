@@ -1,17 +1,14 @@
 global.sjs.module({
 required:[
   {Inheritance:'/{sjshome}/modules/splice.inheritance.js'}
-]
+]}
 ,
-definition:function(sjs){
+function(scope){
   "use strict";
 
-  var
-    exports = sjs.exports
-  ;
 
   var
-    Class = this.scope.Inheritance.Class
+    Class = scope.imports.Inheritance.Class
   ;
   
     var EXCEPTIONS  = {
@@ -205,9 +202,8 @@ definition:function(sjs){
   		}
   	};
 
-exports.module(
-  DataItem, ArrayDataItem
-);
+    scope.exports(
+    DataItem, ArrayDataItem
+    );
 
-
-}})
+})

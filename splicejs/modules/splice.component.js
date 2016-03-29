@@ -3,18 +3,14 @@ required:[
   {Inheritance : '/{sjshome}/modules/splice.Inheritance.js'},
   {Core : '/{sjshome}/modules/splice.component.core.js'},
   {Controls : '/{sjshome}/modules/splice.component.controls.js'}
-],
-definition:function(sjs){
+]},
+function(scope){
+
 
   var
-    exports = sjs.exports
-  , scope = this.scope
-  ;
-
-  var
-    Class = scope.Inheritance.Class
-    ComponentTemplate = scope.Core.Template
-    Controller = scope.Core.Controller
+    Class = scope.imports.Inheritance.Class
+    ComponentTemplate = scope.imports.Core.Template
+    Controller = scope.imports.Core.Controller
   ;
 
   var DocumentApplication = Class(function DocumentApplication(_scope){
@@ -31,9 +27,9 @@ definition:function(sjs){
     controller.onDisplay();
   };
 
-  exports.module(
+  scope.exports(
     DocumentApplication, Controller
   );
 
-}
+
 });

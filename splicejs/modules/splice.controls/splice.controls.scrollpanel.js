@@ -11,20 +11,25 @@ required:[
 	'splice.controls.scrollpanel.html'
 ]
 ,
-definition:function(sjs){
+definition:function(scope){
 
-
-	var exports 	= sjs.exports
-	, 	isTouch 	= false
+	var 
+	 	isTouch 	= false
 	, 	isMobile 	= false;
 
-	var	select = this.scope.Doc.select
-	,		create = this.scope.Doc.create
-	, 	UIControl 	= this.scope.SpliceJS.UI.UIControl
-	, 	DragAndDrop = this.scope.SpliceJS.UI.DragAndDrop
-	,		Controller = this.scope.Component.Controller
-	,		Class = this.scope.Inheritance.Class
-	,		event = this.scope.Events.event;
+    var 
+        sjs = scope.sjs
+    ,   imports = scope.imports
+    ;
+
+	var	select = imports.Doc.select
+	,	create = imports.Doc.create
+	, 	UIControl 	= imports.SpliceJS.UI.UIControl
+	, 	DragAndDrop = imports.SpliceJS.UI.DragAndDrop
+	,	Controller = imports.Component.Controller
+	,	Class = imports.Inheritance.Class
+	,	event = imports.Events.event
+    ;
 
 	var ScrollPanel = Class(function ScrollPanelController(args){
 		this.base(args);
@@ -348,18 +353,15 @@ definition:function(sjs){
 			//_.debug.log(e);
 		};
 
-
-
-
 		return status;
 	}; //end attach scrollbars
 
 	//scope exports
-	exports.scope(
+	scope.add(
 		ScrollPanel
 	);
 	//module exports
-	exports.module(
+	scope.exports(
 		ScrollPanel
 	);
 

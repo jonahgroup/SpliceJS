@@ -16,9 +16,9 @@ required:[
 	'splice.controls.css',
 	'splice.controls.datatable.css',
 	'splice.controls.datatable.html'
-]
+]}
 ,
-definition: function(sjs){
+function(scope){
 	"use strict";
 
 	function _if(obj){
@@ -27,23 +27,23 @@ definition: function(sjs){
 	}
 
 	// import dependencies
-	var mixin = sjs.mixin
-	,	debug = sjs.log.debug
-	,	scope = this.scope
+	var imports = scope.imports
+    ,   mixin = scope.sjs.mixin
+	,	debug = scope.sjs.log.debug
 	;
 
-	var	Class 	= scope.Inheritance.Class
-	,	Doc 			= scope.Doc
-	,	create 		= scope.Doc.create
-	,	dom 			= scope.Doc.dom
-	,	cssvalue 	= scope.Doc.cssvalue
-	,	data 			= scope.Data.data
-	,	fdata 		= scope.Data.data
-	,	compare 	= scope.Data.compare.default
-	,	DataStep 	= scope.Data.DataStep
-	, UIControl = scope.SpliceJS.UI.UIControl
-	,	Event 		= scope.Events.event
-	,	Controller = scope.Component.Controller;
+	var	Class 	    = imports.Inheritance.Class
+	,	Doc 		= imports.Doc
+	,	create 		= imports.Doc.create
+	,	dom 		= imports.Doc.dom
+	,	cssvalue 	= imports.Doc.cssvalue
+	,	data 		= imports.Data.data
+	,	fdata 		= imports.Data.data
+	,	compare 	= imports.Data.compare.default
+	,	DataStep 	= imports.Data.DataStep
+	,   UIControl   = imports.SpliceJS.UI.UIControl
+	,	Event 		= imports.Events.event
+	,	Controller  = imports.Component.Controller;
 	;
 
 	/**
@@ -767,10 +767,10 @@ definition: function(sjs){
 
 
 	//module exports
-	return {
-		DataTable: DataTable,
-		DataTableRow: DataTableRow
-	}
+	scope.exports(
+		DataTable,
+		DataTableRow
+    );
 
 // end module definition
-}});
+});

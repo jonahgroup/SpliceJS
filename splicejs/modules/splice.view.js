@@ -1,22 +1,21 @@
 sjs.module ({
 required:[
     {Syntax:  '/{sjshome}/modules/splice.syntax.js'}
-]
+]}
 ,
-definition:function(sjs){
+function(scope){
 
   var
-    scope = this.scope
-    exports = sjs.exports
+    sjs = scope.sjs
+  , imports = scope.imports
   ;
 
   var
-    Tokenizer = scope.Syntax.Tokenizer
+    Tokenizer = imports.Syntax.Tokenizer
   ;
 
   function dfs(dom, target, filterFn, nodesFn){
     if(!dom) return;
-
 
     if(typeof filterFn === 'function') {
       var node = filterFn(dom);
@@ -501,9 +500,7 @@ definition:function(sjs){
   	element.className = clean;
   };
 
-  exports.module(
+  scope.exports(
     View
   );
-}
-}
-);
+});

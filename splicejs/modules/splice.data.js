@@ -2,13 +2,17 @@
 sjs.module({
 required:[
 	{Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
-],
-definition:function(sjs){
+]},
+function(scope){
+    "use strict";
+	var 
+		sjs = scope.sjs
+    ,   imports = scope.imports
+    ;
 
-	var mixin = sjs.mixin
-	,	exports = sjs.exports;
-
-	var	Class = this.scope.Inheritance.Class;
+	var	
+        mixin = sjs.mixin    
+    ,   Class = imports.Inheritance.Class;
 
 
 	var DataStep = function DataStep(dowork, issource){
@@ -878,9 +882,9 @@ function _objectToMap(onitem){
 	};
 
 
-	exports.module(
+	scope.exports(
 		data,	DataStep,
 		{compare: {'default':defaultComparator} }
 	);
 }
-});
+);

@@ -1,7 +1,6 @@
 /* global sjs*/
-sjs.module({
-
-definition:function(sjs){
+sjs.module(
+function(scope){
 
   function date(d){
     return {
@@ -18,10 +17,5 @@ definition:function(sjs){
     }
   }
 
-  return {
-    date:date
-  }
-
-}
 
 });

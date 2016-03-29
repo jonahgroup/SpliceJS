@@ -1,5 +1,5 @@
-sjs.module({
-  definition:function(){
+sjs.module(
+function(scope){
 
-  }
-});
+}
+);

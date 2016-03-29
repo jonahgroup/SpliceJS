@@ -9,16 +9,19 @@ required:[
 	{'Doc': '{sjshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
 	'splice.controls.buttons.html'
-]
+]}
 ,
-definition:function(sjs){
-	var scope = this.scope
-	,	exports = sjs.exports
-	,	debug = sjs.log.debug;
+function(scope){
+	var 	
+        imports = scope.imports
+    ,	debug = scope.sjs.log.debug
+    ;
 
-	var Class = scope.Inheritance.Class
-	,	UIControl = scope.SpliceJS.UI.UIControl
-	, event = scope.Event.event;
+	var 
+        Class = imports.Inheritance.Class
+	,	UIControl = imports.SpliceJS.UI.UIControl
+	,   event = imports.Event.event
+    ;
 
 	var Button = Class(function ButtonController(args){
 		this.base(args);
@@ -202,25 +205,19 @@ definition:function(sjs){
 	};
 
 
-
-
-
 	/* module scope and exports */
 
-	exports.scope(
+	scope.add(
 		{ButtonController 	 : Button},
 		{CheckBoxController  : CheckBox},
 		{TextFieldController : TextField}
 	);
 
-	exports.module(
+	scope.exports(
 		{ButtonController 	 : Button},
 		{CheckBoxController  : CheckBox},
 		{TextFieldController : TextField}
 	);
-
 
 }
-
-
-});
+);

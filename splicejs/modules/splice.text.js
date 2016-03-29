@@ -1,6 +1,6 @@
 
-sjs.module({
-definition:function(sjs){
+sjs.module(
+function(scope){
 
 var STRINGBODY = 0
 , 	FORMAT = 1
@@ -526,8 +526,8 @@ var Text = function Text(text){
 	};
 };
 
-sjs.exports.module(
+scope.exports(
 	format, Text
 );
 
-}});
+});

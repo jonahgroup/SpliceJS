@@ -1,31 +1,31 @@
 /*blobal sjs */
 sjs.module({
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Animation		: '/{sjshome}/modules/splice.animation.js'},
+	{ Inheritance   : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Animation	    : '/{sjshome}/modules/splice.animation.js'},
 	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
-	{ Data				: '/{sjshome}/modules/splice.dataitem.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'},
-	{ Views				: '/{sjshome}/modules/splice.view.js'}
-],
-definition:function component(sjs){
+	{ Data			: '/{sjshome}/modules/splice.dataitem.js'},
+	{ Events		: '/{sjshome}/modules/splice.event.js'},
+	{ Views			: '/{sjshome}/modules/splice.view.js'}
+]},
+function component(scope){
 	//enable strict mode
 	"use strict";
 
 	// importing framework features makes our code less verbose
-	var debug = sjs.log.debug
-	, log = sjs.log
-	,	scope = this.scope
-	,	exports = sjs.exports;
-
+	var debug = scope.sjs.log.debug
+	,   log = scope.sjs.log
+    ,   imports = scope.imports
+    ;
+    
 	var
-		Class 			= scope.Inheritance.Class
-	, Animate 		= scope.Animation.Animate
-	, Controller 	= scope.Component.Controller
-	,	Event 			= scope.Events.Event
-	,	event 			= scope.Events.event
-	,	View 				= scope.Views.View
-	,	DataItem 		= scope.Data.DataItem
+	    Class 			= imports.Inheritance.Class
+	,   Animate 		= imports.Animation.Animate
+	,   Controller 	    = imports.Component.Controller
+	,	Event 			= imports.Events.Event
+	,	event 			= imports.Events.event
+	,	View 			= imports.Views.View
+	,	DataItem 		= imports.Data.DataItem
 	;
 
 
@@ -396,13 +396,11 @@ definition:function component(sjs){
 
 
 	//module exports
-	exports.module(
+	scope.exports(
 		UIControl, UIElement, KeyListener,
 		DataItem,ObservableDataItem,
 		//singletons
 		{Positioning : Positioning},
 		{DragAndDrop : DragAndDrop}
 	);
-
-
-}});
+});

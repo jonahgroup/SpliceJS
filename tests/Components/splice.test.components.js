@@ -15,24 +15,24 @@ required:[
   'splice.test.components.css',
   'splice.test.components.html',
   'splice.test.components.templates.html'
-]
+]}
 ,
-definition:function(sjs){
+function(scope){
 
   var
-    scope = this.scope
-  , exports = sjs.exports
+    sjs = scope.sjs
+    imports = scope.imports
   ;
 
   var
-    Class = scope.Inheritance.Class
-  , Controller = scope.Component.Controller
-  , Event = scope.Events.Event
-  , event = scope.Events.event
+    Class = imports.Inheritance.Class
+  , Controller = imports.Component.Controller
+  , Event = imports.Events.Event
+  , event = imports.Events.event
   ;
 
-  var DataItem = scope.SpliceJS.Ui.DataItem;
-  var ObservableDataItem = scope.SpliceJS.Ui.ObservableDataItem;
+  var DataItem = imports.SpliceJS.Ui.DataItem;
+  var ObservableDataItem = imports.SpliceJS.Ui.ObservableDataItem;
 
   var provinces = [
     'Ontario','British Columbia', 'Alberta', 'Quebec','New Brunswick',
@@ -138,15 +138,15 @@ definition:function(sjs){
 
 
   //scope exports
-  exports.scope(
+  scope.add(
     ComponentsTest
   );
 
   //module exports
-  exports.module(
+  scope.exports(
     ComponentsTest, foo, testDataItem
   );
 
   new this.scope.Component.DocumentApplication(scope).run();
 
-}});
+});
