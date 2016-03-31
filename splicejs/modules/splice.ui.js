@@ -117,7 +117,7 @@ definition:function component(scope){
 		event(this.dataItem).attach({
 				onChanged : event.multicast
 		});
-		// invode data-item handler
+		// invoke data-item handler
 		this.onDataIn(this.dataItem);
 	};
 
@@ -196,7 +196,7 @@ definition:function component(scope){
 	 * HTML Element decorator
 	 */
 	var UIElement = Class(function UIElement(args){
-		this.super();
+		this.base();
 		event(this).attach({onClick : event.multicast});
 	}).extend(UIControl);
 

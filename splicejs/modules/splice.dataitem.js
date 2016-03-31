@@ -5,7 +5,9 @@ required:[
 ,
 definition:function(scope){
   "use strict";
-
+  var 
+    log = scope.sjs.log
+  ;
 
   var
     Class = scope.imports.Inheritance.Class
@@ -21,23 +23,24 @@ definition:function(scope){
     var DataItem = function DataItem(data){
         this.source = data;
         this.parent = null;
-        this.pathmap = {};
+        this.pathmap = Object.create(null);
     };
 
     DataItem.prototype.getValue = function(){
         if(this._state == 'd' || this.source == null ) return null;
         if(this._path == null) return this.source;
         return this.source[this._path];
-    }
+    };
 
     /*
         setValue must not access arbitrary object keys
-        rework and ArrayDataItem
+        rework add ArrayDataItem
     */
     DataItem.prototype.setValue = function(value){
         if(this.source == null) throw EXCEPTIONS.invalidSourceProperty + ' ' +this.source;
 
         if(typeof this.source != 'object') {
+            this.old = source;
             this.source = value;
             this._path = null;
             return this;
@@ -45,24 +48,28 @@ definition:function(scope){
 
         if(this._path == null) throw EXCEPTIONS.invalidPath + ' ' + this._path;
 
-        var old = this.source[this._path];
-        //same value no change
-        if(old === value) return this;
+        //same current value
+        if(this.source[this._path] === value) return this;
 
-        if(!this.source.hasOwnProperty(this._path)){
-            this._isnew = true;
+        //old is only the original value
+        if(this.old == undefined){
+            this.old = this.source[this._path];            
         }
-
+        
         // set value
         this.source[this._path] = value;
 
-        _setChangeState(this);
-        _bubbleChange(this);
-
-
-        _dataItem_triggerOnChange.call(this, old);
+        if(this.source[this._path] == this.old){
+            _bubbleChange(this,0,-1,0);
+        }
+        else {
+            _bubbleChange(this,0,1,0);
+        }
+        
+        
+        _triggerOnChange.call(this);
         return this;
-    }
+    };
 
   	/**
   		returns child DataItem
@@ -91,7 +98,17 @@ definition:function(scope){
   			if(this.pathmap[keys[key]]._state)
   				onItem(this.pathmap[keys[key]]);
   		}
-  	}
+  	};
+
+    //traverse path map and output changes
+    DataItem.prototype.changePath = function(onItem){                 
+        var list = [];
+        _pathWalker(this,list,'');
+       for(var i in list){
+           onItem(list[i]);
+       }             
+    }; 
+
 
   	DataItem.prototype.subscribe = function(handler, instance){
   		var node = this;
@@ -137,6 +154,23 @@ definition:function(scope){
 
     };
 
+    //hidden methods
+    function _pathWalker(root,list,start){
+        if(!root) {
+           if(start) list.push(start); 3
+           return; 
+        }
+        if(Object.keys(root.pathmap).length == 0) list.push(start);
+        var sep = start?'.':'';
+        
+        for(var key in root.pathmap){
+            if(!root.pathmap[key]._updated) continue;
+            start = start+sep+ key;
+            _pathWalker(root.pathmap[key],list,start);
+            start = '';
+        }
+    };
+
 
     /**
       Module private methods
@@ -174,24 +208,24 @@ definition:function(scope){
       return parent;
     }
 
-  	function _setChangeState(dataItem, isDelete){
+    /** 
+     * _n - new
+     * _u - update
+     * _d - delete
+    */
+  	function _setChangeState(dataItem, _n, _u, _d){
   		if(!dataItem) return dataItem;
-  		if(isDelete === true) {
-  			dataItem._state = 'd'; return;
-  		}
-  		if(dataItem._isnew == true){
-  			dataItem._state = 'n'; return;
-  		}
-  		dataItem._state = 'u';
+        if(!dataItem._updated) dataItem._updated = 0;  
+  		dataItem._updated+=_u;
   		return dataItem;
   	};
 
-  	function _bubbleChange(dataItem){
-  		var p = dataItem;
-  		while(p = _setChangeState(p.parent));
+  	function _bubbleChange(dataItem,_n,_u,_d){
+  		var p = _setChangeState(dataItem,_n,_u,_d);
+  		while(p = _setChangeState(p.parent,_n,_u,_d));
   	}
 
-  	function _dataItem_triggerOnChange(old){
+  	function _triggerOnChange(old){
   		var node = this;
   		while(node != null){
   			if(node.onChanged) {
@@ -203,7 +237,7 @@ definition:function(scope){
   	};
 
     scope.exports(
-    DataItem, ArrayDataItem
+        DataItem, ArrayDataItem
     );
 
 }})

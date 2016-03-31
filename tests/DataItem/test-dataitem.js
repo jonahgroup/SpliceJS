@@ -111,13 +111,18 @@ definition:function(scope){
 
     //count number of changes
     function Test_GetChanges(){
-      var d = new DataItem(orders);
+      var d = new ArrayDataItem(orders);
 
-      var i = d.path('1.items.0.name').setValue('black pencil');
-      //d.path('0.items.0.name').setValue('black pencil');
+      d.path('1.items.0.name').setValue('black pencil');
+      d.path('0.items.0.name').setValue('black pencil');
 
-      log.info(i.getValue());
+      
       d.changes(function(item){
+          log.info(item.fullPath());
+      });
+      d.path('1.items.0.name').setValue('pencil');
+      d.changePath(function(item){
+          log.info(item);
       });
     }
 
