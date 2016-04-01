@@ -591,7 +591,7 @@ try {
 		//all required
 		if(m.required instanceof Array) items = m.required;
 
-		var version = _core.config.version;
+		var version = config.version;
         var appCtx = context(config.appBase);
 
 		//versioned required

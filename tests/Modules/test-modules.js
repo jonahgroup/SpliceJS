@@ -1,6 +1,11 @@
 global.sjs.module({
+version:[
+    {'mobile: 1.0.0 - *]':[
+        {'Mobile':'importmodule.js'}      
+    ]}
+],    
 required: [
-  {'UI':'importmodule.js'}
+    {'UI':'importmodule.js'}
 ]
 ,
 definition:function(scope){
