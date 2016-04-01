@@ -36,6 +36,10 @@ definition:function(scope){
         setValue must not access arbitrary object keys
         rework add ArrayDataItem
     */
+    /*
+        todo: ???  create separate events for new, unpdated, deleted
+        this enable observers to track specific changes separately
+    */
     DataItem.prototype.setValue = function(value){
         if(this.source == null) throw EXCEPTIONS.invalidSourceProperty + ' ' +this.source;
 
@@ -54,6 +58,8 @@ definition:function(scope){
         //old is only the original value
         if(this.old == undefined){
             this.old = this.source[this._path];            
+            //do not log repreated change
+            _bubbleChange(this,0,1,0);
         }
         
         // set value
@@ -62,10 +68,6 @@ definition:function(scope){
         if(this.source[this._path] == this.old){
             _bubbleChange(this,0,-1,0);
         }
-        else {
-            _bubbleChange(this,0,1,0);
-        }
-        
         
         _triggerOnChange.call(this);
         return this;
@@ -160,11 +162,17 @@ definition:function(scope){
            if(start) list.push(start); 3
            return; 
         }
+        if(root._updated) {
+            start = root._path;    
+        }
+        
         if(Object.keys(root.pathmap).length == 0) list.push(start);
         var sep = start?'.':'';
         
         for(var key in root.pathmap){
-            if(!root.pathmap[key]._updated) continue;
+            if( !root.pathmap[key]._updated && 
+                !root.pathmap[key]._new     &&
+                !root.pathmap[key]._deleted ) continue;
             start = start+sep+ key;
             _pathWalker(root.pathmap[key],list,start);
             start = '';
@@ -208,6 +216,7 @@ definition:function(scope){
       return parent;
     }
 
+    /*!!!! TODO: change update varibles to array _changes */
     /** 
      * _n - new
      * _u - update
@@ -219,10 +228,17 @@ definition:function(scope){
   		dataItem._updated+=_u;
   		return dataItem;
   	};
+      
+    function _setChildChangeState(dataItem, _n, _u, _d){
+  		if(!dataItem) return dataItem;
+        if(!dataItem._c_updated) dataItem._c_updated = 0;  
+  		dataItem._c_updated+=_u;
+  		return dataItem;
+  	};  
 
   	function _bubbleChange(dataItem,_n,_u,_d){
   		var p = _setChangeState(dataItem,_n,_u,_d);
-  		while(p = _setChangeState(p.parent,_n,_u,_d));
+  		while(p = _setChildChangeState(p.parent,_n,_u,_d));
   	}
 
   	function _triggerOnChange(old){
@@ -230,7 +246,7 @@ definition:function(scope){
   		while(node != null){
   			if(node.onChanged) {
   				node.onChanged(this, old);
-  				break;
+  				//break;
   			}
   			node = node.parent;
   		}

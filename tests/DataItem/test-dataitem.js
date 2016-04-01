@@ -120,7 +120,9 @@ definition:function(scope){
       d.changes(function(item){
           log.info(item.fullPath());
       });
-      d.path('1.items.0.name').setValue('pencil');
+      d.path('1.items.0.name').setValue('pencil 2');
+    //  d.path('1.items.0.name').setValue('pencil');
+      
       d.changePath(function(item){
           log.info(item);
       });

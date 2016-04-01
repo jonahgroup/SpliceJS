@@ -44,6 +44,9 @@ definition:function component(scope){
 	 */
 	var UIControl = Class(function UIControl(args){
 		this.base(args);
+        
+        if(args)
+            this.observeDataItem = args.observeDataItem;
 
 		event(this).attach({
 			onDataOut  : event.multicast,
@@ -108,7 +111,17 @@ definition:function component(scope){
 					this.onDataIn(this.dataItem);
 					return;
 				}
+
 				this.dataItem = item.path(this.dataPath);
+                if(this.observeDataItem === true){
+                    if(!this.dataItem.onChanged){
+                        event(this.dataItem).attach({
+				            onChanged : event.multicast
+		                });                
+                    }
+                    this.dataItem.onChanged.subscribe(this.onDataItemChanged,this);
+                }
+
 				this.onDataIn(this.dataItem);
 			return;
 		}
@@ -119,6 +132,7 @@ definition:function component(scope){
 		});
 		// invoke data-item handler
 		this.onDataIn(this.dataItem);
+        
 	};
 
 	UIControl.prototype.onDataItemChanged = function(dataItem){};

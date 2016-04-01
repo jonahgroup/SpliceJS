@@ -10,6 +10,19 @@
   </td>
 </tr>
 
+<tr>
+  <td>Data Bound Button</td>
+  <td>
+    <sjs-include sjs-type="SpliceJS.Controls.Button">
+      {
+        dataPath: '0.name',
+        dataIn: binding('onProvinces').parent,
+        observeDataItem:true
+      }
+    </sjs-include>
+  </td>
+</tr>
+
 
 <tr>
   <td>CheckBox</td>

@@ -68,6 +68,13 @@ definition:function(scope){
 		if(!this.staticContent)
 		this.content(item.getValue()).replace();
 	};
+    
+    Button.prototype.onDataItemChanged = function(item){
+        item.changePath(function(item){
+            sjs.log.debug(item);        
+        });
+        this.content(item.getValue()).replace();
+    };
 
 	/**
 	 *
