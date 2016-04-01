@@ -519,7 +519,7 @@ try {
 
 	function applyImports(imports){
 		var scope = this;
-        scope.add('imports',new Namespace());
+        if(!scope.imports) scope.add('imports',new Namespace());
 		for(var i=0; i<imports.length; i++){
 			if(!imports[i].namespace) continue;
 			var ns = imports[i].namespace;
