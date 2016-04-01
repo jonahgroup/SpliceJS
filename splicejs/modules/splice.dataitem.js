@@ -56,7 +56,7 @@ definition:function(scope){
         if(this.source[this._path] === value) return this;
 
         //old is only the original value
-        if(this.old == undefined){
+        if(!this._updated){
             this.old = this.source[this._path];            
             //do not log repreated change
             _bubbleChange(this,0,1,0);
@@ -159,20 +159,17 @@ definition:function(scope){
     //hidden methods
     function _pathWalker(root,list,start){
         if(!root) {
-           if(start) list.push(start); 3
+           if(start) list.push(start); 
            return; 
-        }
-        if(root._updated) {
-            start = root._path;    
         }
         
         if(Object.keys(root.pathmap).length == 0) list.push(start);
         var sep = start?'.':'';
         
         for(var key in root.pathmap){
-            if( !root.pathmap[key]._updated && 
-                !root.pathmap[key]._new     &&
-                !root.pathmap[key]._deleted ) continue;
+            var item = root.pathmap[key]; 
+            if( !item._c_updated && !item._c_new && !item._c_deleted && 
+                !item._updated && !item._deleted && !item._new ) continue;
             start = start+sep+ key;
             _pathWalker(root.pathmap[key],list,start);
             start = '';
@@ -216,7 +213,7 @@ definition:function(scope){
       return parent;
     }
 
-    /*!!!! TODO: change update varibles to array _changes */
+   
     /** 
      * _n - new
      * _u - update
@@ -246,7 +243,7 @@ definition:function(scope){
   		while(node != null){
   			if(node.onChanged) {
   				node.onChanged(this, old);
-  				//break;
+  				break;
   			}
   			node = node.parent;
   		}

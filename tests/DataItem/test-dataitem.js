@@ -121,7 +121,8 @@ definition:function(scope){
           log.info(item.fullPath());
       });
       d.path('1.items.0.name').setValue('pencil 2');
-    //  d.path('1.items.0.name').setValue('pencil');
+      d.path('1.items.0.name').setValue('pencil');
+      d.path('1.items.0.name').setValue('pencil 3');
       
       d.changePath(function(item){
           log.info(item);
