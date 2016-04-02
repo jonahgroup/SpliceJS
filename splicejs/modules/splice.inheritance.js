@@ -1,5 +1,7 @@
 global.sjs.module({
 definition:function(scope){
+  
+  var sjs = scope.sjs;
   /*
   	Inheritance model
   */
@@ -38,6 +40,18 @@ definition:function(scope){
 		return map;
 	};
 
+
+    /**
+     * Interface emulator
+     * 
+    */
+    function Interface(_interface){
+        this._name = Object.keys(_interface)[0];
+        this._interface = _interface[this._name];
+    }
+
+
+
 	/**
 	 * pseudo class wrapper
 	 * */
@@ -70,11 +84,30 @@ definition:function(scope){
 			}
 			return this;
 		}
+        
+        _class.implement = function(_interface){
+            if(!(_interface instanceof Interface) ) 
+                throw 'Cannot implement: ' + _interface + ' is not instance of Interface';
+                
+           var keys = Object.keys(_interface._interface);
+           for(var key in keys){
+               if(!this.prototype[keys[key]]) {
+                this.prototype[keys[key]] = new Function('return function '+keys[key]+'(){ throw "function ' + keys[key] +' is not implemented in "+ global.sjs.fname(this.constructor);};')();     
+               } else {
+                   throw 'Cannot implement '+ _interface._name+': function ' + keys[key] + ' already exists in ' +sjs.fname(this);
+               }
+           } 
+           return this;         
+        }
+        
+        
 		return _class;
 	};
 
+
+
 	scope.exports(
-		Class
+		Class, Interface
 	);
 
 }});
