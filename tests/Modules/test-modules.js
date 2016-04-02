@@ -1,13 +1,13 @@
 global.sjs.module({
-version:[
-    {'mobile: 1.0.0 - *]':[
-        {'Mobile':'importmodule.js'}      
-    ]}
-],    
-required: [
-    {'UI':'importmodule.js'}
-]
-,
+version:{
+    'tablet:1.5.1':[
+        {'UI':'importmodule.js'}      
+    ]
+},    
+// required: [
+//     {'UI':'importmodule.js'}
+// ]
+//,
 definition:function(scope){
     scope.imports.UI.saySomething();
     scope.load(

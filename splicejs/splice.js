@@ -150,6 +150,18 @@ try {
 		};
 	}
 
+    function _parseVersion(version, isWild){
+        if(!version) return null;
+        var v = {target:'*'}, a = version.split(':');
+        
+        if(a.length == 2) v.target = _trim(a[0]);
+        a = a[a.length-1].split('-');
+        
+        v.min = _trim(!a[0]?(isWild?'*':undefined):a[0]);
+        v.max = _trim(!a[1]?(isWild?'*':undefined):a[1]);
+        return v;
+    }
+
 	var PATH_VARIABLES = {};
 	function setPathVar(key, value){
 		//do not allow setting sjs home variable
@@ -567,6 +579,7 @@ try {
 
 	function _vercomp(v1,v2){
 		if(v1 == '*' || v2 == '*') return 0;
+        if(!v1 || !v2) return undefined;
 
 		v1 = _split(v1,/\./,true);
 		v2 = _split(v2,/\./,true);
@@ -585,35 +598,37 @@ try {
 
 	function _required(m,ctx){
 		var r = {resources:[], imports:[]};
-        if(!m || !m.required) return r;
+        if(!m || (!m.required && !m.version)) return r;
 
 		var items = [];
 		//all required
 		if(m.required instanceof Array) items = m.required;
 
-		var version = config.version;
+		
         var appCtx = context(config.appBase);
 
 		//versioned required
-		if(typeof m.version == 'object' && version){
-			//extract versions
-			var versions = [];
-			var keys = Object.keys(m.version);
+		if(typeof m.version == 'object' && config.version){
+		    var v = _parseVersion(config.version);
+           	//extract versions
+		   	var keys = Object.keys(m.version);
+            var versions = [];   
 			for(var key in keys){
-				var parts = _split(keys[key],/-/,true);
-				versions.push({from:_trim(parts[0]), to:_trim(parts[1]), required:m.version[keys[key]]});
+        		versions.push({version:_parseVersion(keys[key], true), required:m.version[keys[key]]});
 			}
+            
 			//evaluate versions
 			for(var i=0; i<versions.length; i++){
-				var ver = versions[i];
-				//exact version
-				var pass = false;
-				if(!ver.to){
-					pass = (_vercomp(ver.from, version) == 0);
-				} else { //range is present
-					pass = (_vercomp(ver.from, version) <= 0 &&  _vercomp(ver.to, version) >= 0);
-				}
-				if(pass == true) _acopy(ver.required, items);
+                var ver = versions[i].version; 
+                
+                //compare target
+                if(ver.target) {
+                    if(v.target != ver.target ) continue;
+                }
+                //compare versions               
+                var pass = (_vercomp(ver.min, v.min) <= 0 &&  _vercomp(ver.max, v.min) >= 0);
+                				
+				if(pass == true) _acopy(versions[i].required, items);
 			}
 		}
 
@@ -759,6 +774,7 @@ var _debug = mixin(Object.create(null),{
     fileExt:fileExt,
     peek: peek,
     trim: _trim,
+    _parseVersion:_parseVersion
 
 });
 
