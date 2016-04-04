@@ -20,6 +20,13 @@
         observeDataItem:true
       }
     </sjs-include>
+    <sjs-include sjs-type="SpliceJS.Controls.Button">
+      {
+        dataPath: '1.name',
+        dataIn: binding('onProvinces').parent,
+        //observeDataItem:true
+      }
+    </sjs-include>
   </td>
 </tr>
 
@@ -50,14 +57,20 @@
     <sjs-include sjs-type="SpliceJS.Controls.DatePicker"></sjs-include>
   </td>
 </tr>
-
+-->
 <tr>
   <td>ComboBox</td>
   <td>
   <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
     {
-        default:<sjs-include sjs-type="SpliceJS.Controls.Button"></sjs-include>,
+        selectedItem:<sjs-include sjs-type="SpliceJS.Controls.Button">
+        {
+           
+            dataIn:binding('onDataOut').parent
+        }
+        </sjs-include>,
         dataItemPath:'name',
+        selectedItemPath:'name',
         dataIn: binding('onProvinces').parent,
         onDataItem: binding('provinceSelected').parent,
         css:{list: 'test-drop-down-list'}
@@ -65,7 +78,7 @@
   </sjs-include>
 </td>
 </tr>
-
+<!--
 
 <tr>
 <td> Text</td>
@@ -88,7 +101,7 @@
   </sjs-include>
 </td>
 </tr>
--->
+
 <tr>
   <td>Templated ComboBox - Button</td>
   <td>
@@ -105,7 +118,7 @@
     </sjs-include>
   </td>
 </tr>
-
+-->
 
 <tr>
   <td>Templated ComboBox - Text Field</td>

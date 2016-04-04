@@ -137,6 +137,16 @@ definition:function(scope){
         bigData.append().setValue({id:i, name:'sample'+i});
       }
     }
+    
+    function Test_DataItem2(){
+        var d = new DataItem2(orders);
+        
+        d.path('1.items.0.name').setValue('black pencil');
+        
+            
+    }
+    
+    
 
     scope.exports(
       Test_PathTree,

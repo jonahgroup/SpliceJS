@@ -4,7 +4,7 @@ type:'component'
 ,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
-	{ Event 			: '/{sjshome}/modules/splice.event.js' },
+	{ Event 	  : '/{sjshome}/modules/splice.event.js' },
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'Doc': '{sjshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',

@@ -1,6 +1,6 @@
 global.sjs.module({
 version:{
-    'tablet:1.5.1':[
+    'tablet:1.5.0':[
         {'UI':'importmodule.js'}      
     ]
 },    

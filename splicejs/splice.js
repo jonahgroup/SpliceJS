@@ -39,6 +39,7 @@ try {
 	if(!log.debug) 	log.debug = function(){};
 	if(!log.info) 	log.info  = function(){};
 	if(!log.warn) 	log.warn = function(){};
+    if(!log.warn) 	log.log = function(){};
 
     //path delimiter
     var _platform_ = window.__sjs_platform__;

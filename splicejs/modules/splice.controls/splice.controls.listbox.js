@@ -104,7 +104,6 @@ definition:function(scope){
 	};
 
 	ListBoxController.prototype.onDataIn = function(dataItem){
-		dataItem.subscribe(this.dataItemChanged, this);
 		var list = dataItem.getValue()
 		, item = null;
 

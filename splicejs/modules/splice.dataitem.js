@@ -4,13 +4,15 @@ required:[
 ]
 ,
 definition:function(scope){
-  "use strict";
-  var 
-    log = scope.sjs.log
-  ;
+    "use strict";
+    var 
+        log = scope.sjs.log
+    ,   imports = scope.imports
+    ;
 
   var
-    Class = scope.imports.Inheritance.Class
+        Class = imports.Inheritance.Class
+  ,     Interface = imports.Inheritance.Interface
   ;
   
     var EXCEPTIONS  = {
@@ -249,8 +251,110 @@ definition:function(scope){
   		}
   	};
 
+
+/* 
+    ------------------------------------------------------------------------------ 
+    IDataContract interface
+*/
+    
+    var IDataContract = new Interface({
+       IDataContract:{
+           onDataItemChanged:function(){},
+           onDataIn:function(){}
+       } 
+    });
+
+
+
+/*
+    -----------------------------------------------------------------------------
+    Fully synchronized data-item map
+*/
+
+
+    function DataItem2(data,path){
+        if(data instanceof DataItem2) {
+            this.parent = data;
+            this.root = data.root;
+        }
+        else {
+            this.source = data;
+            this.root = this;    
+        }
+        if(path) this._path = path;     
+    }  
+
+    DataItem2.prototype.path = function(path){
+         return _path2(this,path);
+    }
+
+    DataItem2.prototype.getValue = function(){
+        var p = this;
+        var path = [];
+        while(p.parent){
+            path.push(p._path);
+            p = p.parent;
+        }
+        _getValue(p,path);
+    }
+
+    function _grabPath(child){
+        
+    }
+
+    function _getValue(p,path){
+        var i = path.length-1;
+        var source = p.source;
+        while(i-- >= 0) {
+            source = source[path[i]];
+        }
+        return source;
+    }
+    
+    
+    function _path2(dataItem, path){
+      if(path == null || path === '') return dataItem;
+
+      var root = dataItem.root;
+
+
+      var parts = path.toString().split('.');
+
+      var parent = dataItem;
+      for(var i=0; i < parts.length; i++){
+
+        var child = parent.pathmap[parts[i]];
+        var ref = parent._path != null?parent.source[parent._path] : parent.source;
+
+        if(ref[parts[i]] == null) throw EXCEPTIONS.invalidPathDepth + ': ' + path;
+
+        if(child == null || ref[parts[i]] == null) {
+          if(ref[parts[i]] instanceof Array)
+            child = new ArrayDataItem(ref);
+          else
+            child = new DataItem(ref);
+
+          child._path = parts[i];
+          parent.pathmap[parts[i]] = child;
+          child.parent = parent;
+
+          if(ref[parts[i]] == null) {
+            if(parts.length > 1) throw EXCEPTIONS.invalidPathDepth + ' ' + path;
+            return child;
+          }
+        }
+        parent = child;
+      }
+      return parent;
+    }
+
+    
+    
+    
+
     scope.exports(
-        DataItem, ArrayDataItem
+        {IDataContract : IDataContract},
+        DataItem, ArrayDataItem, DataItem2
     );
 
 }})

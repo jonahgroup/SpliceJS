@@ -26,6 +26,7 @@ definition:function component(scope){
 	,	event 			= imports.Events.event
 	,	View 			= imports.Views.View
 	,	DataItem 		= imports.Data.DataItem
+    ,   IDataContract   = imports.Data.IDataContract
 	;
 
 
@@ -60,7 +61,7 @@ definition:function component(scope){
 		}
 		this.dataItem = null;
 
-	}).extend(Controller);
+	}).extend(Controller).implement(IDataContract);
 
 	UIControl.prototype.hide = function(){
 		var self = this;
@@ -135,7 +136,7 @@ definition:function component(scope){
         
 	};
 
-	UIControl.prototype.onDataItemChanged = function(dataItem){};
+//	UIControl.prototype.onDataItemChanged = function(dataItem){};
 
 	UIControl.prototype.onDataIn = function(data){
 		this.onDataOut(data);
