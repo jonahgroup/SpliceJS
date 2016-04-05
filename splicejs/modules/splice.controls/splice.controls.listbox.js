@@ -17,6 +17,7 @@ definition:function(scope){
 
 	var
 		sjs = scope.sjs
+    ,   log = scope.sjs.log
 	,	debug =	scope.sjs.log.debug
 	,	components = scope.components
 	,   imports = scope.imports
@@ -106,6 +107,17 @@ definition:function(scope){
 	ListBoxController.prototype.onDataIn = function(dataItem){
 		var list = dataItem.getValue()
 		, item = null;
+        
+        //return if changes are not detected
+        if(this.lastChange == dataItem._change) return;
+
+        this.lastChange = dataItem._change;
+
+        //check changes
+        dataItem.changes(function(item){
+            log.log('List item change' + item._path);
+        });
+
 
 		// update existing items if any
 		for(var i=0; i<this.listItems.length; i++){

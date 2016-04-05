@@ -26,6 +26,7 @@ definition:function(scope){
         this.source = data;
         this.parent = null;
         this.pathmap = Object.create(null);
+        this._change = 0;
     };
 
     DataItem.prototype.getValue = function(){
@@ -69,7 +70,14 @@ definition:function(scope){
 
         if(this.source[this._path] == this.old){
             _bubbleChange(this,0,-1,0);
-        }
+        } 
+       
+        /* 
+            indicates the version number
+            helps observers stay on track
+        */
+        _bubbleChangeCount(this);
+        
         
         _triggerOnChange.call(this);
         return this;
@@ -96,11 +104,22 @@ definition:function(scope){
   	};
 
   	//tranverse path map tree to get change paths at current level
-  	DataItem.prototype.changes = function(onItem){
+  	DataItem.prototype.changes = function(onNew, onUpdated, onDeleted){
   		var keys = Object.keys(this.pathmap);
   		for(var key in keys){
-  			if(this.pathmap[keys[key]]._state)
-  				onItem(this.pathmap[keys[key]]);
+            var item = this.pathmap[keys[key]]; 
+  			if(item._updated){
+                onUpdated(item);
+                continue;
+            }
+            if(item._new){
+                onNew(item);
+                continue;
+            }  
+            if(item._c_deleted){
+  				onDeleted(item);
+                continue;
+            }
   		}
   	};
 
@@ -238,7 +257,15 @@ definition:function(scope){
   	function _bubbleChange(dataItem,_n,_u,_d){
   		var p = _setChangeState(dataItem,_n,_u,_d);
   		while(p = _setChildChangeState(p.parent,_n,_u,_d));
-  	}
+  	};
+      
+    function _bubbleChangeCount(dataItem){
+      var p = dataItem;
+      p._change++;
+      while(p = p.parent){
+        p._change++;    
+      }  
+    };
 
   	function _triggerOnChange(old){
   		var node = this;
