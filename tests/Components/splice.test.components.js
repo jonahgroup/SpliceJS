@@ -31,7 +31,9 @@ definition:function(scope){
   , event = imports.Events.event
   ;
 
-  var DataItem = imports.SpliceJS.Ui.DataItem;
+  var   DataItem = imports.SpliceJS.Ui.DataItem
+  ,     ArrayDataItem = imports.SpliceJS.Ui.ArrayDataItem;
+  
   var ObservableDataItem = imports.SpliceJS.Ui.ObservableDataItem;
 
   var provinces = [
@@ -41,7 +43,7 @@ definition:function(scope){
   ];
 
 
-  var provinces2 = ObservableDataItem([
+  var provinces2 = new ArrayDataItem([
     {name:'Ontario', isChecked:false},
     {name:'Alberta', isChecked:true},
     {name:'British Columbia', isChecked:true, population:10000,

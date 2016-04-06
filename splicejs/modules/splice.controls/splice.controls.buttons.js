@@ -90,7 +90,8 @@ definition:function(scope){
 
 	CheckBox.prototype.initialize = function(){
 		event(this.views.root).attach({
-			onclick :	event.multicast
+			onclick :	event.multicast.stop,
+            onmousedown: event.multicast.stop
 		}).onclick.subscribe(function(){
 
 		this.isChecked = !this.isChecked;

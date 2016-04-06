@@ -107,16 +107,15 @@ definition:function(scope){
 	ListBoxController.prototype.onDataIn = function(dataItem){
 		var list = dataItem.getValue()
 		, item = null;
-        
-        //return if changes are not detected
-        if(this.lastChange == dataItem._change) return;
-
-        this.lastChange = dataItem._change;
 
         //check changes
-        dataItem.changes(function(item){
-            log.log('List item change' + item._path);
-        });
+        dataItem.changes(
+            function(){},
+            function(item){
+                log.log('List item change' + item._path);
+            },
+            function(){}
+       );
 
 
 		// update existing items if any

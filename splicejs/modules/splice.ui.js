@@ -26,6 +26,7 @@ definition:function component(scope){
 	,	event 			= imports.Events.event
 	,	View 			= imports.Views.View
 	,	DataItem 		= imports.Data.DataItem
+    ,   ArrayDataItem   = imports.Data.ArrayDataItem 
     ,   IDataContract   = imports.Data.IDataContract
 	;
 
@@ -109,7 +110,9 @@ definition:function component(scope){
 
 		if(item instanceof DataItem) {
 				if(this.dataItem === item) {
+                    if(this._sjs_di_lastchange == this.dataItem._change) return;
 					this.onDataIn(this.dataItem);
+                    this._sjs_di_lastchange = this.dataItem._change;
 					return;
 				}
 
@@ -120,10 +123,15 @@ definition:function component(scope){
 				            onChanged : event.multicast
 		                });                
                     }
-                    this.dataItem.onChanged.subscribe(this.onDataItemChanged,this);
+                    this.dataItem.onChanged.subscribe(function(dataItem){
+                        if(this._sjs_di_lastchange == dataItem._change) return;
+                        this.onDataIn(dataItem);
+                        this._sjs_di_lastchange = dataItem._change;
+                    },this);
                 }
 
 				this.onDataIn(this.dataItem);
+                 this._sjs_di_lastchange = this.dataItem._change;
 			return;
 		}
 		// datapath is only set externally
@@ -133,10 +141,10 @@ definition:function component(scope){
 		});
 		// invoke data-item handler
 		this.onDataIn(this.dataItem);
+        this._sjs_di_lastchange = this.dataItem._change;
         
 	};
 
-//	UIControl.prototype.onDataItemChanged = function(dataItem){};
 
 	UIControl.prototype.onDataIn = function(data){
 		this.onDataOut(data);
@@ -413,7 +421,7 @@ definition:function component(scope){
 	//module exports
 	scope.exports(
 		UIControl, UIElement, KeyListener,
-		DataItem,ObservableDataItem,
+		DataItem,ArrayDataItem,ObservableDataItem,
 		//singletons
 		{Positioning : Positioning},
 		{DragAndDrop : DragAndDrop}
