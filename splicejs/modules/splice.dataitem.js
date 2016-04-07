@@ -272,7 +272,7 @@ definition:function(scope){
   		while(node != null){
   			if(node.onChanged) {
   				node.onChanged(this, old);
-  				break;
+  				//break;
   			}
   			node = node.parent;
   		}

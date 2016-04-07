@@ -154,10 +154,8 @@ definition:function component(scope){
 	};
 
     UIControl.prototype.processStyle = function(style){
-        if(!style){
-            this.views.root.style('');
-            return;
-        }
+        if(style == null || style == undefined) return;
+
         this.views.root.style(style);        
     };
 

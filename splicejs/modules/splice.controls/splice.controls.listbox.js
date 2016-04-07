@@ -4,7 +4,8 @@ type:'component'
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events      : '/{sjshome}/modules/splice.event.js'},
-	{ Views				: '/{sjshome}/modules/splice.view.js'},
+	{ Views		  : '/{sjshome}/modules/splice.view.js'},
+    { Async       : '/{sjshome}/modules/splice.async.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	{'Doc':'/{sjshome}/modules/splice.document.js'},
@@ -26,11 +27,11 @@ definition:function(scope){
 	var	UIControl   = imports.SpliceJS.UI.UIControl
 	,	DataItem    = imports.SpliceJS.UI.DataItem
 	,   Class       = imports.Inheritance.Class
+    ,   asyncLoop   = imports.Async.asyncLoop
 	,	dom         = imports.Doc.dom
 	,	View        = imports.Views.View
 	,	event       = imports.Events.event
 	;
-
 
 	var ListBoxController = Class(function ListBoxController(){
 			this.base();
@@ -128,7 +129,27 @@ definition:function(scope){
 		}
 
 		// add new items
-		for(var i= this.listItems.length; i<list.length; i++) {
+		asyncLoop(this.listItems.length,list.length-1,100,function(i){
+            if(this.itemTemplate) {
+				item = new this.itemTemplate({parent:this});
+				this.listItems.push(item);
+
+				if(this.dataItemPath)
+				 item.dataIn(dataItem.path(i+'.'+this.dataItemPath));
+				else
+				 item.dataIn(dataItem.path(i));
+
+				item.views.root.htmlElement.__sjs_item_index__ = i;
+				this.dom.add(item.views.root);
+				if(typeof item.onAttached == 'function')
+					item.onAttached();
+			    return true;
+            }
+        }.bind(this));
+        
+        
+        /*
+        for(var i= this.listItems.length; i<list.length; i++) {
 			if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
 				this.listItems.push(item);
@@ -143,7 +164,7 @@ definition:function(scope){
 				if(typeof item.onAttached == 'function')
 					item.onAttached();
 			}
-		}
+		}*/
 
 		this.reflow();
 		if(!this.children.scrollPanel) this.onResize(this);

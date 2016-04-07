@@ -42,15 +42,19 @@ definition:function(scope){
     'Nova Scotia', 'Manitoba','Yukon','Nunavut','Northwest Territories',
     'Saskatchewan', 'Prince Edward Island','Newfoundland'
   ];
-
-
-  var provinces2 = new ArrayDataItem([
+  var a = [
     {name:'Ontario', isChecked:false},
     {name:'Alberta', isChecked:true},
     {name:'British Columbia', isChecked:true, population:10000,
     office:{address:{street:'king'}}},
     {name:'Quebec', isChecked:true}
-  ]);
+  ];
+  
+  for(var i=0; i<10; i++){
+      a.push({name:'Ontario', isChecked:false});
+  }
+
+  var provinces2 = new ArrayDataItem(a);
 
   var charts = [
     {plot:'Bar',name:'series1',data:[10,20,5,23]},
@@ -123,6 +127,15 @@ definition:function(scope){
     var v = item.getValue();
     if(v == 'Alberta') {
         return 'background-color:#ff0000;';
+    }
+    if(v == 'Quebec'){
+        return 'background-color:#ff00cc';
+    }
+    if(v == 'Nova Scotia'){
+        return 'background-color:#FFAE00';
+    } 
+    if(v == 'British Columbia'){
+        return 'background-color:#85B81B';
     }
     
     return "";

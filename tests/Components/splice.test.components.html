@@ -226,13 +226,14 @@ Scroll Panel
 </tr>
 
 
-
+-->
 
 <tr>
   <td>Dom Iterator</td>
   <td><sjs-include sjs-type="SpliceJS.Controls.DomIterator">
     {
         dataIn: binding('onProvinces').parent,
+        observeDataItem: true,
         element:<div sjs-controller="SpliceJS.Ui.UIControl"
                      style="position:relative; width:300px; height:35px;">
           <span sjs-content="name"></span>
@@ -253,7 +254,6 @@ Scroll Panel
   </sjs-include></td>
 </tr>
 
--->
 <tr>
   <td>Component Name</td>
   <td>Component Include</td>

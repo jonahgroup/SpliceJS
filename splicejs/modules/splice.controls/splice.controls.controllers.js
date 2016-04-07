@@ -6,6 +6,7 @@ required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Component: '/{sjshome}/modules/splice.component.core.js'},
 	{ Event: '/{sjshome}/modules/splice.event.js'},
+    { Async:    '/{sjshome}/modules/splice.async.js'},
 	{'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
 	 'splice.controls.controllers.html'
 ]
@@ -20,6 +21,7 @@ definition:function(scope){
 	var Class = imports.Inheritance.Class
 	,	Controller = imports.Component.Controller
 	,   UIControl = imports.SpliceJS.UI.UIControl
+    ,   asyncLoop = imports.Async.asyncLoop
 	,	event = imports.Event.event
 	;
 
@@ -85,6 +87,23 @@ definition:function(scope){
 			element.dataIn(dataItem.path(i));
 		}
 
+
+        asyncLoop(this.elements.length, source.length-1,100, function(i){
+   			var element = new this.element({parent:this});
+			element.content(source[i]).replace();
+			this.content(element).add();
+			element.dataIn(dataItem.path(i));
+
+			//cache elements
+			this.elements.push(element);
+            return true;
+            
+        }.bind(this));
+
+
+
+
+/*
 		//create new elements
 		for(var i = this.elements.length; i < source.length; i++){
 			var element = new this.element({parent:this});
@@ -95,6 +114,7 @@ definition:function(scope){
 			//cache elements
 			this.elements.push(element);
 		}
+  */      
 	};
 
 
