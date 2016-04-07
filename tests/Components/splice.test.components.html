@@ -5,7 +5,9 @@
   <td>Button</td>
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.Button">
-      {content: 'Sample Button'}
+      {
+        content: 'Sample Button'
+      }
     </sjs-include>
   </td>
 </tr>
@@ -17,6 +19,7 @@
       {
         dataPath: '0.name',
         dataIn: binding('onProvinces').parent,
+        onStyle: binding('formatButton').parent,
         observeDataItem:true
       }
     </sjs-include>
@@ -24,7 +27,8 @@
       {
         dataPath: '1.name',
         dataIn: binding('onProvinces').parent,
-        //observeDataItem:true
+        onStyle: binding('formatButton').parent,
+        observeDataItem:true
       }
     </sjs-include>
   </td>

@@ -21,7 +21,8 @@ definition:function(scope){
 
   var
     sjs = scope.sjs
-    imports = scope.imports
+  , imports = scope.imports
+  , log = scope.sjs.log
   ;
 
   var
@@ -116,6 +117,15 @@ definition:function(scope){
   ComponentsTest.prototype.deleteItem = function(item){
     console.log(item);
     item.remove();
+  };
+  
+  ComponentsTest.prototype.formatButton = function(item){
+    var v = item.getValue();
+    if(v == 'Alberta') {
+        return 'background-color:#ff0000;';
+    }
+    
+    return "";
   };
 
 

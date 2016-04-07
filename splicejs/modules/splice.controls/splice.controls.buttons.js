@@ -36,7 +36,8 @@ definition:function(scope){
 	Button.prototype.initialize = function(){
 
 		event(this.views.root).attach({
-			onclick	:	event.unicast
+			onclick	:	event.unicast.stop,
+            onmousedown: event.unicast.stop
 		});
 
 		this.views.root.onclick.subscribe(function(){
@@ -67,14 +68,8 @@ definition:function(scope){
 	Button.prototype.onDataIn = function(item){
 		if(!this.staticContent)
 		this.content(item.getValue()).replace();
-	};
-    
-    Button.prototype.onDataItemChanged = function(item){
-        item.changePath(function(item){
-            sjs.log.debug(item);        
-        });
-        this.content(item.getValue()).replace();
     };
+    
 
 	/**
 	 *

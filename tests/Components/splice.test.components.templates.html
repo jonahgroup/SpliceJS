@@ -25,6 +25,14 @@
         trapMouseInput:true
       }
     </sjs-include>
+    <sjs-include sjs-type="SpliceJS.Controls.Button">
+     {
+        dataPath:'name',
+        dataIn:binding('onDataOut').parent,
+        observeDataItem:true,
+        onStyle:binding('formatButton').type('ComponentsTest')
+     }
+    </sjs-include>
   </div>
 </sjs-component>
 

@@ -52,13 +52,14 @@ definition:function component(scope){
 
 		event(this).attach({
 			onDataOut  : event.multicast,
-			onReflow : event.multicast
+			onReflow : event.multicast,
+            onStyle : event.multicast
 		});
 
 
 		if(this.isHidden) {
 			this.prevDisplayState = this.elements.root.style.display;
-			this.elements.root.style.display = 'none';
+			this.views.root.style.display = 'none';
 		}
 		this.dataItem = null;
 
@@ -72,12 +73,12 @@ definition:function component(scope){
 		this.prevDisplayState = this.elements.root.style.display;
 
 		if(this.animate){
-			Animate(this.elements.root).opacity(100, 0, 300,function(){
-				self.elements.root.style.display = 'none';
+			Animate(this.views.root).opacity(100, 0, 300,function(){
+				self.views.root.style.display = 'none';
 			});
 		}
 		else {
-			this.elements.root.style.display = 'none';
+			this.views.root.style.display = 'none';
 		}
 		this.isHidden = true;
 	};
@@ -113,6 +114,8 @@ definition:function component(scope){
                     if(this._sjs_di_lastchange == this.dataItem._change) return;
 					this.onDataIn(this.dataItem);
                     this._sjs_di_lastchange = this.dataItem._change;
+                    
+                    if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
 					return;
 				}
 
@@ -127,11 +130,14 @@ definition:function component(scope){
                         if(this._sjs_di_lastchange == dataItem._change) return;
                         this.onDataIn(dataItem);
                         this._sjs_di_lastchange = dataItem._change;
-                    },this);
+                        if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
+                },this);
                 }
 
 				this.onDataIn(this.dataItem);
-                 this._sjs_di_lastchange = this.dataItem._change;
+                if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
+
+                this._sjs_di_lastchange = this.dataItem._change;
 			return;
 		}
 		// datapath is only set externally
@@ -141,10 +147,19 @@ definition:function component(scope){
 		});
 		// invoke data-item handler
 		this.onDataIn(this.dataItem);
+        if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
+
         this._sjs_di_lastchange = this.dataItem._change;
         
 	};
 
+    UIControl.prototype.processStyle = function(style){
+        if(!style){
+            this.views.root.style('');
+            return;
+        }
+        this.views.root.style(style);        
+    };
 
 	UIControl.prototype.onDataIn = function(data){
 		this.onDataOut(data);
