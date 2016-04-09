@@ -104,7 +104,7 @@ definition:function(scope){
   	};
 
   	//tranverse path map tree to get change paths at current level
-  	DataItem.prototype.changes = function(onNew, onUpdated, onDeleted){
+  	DataItem.prototype.changes = function(version,onNew, onUpdated, onDeleted){
   		var keys = Object.keys(this.pathmap);
   		for(var key in keys){
             var item = this.pathmap[keys[key]]; 
@@ -267,11 +267,11 @@ definition:function(scope){
       }  
     };
 
-  	function _triggerOnChange(old){
+  	function _triggerOnChange(){
   		var node = this;
   		while(node != null){
   			if(node.onChanged) {
-  				node.onChanged(this, old);
+  				node.onChanged(this);
   				//break;
   			}
   			node = node.parent;

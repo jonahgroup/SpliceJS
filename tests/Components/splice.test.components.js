@@ -51,7 +51,7 @@ definition:function(scope){
   ];
   
   for(var i=0; i<10; i++){
-      a.push({name:'Ontario', isChecked:false});
+      a.push({name:'Ontario ' + i, isChecked:false});
   }
 
   var provinces2 = new ArrayDataItem(a);
@@ -78,6 +78,9 @@ definition:function(scope){
   var ComponentsTest = Class(function ComponentsTest(){
     this.base();
 
+    this.dataProvinces = new DataItem();
+
+
     event(this).attach({
       onProvinces         : event.multicast,
       onNewProvince       : event.multicast,
@@ -93,7 +96,8 @@ definition:function(scope){
   ComponentsTest.prototype.initialize = function(){
     this.onDisplay.subscribe(function(){
       this.onNewProvince(newProvince);
-      this.onProvinces(provinces2);
+      
+      this.onProvinces.setValue(provinces2);
 
       this.onChartsData(charts);
       this.onScatterChartData(scatterChart);
@@ -126,7 +130,7 @@ definition:function(scope){
   ComponentsTest.prototype.formatButton = function(item){
     var v = item.getValue();
     if(v == 'Alberta') {
-        return 'background-color:#ff0000;';
+        return 'background-color:#ff0000; font-size:2em;';
     }
     if(v == 'Quebec'){
         return 'background-color:#ff00cc';

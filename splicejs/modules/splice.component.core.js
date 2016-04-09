@@ -314,21 +314,11 @@ definition:function(scope){
   		,	TYPE 		 : 5
   		/* Indicates type lookup lookup */
   	};
-  	var BINDING_DIRECTIONS = {
-  			FROM : 1,
-  		/* Left assignment */
-  			TO: 2,
-  		/*
-  			determine binding based on the type of objects
-  			use right assignment by default
-  		*/
-  			AUTO: 3
-  	};
 
   	function Binding(propName, bindingType,prev){
   		this.prop = propName;
   		this.type = bindingType;
-  		this.direction = BINDING_DIRECTIONS.AUTO;
+  		this.direction = 3;// auto BINDING_DIRECTIONS.AUTO;
   		this.prev = prev;
   	}
 
@@ -338,7 +328,7 @@ definition:function(scope){
   		return {
   			self:   		new Binding(propName,	BINDING_TYPES.SELF,prev),
   			parent: 		new Binding(propName,	BINDING_TYPES.PARENT,prev),
-  			root:				new Binding(propName,	BINDING_TYPES.ROOT,prev),
+  			root:			new Binding(propName,	BINDING_TYPES.ROOT,prev),
   			'type':			function(type){
   						var b =	new Binding(propName, 	BINDING_TYPES.TYPE,prev);
   						b.vartype = type;

@@ -129,7 +129,7 @@ definition:function(scope){
 		}
 
 		// add new items
-		asyncLoop(this.listItems.length,list.length-1,100,function(i){
+		asyncLoop(this.listItems.length,list.length-1,1,function(i){
             if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
 				this.listItems.push(item);

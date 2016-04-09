@@ -25,7 +25,7 @@
     </sjs-include>
     <sjs-include sjs-type="SpliceJS.Controls.Button">
       {
-        dataPath: '1.name',
+        dataPath: '1.isChecked',
         dataIn: binding('onProvinces').parent,
         onStyle: binding('formatButton').parent,
         observeDataItem:true
@@ -74,7 +74,7 @@
         }
         </sjs-include>,
         dataItemPath:'name',
-        selectedItemPath:'name',
+        //selectedItemPath:'name',
         dataIn: binding('onProvinces').parent,
         onDataItem: binding('provinceSelected').parent,
         css:{list: 'test-drop-down-list'}
@@ -131,6 +131,7 @@
       {
           selectedItem:{name:'Please select an item'},
           selectedItemPath:'name',
+          observeDataItem:true,
           dataIn: binding('onProvinces').parent,
           onDataItem: binding('provinceSelected').parent,
           css:{list: 'test-drop-down-list'},
