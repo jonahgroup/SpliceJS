@@ -34,7 +34,7 @@ definition:function(scope){
 
   var   DataItem = imports.SpliceJS.Ui.DataItem
   ,     ArrayDataItem = imports.SpliceJS.Ui.ArrayDataItem;
-  
+
   var ObservableDataItem = imports.SpliceJS.Ui.ObservableDataItem;
 
   var provinces = [
@@ -49,7 +49,7 @@ definition:function(scope){
     office:{address:{street:'king'}}},
     {name:'Quebec', isChecked:true}
   ];
-  
+
   for(var i=0; i<10; i++){
       a.push({name:'Ontario ' + i, isChecked:false});
   }
@@ -78,9 +78,6 @@ definition:function(scope){
   var ComponentsTest = Class(function ComponentsTest(){
     this.base();
 
-    this.dataProvinces = new DataItem();
-
-
     event(this).attach({
       onProvinces         : event.multicast,
       onNewProvince       : event.multicast,
@@ -96,9 +93,7 @@ definition:function(scope){
   ComponentsTest.prototype.initialize = function(){
     this.onDisplay.subscribe(function(){
       this.onNewProvince(newProvince);
-      
-      this.onProvinces.setValue(provinces2);
-
+      this.onProvinces(provinces2);
       this.onChartsData(charts);
       this.onScatterChartData(scatterChart);
       this.onTestCheck(this.sourceTestCheck);
@@ -126,7 +121,7 @@ definition:function(scope){
     console.log(item);
     item.remove();
   };
-  
+
   ComponentsTest.prototype.formatButton = function(item){
     var v = item.getValue();
     if(v == 'Alberta') {
@@ -137,11 +132,11 @@ definition:function(scope){
     }
     if(v == 'Nova Scotia'){
         return 'background-color:#FFAE00';
-    } 
+    }
     if(v == 'British Columbia'){
         return 'background-color:#85B81B';
     }
-    
+
     return "";
   };
 

@@ -28,6 +28,7 @@ definition:function(scope){
     Test_RemoveValue();
     Test_GetChanges();
     Test_LargeData();
+    Test_DataItemChaining();
 
     function Test_PathTree(){
       var d = new DataItem(orders);
@@ -116,14 +117,14 @@ definition:function(scope){
       d.path('1.items.0.name').setValue('black pencil');
       d.path('0.items.0.name').setValue('black pencil');
 
-      
+
       d.changes(function(item){
           log.info(item.fullPath());
       });
       d.path('1.items.0.name').setValue('pencil 2');
       d.path('1.items.0.name').setValue('pencil');
       d.path('1.items.0.name').setValue('pencil 3');
-      
+
       d.changePath(function(item){
           log.info(item);
       });
@@ -137,16 +138,19 @@ definition:function(scope){
         bigData.append().setValue({id:i, name:'sample'+i});
       }
     }
-    
+
     function Test_DataItem2(){
         var d = new DataItem2(orders);
-        
         d.path('1.items.0.name').setValue('black pencil');
-        
-            
     }
-    
-    
+
+    function Test_DataItemChaining(){
+      log.info('Testing data item chaining');
+
+      var source = new DataItem();
+      var target = new DataItem(source);
+    }
+
 
     scope.exports(
       Test_PathTree,

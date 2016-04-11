@@ -17,7 +17,7 @@ definition:function component(scope){
 	,   log = scope.sjs.log
     ,   imports = scope.imports
     ;
-    
+
 	var
 	    Class 			= imports.Inheritance.Class
 	,   Animate 		= imports.Animation.Animate
@@ -26,7 +26,7 @@ definition:function component(scope){
 	,	event 			= imports.Events.event
 	,	View 			= imports.Views.View
 	,	DataItem 		= imports.Data.DataItem
-    ,   ArrayDataItem   = imports.Data.ArrayDataItem 
+    ,   ArrayDataItem   = imports.Data.ArrayDataItem
     ,   IDataContract   = imports.Data.IDataContract
 	;
 
@@ -41,19 +41,20 @@ definition:function component(scope){
 	};
 
 
+
 	/**
 	 * Base UIControl class
 	 */
 	var UIControl = Class(function UIControl(args){
 		this.base(args);
-        
+
         if(args)
             this.observeDataItem = args.observeDataItem;
 
 		event(this).attach({
 			onDataOut  : event.multicast,
 			onReflow : event.multicast,
-            onStyle : event.multicast
+      onStyle : event.multicast
 		});
 
 
@@ -114,7 +115,7 @@ definition:function component(scope){
                     if(this._sjs_di_lastchange == this.dataItem._change) return;
 					this.onDataIn(this.dataItem);
                     this._sjs_di_lastchange = this.dataItem._change;
-                    
+
                     if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
 					return;
 				}
@@ -124,7 +125,7 @@ definition:function component(scope){
                     if(!this.dataItem.onChanged){
                         event(this.dataItem).attach({
 				            onChanged : event.multicast
-		                });                
+		                });
                     }
                     this.dataItem.onChanged.subscribe(function(dataItem){
                         if(this._sjs_di_lastchange == dataItem._change) return;
@@ -135,9 +136,8 @@ definition:function component(scope){
                 }
 
 				this.onDataIn(this.dataItem);
-                if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
-
-                this._sjs_di_lastchange = this.dataItem._change;
+      	if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
+        this._sjs_di_lastchange = this.dataItem._change;
 			return;
 		}
 		// datapath is only set externally
@@ -150,13 +150,13 @@ definition:function component(scope){
         if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
 
         this._sjs_di_lastchange = this.dataItem._change;
-        
+
 	};
 
-    UIControl.prototype.processStyle = function(style){
+  UIControl.prototype.processStyle = function(style){
         if(style == null || style == undefined) return;
 
-        this.views.root.style(style);        
+        this.views.root.style(style);
     };
 
 	UIControl.prototype.onDataIn = function(data){

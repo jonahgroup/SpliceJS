@@ -1,11 +1,12 @@
 global.sjs.module({
 required:[
-  {Inheritance:'/{sjshome}/modules/splice.inheritance.js'}
+  {Inheritance:'/{sjshome}/modules/splice.inheritance.js'},
+  {Events:'/{sjshome}/modules/splice.event.js'}
 ]
 ,
 definition:function(scope){
     "use strict";
-    var 
+    var
         log = scope.sjs.log
     ,   imports = scope.imports
     ;
@@ -13,8 +14,9 @@ definition:function(scope){
   var
         Class = imports.Inheritance.Class
   ,     Interface = imports.Inheritance.Interface
+  ,     event = imports.Events.event
   ;
-  
+
     var EXCEPTIONS  = {
         invalidSourceProperty : 'Invalid source property',
         invalidPath           :	'Reference data-item path is not specified',
@@ -22,11 +24,36 @@ definition:function(scope){
         invalidDeleteOperation:	'Invalid delete operation, on an object'
     }
 
+    /*
+        ------------------------------------------------------------------------------
+        IDataContract interface
+    */
+
+        var IDataContract = new Interface({
+           IDataContract:{
+               onDataItemChanged:function(){},
+               onDataIn:function(){}
+           }
+        });
+
+
+
+
+    /*
+        ------------------------------------------------------------------------------
+        DataItem class
+    */
+
+
     var DataItem = function DataItem(data){
         this.source = data;
         this.parent = null;
         this.pathmap = Object.create(null);
         this._change = 0;
+
+        event(this).attach({
+          onChange:event.MulticastEvent
+        });
     };
 
     DataItem.prototype.getValue = function(){
@@ -60,25 +87,25 @@ definition:function(scope){
 
         //old is only the original value
         if(!this._updated){
-            this.old = this.source[this._path];            
+            this.old = this.source[this._path];
             //do not log repreated change
             _bubbleChange(this,0,1,0);
         }
-        
+
         // set value
         this.source[this._path] = value;
 
         if(this.source[this._path] == this.old){
             _bubbleChange(this,0,-1,0);
-        } 
-       
-        /* 
+        }
+
+        /*
             indicates the version number
             helps observers stay on track
         */
         _bubbleChangeCount(this);
-        
-        
+
+
         _triggerOnChange.call(this);
         return this;
     };
@@ -107,7 +134,7 @@ definition:function(scope){
   	DataItem.prototype.changes = function(version,onNew, onUpdated, onDeleted){
   		var keys = Object.keys(this.pathmap);
   		for(var key in keys){
-            var item = this.pathmap[keys[key]]; 
+            var item = this.pathmap[keys[key]];
   			if(item._updated){
                 onUpdated(item);
                 continue;
@@ -115,7 +142,7 @@ definition:function(scope){
             if(item._new){
                 onNew(item);
                 continue;
-            }  
+            }
             if(item._c_deleted){
   				onDeleted(item);
                 continue;
@@ -124,13 +151,13 @@ definition:function(scope){
   	};
 
     //traverse path map and output changes
-    DataItem.prototype.changePath = function(onItem){                 
+    DataItem.prototype.changePath = function(onItem){
         var list = [];
         _pathWalker(this,list,'');
        for(var i in list){
            onItem(list[i]);
-       }             
-    }; 
+       }
+    };
 
 
   	DataItem.prototype.subscribe = function(handler, instance){
@@ -180,16 +207,16 @@ definition:function(scope){
     //hidden methods
     function _pathWalker(root,list,start){
         if(!root) {
-           if(start) list.push(start); 
-           return; 
+           if(start) list.push(start);
+           return;
         }
-        
+
         if(Object.keys(root.pathmap).length == 0) list.push(start);
         var sep = start?'.':'';
-        
+
         for(var key in root.pathmap){
-            var item = root.pathmap[key]; 
-            if( !item._c_updated && !item._c_new && !item._c_deleted && 
+            var item = root.pathmap[key];
+            if( !item._c_updated && !item._c_new && !item._c_deleted &&
                 !item._updated && !item._deleted && !item._new ) continue;
             start = start+sep+ key;
             _pathWalker(root.pathmap[key],list,start);
@@ -234,37 +261,37 @@ definition:function(scope){
       return parent;
     }
 
-   
-    /** 
+
+    /**
      * _n - new
      * _u - update
      * _d - delete
     */
   	function _setChangeState(dataItem, _n, _u, _d){
   		if(!dataItem) return dataItem;
-        if(!dataItem._updated) dataItem._updated = 0;  
+        if(!dataItem._updated) dataItem._updated = 0;
   		dataItem._updated+=_u;
   		return dataItem;
   	};
-      
+
     function _setChildChangeState(dataItem, _n, _u, _d){
   		if(!dataItem) return dataItem;
-        if(!dataItem._c_updated) dataItem._c_updated = 0;  
+        if(!dataItem._c_updated) dataItem._c_updated = 0;
   		dataItem._c_updated+=_u;
   		return dataItem;
-  	};  
+  	};
 
   	function _bubbleChange(dataItem,_n,_u,_d){
   		var p = _setChangeState(dataItem,_n,_u,_d);
   		while(p = _setChildChangeState(p.parent,_n,_u,_d));
   	};
-      
+
     function _bubbleChangeCount(dataItem){
       var p = dataItem;
       p._change++;
       while(p = p.parent){
-        p._change++;    
-      }  
+        p._change++;
+      }
     };
 
   	function _triggerOnChange(){
@@ -279,17 +306,6 @@ definition:function(scope){
   	};
 
 
-/* 
-    ------------------------------------------------------------------------------ 
-    IDataContract interface
-*/
-    
-    var IDataContract = new Interface({
-       IDataContract:{
-           onDataItemChanged:function(){},
-           onDataIn:function(){}
-       } 
-    });
 
 
 
@@ -306,10 +322,10 @@ definition:function(scope){
         }
         else {
             this.source = data;
-            this.root = this;    
+            this.root = this;
         }
-        if(path) this._path = path;     
-    }  
+        if(path) this._path = path;
+    }
 
     DataItem2.prototype.path = function(path){
          return _path2(this,path);
@@ -326,7 +342,7 @@ definition:function(scope){
     }
 
     function _grabPath(child){
-        
+
     }
 
     function _getValue(p,path){
@@ -337,8 +353,8 @@ definition:function(scope){
         }
         return source;
     }
-    
-    
+
+
     function _path2(dataItem, path){
       if(path == null || path === '') return dataItem;
 
@@ -375,9 +391,9 @@ definition:function(scope){
       return parent;
     }
 
-    
-    
-    
+
+
+
 
     scope.exports(
         {IDataContract : IDataContract},
