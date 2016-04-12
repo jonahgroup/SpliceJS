@@ -394,6 +394,20 @@ definition:function(scope){
         ------------------------------------------------------------------------------
         Private functions
     */
+    /**
+    */
+    function _attachEvent(o,p,e){
+      if(!o || !p) return e;
+
+      var v = o[p];
+      if(v && v.__sjs_event__) return v;
+
+      //target property is a function
+      if(typeof v === 'function') {
+          return e.subscribe(o,v);
+      }
+      return o[p] = e;
+    }
 
 
 
@@ -477,22 +491,6 @@ definition:function(scope){
     }
 
 
-    /**
-    */
-    function _attachEvent(o,p,e){
-      if(!o || !p) return e;
-
-      var v = o[p];
-      if(v && v.__sjs_event__) return v;
-
-      //target property is a function
-      if(typeof v === 'function') {
-          return e.subscribe(o,v);
-      }
-      return o[p] = e;
-    }
-
-
 
     /*
         ------------------------------------------------------------------------------
@@ -502,6 +500,8 @@ definition:function(scope){
         BaseEvent,
         { 'event':Event,
           attach:_attach,
+          createMulticastRunner: _createUnicastEvent,
+          createUnicastRunner:_createUnicastEvent,
           MulticastEvent:new MulticastEvent(),
           UnicastEvent:new UnicastEvent()
         }

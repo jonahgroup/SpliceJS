@@ -6,7 +6,8 @@ required:[
 	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
 	{ Data			: '/{sjshome}/modules/splice.dataitem.js'},
 	{ Events		: '/{sjshome}/modules/splice.event.js'},
-	{ Views			: '/{sjshome}/modules/splice.view.js'}
+	{ Views			: '/{sjshome}/modules/splice.view.js'},
+	{ Document  : '/{sjshome}/modules/splice.document.js'}
 ],
 definition:function component(scope){
 	//enable strict mode
@@ -15,20 +16,37 @@ definition:function component(scope){
 	// importing framework features makes our code less verbose
 	var debug = scope.sjs.log.debug
 	,   log = scope.sjs.log
-    ,   imports = scope.imports
-    ;
+  ,   imports = scope.imports
+  ;
 
 	var
 	    Class 			= imports.Inheritance.Class
 	,   Animate 		= imports.Animation.Animate
-	,   Controller 	    = imports.Component.Controller
-	,	Event 			= imports.Events.Event
-	,	event 			= imports.Events.event
-	,	View 			= imports.Views.View
-	,	DataItem 		= imports.Data.DataItem
-    ,   ArrayDataItem   = imports.Data.ArrayDataItem
-    ,   IDataContract   = imports.Data.IDataContract
+	,   Controller 	= imports.Component.Controller
+	,	Event 				= imports.Events.Event
+	,	Events 				= imports.Events
+	,	event 				= imports.Events.event
+	,	View 					= imports.Views.View
+	,	DataItem 			= imports.Data.DataItem
+  , ArrayDataItem   = imports.Data.ArrayDataItem
+  , IDataContract   = imports.Data.IDataContract
+	, Document = imports.Document
 	;
+
+	/**
+	* DomEvent
+	*/
+	var DomMulticastEvent = Class(function DomEvent(){
+	}).extend(Events.BaseEvent);
+
+	DomMulticastEvent.prototype.attach = function(instance, property){
+		if(!Document.isHTMLElement(instance) && !(instance instanceof View))
+			throw "Cannot attach DomMulticastEvent target instance if not HTMLElement or not an instance of View ";
+	}
+
+
+
+
 
 
 	/**
