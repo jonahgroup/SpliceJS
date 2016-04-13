@@ -1,6 +1,9 @@
 sjs.module ({
 required:[
-    {Syntax:  '/{sjshome}/modules/splice.syntax.js'}
+    { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+    { Syntax : '/{sjshome}/modules/splice.syntax.js'},
+    { Document  : '/{sjshome}/modules/splice.document.js'},
+    { Events : '/{sjshome}/modules/splice.event.js'}
 ]
 ,
 definition:function(scope){
@@ -12,6 +15,9 @@ definition:function(scope){
 
   var
     Tokenizer = imports.Syntax.Tokenizer
+    Document = imports.Document
+    Class = imports.Inheritance.Class
+    Events = imports.Events
   ;
 
   function dfs(dom, target, filterFn, nodesFn){
@@ -211,6 +217,41 @@ definition:function(scope){
   };
 
 
+
+    	function domEventArgs(e){
+    		return {
+    			mouse: mousePosition(e),
+    		  source: e.srcElement,
+          domEvent:e,     // source event
+    			cancel: function(){
+                	this.cancelled = true;
+                	e.__jsj_cancelled = true;
+                }
+    		}
+    	};
+
+
+  function mousePosition(e){
+        //http://www.quirksmode.org/js/events_properties.html#position
+    var posx = 0
+    ,   posy = 0;
+
+    if (e.pageX || e.pageY) 	{
+      posx = e.pageX;
+      posy = e.pageY;
+    }
+    else if (e.clientX || e.clientY) 	{
+      posx = e.clientX + document.body.scrollLeft
+        + document.documentElement.scrollLeft;
+      posy = e.clientY + document.body.scrollTop
+        + document.documentElement.scrollTop;
+    }
+
+    return {x:posx,y:posy};
+  };
+
+
+
   /**
   */
   function ViewReflow(){
@@ -238,7 +279,27 @@ definition:function(scope){
   	return this;
   };
 
+  /*
+      -----------------------------------------------------------------
+      Dom Event
+  */
+  var DomMulticastEvent = Class(function DomMulticastEvent(s){
+    if(s == true) return this;
+    this.stop = new DomMulticastEvent(true);
+    this.stop.stopPropagation = true;
+  }).extend(Events.BaseEvent);
 
+  DomMulticastEvent.prototype.attach = function(instance, property){
+    if(!Document.isHTMLElement(instance) && !(instance instanceof View))
+      throw "Cannot attach DomMulticastEvent target instance if not HTMLElement or not an instance of View ";
+  }
+
+
+
+
+  /*
+      -----------------------------------------------------------------
+  */
   /**
   	Dom manipulation api
   */
@@ -501,7 +562,7 @@ definition:function(scope){
   };
 
   scope.exports(
-    View
+    View, {DomMulticastEvent:new DomMulticastEvent()}
   );
 }
 });

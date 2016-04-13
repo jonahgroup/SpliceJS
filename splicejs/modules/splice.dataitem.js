@@ -14,7 +14,7 @@ definition:function(scope){
   var
         Class = imports.Inheritance.Class
   ,     Interface = imports.Inheritance.Interface
-  ,     event = imports.Events.event
+  ,     Events = imports.Events
   ;
 
     var EXCEPTIONS  = {
@@ -51,8 +51,8 @@ definition:function(scope){
         this.pathmap = Object.create(null);
         this._change = 0;
 
-        event(this).attach({
-          onChange:event.MulticastEvent
+        Events.attach(this,{
+          onChange:Events.MulticastEvent
         });
     };
 

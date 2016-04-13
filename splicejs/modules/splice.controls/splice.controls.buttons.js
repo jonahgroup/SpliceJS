@@ -4,7 +4,8 @@ type:'component'
 ,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
-	{ Event 	  : '/{sjshome}/modules/splice.event.js' },
+	{ Events 	  	: '/{sjshome}/modules/splice.event.js' },
+	{ Views				: '/{sjshome}/modules/splice.view.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'Doc': '{sjshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
@@ -12,22 +13,24 @@ required:[
 ]
 ,
 definition:function(scope){
-	var 	
-        imports = scope.imports
+	var
+      imports = scope.imports
     ,	debug = scope.sjs.log.debug
     ;
 
-	var 
-        Class = imports.Inheritance.Class
+	var
+    Class = imports.Inheritance.Class
 	,	UIControl = imports.SpliceJS.UI.UIControl
-	,   event = imports.Event.event
-    ;
+	, Events = imports.Events
+	, MulticastEvent = imports.Events.MulticastEvent
+	,	DomMulticastEvent = imports.Views.DomMulticastEvent
+  ;
 
 	var Button = Class(function ButtonController(args){
 		this.base(args);
 
-		event(this).attach({
-			onClick : event.multicast
+		Events.attach(this,{
+			onClick : MulticastEvent
 		});
 
 	}).extend(UIControl);
@@ -35,9 +38,9 @@ definition:function(scope){
 
 	Button.prototype.initialize = function(){
 
-		event(this.views.root).attach({
-			onclick	:	event.unicast.stop,
-            onmousedown: event.unicast.stop
+		Events.attach(this.views.root,{
+			onclick			:	DomMulticastEvent.stop,
+    	onmousedown	: DomMulticastEvent.stop
 		});
 
 		this.views.root.onclick.subscribe(function(){
@@ -69,7 +72,7 @@ definition:function(scope){
 		if(!this.staticContent)
 		this.content(item.getValue()).replace();
     };
-    
+
 
 	/**
 	 *

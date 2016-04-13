@@ -9,7 +9,7 @@ required:[
 ],
 definition:function(scope){
   "use strict";
-  var 
+  var
     imports = scope.imports
   , log = scope.sjs.log
   , sjs = scope.sjs
@@ -110,7 +110,7 @@ definition:function(scope){
 			/* create instance of the proxy object
 			 * local scope lookup takes priority
 			 */
-            
+
             //look in root scope
 			var obj = scope.lookup(args.type);
             //look in the inmports
@@ -359,7 +359,7 @@ definition:function(scope){
   			case BINDING_TYPES.PARENT:
   				if(!originInstance.parent) throw 'Unable to locate parent instance';
   			return originInstance.parent;
-  			
+
 
 
   			case BINDING_TYPES.TYPE:
@@ -476,10 +476,10 @@ definition:function(scope){
   		if(!this.children)	this.children = [];
   		if(!this.__sjs_visual_children__) this.__sjs_visual_children__ = [];
 
-  		event(this).attach({
-  			onAttach	:	event.multicast,
-  			onDisplay	:	event.multicast,
-  			onData		: event.multicast
+  		Events.attach(this,{
+  			onAttach	:	Events.MulticastEvent,
+  			onDisplay	:	Events.MulticastEvent,
+  			onData		: Events.MulticastEvent
   		});
 
   		this.onDisplay.subscribe(function(){
@@ -1273,14 +1273,14 @@ definition:function(scope){
   			if(!(this instanceof Component)) throw 'Component function must be invoked with [new] keyword';
 
   			/* lookup controller */
-  			var controller = null; 
+  			var controller = null;
             if(_controller) {
                 controller = scope.lookup(_controller);
                 if(!controller)
-                controller = scope.imports.lookup(_controller);    
+                controller = scope.imports.lookup(_controller);
             }
-            
-                                     
+
+
   			/* assign default */
   			if(!controller) controller = Controller;
   			if(controller.isComponent) controller = controller.controller();

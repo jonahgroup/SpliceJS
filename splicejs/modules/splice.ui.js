@@ -20,44 +20,17 @@ definition:function component(scope){
   ;
 
 	var
-	    Class 			= imports.Inheritance.Class
-	,   Animate 		= imports.Animation.Animate
-	,   Controller 	= imports.Component.Controller
-	,	Event 				= imports.Events.Event
+	  Class 			= imports.Inheritance.Class
+	, Animate 		= imports.Animation.Animate
+	, Controller 	= imports.Component.Controller
 	,	Events 				= imports.Events
-	,	event 				= imports.Events.event
+	, MulticastEvent = imports.Events.MulticastEvent
 	,	View 					= imports.Views.View
 	,	DataItem 			= imports.Data.DataItem
   , ArrayDataItem   = imports.Data.ArrayDataItem
   , IDataContract   = imports.Data.IDataContract
 	, Document = imports.Document
 	;
-
-	/**
-	* DomEvent
-	*/
-	var DomMulticastEvent = Class(function DomEvent(){
-	}).extend(Events.BaseEvent);
-
-	DomMulticastEvent.prototype.attach = function(instance, property){
-		if(!Document.isHTMLElement(instance) && !(instance instanceof View))
-			throw "Cannot attach DomMulticastEvent target instance if not HTMLElement or not an instance of View ";
-	}
-
-
-
-
-
-
-	/**
-	* Create a DataItem object with onChanged event
-	*/
-	var ObservableDataItem = function ObservableDataItem(data){
-		return event(new DataItem(data)).attach({
-			onChanged : event.multicast
-		});
-	};
-
 
 
 	/**
@@ -66,13 +39,12 @@ definition:function component(scope){
 	var UIControl = Class(function UIControl(args){
 		this.base(args);
 
-        if(args)
-            this.observeDataItem = args.observeDataItem;
+    if(args) this.observeDataItem = args.observeDataItem;
 
-		event(this).attach({
-			onDataOut  : event.multicast,
-			onReflow : event.multicast,
-      onStyle : event.multicast
+		Events.attach(this, {
+			onDataOut : MulticastEvent,
+			onReflow 	: MulticastEvent,
+      onStyle 	: MulticastEvent
 		});
 
 
@@ -452,7 +424,7 @@ definition:function component(scope){
 	//module exports
 	scope.exports(
 		UIControl, UIElement, KeyListener,
-		DataItem,ArrayDataItem,ObservableDataItem,
+		DataItem,ArrayDataItem,
 		//singletons
 		{Positioning : Positioning},
 		{DragAndDrop : DragAndDrop}

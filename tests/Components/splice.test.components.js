@@ -28,14 +28,14 @@ definition:function(scope){
   var
     Class = imports.Inheritance.Class
   , Controller = imports.Component.Controller
-  , Event = imports.Events.Event
-  , event = imports.Events.event
+  , Events = imports.Events
+  , MulticastEvent = imports.Events.MulticastEvent
   ;
 
   var   DataItem = imports.SpliceJS.Ui.DataItem
   ,     ArrayDataItem = imports.SpliceJS.Ui.ArrayDataItem;
 
-  var ObservableDataItem = imports.SpliceJS.Ui.ObservableDataItem;
+
 
   var provinces = [
     'Ontario','British Columbia', 'Alberta', 'Quebec','New Brunswick',
@@ -71,19 +71,19 @@ definition:function(scope){
 
   };
 
-  var newProvince = new ObservableDataItem({
+  var newProvince = new DataItem({
       name:'',isChecked:false
   });
 
   var ComponentsTest = Class(function ComponentsTest(){
     this.base();
 
-    event(this).attach({
-      onProvinces         : event.multicast,
-      onNewProvince       : event.multicast,
-      onChartsData        : event.multicast,
-      onScatterChartData  : event.multicast,
-      onTestCheck         : event.multicast
+    Events.attach(this,{
+      onProvinces         : MulticastEvent,
+      onNewProvince       : MulticastEvent,
+      onChartsData        : MulticastEvent,
+      onScatterChartData  : MulticastEvent,
+      onTestCheck         : MulticastEvent
     });
 
     this.sourceTestCheck = {checked:true};
