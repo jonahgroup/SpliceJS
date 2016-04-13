@@ -16,7 +16,7 @@ definition:function(scope){
 	"use strict";
 
 	/* framework imports */
-	var 
+	var
         sjs = scope.sjs
     ,   imports = scope.imports
 	;
@@ -26,8 +26,9 @@ definition:function(scope){
 	,	dom         = imports.Doc.dom
 	,	UIControl   = imports.SpliceJS.UI.UIControl
 	,	Class       = imports.Inheritance.Class
-	,   Controller  = imports.Component.Controller
-	,	event       = imports.Events.event
+	, Controller  = imports.Component.Controller
+	,	Events      = imports.Events
+	, Views 			= imports.Views
 	,	display     = imports.Views.View.display
 	;
 	//static single instance
@@ -42,8 +43,8 @@ definition:function(scope){
 	var DropDownController = Class(function DropDownController(args){
 		this.base(args);
 
-		event(this).attach({
-			onDropDown : event.multicast
+		Events.attach(this,{
+			onDropDown : Events.MulticastEvent
 		});
 
 		this.dropDownItem = this.dropDownItem;
@@ -59,7 +60,9 @@ definition:function(scope){
 					Subscribe to onclick instead of mousedown, because firing mousedown
 					will immediately execute event within dropDown() closing the dropdown
 			*/
-		event(this.views.root).attach({ onmousedown : event.unicast.stop })
+		Events.attach(this.views.root,{
+			onmousedown : Views.DomMulticastEvent.stop
+		})
 		.onmousedown.subscribe(function(e){
 			this.dropDown();
 		},this);

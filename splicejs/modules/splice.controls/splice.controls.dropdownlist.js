@@ -19,7 +19,8 @@ definition:function(scope){
 
 	var
 		Class = imports.Inheritance.Class
-	,	event = imports.Events.event
+	,	Events = imports.Events
+	, MulticastEvent = imports.Events.MulticastEvent
 	,	UIControl = imports.SpliceJS.UI.UIControl
 	;
 
@@ -29,10 +30,10 @@ definition:function(scope){
 	var DropDownListController = Class(function DropDownListController(args){
 		this.base();
 
-		event(this).attach({
-			onDropDown : event.multicast,
-			onListData : event.multicast,
-			onDataItem : event.multicast
+		Events.attach(this,{
+			onDropDown : MulticastEvent,
+			onListData : MulticastEvent,
+			onDataItem : MulticastEvent
 		});
 
 	}).extend(UIControl);

@@ -82,24 +82,25 @@ definition:function(scope){
 		this.base(args);
 		this.isChecked = false;
 
-		event(this).attach({onChecked:event.multicast});
+		Events.attach(this,{
+			onChecked	:	MulticastEvent
+		});
 
 	}).extend(UIControl);
 
 	CheckBox.prototype.initialize = function(){
-		event(this.views.root).attach({
-			onclick :	event.multicast.stop,
-            onmousedown: event.multicast.stop
+		Events.attach(this.views.root,{
+			onclick 		:	DomMulticastEvent.stop,
+      onmousedown : DomMulticastEvent.stop
 		}).onclick.subscribe(function(){
+				this.isChecked = !this.isChecked;
 
-		this.isChecked = !this.isChecked;
+				if(this.dataItem) {
+					this.dataItem.setValue(this.isChecked);
+				}
 
-		if(this.dataItem) {
-			this.dataItem.setValue(this.isChecked);
-		}
-
-		this.check(this.isChecked);
-		this.onChecked(this.dataItem);
+				this.check(this.isChecked);
+				this.onChecked(this.dataItem);
 
 		},this);
 	}

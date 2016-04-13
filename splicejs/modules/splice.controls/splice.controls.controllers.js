@@ -5,32 +5,32 @@ type:'component'
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Component: '/{sjshome}/modules/splice.component.core.js'},
-	{ Event: '/{sjshome}/modules/splice.event.js'},
-    { Async:    '/{sjshome}/modules/splice.async.js'},
+	{ Events: '/{sjshome}/modules/splice.event.js'},
+  { Async:    '/{sjshome}/modules/splice.async.js'},
 	{'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
 	 'splice.controls.controllers.html'
 ]
 ,
 definition:function(scope){
     "use strict";
-	var 
+	var
         sjs = scope.sjs
     ,   imports = scope.imports
     ;
 
 	var Class = imports.Inheritance.Class
 	,	Controller = imports.Component.Controller
-	,   UIControl = imports.SpliceJS.UI.UIControl
-    ,   asyncLoop = imports.Async.asyncLoop
-	,	event = imports.Event.event
+	, UIControl = imports.SpliceJS.UI.UIControl
+  , asyncLoop = imports.Async.asyncLoop
+	,	Events = imports.Events
 	;
 
 	var DomIterator = Class(function DomIteratorController(args){
 		this.base();
 		this.elements = [];
 
-		event(this).attach({
-			onStyleSelect : event.multicast
+		Events.attach(this,{
+			onStyleSelect : Events.MulticastEvent
 		});
 
 	}).extend(UIControl);
@@ -97,7 +97,7 @@ definition:function(scope){
 			//cache elements
 			this.elements.push(element);
             return true;
-            
+
         }.bind(this));
 
 
@@ -114,7 +114,7 @@ definition:function(scope){
 			//cache elements
 			this.elements.push(element);
 		}
-  */      
+  */
 	};
 
 

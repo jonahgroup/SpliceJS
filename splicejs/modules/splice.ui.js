@@ -113,9 +113,9 @@ definition:function component(scope){
 				this.dataItem = item.path(this.dataPath);
                 if(this.observeDataItem === true){
                     if(!this.dataItem.onChanged){
-                        event(this.dataItem).attach({
-				            onChanged : event.multicast
-		                });
+                    	Events.attach(this.dataItem,{
+				            		onChanged : Events.MulticastEvent
+		                	});
                     }
                     this.dataItem.onChanged.subscribe(function(dataItem){
                         if(this._sjs_di_lastchange == dataItem._change) return;
@@ -132,8 +132,8 @@ definition:function component(scope){
 		}
 		// datapath is only set externally
 		this.dataItem = (new DataItem(item)).path(this.dataPath);
-		event(this.dataItem).attach({
-				onChanged : event.multicast
+		Events.attach(this.dataItem, {
+				onChanged : Events.MulticastEvent
 		});
 		// invoke data-item handler
 		this.onDataIn(this.dataItem);
