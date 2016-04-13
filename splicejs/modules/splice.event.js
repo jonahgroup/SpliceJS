@@ -164,7 +164,7 @@ definition:function(scope){
     scope.exports(
         BaseEvent,
         { attach:_attach,
-          createMulticastRunner: _createUnicastEvent,
+          createMulticastRunner: _createMulticastEvent,
           createUnicastRunner:_createUnicastEvent,
           MulticastEvent:new MulticastEvent(),
           UnicastEvent:new UnicastEvent()

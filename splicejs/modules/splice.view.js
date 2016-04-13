@@ -292,6 +292,10 @@ definition:function(scope){
   DomMulticastEvent.prototype.attach = function(instance, property){
     if(!Document.isHTMLElement(instance) && !(instance instanceof View))
       throw "Cannot attach DomMulticastEvent target instance if not HTMLElement or not an instance of View ";
+    var evt = Events.createMulticastRunner();
+
+
+    return evt;
   }
 
 
