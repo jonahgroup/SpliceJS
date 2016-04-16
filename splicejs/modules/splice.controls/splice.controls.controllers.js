@@ -66,8 +66,6 @@ definition:function(scope){
 
 			//cache elements
 			this.elements.push(element);
-
-
 		}
 
 	};

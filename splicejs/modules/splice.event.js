@@ -86,6 +86,7 @@ definition:function(scope){
         _multicastRun.apply(_closure,arguments);
       };
       fnE.subscribe = function(callback,instance){
+        if(callback == fnE) throw 'Recursive event subscription on ' + fname(instance.constructor) + ' "' + fname(callback)+'"';
         return _multicastSubscribe.call(fnE,_closure,callback,instance);
       }
       return fnE;
@@ -102,7 +103,9 @@ definition:function(scope){
     }
 
     function _multicastRun(){
+      if(!this.callbacks) return;
       var callbacks = this.callbacks[this.idx];
+
       for(var key in callbacks){
         callbacks[key][0].apply(callbacks[key][0],arguments);
       }

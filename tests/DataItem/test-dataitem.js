@@ -20,7 +20,7 @@ definition:function(scope){
       {id:2, desc:'Sample order', items:[{id:7, name:'pencil', qty:3}]}
     ];
 
-    Test_PathTree();
+    /*Test_PathTree();
     Test_ValueSetter();
     Test_ValueSetterRefSource();
     Test_ValueSetterPrimSource();
@@ -28,7 +28,8 @@ definition:function(scope){
     Test_RemoveValue();
     Test_GetChanges();
     Test_LargeData();
-    Test_DataItemChaining();
+*/
+    Test_DataItemLink();
 
     function Test_PathTree(){
       var d = new DataItem(orders);
@@ -144,11 +145,20 @@ definition:function(scope){
         d.path('1.items.0.name').setValue('black pencil');
     }
 
-    function Test_DataItemChaining(){
+    function Test_DataItemLink(){
       log.info('Testing data item chaining');
 
       var source = new DataItem();
       var target = new DataItem(source);
+
+      target.subscribe(function(){
+        log.info('Chained call');
+      }, target);
+
+      source.setValue(orders);
+
+
+
     }
 
 

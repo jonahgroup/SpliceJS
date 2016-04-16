@@ -43,8 +43,6 @@ definition:function(scope){
         ------------------------------------------------------------------------------
         DataItem class
     */
-
-
     var DataItem = function DataItem(data){
         this.source = data;
         this.parent = null;
@@ -54,6 +52,11 @@ definition:function(scope){
         Events.attach(this,{
           onChange:Events.MulticastEvent
         });
+
+        //linked data items
+        if(data instanceof DataItem){
+          this.subscribe(data.onChange,data);
+        }
     };
 
     DataItem.prototype.getValue = function(){
@@ -71,7 +74,15 @@ definition:function(scope){
         this enable observers to track specific changes separately
     */
     DataItem.prototype.setValue = function(value){
-        if(this.source == null) throw EXCEPTIONS.invalidSourceProperty + ' ' +this.source;
+        /*
+          set initial value, nothing to bubble
+          this is a new value
+        */
+        if(this.source == null) {
+          this.source = value;
+          _triggerOnChange.call(this);
+          return;
+        }//throw EXCEPTIONS.invalidSourceProperty + ' ' +this.source;
 
         if(typeof this.source != 'object') {
             this.old = source;
@@ -161,15 +172,21 @@ definition:function(scope){
 
 
   	DataItem.prototype.subscribe = function(handler, instance){
-  		var node = this;
-  		while(node != null){
-  			if(node.onChanged) {
-  				node.onChanged.subscribe(handler,instance);
-  				break;
-  			}
-  			node = node.parent;
-  		}
-  	};
+      var node = this;
+      if(node.onChange) {
+        node.onChange.subscribe(handler,instance);
+      }
+
+    	// var node = this;
+  		// while(node != null){
+  		// 	if(node.onChanged) {
+  		// 		node.onChanged.subscribe(handler,instance);
+  		// 		break;
+  		// 	}
+  		// 	node = node.parent;
+  		// }
+
+    };
 
     /**
       ArrayDataItem
@@ -297,8 +314,8 @@ definition:function(scope){
   	function _triggerOnChange(){
   		var node = this;
   		while(node != null){
-  			if(node.onChanged) {
-  				node.onChanged(this);
+  			if(node.onChange) {
+  				node.onChange(this);
   				//break;
   			}
   			node = node.parent;
