@@ -44,25 +44,43 @@ definition:function(scope){
         DataItem class
     */
     var DataItem = function DataItem(data){
-        this.source = data;
-        this.parent = null;
-        this.pathmap = Object.create(null);
-        this._change = 0;
 
-        Events.attach(this,{
-          onChange:Events.MulticastEvent
-        });
+      //create change event
+      Events.attach(this,{
+        onChange:Events.MulticastEvent
+      });
 
-        //linked data items
-        if(data instanceof DataItem){
-          this.subscribe(data.onChange,data);
-        }
+      //core properties
+      this.source = data;
+      this.parent = null;
+      this.root = this;
+      this.pathmap = Object.create(null);
+      this._change = 0;
+
+      //delegate constructor below
+      if(!(data instanceof DataItem)) return this;
+
+      this._delegate = data;
+      if(data instanceof DataItem){
+        data.subscribe(this.onChange,this);
+      }
+
     };
 
     DataItem.prototype.getValue = function(){
-        if(this._state == 'd' || this.source == null ) return null;
-        if(this._path == null) return this.source;
-        return this.source[this._path];
+      /*
+        Forward call to a delegate if the item had one
+      */
+      if(this._delegate) {
+        return this._delegate.getValue();
+      }
+
+      /*!!!! 2016-04-20
+        get value from the root's source
+      */
+      if(this._state == 'd' || this.source == null ) return null;
+      if(this._path == null) return this.root.source;
+      return this.root.source[this._path];
     };
 
     /*
@@ -74,6 +92,13 @@ definition:function(scope){
         this enable observers to track specific changes separately
     */
     DataItem.prototype.setValue = function(value){
+        /*
+          Forward call to a delegate if the item had one
+        */
+        if(this._delegate) {
+          return this._delegate.setValue(value);
+        }
+
         /*
           set initial value, nothing to bubble
           this is a new value
@@ -91,7 +116,12 @@ definition:function(scope){
             return this;
         }
 
-        if(this._path == null) throw EXCEPTIONS.invalidPath + ' ' + this._path;
+        //this is a root level item
+        if(this._path == null){
+          //throw EXCEPTIONS.invalidPath + ' ' + this._path;
+          //do we rebuild path map?
+          this.source = value;
+        }
 
         //same current value
         if(this.source[this._path] === value) return this;
@@ -125,6 +155,13 @@ definition:function(scope){
   		returns child DataItem
   	*/
   	DataItem.prototype.path = function(path){
+      /*
+        Forward call to a delegate if the item had one
+      */
+      if(this._delegate) {
+        return _path(this._delegate,path);
+      }
+
       return _path(this,path);
   	};
 
@@ -170,7 +207,10 @@ definition:function(scope){
        }
     };
 
-
+    /*
+      !!! There is not delegation ons subscribe
+      Delegator item acts as an event aggregator
+    */
   	DataItem.prototype.subscribe = function(handler, instance){
       var node = this;
       if(node.onChange) {
@@ -264,6 +304,7 @@ definition:function(scope){
           else
             child = new DataItem(ref);
 
+          child.root = dataItem;
           child._path = parts[i];
           parent.pathmap[parts[i]] = child;
           child.parent = parent;
@@ -326,95 +367,13 @@ definition:function(scope){
 
 
 
-/*
-    -----------------------------------------------------------------------------
-    Fully synchronized data-item map
-*/
-
-
-    function DataItem2(data,path){
-        if(data instanceof DataItem2) {
-            this.parent = data;
-            this.root = data.root;
-        }
-        else {
-            this.source = data;
-            this.root = this;
-        }
-        if(path) this._path = path;
-    }
-
-    DataItem2.prototype.path = function(path){
-         return _path2(this,path);
-    }
-
-    DataItem2.prototype.getValue = function(){
-        var p = this;
-        var path = [];
-        while(p.parent){
-            path.push(p._path);
-            p = p.parent;
-        }
-        _getValue(p,path);
-    }
-
-    function _grabPath(child){
-
-    }
-
-    function _getValue(p,path){
-        var i = path.length-1;
-        var source = p.source;
-        while(i-- >= 0) {
-            source = source[path[i]];
-        }
-        return source;
-    }
-
-
-    function _path2(dataItem, path){
-      if(path == null || path === '') return dataItem;
-
-      var root = dataItem.root;
-
-
-      var parts = path.toString().split('.');
-
-      var parent = dataItem;
-      for(var i=0; i < parts.length; i++){
-
-        var child = parent.pathmap[parts[i]];
-        var ref = parent._path != null?parent.source[parent._path] : parent.source;
-
-        if(ref[parts[i]] == null) throw EXCEPTIONS.invalidPathDepth + ': ' + path;
-
-        if(child == null || ref[parts[i]] == null) {
-          if(ref[parts[i]] instanceof Array)
-            child = new ArrayDataItem(ref);
-          else
-            child = new DataItem(ref);
-
-          child._path = parts[i];
-          parent.pathmap[parts[i]] = child;
-          child.parent = parent;
-
-          if(ref[parts[i]] == null) {
-            if(parts.length > 1) throw EXCEPTIONS.invalidPathDepth + ' ' + path;
-            return child;
-          }
-        }
-        parent = child;
-      }
-      return parent;
-    }
-
 
 
 
 
     scope.exports(
         {IDataContract : IDataContract},
-        DataItem, ArrayDataItem, DataItem2
+        DataItem, ArrayDataItem
     );
 
 }})

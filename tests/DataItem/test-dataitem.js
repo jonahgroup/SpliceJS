@@ -20,6 +20,11 @@ definition:function(scope){
       {id:2, desc:'Sample order', items:[{id:7, name:'pencil', qty:3}]}
     ];
 
+    var orders2 = [
+      {id:1, desc:'Sample order', items:[{id:24, name:'note book', qty:1}]},
+      {id:2, desc:'Sample order', items:[{id:7, name:'pencil', qty:3}]}
+    ];
+
     /*Test_PathTree();
     Test_ValueSetter();
     Test_ValueSetterRefSource();
@@ -150,15 +155,23 @@ definition:function(scope){
 
       var source = new DataItem();
       var target = new DataItem(source);
+      var target2 = new DataItem(source);
 
-      target.subscribe(function(){
+      target.subscribe(function(item){
         log.info('Chained call');
       }, target);
 
+      target2.subscribe(function(item){
+        log.info('Chained call 2');
+      }, target2);
+
+
       source.setValue(orders);
+      target.path('1.items.0.name').setValue('name set by a delegate');
 
-
-
+      source.setValue(orders2);
+      var v = target.path('1.items.0.name').getValue();
+      log.info(v);
     }
 
 
