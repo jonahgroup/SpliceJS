@@ -80,7 +80,9 @@ definition:function(scope){
       */
       if(this._state == 'd' || this.source == null ) return null;
       if(this._path == null) return this.root.source;
-      return this.root.source[this._path];
+
+      var s = _recGetValue(this);
+      return !s ? null : s[this._path];
     };
 
     /*
@@ -99,6 +101,8 @@ definition:function(scope){
           return this._delegate.setValue(value);
         }
 
+        var s = _recGetValue(this);
+!!!!continue here
         /*
           set initial value, nothing to bubble
           this is a new value
@@ -228,6 +232,17 @@ definition:function(scope){
 
     };
 
+
+    function _recGetValue(dataItem, i){
+      if(dataItem.parent == null){
+        if(dataItem._path) return dataItem.source[dataItem._path];
+        return dataItem.source;
+      }
+      var source = _recGetValue(dataItem.parent,1);
+      if(i == null) return source;
+      return source[dataItem._path];
+    };
+
     /**
       ArrayDataItem
     */
@@ -304,7 +319,7 @@ definition:function(scope){
           else
             child = new DataItem(ref);
 
-          child.root = dataItem;
+          child.root = dataItem.root;
           child._path = parts[i];
           parent.pathmap[parts[i]] = child;
           child.parent = parent;

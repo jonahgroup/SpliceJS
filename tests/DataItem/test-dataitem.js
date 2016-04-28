@@ -168,6 +168,8 @@ definition:function(scope){
 
       source.setValue(orders);
       target.path('1.items.0.name').setValue('name set by a delegate');
+      var v = target.path('1.items.0.name').getValue();
+      log.info(v);
 
       source.setValue(orders2);
       var v = target.path('1.items.0.name').getValue();
