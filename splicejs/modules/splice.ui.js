@@ -3,11 +3,11 @@ sjs.module({
 required:[
 	{ Inheritance   : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Animation	    : '/{sjshome}/modules/splice.animation.js'},
-	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
-	{ Data			: '/{sjshome}/modules/splice.dataitem.js'},
-	{ Events		: '/{sjshome}/modules/splice.event.js'},
-	{ Views			: '/{sjshome}/modules/splice.view.js'},
-	{ Document  : '/{sjshome}/modules/splice.document.js'}
+	{ Component			: '/{sjshome}/modules/splice.component.core.js'},
+	{ Data					: '/{sjshome}/modules/splice.dataitem.js'},
+	{ Events				: '/{sjshome}/modules/splice.event.js'},
+	{ Views					: '/{sjshome}/modules/splice.view.js'},
+	{ Document  		: '/{sjshome}/modules/splice.document.js'}
 ],
 definition:function component(scope){
 	//enable strict mode

@@ -21,7 +21,8 @@ definition:function(scope){
         invalidSourceProperty : 'Invalid source property',
         invalidPath           :	'Reference data-item path is not specified',
         invalidPathDepth      :	'Ivalid DataItem path',
-        invalidDeleteOperation:	'Invalid delete operation, on an object'
+        invalidDeleteOperation:	'Invalid delete operation, on an object',
+        invalidDelegateSource : 'Unable to create data-item delegate, source is not an instance of DataItem'
     }
 
     /*
@@ -39,11 +40,12 @@ definition:function(scope){
 
 
 
+
     /*
         ------------------------------------------------------------------------------
         DataItem class
     */
-    var DataItem = function DataItem(data){
+    var DataItem = function DataItem(){
 
       //create change event
       Events.attach(this,{
@@ -51,37 +53,15 @@ definition:function(scope){
       });
 
       //core properties
-      this.source = data;
       this.parent = null;
-      this.root = this;
       this.pathmap = Object.create(null);
       this._change = 0;
-
-      //delegate constructor below
-      if(!(data instanceof DataItem)) return this;
-
-      this._delegate = data;
-      if(data instanceof DataItem){
-        data.subscribe(this.onChange,this);
-      }
 
     };
 
     DataItem.prototype.getValue = function(){
-      /*
-        Forward call to a delegate if the item had one
-      */
-      if(this._delegate) {
-        return this._delegate.getValue();
-      }
-
-      /*!!!! 2016-04-20
-        get value from the root's source
-      */
-      if(this._state == 'd' || this.source == null ) return null;
-      if(this._path == null) return this.root.source;
-
-      var s = _recGetValue(this);
+      var s = _recGetSource(this);
+      if(this._path == null) return s;
       return !s ? null : s[this._path];
     };
 
@@ -94,53 +74,34 @@ definition:function(scope){
         this enable observers to track specific changes separately
     */
     DataItem.prototype.setValue = function(value){
-        /*
-          Forward call to a delegate if the item had one
-        */
-        if(this._delegate) {
-          return this._delegate.setValue(value);
-        }
 
-        var s = _recGetValue(this);
-!!!!continue here
         /*
           set initial value, nothing to bubble
           this is a new value
         */
-        if(this.source == null) {
+        if(this.parent == null) {
           this.source = value;
           _triggerOnChange.call(this);
           return;
         }//throw EXCEPTIONS.invalidSourceProperty + ' ' +this.source;
 
-        if(typeof this.source != 'object') {
-            this.old = source;
-            this.source = value;
-            this._path = null;
-            return this;
-        }
-
-        //this is a root level item
-        if(this._path == null){
-          //throw EXCEPTIONS.invalidPath + ' ' + this._path;
-          //do we rebuild path map?
-          this.source = value;
-        }
+        //find data source
+        var source = _recGetSource(this);
 
         //same current value
-        if(this.source[this._path] === value) return this;
+        if(source[this._path] === value) return this;
 
         //old is only the original value
         if(!this._updated){
-            this.old = this.source[this._path];
+            this.old = source[this._path];
             //do not log repreated change
             _bubbleChange(this,0,1,0);
         }
 
         // set value
-        this.source[this._path] = value;
+        source[this._path] = value;
 
-        if(this.source[this._path] == this.old){
+        if(source[this._path] == this.old){
             _bubbleChange(this,0,-1,0);
         }
 
@@ -149,8 +110,6 @@ definition:function(scope){
             helps observers stay on track
         */
         _bubbleChangeCount(this);
-
-
         _triggerOnChange.call(this);
         return this;
     };
@@ -159,13 +118,6 @@ definition:function(scope){
   		returns child DataItem
   	*/
   	DataItem.prototype.path = function(path){
-      /*
-        Forward call to a delegate if the item had one
-      */
-      if(this._delegate) {
-        return _path(this._delegate,path);
-      }
-
       return _path(this,path);
   	};
 
@@ -233,15 +185,6 @@ definition:function(scope){
     };
 
 
-    function _recGetValue(dataItem, i){
-      if(dataItem.parent == null){
-        if(dataItem._path) return dataItem.source[dataItem._path];
-        return dataItem.source;
-      }
-      var source = _recGetValue(dataItem.parent,1);
-      if(i == null) return source;
-      return source[dataItem._path];
-    };
 
     /**
       ArrayDataItem
@@ -276,7 +219,52 @@ definition:function(scope){
 
     };
 
+
+    /**
+
+    */
+    var DelegateDataItem = Class(function DelegateDataItem(delegate){
+      //do not invoke super constructor on purpose
+      if(!(delegate instanceof DataItem))
+        throw EXCEPTIONS.invalidDelegateSource;
+
+        this.base();
+        //create change event
+        Events.attach(this,{
+          onChange:Events.MulticastEvent
+        });
+
+        this._delegate = delegate;
+        this._delegate.subscribe(this.onChange, this);
+
+    }).extend(DataItem);
+
+
+    DelegateDataItem.prototype.getValue = function() {
+      return this._delegate.getValue();
+    };
+
+    DelegateDataItem.prototype.setValue = function(value){
+      return this._delegate.setValue(value);
+    };
+
+    DelegateDataItem.prototype.path = function(path){
+      return _path(this._delegate,path);
+    };
+
     //hidden methods
+    function _recGetSource(dataItem, i){
+      if(dataItem.parent == null){
+        if(dataItem._path) return dataItem.source[dataItem._path];
+        return dataItem.source;
+      }
+      var source = _recGetSource(dataItem.parent,1);
+      if(i == null) return source;
+      return source[dataItem._path];
+    };
+
+
+
     function _pathWalker(root,list,start){
         if(!root) {
            if(start) list.push(start);
@@ -303,13 +291,18 @@ definition:function(scope){
     function _path(dataItem, path){
       if(path == null || path === '') return dataItem;
 
+      var source = _recGetSource(dataItem,0);
+
+
       var parts = path.toString().split('.');
 
       var parent = dataItem;
       for(var i=0; i < parts.length; i++){
 
         var child = parent.pathmap[parts[i]];
-        var ref = parent._path != null?parent.source[parent._path] : parent.source;
+        var source = parent._path != null ? source[parent._path] : source;
+        //TODO: remove redundant variable
+        var ref = source;
 
         if(ref[parts[i]] == null) throw EXCEPTIONS.invalidPathDepth + ': ' + path;
 
@@ -319,7 +312,6 @@ definition:function(scope){
           else
             child = new DataItem(ref);
 
-          child.root = dataItem.root;
           child._path = parts[i];
           parent.pathmap[parts[i]] = child;
           child.parent = parent;
@@ -388,7 +380,7 @@ definition:function(scope){
 
     scope.exports(
         {IDataContract : IDataContract},
-        DataItem, ArrayDataItem
+        DataItem, DelegateDataItem, ArrayDataItem
     );
 
 }})

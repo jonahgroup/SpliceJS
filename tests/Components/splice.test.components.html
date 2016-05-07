@@ -17,8 +17,10 @@
   <td>
     <sjs-include sjs-type="SpliceJS.Controls.Button">
       {
-        dataPath: '0.name',
+        /*dataPath: '0.name',
         dataIn: binding('onProvinces').parent,
+        */
+        data: binding('onProvinces.0.name').parent,
         onStyle: binding('formatButton').parent,
         observeDataItem:true
       }
@@ -69,7 +71,7 @@
     {
         selectedItem:<sjs-include sjs-type="SpliceJS.Controls.Button">
         {
-           
+
             dataIn:binding('onDataOut').parent
         }
         </sjs-include>,

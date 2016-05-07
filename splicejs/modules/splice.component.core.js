@@ -5,7 +5,8 @@ required:[
   { Document    : '/{sjshome}/modules/splice.document.js'},
   { Syntax      : '/{sjshome}/modules/splice.syntax.js'},
   { Events      : '/{sjshome}/modules/splice.event.js'},
-  { Views      : '/{sjshome}/modules/splice.view.js'}
+  { Views       : '/{sjshome}/modules/splice.view.js'},
+  { DataItem    : '/{sjshome}/modules/splice.dataitem.js'}
 ],
 definition:function(scope){
   "use strict";
@@ -19,7 +20,8 @@ definition:function(scope){
   , doc = imports.Document
   , Tokenizer = imports.Syntax.Tokenizer
   , event = imports.Events.event
-  , View = imports.Views.View;
+  , View = imports.Views.View
+  , DataItem = imports.DataItem
   /*
   ----------------------------------------------------------
   	HTML File Handler

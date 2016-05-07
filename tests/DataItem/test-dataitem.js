@@ -12,6 +12,7 @@ definition:function(scope){
 
     var
       DataItem = scope.imports.UI.DataItem
+    , DelegateDataItem = scope.imports.UI.DelegateDataItem
     , ArrayDataItem = scope.imports.UI.ArrayDataItem
     ;
 
@@ -154,26 +155,37 @@ definition:function(scope){
       log.info('Testing data item chaining');
 
       var source = new DataItem();
-      var target = new DataItem(source);
-      var target2 = new DataItem(source);
+      var target = new DelegateDataItem(source);
+      var target2 = new DelegateDataItem(source);
 
+      /*
+        event subscriber will get invoked when
+        source data item value changes
+      */
       target.subscribe(function(item){
         log.info('Chained call');
       }, target);
 
+      /*
+        event subscriber will get invoked when
+        source data item value changes
+      */
       target2.subscribe(function(item){
         log.info('Chained call 2');
       }, target2);
 
 
       source.setValue(orders);
+      var originalValue = target.path('1.items.0.name').getValue();
+
       target.path('1.items.0.name').setValue('name set by a delegate');
+      var di = target.path('1.items.0.name');
       var v = target.path('1.items.0.name').getValue();
-      log.info(v);
+      log.info("Original Value: " + originalValue + ' New Value ' + v);
 
       source.setValue(orders2);
       var v = target.path('1.items.0.name').getValue();
-      log.info(v);
+      log.info("Original Value: " + originalValue + ' New Value ' + v);
     }
 
 
