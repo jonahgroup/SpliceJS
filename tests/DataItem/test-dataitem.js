@@ -18,7 +18,9 @@ definition:function(scope){
 
     var orders = [
       {id:1, desc:'Sample order', items:[{id:24, name:'note book', qty:1}]},
-      {id:2, desc:'Sample order', items:[{id:7, name:'pencil', qty:3}]}
+      {id:2, desc:'Sample order', items:[{id:7, name:'pencil', qty:3}]},
+      {id:3, desc:'Di order',
+             items:new DataItem().setValue({id:7, name:'di pencil', qty:3})}
     ];
 
     var orders2 = [
@@ -177,6 +179,11 @@ definition:function(scope){
 
       source.setValue(orders);
       var originalValue = target.path('1.items.0.name').getValue();
+
+      //
+      var di = new DataItem().setValue(source);
+      var temp1 = source.path('1.items.0');
+      var temp = di.path('2.items.name').getValue();
 
       target.path('1.items.0.name').setValue('name set by a delegate');
       var di = target.path('1.items.0.name');

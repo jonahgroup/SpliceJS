@@ -36,6 +36,8 @@ definition:function(scope){
 			onDataItem : MulticastEvent
 		});
 
+		this.selectedItemPath = null;
+
 	}).extend(UIControl);
 
 

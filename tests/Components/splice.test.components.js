@@ -88,6 +88,8 @@ definition:function(scope){
 
     this.sourceTestCheck = {checked:true};
 
+    this.provinces = new DataItem(a);
+
   }).extend(Controller);
 
   ComponentsTest.prototype.initialize = function(){

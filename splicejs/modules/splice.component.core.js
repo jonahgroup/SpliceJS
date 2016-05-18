@@ -6,7 +6,7 @@ required:[
   { Syntax      : '/{sjshome}/modules/splice.syntax.js'},
   { Events      : '/{sjshome}/modules/splice.event.js'},
   { Views       : '/{sjshome}/modules/splice.view.js'},
-  { DataItem    : '/{sjshome}/modules/splice.dataitem.js'}
+  { Data        : '/{sjshome}/modules/splice.dataitem.js'}
 ],
 definition:function(scope){
   "use strict";
@@ -21,7 +21,7 @@ definition:function(scope){
   , Tokenizer = imports.Syntax.Tokenizer
   , event = imports.Events.event
   , View = imports.Views.View
-  , DataItem = imports.DataItem
+  , DataItem = imports.Data.DataItem
   /*
   ----------------------------------------------------------
   	HTML File Handler
@@ -113,13 +113,12 @@ definition:function(scope){
 			 * local scope lookup takes priority
 			 */
 
-            //look in root scope
+      //look in root scope
 			var obj = scope.lookup(args.type);
-            //look in the inmports
-            if(!obj) obj = scope.imports.lookup(args.type);
-            // looks in the components
+      //look in the inmports
+      if(!obj) obj = scope.imports.lookup(args.type);
+      // looks in the components
 			if(!obj) obj = scope.components.lookup(args.type);
-
 
 			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
@@ -157,7 +156,7 @@ definition:function(scope){
 			*/
 			parameters._includer_scope = scope;
 
-			if(!obj.isComponent)
+			if(!obj.isComponent && false)
 				return instantiate(obj, parameters);
 			else
 				return new obj(parameters);
@@ -199,7 +198,9 @@ definition:function(scope){
   			if(parameters[key] instanceof Binding) {
   				try {
   					resolveBinding(parameters[key], instance, key, scope);
-  				} catch(ex){}
+  				} catch(ex){
+            throw ex;
+          }
 
   				continue;
   			}
@@ -1048,20 +1049,17 @@ definition:function(scope){
   		resolveBinding(binding.prev, instance, key, scope);
 
   		var source = null;
+      //target of the binding
+      var target = new DataItem(instance).path(key);
+
   		switch(binding.type){
   		case BINDING_TYPES.SELF:
   			break;
 
   		case BINDING_TYPES.PARENT:
   			if(!instance.parent) throw 'Cannot resolve parent binding, [instance.parent] is null';
-
-  			var v = Binding.Value(instance.parent);
-
-  			source = {
-  						instance: 	v.instance(binding.prop),
-  						path: 	  	v.path(binding.prop),
-  						value: 		function(){return this.instance[this.path];}
-  					};
+        //resolve binding through dataitem
+        source = new DataItem(instance.parent).path(binding.prop);
   			break;
 
   		case BINDING_TYPES.FIRST_PARENT:
@@ -1073,7 +1071,7 @@ definition:function(scope){
   		case BINDING_TYPES.TYPE:
   			log.debug('Resolving binding to type: ' + binding.vartype);
   			var parent = instance;
-
+        //find the type
   			//1. component lookup
   			var vartype = scope.components.lookup(binding.vartype);
   			//2. imports lookup
@@ -1085,72 +1083,20 @@ definition:function(scope){
   			while(parent) {
   				if(parent.__sjs_type__ === vartype.__sjs_type__ || (parent instanceof vartype)) {
   					log.debug('Found instance of type: ' + binding.vartype);
-
-  					var v = Binding.Value(parent);
-
-  					source = {
-  								instance: 	v.instance(binding.prop),
-  							  	path: 		v.path(binding.prop),
-  							  	value: 		function(){return this.instance[this.path];}
-  							};
+            source = new DataItem(parent).path(binding.prop);
   					break;
   				}
   				parent = parent.parent;
   			}
-  		}
+        break;
+  		} //end switch statement
 
   		if(!source) throw 'Cannot resolve binding source';
 
-  		var v = Binding.Value(instance);
-  		var dest = {
-  				instance:  	v.instance(key),
-  				path: 		v.path(key),
-  				value: 		function(){return this.instance[this.path];}
-  		}
+      var sourceValue = source.getValue();
+      var targetValue = target.getValue();
 
 
-  		/* Initialize events where applicable */
-  		if(dest.value() instanceof Event )  { dest.instance[dest.path] 	= Event.attach(); }
-  		if(source.value() instanceof Event) { source.instance[source.path] = Event.attach(); }
-
-
-  		/* Default binding mode is FROM */
-
-
-  		/*
-  			If course is an event then switch to TO mode
-  			unless destination is an event too
-  		*/
-  		if(source.value() && source.value().__sjs_event__ &&
-  		  (!dest.value() || !dest.value().__sjs_event__)) {
-  			var _s = source;
-  			source = dest;
-  			dest = _s;
-  			_s = null;
-  		}
-
-  		/* Perform binding here */
-
-  		/*  this is event binding only allow functions to be bound to events */
-  		if(dest.value() && dest.value().__sjs_event__) {
-  			if(typeof source.value() !== 'function')
-  				throw 'Cannot establish binding between \''+ key + '\' and \'' + binding.prop + '\'. Check that properties are of types \'function\'';
-
-  			dest.instance[dest.path].subscribe(source.value(), source.instance);
-
-  			return;
-  		}
-
-  		if(source.value().__sjs_isproxy__ === true){
-  				dest.instance[dest.path] = source.instance[source.path];
-  		}
-  		else if(typeof source.value() === 'function'){
-  			dest.instance[dest.path] = 	function(){
-  					return source.instance[source.path].apply(source.instance,arguments);
-  				}
-  		}
-  		else
-  			dest.instance[dest.path] = source.instance[source.path];
   	};
 
 
@@ -1276,11 +1222,11 @@ definition:function(scope){
 
   			/* lookup controller */
   			var controller = null;
-            if(_controller) {
-                controller = scope.lookup(_controller);
-                if(!controller)
-                controller = scope.imports.lookup(_controller);
-            }
+        if(_controller) {
+            controller = scope.lookup(_controller);
+            if(!controller)
+            controller = scope.imports.lookup(_controller);
+        }
 
 
   			/* assign default */

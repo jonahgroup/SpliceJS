@@ -1,7 +1,8 @@
 global.sjs.module({
 required:[
   {Inheritance:'/{sjshome}/modules/splice.inheritance.js'},
-  {Events:'/{sjshome}/modules/splice.event.js'}
+  {Events:'/{sjshome}/modules/splice.event.js'},
+  {Util:'/{sjshome}/modules/splice.util.js'}
 ]
 ,
 definition:function(scope){
@@ -15,6 +16,7 @@ definition:function(scope){
         Class = imports.Inheritance.Class
   ,     Interface = imports.Inheritance.Interface
   ,     Events = imports.Events
+  ,     TextUtil = imports.Util.Text
   ;
 
     var EXCEPTIONS  = {
@@ -37,15 +39,11 @@ definition:function(scope){
            }
         });
 
-
-
-
-
     /*
         ------------------------------------------------------------------------------
         DataItem class
     */
-    var DataItem = function DataItem(){
+    var DataItem = function DataItem(data){
 
       //create change event
       Events.attach(this,{
@@ -56,6 +54,8 @@ definition:function(scope){
       this.parent = null;
       this.pathmap = Object.create(null);
       this._change = 0;
+
+      if(data!= null) this.setValue(data);
 
     };
 
@@ -82,7 +82,7 @@ definition:function(scope){
         if(this.parent == null) {
           this.source = value;
           _triggerOnChange.call(this);
-          return;
+          return this;
         }//throw EXCEPTIONS.invalidSourceProperty + ' ' +this.source;
 
         //find data source
@@ -292,31 +292,39 @@ definition:function(scope){
       if(path == null || path === '') return dataItem;
 
       var source = _recGetSource(dataItem,0);
-
-
       var parts = path.toString().split('.');
 
       var parent = dataItem;
       for(var i=0; i < parts.length; i++){
 
+        source = parent._path != null ? source[parent._path] : source;
+
+        /*
+          if source is a dataitem handle differently,
+          use path lookup
+        */
+        if(source instanceof DataItem) {
+          var pt = TextUtil.join('.',parts,i);
+          return _path(source, pt);
+        }
+
         var child = parent.pathmap[parts[i]];
-        var source = parent._path != null ? source[parent._path] : source;
-        //TODO: remove redundant variable
-        var ref = source;
 
-        if(ref[parts[i]] == null) throw EXCEPTIONS.invalidPathDepth + ': ' + path;
+        if(source[parts[i]] == undefined) {
+          throw EXCEPTIONS.invalidPathDepth + ': ' + sjs.fname(source.constructor) + '.' + path;
+        }
 
-        if(child == null || ref[parts[i]] == null) {
-          if(ref[parts[i]] instanceof Array)
-            child = new ArrayDataItem(ref);
+        if(child == null || source[parts[i]] == null) {
+          if(source[parts[i]] instanceof Array)
+            child = new ArrayDataItem(source);
           else
-            child = new DataItem(ref);
+            child = new DataItem();
 
           child._path = parts[i];
           parent.pathmap[parts[i]] = child;
           child.parent = parent;
 
-          if(ref[parts[i]] == null) {
+          if(source[parts[i]] == undefined) {
             if(parts.length > 1) throw EXCEPTIONS.invalidPathDepth + ' ' + path;
             return child;
           }

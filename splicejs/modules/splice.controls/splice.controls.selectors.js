@@ -51,6 +51,7 @@ definition:function(scope){
 		if(!this.isIgnoreSelector)	this.isIgnoreSelector = false;
 
 		this.dropDownContainerSize = {left:0,top:0};
+		this.dataPath = '';
 
 	}).extend(Controller);
 

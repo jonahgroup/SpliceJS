@@ -47,6 +47,8 @@ definition:function component(scope){
       onStyle 	: MulticastEvent
 		});
 
+		//data attachment point
+		this.data = new DataItem();
 
 		if(this.isHidden) {
 			this.prevDisplayState = this.elements.root.style.display;
@@ -100,6 +102,7 @@ definition:function component(scope){
 	/*!!!!! make sure to unsubscribe when data items changes */
 	UIControl.prototype.dataIn = function(item){
 
+		return; //just return for now
 		if(item instanceof DataItem) {
 				if(this.dataItem === item) {
                     if(this._sjs_di_lastchange == this.dataItem._change) return;
