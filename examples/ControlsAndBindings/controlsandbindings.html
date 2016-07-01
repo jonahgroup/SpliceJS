@@ -1,23 +1,23 @@
 <sjs-template type="UserApplications.ControlsAndBindings">
 	<div class="applicationpanel">
 	<div class="menubar">
-	
+
 	    <sjs-include type="SpliceJS.Controls.Button">{
 	        ref:'addButton',
 	        style: 'button',
-	        onClick:_.Binding('onAddRecord').Parent,
+	        onClick:	_.Binding('onAddRecord').Parent,
 	        content:{label:'Add'}
     	}
     	</sjs-include>
 
 
-		<sjs-include type="SpliceJS.Controls.Button">{  
+		<sjs-include type="SpliceJS.Controls.Button">{
 			ref:'editButton',
 			style: 'button',
 			onClick:_.Binding('onEdit').Parent,
 			content:{label:'Edit'}
 		}</sjs-include>
-		
+
 		<sjs-include type="SpliceJS.Controls.Button">{
 			ref:'deleteButton',
 			style: 'button',
@@ -34,9 +34,9 @@
 			onClick:_.Binding('onCancel').Parent,
 			content:{label:'Cancel'}
 		}</sjs-include>
-		
+
 		<div class="search">
-			
+
 			<sjs-include type="SpliceJS.Controls.Button">{
 				content:{label:'Clear'},
 				ref:'searchClearButton',
@@ -44,7 +44,7 @@
 				animate:true,
 				onClick:_.Binding('clearSearch').Parent,
 			}</sjs-include>
-			
+
 			<sjs-include type="SpliceJS.Controls.TextField">{
 				style: 'edit-field',
 				ref:'searchTextField',
@@ -62,14 +62,14 @@
 		<sjs-include type="SpliceJS.Controls.DataTable">{
 			ref:'editTable',
 			style:'edit-fields-table',
-			dataIn: _.Binding('onEditRecordData').Parent,		
+			dataIn: _.Binding('onEditRecordData').Parent,
 			itemTemplate: 	<sjs-include>{type:'EditRecordRow'}</sjs-include>
-			
+
 		}</sjs-include>
 		</div>
 	</div>
 	<div class="datapanel" data-sjs-element="dataPanel">
-		
+
 		<sjs-include type="SpliceJS.Controls.DataTable">{
 			ref:'ordersTable',
 			style:'cool-blue-table',
@@ -80,7 +80,7 @@
 			itemTemplate: <sjs-include type="OrderRowTemplate">{
 				onHighlightValue:_.Binding('getHighlightValue').Type('UserApplications.ControlsAndBindings')
 			}</sjs-include>
-		
+
 		}</sjs-include>
 
 
@@ -114,7 +114,7 @@
 	<div>@6</div>
 	<div>@7</div>
 	<div>@8</div>
-</sjs-template>	
+</sjs-template>
 
 <sjs-template type="OrderRowTemplate" tie="SpliceJS.Controls.DataTableRow">
 	<div>
@@ -138,7 +138,7 @@
 	<sjs-include type="DataRowBuilder"> {
 		columnPath:_.Binding('columnPaths').Type('UserApplications.ControlsAndBindings'),
 	}</sjs-include>
-</sjs-template>	
+</sjs-template>
 
 
 <sjs-template type="DeleteButton" tie="SpliceJS.Controls.Button">

@@ -199,7 +199,8 @@ definition:function(scope){
   				try {
   					resolveBinding(parameters[key], instance, key, scope);
   				} catch(ex){
-            throw ex;
+            return;
+            //throw ex;
           }
 
   				continue;
@@ -1046,7 +1047,7 @@ definition:function(scope){
 
   	function resolveBinding(binding, instance, key, scope){
   		if(!binding) return;
-  		resolveBinding(binding.prev, instance, key, scope);
+  		//resolveBinding(binding.prev, instance, key, scope);
 
   		var source = null;
       //target of the binding
@@ -1095,7 +1096,21 @@ definition:function(scope){
 
       var sourceValue = source.getValue();
       var targetValue = target.getValue();
+      /*
+        definition: source is a property reference residing in the controller class
+      */
+      //1. if source is event, subscribe to it
+      if(sourceValue.__sjs_event__ === true){
+        sourceValue.subscribe(targetValue);
+        return;
+      }
 
+      //2. is target is event subscribe to it
+      if(targetValue.__sjs_event__ == true){
+        return;
+      }
+
+      log.info('---- target source ------');
 
   	};
 
