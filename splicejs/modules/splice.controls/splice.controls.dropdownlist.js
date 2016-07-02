@@ -41,11 +41,17 @@ definition:function(scope){
 	}).extend(UIControl);
 
 
+	DropDownListController.prototype.onDataItemChanged = function(item){
+		
+	};
+
 	DropDownListController.prototype.initialize = function(){
 		this.onDataItem.subscribe(function(item){
 			this.children.selector.close();
 		},this);
 	};
+
+
 
 	/**
 		Override onDataIn handler to avoid calling onDataOut event

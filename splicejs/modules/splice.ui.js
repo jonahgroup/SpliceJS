@@ -27,6 +27,7 @@ definition:function component(scope){
 	, MulticastEvent = imports.Events.MulticastEvent
 	,	View 					= imports.Views.View
 	,	DataItem 			= imports.Data.DataItem
+	, DataItemStub  = imports.Data.DataItemStub
   , ArrayDataItem   = imports.Data.ArrayDataItem
   , IDataContract   = imports.Data.IDataContract
 	, Document = imports.Document
@@ -54,8 +55,7 @@ definition:function component(scope){
 			this.prevDisplayState = this.elements.root.style.display;
 			this.views.root.style.display = 'none';
 		}
-		this.dataItem = null;
-
+		this.dataItem = new DataItemStub(this.onDataItemChanged,this);
 	}).extend(Controller).implement(IDataContract);
 
 	UIControl.prototype.hide = function(){

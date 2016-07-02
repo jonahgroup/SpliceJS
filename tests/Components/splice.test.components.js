@@ -42,6 +42,11 @@ definition:function(scope){
     'Nova Scotia', 'Manitoba','Yukon','Nunavut','Northwest Territories',
     'Saskatchewan', 'Prince Edward Island','Newfoundland'
   ];
+
+  var provincesOfProvinces = [
+    provinces
+  ]
+
   var a = [
     {name:'Ontario', isChecked:false},
     {name:'Alberta', isChecked:true},
@@ -89,6 +94,7 @@ definition:function(scope){
     this.sourceTestCheck = {checked:true};
 
     this.provinces = new DataItem(a);
+    this.provincesOfProvinces = new DataItem();
 
   }).extend(Controller);
 
@@ -100,6 +106,8 @@ definition:function(scope){
       this.onScatterChartData(scatterChart);
       this.onTestCheck(this.sourceTestCheck);
     }, this);
+
+    this.provincesOfProvinces.setValue(provincesOfProvinces);
   };
 
   ComponentsTest.prototype.addProvince = function(){

@@ -107,7 +107,7 @@ definition:function(scope){
       var callbacks = this.callbacks[this.idx];
 
       for(var key in callbacks){
-        callbacks[key][0].apply(callbacks[key][0],arguments);
+        callbacks[key][0].apply(callbacks[key][1],arguments);
       }
     }
 

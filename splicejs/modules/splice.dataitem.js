@@ -6,11 +6,11 @@ required:[
 ]
 ,
 definition:function(scope){
-    "use strict";
-    var
-        log = scope.sjs.log
-    ,   imports = scope.imports
-    ;
+  "use strict";
+  var
+      log = scope.sjs.log
+  ,   imports = scope.imports
+  ;
 
   var
         Class = imports.Inheritance.Class
@@ -32,12 +32,24 @@ definition:function(scope){
         IDataContract interface
     */
 
-        var IDataContract = new Interface({
-           IDataContract:{
-               onDataItemChanged:function(){},
-               onDataIn:function(){}
-           }
-        });
+      var IDataContract = new Interface({
+         IDataContract:{
+             onDataItemChanged:function(){},
+             onDataIn:function(){}
+         }
+      });
+
+
+
+    /*
+    ------------------------------------------------------------------------------
+    DataItemStub
+
+    */
+    var DataItemStub = function DataItemStub(changeHandler,instance){
+      this.handler = changeHandler;
+      this.instance = instance;
+    }
 
     /*
         ------------------------------------------------------------------------------
@@ -45,10 +57,6 @@ definition:function(scope){
     */
     var DataItem = function DataItem(data){
 
-      //create change event
-      Events.attach(this,{
-        onChange:Events.MulticastEvent
-      });
 
       //core properties
       this.parent = null;
@@ -81,14 +89,15 @@ definition:function(scope){
         */
         if(this.parent == null) {
           this.source = value;
-          _triggerOnChange.call(this);
+          //_triggerOnChange.call(this);
+          _notifyDown(this,this);
           return this;
         }//throw EXCEPTIONS.invalidSourceProperty + ' ' +this.source;
 
         //find data source
         var source = _recGetSource(this);
 
-        //same current value
+        //same as current value
         if(source[this._path] === value) return this;
 
         //old is only the original value
@@ -101,6 +110,9 @@ definition:function(scope){
         // set value
         source[this._path] = value;
 
+        //pass the change down the tree
+        _notifyDown(this,this);
+
         if(source[this._path] == this.old){
             _bubbleChange(this,0,-1,0);
         }
@@ -110,7 +122,7 @@ definition:function(scope){
             helps observers stay on track
         */
         _bubbleChangeCount(this);
-        _triggerOnChange.call(this);
+        //_triggerOnChange.call(this);
         return this;
     };
 
@@ -170,18 +182,17 @@ definition:function(scope){
     */
   	DataItem.prototype.subscribe = function(handler, instance){
       var node = this;
-      if(node.onChange) {
-        node.onChange.subscribe(handler,instance);
-      }
+      //create change event
+      Events.attach(this,{
+        onChange:Events.MulticastEvent
+      }).onChange.subscribe(handler,instance);
 
-    	// var node = this;
-  		// while(node != null){
-  		// 	if(node.onChanged) {
-  		// 		node.onChanged.subscribe(handler,instance);
-  		// 		break;
-  		// 	}
-  		// 	node = node.parent;
-  		// }
+      var item = this;
+      while(item.parent != null){
+        if(!item.parent.eventmap) item.parent.eventmap = Object.create(null);
+        item.parent.eventmap[item._path] = item;
+        item = item.parent;
+      }
 
     };
 
@@ -264,7 +275,13 @@ definition:function(scope){
       return source[dataItem._path];
     };
 
-
+    //!!!!! must have circular reference detection implementation
+    function _notifyDown(dataItem, source){
+      if(dataItem.onChange) dataItem.onChange(source);
+      for(var key in dataItem.eventmap){
+        _notifyDown(dataItem.eventmap[key],source);
+      }
+    };
 
     function _pathWalker(root,list,start){
         if(!root) {
@@ -298,25 +315,27 @@ definition:function(scope){
       var parent = dataItem;
       for(var i=0; i < parts.length; i++){
 
+        if(source)
         source = parent._path != null ? source[parent._path] : source;
 
         /*
           if source is a dataitem handle differently,
           use path lookup
         */
-        if(source instanceof DataItem) {
+        if(source && source instanceof DataItem) {
           var pt = TextUtil.join('.',parts,i);
           return _path(source, pt);
         }
 
         var child = parent.pathmap[parts[i]];
 
+/*
         if(source[parts[i]] == undefined) {
           throw EXCEPTIONS.invalidPathDepth + ': ' + sjs.fname(source.constructor) + '.' + path;
         }
-
-        if(child == null || source[parts[i]] == null) {
-          if(source[parts[i]] instanceof Array)
+*/
+        if(child == null /*|| source[parts[i]] == null*/) {
+          if(source && source[parts[i]] instanceof Array)
             child = new ArrayDataItem(source);
           else
             child = new DataItem();
@@ -325,10 +344,12 @@ definition:function(scope){
           parent.pathmap[parts[i]] = child;
           child.parent = parent;
 
+/*
           if(source[parts[i]] == undefined) {
             if(parts.length > 1) throw EXCEPTIONS.invalidPathDepth + ' ' + path;
             return child;
           }
+*/
         }
         parent = child;
       }
@@ -389,6 +410,7 @@ definition:function(scope){
 
     scope.exports(
         {IDataContract : IDataContract},
+        DataItemStub,
         DataItem, DelegateDataItem, ArrayDataItem
     );
 

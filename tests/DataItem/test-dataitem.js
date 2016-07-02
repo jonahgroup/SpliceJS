@@ -37,7 +37,9 @@ definition:function(scope){
     Test_GetChanges();
     Test_LargeData();
 */
-    Test_DataItemLink();
+    //Test_DataItemLink();
+    Test_Path();
+    Test_BlindPath();
 
     function Test_PathTree(){
       var d = new DataItem(orders);
@@ -151,6 +153,41 @@ definition:function(scope){
     function Test_DataItem2(){
         var d = new DataItem2(orders);
         d.path('1.items.0.name').setValue('black pencil');
+    }
+
+    function Test_BlindPath(){
+      var bigData = new Array(1000000);
+      for(var i=0; i<1000000; i++){
+        bigData[i] = "Data " + i;
+      }
+
+
+      var dataItem = new DataItem();
+      for(var i=0; i<1000000; i++){
+        dataItem.path(''+i);
+      }
+      var blindItem = dataItem.path('100');
+      blindItem.subscribe(function(item){
+        console.log("Things changed " + this.getValue());
+      },blindItem);
+
+      dataItem.setValue(bigData);
+
+      blindItem.setValue('haha new value 100');
+      bigData[100] = "this was changed on the big data itself";
+
+      dataItem.setValue(bigData);
+    }
+
+    function Test_Path(){
+      var bigData = new Array(1000);
+      var di = new DataItem(bigData);
+
+      for(var i=0; i<1000; i++){
+        bigData[i] = "Data" + i;
+        di.path(i);
+      }
+
     }
 
     function Test_DataItemLink(){

@@ -22,6 +22,8 @@ definition:function(scope){
   , event = imports.Events.event
   , View = imports.Views.View
   , DataItem = imports.Data.DataItem
+  , DataItemStub = imports.Data.DataItemStub
+  ;
   /*
   ----------------------------------------------------------
   	HTML File Handler
@@ -1099,16 +1101,29 @@ definition:function(scope){
       /*
         definition: source is a property reference residing in the controller class
       */
-      //1. if source is event, subscribe to it
+
+      //1.
+      if(targetValue instanceof DataItemStub){
+        var handler = targetValue.handler;
+        var instance = targetValue.instance;
+        target.setValue(source);
+        source.subscribe(handler,instance);
+        return;
+      }
+
+
+      //2. if source is event, subscribe to it
       if(sourceValue.__sjs_event__ === true){
         sourceValue.subscribe(targetValue);
         return;
       }
 
-      //2. is target is event subscribe to it
+      //3. is target is event subscribe to it
       if(targetValue.__sjs_event__ == true){
         return;
       }
+
+
 
       log.info('---- target source ------');
 
