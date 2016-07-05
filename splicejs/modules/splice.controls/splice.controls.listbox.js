@@ -4,8 +4,8 @@ type:'component'
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events      : '/{sjshome}/modules/splice.event.js'},
-	{ Views		  : '/{sjshome}/modules/splice.view.js'},
-    { Async       : '/{sjshome}/modules/splice.async.js'},
+	{ Views		  	: '/{sjshome}/modules/splice.view.js'},
+  { Async       : '/{sjshome}/modules/splice.async.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	{'Doc':'/{sjshome}/modules/splice.document.js'},
@@ -18,36 +18,38 @@ definition:function(scope){
 
 	var
 		sjs = scope.sjs
-    ,   log = scope.sjs.log
+  , log = scope.sjs.log
 	,	debug =	scope.sjs.log.debug
 	,	components = scope.components
-	,   imports = scope.imports
-    ;
+	, imports = scope.imports
+  ;
 
 	var	UIControl   = imports.SpliceJS.UI.UIControl
 	,	DataItem    = imports.SpliceJS.UI.DataItem
-	,   Class       = imports.Inheritance.Class
-    ,   asyncLoop   = imports.Async.asyncLoop
+	, Class       = imports.Inheritance.Class
+  , asyncLoop   = imports.Async.asyncLoop
 	,	dom         = imports.Doc.dom
 	,	View        = imports.Views.View
-	,	event       = imports.Events.event
+	, MulticastEvent = imports.Events.MulticastEvent
+	, DomMulticastEvent = imports.Views.DomMulticastEvent
 	;
 
 	var ListBoxController = Class(function ListBoxController(){
 			this.base();
 			this.listItems = [];
 
-			event(this).attach({
-				onListItem : event.multicast,
-				onDataItem : event.multicast,
-				onResize   : event.multicast
+			Events.attach(this,{
+				onListItem : MulticastEvent,
+				onDataItem : MulticastEvent,
+				onResize   : MulticastEvent
 			});
 	}).extend(UIControl);
 
 
 	ListBoxController.prototype.initialize = function(){
-			event(this.views.root).attach({	onmousedown	:	event.unicast.stop	})
-			.onmousedown.subscribe(_itemClick,this);
+			Events.attach(this.views.root, {
+				onmousedown	:	DomMulticastEvent.stop
+			}).onmousedown.subscribe(_itemClick,this);
 
 			if(this.children.contentClient) {
 				this.dom = this.children.contentClient.views.root;

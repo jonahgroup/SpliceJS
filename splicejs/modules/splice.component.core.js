@@ -1052,6 +1052,7 @@ definition:function(scope){
   		//resolveBinding(binding.prev, instance, key, scope);
 
   		var source = null;
+      var sourceInstance = null;
       //target of the binding
       var target = new DataItem(instance).path(key);
 
@@ -1063,6 +1064,7 @@ definition:function(scope){
   			if(!instance.parent) throw 'Cannot resolve parent binding, [instance.parent] is null';
         //resolve binding through dataitem
         source = new DataItem(instance.parent).path(binding.prop);
+        sourceInstance = instance.parent;
   			break;
 
   		case BINDING_TYPES.FIRST_PARENT:
@@ -1087,6 +1089,7 @@ definition:function(scope){
   				if(parent.__sjs_type__ === vartype.__sjs_type__ || (parent instanceof vartype)) {
   					log.debug('Found instance of type: ' + binding.vartype);
             source = new DataItem(parent).path(binding.prop);
+            sourceInstance = parent;
   					break;
   				}
   				parent = parent.parent;
@@ -1113,16 +1116,21 @@ definition:function(scope){
 
 
       //2. if source is event, subscribe to it
-      if(sourceValue.__sjs_event__ === true){
-        sourceValue.subscribe(targetValue);
+      if(sourceValue && sourceValue.__sjs_event__ === true &&
+        typeof(targetValue) == 'function'){
+        sourceValue.subscribe(targetValue,instance);
         return;
       }
 
       //3. is target is event subscribe to it
-      if(targetValue.__sjs_event__ == true){
+      if(sourceValue && targetValue.__sjs_event__ == true &&
+        typeof(sourceValue) == 'function'){
+        targetValue.subscribe(sourceValue,sourceInstance);
         return;
       }
 
+      //4. value to value binding
+      target.setValue(sourceValue);
 
 
       log.info('---- target source ------');

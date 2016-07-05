@@ -294,9 +294,12 @@ definition:function(scope){
       throw "Cannot attach DomMulticastEvent target instance if not HTMLElement or not an instance of View ";
     var evt = Events.createMulticastRunner();
 
-    if(instance instanceof View){
-      instance[property] = evt;
-      instance = instance.htmlElement;
+    if(instance instanceof View
+      && instance.htmlElement[property] !== undefined){
+      instance[property] = evt;  
+      instance.htmlElement[property] = evt;
+
+      //instance = instance.htmlElement;
     }
 
     return evt;

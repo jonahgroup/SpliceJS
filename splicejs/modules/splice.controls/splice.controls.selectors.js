@@ -30,6 +30,8 @@ definition:function(scope){
 	,	Events      = imports.Events
 	, Views 			= imports.Views
 	,	display     = imports.Views.View.display
+	,	DomMulticastEvent = imports.Views.DomMulticastEvent
+	, MulticastEvent = imports.Events.MulticastEvent
 	;
 	//static single instance
 	var dropDownContainer = new scope.components.DropDownContainerResizable()
@@ -151,8 +153,8 @@ definition:function(scope){
 		s.display='block';
 
 
-		event(window).attach({
-			onmousedown	:	event.multicast
+		Events.attach(window, {
+			onmousedown	:	MulticastEvent
 		}).onmousedown.subscribe(_offFocusReaper,dropDownContainer);
 
 		this.onDropDown(this.data);

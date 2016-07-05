@@ -102,47 +102,10 @@ definition:function component(scope){
 	/*!!!!! make sure to unsubscribe when data items changes */
 	UIControl.prototype.dataIn = function(item){
 
-		return; //just return for now
-		if(item instanceof DataItem) {
-				if(this.dataItem === item) {
-                    if(this._sjs_di_lastchange == this.dataItem._change) return;
-					this.onDataIn(this.dataItem);
-                    this._sjs_di_lastchange = this.dataItem._change;
-
-                    if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
-					return;
-				}
-
-				this.dataItem = item.path(this.dataPath);
-                if(this.observeDataItem === true){
-                    if(!this.dataItem.onChanged){
-                    	Events.attach(this.dataItem,{
-				            		onChanged : Events.MulticastEvent
-		                	});
-                    }
-                    this.dataItem.onChanged.subscribe(function(dataItem){
-                        if(this._sjs_di_lastchange == dataItem._change) return;
-                        this.onDataIn(dataItem);
-                        this._sjs_di_lastchange = dataItem._change;
-                        if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
-                },this);
-                }
-
-				this.onDataIn(this.dataItem);
-      	if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
-        this._sjs_di_lastchange = this.dataItem._change;
-			return;
-		}
 		// datapath is only set externally
-		this.dataItem = (new DataItem(item)).path(this.dataPath);
-		Events.attach(this.dataItem, {
-				onChanged : Events.MulticastEvent
-		});
-		// invoke data-item handler
+		this.dataItem = item;
+				// invoke data-item handler
 		this.onDataIn(this.dataItem);
-        if(this.onStyle) this.processStyle(this.onStyle(this.dataItem));
-
-        this._sjs_di_lastchange = this.dataItem._change;
 
 	};
 
