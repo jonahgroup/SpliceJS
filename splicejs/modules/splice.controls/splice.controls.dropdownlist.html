@@ -1,7 +1,6 @@
 <sjs-component sjs-type="DropDownList" sjs-controller="DropDownListController" sjs-export>
 	<sjs-include sjs-type="SpliceJS.Controls.DropDownSelector" sjs-name="selector">
 	{
-				dataPath:binding('selectedItemPath').parent,
 				content:binding('content').parent,
 				onDropDown:binding('dropDown').parent,
 				dropDownItem:
@@ -12,7 +11,7 @@
 						dataItemPath:binding('dataItemPath').type('DropDownList'),
 						itemTemplate:binding('itemTemplate').type('DropDownList'),
 						dataPath:binding('dataPath').type('DropDownList'),
-						onDataItem:binding('onDataItem').type('DropDownList')
+						onDataItem:binding('listItemSelected').type('DropDownList')
 					}
 				</sjs-include>
 	}

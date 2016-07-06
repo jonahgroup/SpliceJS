@@ -78,10 +78,11 @@
             dataIn:binding('onDataOut').parent
         }
         </sjs-include>,
-        dataItemPath:'name',
+        //dataItemPath:'name',
         //selectedItemPath:'name',
         dataIn: binding('provincesOfProvinces.0').parent,
-        onDataItem: binding('provinceSelected').parent,
+        //onDataItem: binding('provinceSelected').parent,
+        onItemSelected: binding('provinceSelected').parent,
         css:{list: 'test-drop-down-list'}
     }
   </sjs-include>

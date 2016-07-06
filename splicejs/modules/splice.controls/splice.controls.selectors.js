@@ -64,7 +64,7 @@ definition:function(scope){
 					will immediately execute event within dropDown() closing the dropdown
 			*/
 		Events.attach(this.views.root,{
-			onmousedown : Views.DomMulticastEvent.stop
+			onmousedown : Views.DomMulticastStopEvent
 		})
 		.onmousedown.subscribe(function(e){
 			this.dropDown();
@@ -154,7 +154,7 @@ definition:function(scope){
 
 
 		Events.attach(window, {
-			onmousedown	:	MulticastEvent
+		 	onmousedown	:	Views.DomMulticastStopEvent
 		}).onmousedown.subscribe(_offFocusReaper,dropDownContainer);
 
 		this.onDropDown(this.data);

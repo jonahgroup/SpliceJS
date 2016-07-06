@@ -31,9 +31,10 @@ definition:function(scope){
 		this.base();
 
 		Events.attach(this,{
-			onDropDown : MulticastEvent,
-			onListData : MulticastEvent,
-			onDataItem : MulticastEvent
+			onDropDown 		: MulticastEvent,
+			onListData 		: MulticastEvent,
+			onDataItem 		: MulticastEvent,
+			onItemSelected: MulticastEvent,
 		});
 
 		this.selectedItemPath = null;
@@ -42,7 +43,7 @@ definition:function(scope){
 
 
 	DropDownListController.prototype.onDataItemChanged = function(item){
-		
+
 	};
 
 	DropDownListController.prototype.initialize = function(){
@@ -59,14 +60,21 @@ definition:function(scope){
 		drop-down function is activated
 	*/
 	DropDownListController.prototype.onDataIn = function(item){
-	};
+	}
 
 	DropDownListController.prototype.dropDown = function(){
 		if(this.dataItem) {
 			this.onDataOut(this.dataItem);
 		}
 		this.onDropDown();
-	};
+	}
+
+	DropDownListController.prototype.listItemSelected = function(item){
+		this.children.selector.dataIn(item);
+		this.children.selector.close();
+		this.onItemSelected(item);
+	}
+
 
 	DropDownListController.prototype.setSelectedItem = function(item){
 		this.children.selector.dataPath = this.selectedItemPath;

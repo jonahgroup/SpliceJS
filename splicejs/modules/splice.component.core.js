@@ -1105,30 +1105,34 @@ definition:function(scope){
         definition: source is a property reference residing in the controller class
       */
 
-      //1.
 
 
-      //2. if source is event, subscribe to it
+      //1. if source is event, subscribe to it
       if(sourceValue && sourceValue.__sjs_event__ === true &&
         typeof(targetValue) == 'function'){
         sourceValue.subscribe(targetValue,instance);
         return;
       }
 
-      //3. is target is event subscribe to it
-      if(sourceValue && targetValue.__sjs_event__ == true &&
+      //2. is target is event subscribe to it
+      if(targetValue && targetValue.__sjs_event__ == true &&
         typeof(sourceValue) == 'function'){
         targetValue.subscribe(sourceValue,sourceInstance);
         return;
       }
 
-      if(typeof(targetValue) == 'function' instanceof DataItemStub){
-        var handler = targetValue.handler;
-        var instance = targetValue.instance;
-        target.setValue(source);
-        source.subscribe(handler,instance);
+      if(targetValue && targetValue.__sjs_event__ &&
+         sourceValue && sourceValue.__sjs_event__ ){
+        targetValue.subscribe(sourceValue,sourceInstance);
         return;
       }
+
+      //3.
+      if(typeof(targetValue) == 'function' && typeof(sourceValue) != 'function'){
+        source.subscribe(targetValue,instance);
+        return;
+      }
+
 
       //4. value to value binding
       target.setValue(sourceValue);

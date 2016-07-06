@@ -277,7 +277,7 @@ definition:function(scope){
 
     //!!!!! must have circular reference detection implementation
     function _notifyDown(dataItem, source){
-      if(dataItem.onChange) dataItem.onChange(source);
+      if(dataItem.onChange) dataItem.onChange(dataItem);
       for(var key in dataItem.eventmap){
         _notifyDown(dataItem.eventmap[key],source);
       }

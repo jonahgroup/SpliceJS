@@ -30,6 +30,7 @@ definition:function(scope){
   , asyncLoop   = imports.Async.asyncLoop
 	,	dom         = imports.Doc.dom
 	,	View        = imports.Views.View
+	, Views 			= imports.Views
 	, MulticastEvent = imports.Events.MulticastEvent
 	, DomMulticastEvent = imports.Views.DomMulticastEvent
 	;
@@ -48,7 +49,7 @@ definition:function(scope){
 
 	ListBoxController.prototype.initialize = function(){
 			Events.attach(this.views.root, {
-				onmousedown	:	DomMulticastEvent.stop
+				onmousedown	:	Views.DomMulticastStopEvent
 			}).onmousedown.subscribe(_itemClick,this);
 
 			if(this.children.contentClient) {
@@ -80,7 +81,7 @@ definition:function(scope){
 		this.onListItem(this.listItems[idx]);
 
 		//notify on data item
-		this.onDataItem(this.dataItem.getValue()[idx]);
+		this.onDataItem(this.dataItem.path(idx));
 	};
 
 
@@ -132,14 +133,18 @@ definition:function(scope){
 
 		// add new items
 		asyncLoop(this.listItems.length,list.length-1,100,function(i){
-            if(this.itemTemplate) {
+        if(this.itemTemplate) {
 				item = new this.itemTemplate({parent:this});
 				this.listItems.push(item);
 
+				var itm = null;
+
 				if(this.dataItemPath)
-				 item.dataIn(dataItem.path(i+'.'+this.dataItemPath));
+				 itm = dataItem.path(i+'.'+this.dataItemPath);
 				else
-				 item.dataIn(dataItem.path(i));
+				 itm = dataItem.path(i);
+
+				 item.dataIn(itm);
 
 				item.views.root.htmlElement.__sjs_item_index__ = i;
 				this.dom.add(item.views.root);

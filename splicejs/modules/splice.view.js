@@ -255,16 +255,15 @@ definition:function(scope){
   /**
   */
   function ViewReflow(){
-
   }
 
   ViewReflow.prototype.default = function(){
   	return this;
-  };
+  }
 
   ViewReflow.prototype.fitparent = function(){
   	return this;
-  };
+  }
 
   ViewReflow.prototype.size = function(left, top, width, height){
   	var box = _box(this.htmlElement).unit()
@@ -277,34 +276,70 @@ definition:function(scope){
 
 
   	return this;
-  };
+  }
+
+
+
+
+
 
   /*
       -----------------------------------------------------------------
       Dom Event
   */
-  var DomMulticastEvent = Class(function DomMulticastEvent(s){
-    if(s == true) return this;
-    this.stop = new DomMulticastEvent(true);
-    this.stop.stopPropagation = true;
+  var DomMulticastEvent = Class(function DomMulticastEvent(){
   }).extend(Events.BaseEvent);
 
+
+  var DomMulticastStopEvent = Class(function DomMulticastStopEvent(){
+    this.base();
+    this.stopPropagation = true;
+  }).extend(DomMulticastEvent);
+
   DomMulticastEvent.prototype.attach = function(instance, property){
-    if(!Document.isHTMLElement(instance) && !(instance instanceof View))
+    if(!Document.isHTMLElement(instance) && !(instance instanceof View) && !(instance == window))
       throw "Cannot attach DomMulticastEvent target instance if not HTMLElement or not an instance of View ";
     var evt = Events.createMulticastRunner();
 
-    if(instance instanceof View
-      && instance.htmlElement[property] !== undefined){
-      instance[property] = evt;  
-      instance.htmlElement[property] = evt;
 
-      //instance = instance.htmlElement;
+    if(this.stopPropagation === true) {
+      var fn = evt;
+      evt = function(e){
+        if(!e) e = window.event;
+        _cancelBubble(e);
+        setTimeout(function(){
+          fn(this.args);
+        }.bind({args:_domEventArgs(e)}),1);
+      };
+      evt.subscribe = function(){
+        fn.subscribe.apply(fn,arguments);
+      };
     }
 
+
+    instance[property] = evt;
+    if(instance instanceof View) {
+      instance.htmlElement[property] = evt;
+    }
     return evt;
   }
 
+  function _cancelBubble(e){
+    e.cancelBubble = true;
+    if (e.stopPropagation) e.stopPropagation();
+  }
+
+  function _domEventArgs(e){
+    return {
+      mouse: mousePosition(e),
+      source: e.srcElement,
+      domEvent:e,     // source event
+      cancel: function(){
+              this.cancelled = true;
+              e.__jsj_cancelled = true;
+            }
+    }
+  };
 
 
 
@@ -573,7 +608,10 @@ definition:function(scope){
   };
 
   scope.exports(
-    View, {DomMulticastEvent:new DomMulticastEvent()}
+    View, {
+      DomMulticastEvent:new DomMulticastEvent(),
+      DomMulticastStopEvent: new DomMulticastStopEvent()
+    }
   );
 }
 });
