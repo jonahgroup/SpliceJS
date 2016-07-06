@@ -1106,13 +1106,6 @@ definition:function(scope){
       */
 
       //1.
-      if(targetValue instanceof DataItemStub){
-        var handler = targetValue.handler;
-        var instance = targetValue.instance;
-        target.setValue(source);
-        source.subscribe(handler,instance);
-        return;
-      }
 
 
       //2. if source is event, subscribe to it
@@ -1126,6 +1119,14 @@ definition:function(scope){
       if(sourceValue && targetValue.__sjs_event__ == true &&
         typeof(sourceValue) == 'function'){
         targetValue.subscribe(sourceValue,sourceInstance);
+        return;
+      }
+
+      if(typeof(targetValue) == 'function' instanceof DataItemStub){
+        var handler = targetValue.handler;
+        var instance = targetValue.instance;
+        target.setValue(source);
+        source.subscribe(handler,instance);
         return;
       }
 
