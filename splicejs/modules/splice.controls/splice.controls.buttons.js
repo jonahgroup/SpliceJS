@@ -23,6 +23,7 @@ definition:function(scope){
 	,	UIControl = imports.SpliceJS.UI.UIControl
 	, Events = imports.Events
 	, MulticastEvent = imports.Events.MulticastEvent
+	, Views = imports.Views
 	,	DomMulticastEvent = imports.Views.DomMulticastEvent
   ;
 
@@ -39,8 +40,8 @@ definition:function(scope){
 	Button.prototype.initialize = function(){
 
 		Events.attach(this.views.root,{
-			onclick			:	DomMulticastEvent.stop,
-    	onmousedown	: DomMulticastEvent.stop
+			onclick			:	Views.DomMulticastStopEvent,
+    	onmousedown	: Views.DomMulticastStopEvent
 		});
 
 		this.views.root.onclick.subscribe(function(){

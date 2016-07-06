@@ -86,6 +86,32 @@
         css:{list: 'test-drop-down-list'}
     }
   </sjs-include>
+
+  <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
+    {
+        selectedItem:
+        <sjs-include sjs-type="SpliceJS.Controls.Button">
+        {
+            dataIn:binding('onItemSelected').parent
+        }
+        </sjs-include>,
+        //dataItemPath:'name',
+        //selectedItemPath:'name',
+        dataIn: binding('provincesOfProvinces.0').parent,
+        //onDataItem: binding('provinceSelected').parent,
+        onItemSelected: binding('provinceSelected').parent,
+        css:{list: 'test-drop-down-list'},
+        itemTemplate:<div sjs-controller="SpliceJS.Ui.UIControl">
+        <sjs-include sjs-type="SpliceJS.Controls.Button">
+        {
+            dataIn:binding('onDataOut').parent
+        }
+      </sjs-include></div>
+    }
+  </sjs-include>
+
+
+
 </td>
 </tr>
 <!--
