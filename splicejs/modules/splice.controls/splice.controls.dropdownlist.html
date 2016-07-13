@@ -1,7 +1,7 @@
 <sjs-component sjs-type="DropDownList" sjs-controller="DropDownListController" sjs-export>
 	<sjs-include sjs-type="SpliceJS.Controls.DropDownSelector" sjs-name="selector">
 	{
-				content:binding('content').parent,
+				content:binding('selectorItemTemplate').parent,
 				onDropDown:binding('dropDown').parent,
 				dropDownItem:
 				<sjs-include class="binding('css.list').type('DropDownList')"

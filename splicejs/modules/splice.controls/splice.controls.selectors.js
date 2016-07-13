@@ -72,8 +72,12 @@ definition:function(scope){
 
 	};
 
-	DropDownController.prototype.dataIn = function(data,path){
-		if(!this.isIgnoreSelector)
+	DropDownController.prototype.dataIn = function(data){
+		if(this.itemTemplate){
+				var item = this.itemTemplate({parent:this});
+				item.dataIn(data);
+				return;
+		}
 		UIControl.prototype.dataIn.call(this,data);
 	};
 

@@ -3,6 +3,7 @@ type:'component'
 ,
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Data: '/{sjshome}/modules/splice.dataitem.js'},
 	{ Events			: '/{sjshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
@@ -21,6 +22,7 @@ definition:function(scope){
 		Class = imports.Inheritance.Class
 	,	Events = imports.Events
 	, MulticastEvent = imports.Events.MulticastEvent
+	,	DataItem = imports.Data.DataItem
 	,	UIControl = imports.SpliceJS.UI.UIControl
 	;
 
@@ -50,6 +52,11 @@ definition:function(scope){
 		this.onDataItem.subscribe(function(item){
 			this.children.selector.close();
 		},this);
+
+		if(this.defaultSelectedItem){
+			this.children.selector.dataIn(new DataItem(this.defaultSelectedItem));
+		}
+
 	};
 
 
