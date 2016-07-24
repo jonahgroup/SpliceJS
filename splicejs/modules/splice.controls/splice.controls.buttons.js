@@ -195,7 +195,6 @@ definition:function(scope){
 		else {
 			this.views.root.onchange.subscribe(_textFieldOnKey, this);
 		}
-
 	}
 
 
@@ -214,7 +213,6 @@ definition:function(scope){
 
 
 	/* module scope and exports */
-
 	scope.add(
 		{ButtonController 	 : Button},
 		{CheckBoxController  : CheckBox},

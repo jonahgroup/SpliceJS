@@ -19,11 +19,12 @@ definition:function(scope){
   var http = imports.Networking.http
   , doc = imports.Document
   , Tokenizer = imports.Syntax.Tokenizer
-  , event = imports.Events.event
   , View = imports.Views.View
   , DataItem = imports.Data.DataItem
   , DataItemStub = imports.Data.DataItemStub
   ;
+
+  var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
   /*
   ----------------------------------------------------------
   	HTML File Handler
@@ -292,15 +293,6 @@ definition:function(scope){
 
 
 
-  function isExternalType(type){
-  		if(type[0] === '{') {
-  			var parts = type.substring(1,type.indexOf('}')).split(':');
-  			return {namespace:parts[0], filename:parts[1]}
-  		}
-  		return null;
-  }
-
-
 
   /*
   ----------------------------------------------------------
@@ -323,49 +315,30 @@ definition:function(scope){
 
   	function Binding(propName, bindingType,prev){
   		this.prop = propName;
-  		this.type = bindingType;
+  		this._type = BINDING_TYPES.PARENT;
   		this.direction = 3;// auto BINDING_DIRECTIONS.AUTO;
   		this.prev = prev;
+
+      //fallback fill
+      this.parent = this;
   	}
 
-
-  	function createBinding(propName,prev){
-
-  		return {
-  			self:   		new Binding(propName,	BINDING_TYPES.SELF,prev),
-  			parent: 		new Binding(propName,	BINDING_TYPES.PARENT,prev),
-  			root:			new Binding(propName,	BINDING_TYPES.ROOT,prev),
-  			'type':			function(type){
-  						var b =	new Binding(propName, 	BINDING_TYPES.TYPE,prev);
-  						b.vartype = type;
-  						return b;
-  			 }
-  		}
-  	}
-  	/*
-  	 * !!! Bidirectional bindings are junk and not allowed, use event-based data contract instead
-  	 * */
-  	var binding =  function binding(args){
-  		 return createBinding(args);
-  	 }
-
-
-  	 Binding.prototype.binding = function binding(pn){
-  		return createBinding(pn,this);
-  	}
-
+    Binding.prototype.type = function(type){
+      this._type = BINDING_TYPES.TYPE;
+      this.vartype = type;
+      return this;
+    }
 
   	/**
   	 *	@scope|Namespace - component scope
   	 */
   	Binding.prototype.getTargetInstance = function(originInstance, scope){
 
-  		switch(this.type){
+  		switch(this._type){
 
   			case BINDING_TYPES.PARENT:
   				if(!originInstance.parent) throw 'Unable to locate parent instance';
   			return originInstance.parent;
-
 
 
   			case BINDING_TYPES.TYPE:
@@ -389,87 +362,13 @@ definition:function(scope){
 
   	};
 
+    /*
+   * !!! Bidirectional bindings are junk and not allowed, use event-based data contract instead
+   * */
+  function binding(np){
+     return new Binding(np);
+  }
 
-  	Binding.findValue = function(obj, path){
-  		var nPath = path.split('.'),
-  			result = obj;
-
-  		if (!obj) return null;
-
-  		for (var i = 0; i< nPath.length; i++){
-
-  			result = result[nPath[i]];
-
-  			if (!result) return null;
-  		}
-
-  		return result;
-  	}
-
-  	Binding.Value = function(obj){
-
-  		return {
-  			set : function(value, path){
-
-  				var nPath = path.split('.');
-
-  				for(var i=0; i< nPath.length-1; i++){
-  					obj = obj[nPath[i]];
-  				}
-
-  				if(obj) {
-  					obj[nPath[nPath.length-1]] = value;
-  				}
-  			},
-
-  			get : function(path){
-
-  				var nPath = path.split('.'),
-  					result = obj;
-
-  				if(nPath.length < 1) return null;
-
-  				for (var i = 0; i< nPath.length; i++){
-
-  					result = result[nPath[i]];
-
-  					if (!result) return null;
-  				}
-
-  				return result;
-  			},
-
-  			instance:function(path){
-
-  				var nPath = path.split('.'),
-  					result = obj;
-
-  				for (var i = 0; i< nPath.length-1; i++){
-
-  					if(typeof result._bindingRouter === 'function'){
-  						result = result._bindingRouter(nPath[i]);
-  					}
-  					else {
-  						result = result[nPath[i]];
-  					}
-  					if (!result) return null;
-  				}
-
-  				if(typeof result._bindingRouter === 'function'){
-  					result = result._bindingRouter(nPath[nPath.length-1]);
-  				}
-
-  				return result;
-
-  			},
-
-  			path:function(path){
-  				var nPath = path.split('.');
-  				return nPath[nPath.length-1];
-  			}
-  		}
-
-  	};
 
 
   /**
@@ -481,34 +380,29 @@ definition:function(scope){
 
   		if(!this.children)	this.children = [];
   		if(!this.__sjs_visual_children__) this.__sjs_visual_children__ = [];
-
-  		Events.attach(this,{
-  			onAttach	:	Events.MulticastEvent,
-  			onDisplay	:	Events.MulticastEvent,
-  			onData		: Events.MulticastEvent
-  		});
-
-  		this.onDisplay.subscribe(function(){
-  			if(!this.children) return;
-  			for(var i=0; i< this.children.length; i++){
-  				var child = this.children[i];
-  				if(typeof child.onDisplay === 'function')
-  					child.onDisplay();
-  			}
-  		},this);
-
-  		this.onAttach.subscribe(function(){
-  			if(!this.children) return;
-
-  			for(var i=0; i< this.children.length; i++){
-  				var child = this.children[i];
-  				child.__sjs_is_attached__ = this.__sjs_is_attached__;
-  				if(typeof child.onAttach === 'function')
-  					child.onAttach();
-  			}
-
-  		},this);
   	};
+
+
+    Controller.prototype.onAttach = function(){
+      if(!this.children) return;
+
+      for(var i=0; i< this.children.length; i++){
+        var child = this.children[i];
+        child.__sjs_is_attached__ = this.__sjs_is_attached__;
+        if(typeof child.onAttach === 'function')
+          child.onAttach();
+      }
+    };
+
+    Controller.prototype.onDisplay = function(){
+      this.onDisplay();
+      if(!this.children) return;
+      for(var i=0; i< this.children.length; i++){
+        var child = this.children[i];
+        if(typeof child.onDisplay === 'function')
+          child.onDisplay();
+      }
+    };
 
   	Controller.prototype.toString = function(){
   		return getFunctionName(this.constructor);
@@ -691,7 +585,7 @@ definition:function(scope){
       * Run notations and scripts to form a
       * final template DOM
       * */
-     resolveCustomElements.call(scope,template);
+     _resolveCustomElements.call(scope,template);
 
      var component = createComponent(template.controller, template, scope);
      scope.components[template.type] = component;
@@ -856,7 +750,7 @@ definition:function(scope){
   		return result;
   	};
 
-  	var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
+
 
   	function collectAttributes(node, filter){
   		if(!node) return null;
@@ -1006,7 +900,7 @@ definition:function(scope){
 
 
 
-  	function resolveCustomElements(template){
+  	function _resolveCustomElements(template){
 
   		var scope = this;
 
@@ -1056,7 +950,7 @@ definition:function(scope){
       //target of the binding
       var target = new DataItem(instance).path(key);
 
-  		switch(binding.type){
+  		switch(binding._type){
   		case BINDING_TYPES.SELF:
   			break;
 
@@ -1144,10 +1038,8 @@ definition:function(scope){
 
 
   	function constructTemplate(html){
-
   		var wrapper = document.createElement('sjs-component');
   		wrapper.innerHTML = html;
-
   		return new Template(wrapper);
   	}
 
@@ -1186,7 +1078,7 @@ definition:function(scope){
     		 * Run notations and scripts to form a
     		 * final template DOM
     		 * */
-    		resolveCustomElements.call(scope,template);
+    		_resolveCustomElements.call(scope,template);
 
     		var component = createComponent(template.controller, template, scope);
     		scope.components[template.type] = component;
@@ -1295,22 +1187,20 @@ definition:function(scope){
   			var obj = new controller(args);
 
   			obj.__sjs_type__ = template.type;
-  			obj.children = [];
-  			obj.__sjs_visual_children__ = [];
+        obj.__sjs_visual_children__ = [];
+        obj.__sjs_args__ = args;
+        obj.children = [];
   			obj.scope = scope;
-  			obj.__sjs_args__ = args;
 
   			/*
   			 * assign reference to a parent and
   			 * append to children array
   			 * */
   			configureHierarchy.call(args._includer_scope,obj,args);
-
   			/*
   			 * Bind declarative parameters
   			 */
   			bindDeclarations(args, obj, args._includer_scope);
-
   			/*
   				Instantiate Template
   			*/
