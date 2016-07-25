@@ -53,7 +53,7 @@ global.sjs.module.splash(  function(scope){
     },
 
     update:function(complete,total,itemName){
-    
+      if(!itemName) return;
       this.label.innerHTML = itemName.substring(itemName.lastIndexOf('/')+1);
 
     }

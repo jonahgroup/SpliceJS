@@ -95,7 +95,7 @@ try {
 
 	/* checks if parallel script loading can be used */
 	function _allowAsync(){
-		return false;
+		//return false;
 		return !(document['currentScript'] === undefined);
 	}
 
@@ -394,7 +394,7 @@ try {
 			var head = document.head || document.getElementsByTagName('head')[0];
 			var script = document.createElement('script');
 			script.setAttribute("type", "text/javascript");
-			script.setAttribute("async","");
+			if(_allowAsync()) script.setAttribute("async","");
 			script.setAttribute("src", filename);
 
 			script.onload = script.onreadystatechange = function(){
@@ -757,10 +757,19 @@ ImportSpec.prototype.execute = function(){}
 
 
 var _loaderStats = {
-	pendingImports:0,
-	loadingIndicator:null,
-	oncomplete:[],
-	loaders:[]
+	pendingImports:0,	loadingIndicator:null,
+	oncomplete:[], loaders:[],
+	showLoadingIndicator:function(){
+		if(_loaderStats.loadingIndicator) {
+			_loaderStats.loadingIndicator.show();
+		}
+	},
+	updateLoadingIndicator:function(item){
+		if(_loaderStats.loadingIndicator) {
+			_loaderStats.loadingIndicator.update(0,1,item);
+		}
+	}
+
 };
 
 /*
@@ -777,6 +786,7 @@ function SyncLoader(resources, oncomplete){
 
 SyncLoader.prototype.load = function(){
 	if(this.resources.length == 0) return;
+	_loaderStats.showLoadingIndicator();
 	if(_loaderStats.loaders.push(this) == 1)	SyncLoader.loadNext();
 }
 
@@ -793,7 +803,10 @@ SyncLoader.loadNext = function(){
 	if(!loader) return;
 
 	var filename = loader.nextResource();
-	if(!filename) return;
+	if(!filename) {
+		SyncLoader.syncOnItemLoaded(filename);
+		return;
+	}
 	var mapped = IMPORTS_MAP[filename];
 	if(mapped) {
 		SyncLoader.loadNext();
@@ -803,12 +816,21 @@ SyncLoader.loadNext = function(){
 	IMPORTS_MAP[filename] = new ImportSpec();
 
 	var handler = _fileHandlers[fileExt(filename)];
+	if(!handler){
+			SyncLoader.loadNext();
+			return;
+	}
 	_loaderStats.pendingImports++;
 	handler(filename, loader);
 }
 
-SyncLoader.prototype.onitemloaded = function(){
+SyncLoader.prototype.onitemloaded = function(item){
 	_loaderStats.pendingImports--;
+	SyncLoader.syncOnItemLoaded(item);
+}
+
+SyncLoader.syncOnItemLoaded = function(item){
+	_loaderStats.updateLoadingIndicator(item);
 	var loader = peek(_loaderStats.loaders);
 
 	if(loader.pending == 0)	{
@@ -859,6 +881,7 @@ AsyncLoader.prototype.load = function(){
 
 AsyncLoader.prototype.onitemloaded = function(item){
 		var importSpec = IMPORTS_MAP[item];
+
 
 		if(_loaderStats.loadingIndicator) {
 			_loaderStats.loadingIndicator.update(0,1,item);
