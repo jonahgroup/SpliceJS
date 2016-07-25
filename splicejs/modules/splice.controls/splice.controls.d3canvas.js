@@ -13,7 +13,7 @@ definition:function(scope){
 
 	var
 	    sjs = scope.sjs
-    ,   imports = scope.imports 	
+    ,   imports = scope.imports
 	;
 
 	var
@@ -57,9 +57,11 @@ definition:function(scope){
 	}).extend(UIControl);
 
 	d3 = null;
-    
+	// shim
+	function D3Canvas(){}
+
 	scope.exports(
-		D3CanvasController
+		D3CanvasController,D3Canvas
 	);
 
 }

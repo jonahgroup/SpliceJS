@@ -31,15 +31,20 @@ definition:function(scope){
 	, Views 			= imports.Views
 	,	display     = imports.Views.View.display
 	,	DomMulticastEvent = imports.Views.DomMulticastEvent
+	, DefineComponents = imports.Component.DefineComponents
 	, MulticastEvent = imports.Events.MulticastEvent
 	;
 	//static single instance
-	var dropDownContainer = new scope.components.DropDownContainerResizable()
+	var dropDownContainer = null//new scope.components.DropDownContainerResizable()
 	,	selectorElement = null;
 
 	function _offFocusReaper(){
 		_hide();
 	};
+
+	//define components
+	var components = DefineComponents(scope,'splice.controls.selectors.html');
+
 
 	//
 	var DropDownController = Class(function DropDownController(args){

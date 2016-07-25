@@ -1,8 +1,6 @@
-global.sjs.module({
-type:'splash',
-definition:function(scope){
+global.sjs.module.splash(  function(scope){
   var document = scope.sjs.document;
-  
+
   var style = "position:absolute; left:0px; top:0px; right:0px; bottom:0px; transition:opacity 0.4s;     background-color: rgba(10,10,10,0.8);";
 
   var wrapStyle ="position:absolute; left:0px; right:0px; top:50%; transition:opacity 0.4s;";
@@ -55,12 +53,11 @@ definition:function(scope){
     },
 
     update:function(complete,total,itemName){
-      var p = Math.round(complete/total*100);
-      this.progress = p;
+    
       this.label.innerHTML = itemName.substring(itemName.lastIndexOf('/')+1);
 
     }
   };
 
   return Splash;
-}});
+});

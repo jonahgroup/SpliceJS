@@ -79,8 +79,8 @@ try {
 			sjsMain:	main.getAttribute('sjs-main'),
 			splash:		main.getAttribute('sjs-splash'),
 			version:	main.getAttribute('sjs-version'),
-			mode:		main.getAttribute('sjs-start-mode'),
-            debug:      main.getAttribute('sjs-debug') == 'true' ? true:false
+			mode:			main.getAttribute('sjs-start-mode'),
+      debug:    main.getAttribute('sjs-debug') == 'true' ? true:false
 		});
 
 		var sjsConfig = node.getAttribute('sjs-config');
@@ -92,6 +92,12 @@ try {
 				//async load here
 		}
 	};
+
+	/* checks if parallel script loading can be used */
+	function _allowAsync(){
+		return false;
+		return !(document['currentScript'] === undefined);
+	}
 
 	function mixin(_t, _s){
 		if(!_s) return _t;
@@ -154,10 +160,10 @@ try {
     function _parseVersion(version, isWild){
         if(!version) return null;
         var v = {target:'*'}, a = version.split(':');
-        
+
         if(a.length == 2) v.target = _trim(a[0]);
         a = a[a.length-1].split('-');
-        
+
         v.min = _trim(!a[0]?(isWild?'*':undefined):a[0]);
         v.max = _trim(!a[1]?(isWild?'*':undefined):a[1]);
         return v;
@@ -249,21 +255,23 @@ try {
     }
 
 	function context(contextUrl){
-		//content must end with /
+		//context must end with /
 		var ctx = null;
-        if(contextUrl) {
-            ctx = contextUrl.replace(new RegExp(_not_pd_,"g"),_pd_);
-            ctx = ctx.substring(0,ctx.lastIndexOf(_pd_)+1);
-        }
 
-        if(!ctx && config.appBase) ctx = config.appBase;
+    if(contextUrl) {
+        ctx = contextUrl.replace(new RegExp(_not_pd_,"g"),_pd_);
+        ctx = ctx.substring(0,ctx.lastIndexOf(_pd_)+1);
+    }
+
+    if(!ctx && config.appBase) ctx = config.appBase;
 
 		if(ctx != null && ctx && ctx[ctx.length-1] != _pd_)
 		 	throw 'Context URL must end with "'+ _pd_ +'"';
 
 		return {
-            isAbs: isAbsUrl(ctx),
-            path:ctx,
+      isAbs: isAbsUrl(ctx),
+      path:ctx,
+			source:contextUrl,
 			resolve:function(url){
 				if(!url) return null;
 
@@ -330,19 +338,19 @@ try {
 
         if(isSealed == true) this.__sjs_seal__[path] = true;
     }
-    
+
 	Namespace.prototype = {
 			add : function(path, obj, isSealed){
 	            if(typeof(path)=='object' || typeof(path) == 'function'){
                     for(var i=0; i < arguments.length; i++){
                         var arg = arguments[i];
-                                
+
                         if(typeof arg === 'function' ){
 						    _namespaceAdd.call(this, fname(arg),arg,isSealed);
 						    continue;
-					    }                                                   
-                                            
-                        if(typeof arg == 'object') {                                            
+					    }
+
+                        if(typeof arg == 'object') {
                             var keys = Object.keys(arg);
                             for(var key in keys){
                                 _namespaceAdd.call(this, keys[key],arg[keys[key]],isSealed);
@@ -350,8 +358,8 @@ try {
                             continue;
                         }
                     }
-                 return this;   
-                }			
+                 return this;
+                }
 
                 if(typeof(path) == 'string'){
                     _namespaceAdd.call(this, path,obj,isSealed);
@@ -386,15 +394,13 @@ try {
 			var head = document.head || document.getElementsByTagName('head')[0];
 			var script = document.createElement('script');
 			script.setAttribute("type", "text/javascript");
+			script.setAttribute("async","");
 			script.setAttribute("src", filename);
 
 			script.onload = script.onreadystatechange = function(){
 				if(!script.readyState || script.readyState == 'complete' || script.readyState == 'loaded') {
 					URL_CACHE[filename] = true;
-					loader.onitemloaded();
-					loader.progress();
-
-					loader.loadNext({});
+					loader.onitemloaded(filename);
 				}
 			};
 			head.appendChild(script);
@@ -496,7 +502,17 @@ try {
 	};
 
 	var isSplashScreen = false;
-	function load(resources, oncomplete, onitemloaded){
+
+
+	function load(resources,oncomplete){
+		if(_allowAsync()) new AsyncLoader(resources,oncomplete).load();
+		else new SyncLoader(resources,oncomplete).load();
+	}
+
+	/*
+		loader function
+	*/
+	function load_old(resources, oncomplete, onitemloaded){
 		if(!resources || resources.length < 1){
 			if(typeof oncomplete != 'function') return;
 			oncomplete();
@@ -536,8 +552,9 @@ try {
 		for(var i=0; i<imports.length; i++){
 			if(!imports[i].namespace) continue;
 			var ns = imports[i].namespace;
-			var x = MODULE_MAP[imports[i].url];
-			if(!x) continue;
+			var x = IMPORTS_MAP[imports[i].url];
+			if(!x || !x.scope) continue;
+			x = x.scope.__sjs_module_exports__;
 			var keys = Object.keys(x);
 			for(var key in keys){
 				scope.add('imports.'+ns+'.'+keys[key],x[keys[key]]);
@@ -547,7 +564,7 @@ try {
 
 	function _exports(scope){
 		scope.__sjs_module_exports__ = Object.create(null);
- 
+
         return function(){
 				var exports = scope.__sjs_module_exports__;
 				//if(!exports) exports = scope.__sjs_module_exports__ = Object.create(null);
@@ -605,7 +622,7 @@ try {
 		//all required
 		if(m.required instanceof Array) items = m.required;
 
-		
+
         var appCtx = context(config.appBase);
 
 		//versioned required
@@ -613,22 +630,22 @@ try {
 		    var v = _parseVersion(config.version);
            	//extract versions
 		   	var keys = Object.keys(m.version);
-            var versions = [];   
+            var versions = [];
 			for(var key in keys){
         		versions.push({version:_parseVersion(keys[key], true), required:m.version[keys[key]]});
 			}
-            
+
 			//evaluate versions
 			for(var i=0; i<versions.length; i++){
-                var ver = versions[i].version; 
-                
+                var ver = versions[i].version;
+
                 //compare target
                 if(ver.target) {
                     if(v.target != ver.target ) continue;
                 }
-                //compare versions               
+                //compare versions
                 var pass = (_vercomp(ver.min, v.min) <= 0 &&  _vercomp(ver.max, v.min) >= 0);
-                				
+
 				if(pass == true) _acopy(versions[i].required, items);
 			}
 		}
@@ -664,7 +681,7 @@ try {
 		return r;
 	}
 
-	var MODULE_MAP = new Object(null);
+	var IMPORTS_MAP = new Object(null);
 	var _moduleHandlers = {
 		'default' : function anonymousModule(m,scope){
 			m.definition.bind(scope)(scope);
@@ -678,46 +695,317 @@ try {
 
 function loadModule(m, scope,url){
     if(!m)
-        throw 'Invalid module defintion "'+ m + '" in ' + url; 
+        throw 'Invalid module defintion "'+ m + '" in ' + url;
     if(typeof(m.definition) != 'function')
-        throw 'Invalid module defintion "'+ typeof(m.definition) + '" in ' + url;        
-    
+        throw 'Invalid module defintion "'+ typeof(m.definition) + '" in ' + url;
+
     var	required = _required(m,scope.context);
+
+		/* if currentScript property is supported use async loading */
+		if(document.currentScript != null ) {
+			load.call(scope,required.resources, function(){});
+			return;
+		}
+
+		/* othweise use synchronous loading */
     load.call(scope,required.resources, function(){
         applyImports.call(scope,required.imports);
-           
+
         var handler = _moduleHandlers[(m!=null?m.type:null)||'default'];
         if(handler == null) throw 'Handler for "' + m.type + '" is not found' ;
-        
+
         handler(m,scope);
-        if(url != null) MODULE_MAP[url] = scope.__sjs_module_exports__;
+        if(url != null) IMPORTS_MAP[url] = scope.__sjs_module_exports__;
     });
 }
-
+/*
 function _module(m){
     var loader = Loader.currentLoader;
+
     if(this instanceof Loader) loader = this;
 
     var scope = new Namespace(null); //our module scope
     var path = context(loader.currentFile).path;
     var url = loader.currentFile;
 
+		log.debug("a: " + document.currentScript.src);
+		log.debug("b: " + url)
+		log.debug("c: " + document.scripts[document.scripts.length - 1].src);
+		log.debug("-------------------------------------------------");
+
     scope.__sjs_uri__ = {path:path, url:url };
     scope.add('__sjs_file__',url);
-	scope.add('sjs',mixin(Object.create(null),_core),true);
+		scope.add('sjs',mixin(Object.create(null),_core),true);
     scope.add('exports',_exports(scope));
     scope.add('context',context(path));
-    
+
     scope.add('load',(function load(r,c){
         return loadModule({required:r, definition:c},this,null);
     }).bind(scope) ,true)
- 
-    return loadModule(m,scope,url);        
+
+    return loadModule(m,scope,url);
+};
+*/
+
+
+/*------------------------------------------------------------------------*/
+
+function ImportSpec(){
+	this.imports = null;
+}
+ImportSpec.prototype.execute = function(){}
+
+
+var _loaderStats = {
+	pendingImports:0,
+	loadingIndicator:null,
+	oncomplete:[],
+	loaders:[]
 };
 
+/*
+	Synchronized loader, loads imports sequentially
+*/
+function SyncLoader(resources, oncomplete){
+	this.resources = resources;
+	this.oncomplete = oncomplete;
+	this.pending = resources.length;
+
+	if(typeof oncomplete == 'function')
+		_loaderStats.oncomplete.push(oncomplete);
+}
+
+SyncLoader.prototype.load = function(){
+	if(this.resources.length == 0) return;
+	if(_loaderStats.loaders.push(this) == 1)	SyncLoader.loadNext();
+}
+
+
+SyncLoader.prototype.nextResource = function(){
+	if(this.pending == 0 ) return null;
+	var resource = this.resources[this.resources.length - this.pending];
+	this.pending--;
+	return resource;
+}
+
+SyncLoader.loadNext = function(){
+	var loader = peek(_loaderStats.loaders);
+	if(!loader) return;
+
+	var filename = loader.nextResource();
+	if(!filename) return;
+	var mapped = IMPORTS_MAP[filename];
+	if(mapped) {
+		SyncLoader.loadNext();
+		return;
+	}
+	//default import spec
+	IMPORTS_MAP[filename] = new ImportSpec();
+
+	var handler = _fileHandlers[fileExt(filename)];
+	_loaderStats.pendingImports++;
+	handler(filename, loader);
+}
+
+SyncLoader.prototype.onitemloaded = function(){
+	_loaderStats.pendingImports--;
+	var loader = peek(_loaderStats.loaders);
+
+	if(loader.pending == 0)	{
+		_loaderStats.loaders.pop();
+	}
+
+	//we are done here all files have been loaded
+	if(	_loaderStats.pendingImports == 0 &&
+			_loaderStats.loaders.length == 0) {
+				_loadingComplete();
+				return;
+			}
+	SyncLoader.loadNext();
+}
+
+/*
+	Asynchronous loader
+*/
+function AsyncLoader(resources, oncomplete){
+	this.resources = resources;
+	this.oncomplete = oncomplete;
+
+	if(typeof oncomplete == 'function')
+		_loaderStats.oncomplete.push(oncomplete);
+}
+
+AsyncLoader.prototype.load = function(){
+
+	if(_loaderStats.loadingIndicator) {
+		_loaderStats.loadingIndicator.show();
+	}
+
+	for(var i=0; i<this.resources.length; i++){
+		var filename = this.resources[i];
+		var mapped = IMPORTS_MAP[filename];
+		if(mapped) continue;
+		//default import spec
+		IMPORTS_MAP[filename] = new ImportSpec();
+
+		var handler = _fileHandlers[fileExt(filename)];
+		if(!handler) continue;
+
+		_loaderStats.pendingImports++;
+
+		handler(filename, this);
+	}
+}
+
+AsyncLoader.prototype.onitemloaded = function(item){
+		var importSpec = IMPORTS_MAP[item];
+
+		if(_loaderStats.loadingIndicator) {
+			_loaderStats.loadingIndicator.update(0,1,item);
+		}
+
+/*
+		//execute import if no import dependencies are present
+		if(!importSpec.imports || importSpec.imports.length == 0) {
+			importSpec.execute();
+		}
+		*/
+		_loaderStats.pendingImports--;
+
+
+		if(_loaderStats.pendingImports == 0){
+			_loadingComplete()
+		}
+}
+
+function _loadingComplete(){
+	log.debug("Loading is complete");
+	if(_loaderStats.loadingIndicator) {
+		_loaderStats.loadingIndicator.hide();
+	}
+
+	/* module loading is complete execute dependency tree*/
+	log.debug("Run dependency tree");
+	try {
+		executeImportsTree();
+	} catch(ex) {
+
+	}
+	var oncomplete = _loaderStats.oncomplete.pop();
+	while(oncomplete){
+		if(typeof(oncomplete) == 'function') oncomplete();
+		oncomplete = _loaderStats.oncomplete.pop();
+	}
+}
+
+function executeImportSpec(importSpec){
+		if(typeof importSpec.execute  != "function") return;
+
+		if(!importSpec.imports || importSpec.imports.length == 0) {
+				importSpec.execute();
+				return;
+		}
+
+		for(var i = 0; i < importSpec.imports.length; i++ ){
+			var importUrl = importSpec.imports[i];
+			executeImportSpec(IMPORTS_MAP[importUrl]);
+		}
+		importSpec.execute();
+}
+
+function executeImportsTree(){
+
+	var result = [];
+	var keys = Object.keys(IMPORTS_MAP);
+	for(var key in keys ){
+		var proc = IMPORTS_MAP[keys[key]];
+		executeImportSpec(proc);
+	}
+	return result;
+
+}
+
+function _getModuleContext(){
+	var ctx = context(document.currentScript.src);
+//	log.debug("module path:"); log.debug(ctx);
+	return ctx;
+}
+
+/*
+	Module processor
+*/
+function ModuleSpec(scope,imports,m){
+	this.scope = scope;
+	this.imports = imports.resources;
+	this.namedImports = imports;
+	this.__sjs_module__ = m;
+}
+ModuleSpec.prototype.execute = function(){
+	this.execute = null;
+	applyImports.call(this.scope,this.namedImports.imports);
+	this.__sjs_module__.definition.bind(this.scope)(this.scope);
+}
+
+/*
+	Loads a module
+	m - module descriptor
+*/
+function _module(m){
+	var context = _getModuleContext();
+
+	/*init module scope*/
+	var scope = new Namespace(null);
+	scope.__$js_uri__ = {path:context.path, url:context.source };
+	scope.add('sjs',mixin(Object.create(null),_core),true);
+	scope.add('exports',_exports(scope));
+	/*
+		resolve required resources relative to
+		current context
+	*/
+	var	imports = _required(m,context);
+	/* get module proc for this module */
+	IMPORTS_MAP[context.source] = new ModuleSpec(scope,imports,m);
+
+	/*Load dependencies*/
+	load(imports.resources);
+}
+
 _module.list= function list(){
-    return mixin({},MODULE_MAP);
+	return mixin({},IMPORTS_MAP);
+  //  return mixin({},IMPORTS_MAP);
 };
+
+_module.listProcessed = function listProcessed(){
+	var result = [];
+	var keys = Object.keys(IMPORTS_MAP);
+	for(var key in keys ){
+		if(IMPORTS_MAP[keys[key]].isProcessed) result.push(IMPORTS_MAP[keys[key]]);
+	}
+	return result;
+};
+
+_module.listPending = function listPending(){
+	var result = [];
+	var keys = Object.keys(IMPORTS_MAP);
+	for(var key in keys ){
+		var spec = IMPORTS_MAP[keys[key]];
+		if(!spec.isProcessed && typeof(spec.execute) == "function" )
+		result.push(IMPORTS_MAP[keys[key]]);
+	}
+	return result;
+};
+
+/*special splash screen module*/
+_module.splash = function(m){
+		var context = _getModuleContext();
+		IMPORTS_MAP[context.source] = {
+			execute:function(){
+				var splash = m({sjs:mixin(Object.create(null),_core)});
+				_loaderStats.loadingIndicator  = new splash();
+			}
+		}
+}
+
 
 function addTo(s,t){
 	var keys = Object.keys(s);
@@ -755,7 +1043,7 @@ function start(config){
 
 var _core = mixin(Object.create(null),{
 	config      : function() {return mixin({},config)},
-    namespace   : Namespace,
+  namespace   : Namespace,
 	pathVar 	: setPathVar,
 	context  	: context,
 	mixin		: mixin,
