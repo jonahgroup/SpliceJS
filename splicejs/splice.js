@@ -399,19 +399,12 @@ try {
 
 			script.onload = script.onreadystatechange = function(){
 				if(!script.readyState || script.readyState == 'complete' || script.readyState == 'loaded') {
-					URL_CACHE[filename] = true;
 					loader.onitemloaded(filename);
 				}
 			};
 			head.appendChild(script);
 		}
 	};
-
-	function updateSplash(){
-		if(!isSplashScreen) return;
-		if(Loader.splashScreen && typeof(Loader.splashScreen.update) == 'function')
-			Loader.splashScreen.update(Loader.complete, Loader.total, Loader.currentFile);
-	}
 
 
 	function detectCircular(loader,print){
@@ -431,79 +424,6 @@ try {
 		}
 	}
 
-	function Loader(scope,resources, oncomplete, onitemloaded) {
-		if(!resources || resources.length == 0) throw 'Invalid Loader constructor';
-		this.iterator = new Iterator(resources);
-		this._progress = resources.length;
-		this.isActive = true;
-		this.oncomplete = oncomplete;
-		this.onitemloaded = onitemloaded;
-		this.scope = scope;
-		Loader.total += resources.length;
-
-        this.appContext = context(config.appBase);
-
-		if(!this.onitemloaded) this.onitemloaded = function(){}; //noop
-	};
-	Loader.complete = Loader.total = 0;
-	Loader.loaders = new Array();
-
-	Loader.prototype.progress = function(){
-		this._progress--; 	Loader.complete++; 	updateSplash();
-	}
-	Loader.prototype.disable = function(){this.isActive = false; return this;};
-	Loader.prototype.enable = function(){this.isActive = true; return this;};
-	Loader.prototype.loadNext = function(watcher){
-		if(!this.isActive) return;
-		var loader = Loader.currentLoader = this;
-
-		if(loader._progress <= 0) {
-			this.iterator = null; this.oncomplete(); this.oncomplete = null; this.onitemloaded = null;
-			return;
-		}
-
-		var obj = loader.iterator.next();
-		if(!obj) return;
-
-		var filename = obj;
-        //returns absolute URL
-		filename = this.appContext.resolve(filename);
-
-		Loader.currentFile = this.currentFile = filename;
-		updateSplash();
-
-		//detect circular dependency here
-		detectCircular(this);
-
-		if(URL_CACHE[filename] === true){
-			setTimeout(function(){
-				loader.progress();
-				loader.loadNext(watcher)
-			},1);
-			return;
-		}
-
-		var handler = _fileHandlers[fileExt(filename)];
-		if(!handler) return;
-		return handler(filename,loader);
-
-	};
-
-	var URL_CACHE = new Array();
-	function urlCache(){
-		var cache = [];
-		for(var key in URL_CACHE){
-			if( URL_CACHE.hasOwnProperty(key)) {
-				log.info(key);
-				cache.push(key);
-			}
-		}
-		return cache;
-	};
-
-	var isSplashScreen = false;
-
-
 	function load(resources,oncomplete){
 		if(_allowAsync()) new AsyncLoader(resources,oncomplete).load();
 		else new SyncLoader(resources,oncomplete).load();
@@ -512,39 +432,6 @@ try {
 	/*
 		loader function
 	*/
-	function load_old(resources, oncomplete, onitemloaded){
-		if(!resources || resources.length < 1){
-			if(typeof oncomplete != 'function') return;
-			oncomplete();
-			return;
-		}
-
-		//suspend current loader
-		var currentLoader = peek(Loader.loaders);
-		if(currentLoader) currentLoader.disable();
-
-		var loader = new Loader((this instanceof Namespace)?this:null,
-			resources, function(){
-			Loader.loaders.pop();
-			if(typeof(oncomplete)  === 'function') oncomplete();
-			var queuedLoader = 	peek(Loader.loaders);
-			if(queuedLoader) queuedLoader.enable().loadNext({});
-			//hide splash screen if applicable
-			if(isSplashScreen == true && this.isInitialLoader){
-				Loader.splashScreen.hide();
-			}
-		}, onitemloaded);
-
-		//setup splash screen if applicable
-		if(Loader.splashScreen != null && !isSplashScreen){
-			loader.isInitialLoader = true;
-			isSplashScreen = true;
-			Loader.splashScreen.show();
-		}
-		Loader.loaders.push(loader);
-		loader.loadNext({});
-	};
-
 
 	function applyImports(imports){
 		var scope = this;
@@ -949,8 +836,12 @@ function executeImportsTree(){
 }
 
 function _getModuleContext(){
-	var ctx = context(document.currentScript.src);
-//	log.debug("module path:"); log.debug(ctx);
+	var ctx = null;
+	if(_allowAsync) ctx =  context(document.currentScript.src);
+	else
+	ctx = context(document.scripts[document.scripts.length-1].src);
+
+	log.debug("module path:"); log.debug(ctx);
 	return ctx;
 }
 
