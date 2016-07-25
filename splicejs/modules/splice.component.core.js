@@ -1,4 +1,12 @@
 sjs.module({
+/*
+  is a prerequisite for the module to load corredctly
+  prerequisite is run before the module imports are processed
+  starts a new loading stack
+*/
+prerequsite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+]
 required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
   { Networking  : '/{sjshome}/modules/splice.network.js'},

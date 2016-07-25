@@ -80,6 +80,7 @@ try {
 			splash:		main.getAttribute('sjs-splash'),
 			version:	main.getAttribute('sjs-version'),
 			mode:			main.getAttribute('sjs-start-mode'),
+			loadMode: main.getAttribute('sjs-load-mode'),
       debug:    main.getAttribute('sjs-debug') == 'true' ? true:false
 		});
 
@@ -96,6 +97,7 @@ try {
 	/* checks if parallel script loading can be used */
 	function _allowAsync(){
 		//return false;
+		if(config.loadMode === 'sync') return false;
 		return !(document['currentScript'] === undefined);
 	}
 
@@ -157,17 +159,17 @@ try {
 		};
 	}
 
-    function _parseVersion(version, isWild){
-        if(!version) return null;
-        var v = {target:'*'}, a = version.split(':');
+  function _parseVersion(version, isWild){
+      if(!version) return null;
+      var v = {target:'*'}, a = version.split(':');
 
-        if(a.length == 2) v.target = _trim(a[0]);
-        a = a[a.length-1].split('-');
+      if(a.length == 2) v.target = _trim(a[0]);
+      a = a[a.length-1].split('-');
 
-        v.min = _trim(!a[0]?(isWild?'*':undefined):a[0]);
-        v.max = _trim(!a[1]?(isWild?'*':undefined):a[1]);
-        return v;
-    }
+      v.min = _trim(!a[0]?(isWild?'*':undefined):a[0]);
+      v.max = _trim(!a[1]?(isWild?'*':undefined):a[1]);
+      return v;
+  }
 
 	var PATH_VARIABLES = {};
 	function setPathVar(key, value){
@@ -213,7 +215,7 @@ try {
 		return r;
 	}
 
-    function collapseUrl(path){
+  function collapseUrl(path){
 		var stack = [];
 		var parts = path.split(_pd_);
 		for(var i=0; i<parts.length; i++){
@@ -237,22 +239,22 @@ try {
 		return cpath;
 	};
 
-    function isAbsUrl(url){
-        if(!url) return false;
-        //platform specific URL
-        if(config.platform == 'UNX'){
-            if(url.startsWith('/')) return true;
-            return false;
-        }
-        if(config.platform == 'WIN'){
-            if(/^[a-zA-Z]:\\/.test(url)) return true;
-            return false;
-        }
-        if(config.platform == 'WEB'){
-            if(/^[a-zA-Z]+:\/\//.test(url)) return true;
-            return false;
-        }
-    }
+  function isAbsUrl(url){
+      if(!url) return false;
+      //platform specific URL
+      if(config.platform == 'UNX'){
+          if(url.startsWith('/')) return true;
+          return false;
+      }
+      if(config.platform == 'WIN'){
+          if(/^[a-zA-Z]:\\/.test(url)) return true;
+          return false;
+      }
+      if(config.platform == 'WEB'){
+          if(/^[a-zA-Z]+:\/\//.test(url)) return true;
+          return false;
+      }
+  }
 
 	function context(contextUrl){
 		//context must end with /
@@ -389,7 +391,11 @@ try {
 	};
 
 	var _fileHandlers = {
-		'.js': function(filename,loader){
+		'.js': {
+			importSpec:function(filename){
+				return new ImportSpec();
+			},
+			load: function(filename,loader){
 			//document script loader
 			var head = document.head || document.getElementsByTagName('head')[0];
 			var script = document.createElement('script');
@@ -404,6 +410,7 @@ try {
 			};
 			head.appendChild(script);
 		}
+	}
 	};
 
 
@@ -503,81 +510,72 @@ try {
 
 	function _required(m,ctx){
 		var r = {resources:[], imports:[]};
-        if(!m || (!m.required && !m.version)) return r;
+    if(!m || (!m.required && !m.version)) return r;
 
 		var items = [];
 		//all required
 		if(m.required instanceof Array) items = m.required;
 
 
-        var appCtx = context(config.appBase);
+    var appCtx = context(config.appBase);
 
 		//versioned required
 		if(typeof m.version == 'object' && config.version){
-		    var v = _parseVersion(config.version);
-           	//extract versions
-		   	var keys = Object.keys(m.version);
-            var versions = [];
+			var v = _parseVersion(config.version);
+      //extract versions
+		  var keys = Object.keys(m.version);
+      var versions = [];
 			for(var key in keys){
         		versions.push({version:_parseVersion(keys[key], true), required:m.version[keys[key]]});
 			}
 
 			//evaluate versions
 			for(var i=0; i<versions.length; i++){
-                var ver = versions[i].version;
+      var ver = versions[i].version;
 
-                //compare target
-                if(ver.target) {
-                    if(v.target != ver.target ) continue;
-                }
-                //compare versions
-                var pass = (_vercomp(ver.min, v.min) <= 0 &&  _vercomp(ver.max, v.min) >= 0);
+      //compare target
+      if(ver.target) {
+          if(v.target != ver.target ) continue;
+      }
+      //compare versions
+      var pass = (_vercomp(ver.min, v.min) <= 0 &&  _vercomp(ver.max, v.min) >= 0);
 
 				if(pass == true) _acopy(versions[i].required, items);
 			}
 		}
 
 		for(var i=0; i < items.length; i++){
-            var item = items[i], url = '', ns = '';
+  		var item = items[i], url = '', ns = '';
 
-            //name space includes
-            if(typeof(item)  == 'object'){
-                for(var key in item){
-				    if(item.hasOwnProperty(key)) {
-					    url = item[key];
-						ns = key;
-						break;
-					}
+      //name space includes
+      if(typeof(item)  == 'object'){
+      	for(var key in item){
+				if(item.hasOwnProperty(key)) {
+					url = item[key];
+					ns = key;
+					break;
 				}
-            }
-            //no namespace includes
-            else {
-                url = item;
-            }
-            //this means that our url is relative to application context
+				}
+      }  //no namespace includes
+      else {
+      	url = item;
+      }
+      //this means that our url is relative to application context
+			//i.e. absolute to application's base url
 			if(url[0] == '/') {
-                url = appCtx.resolve(url.substr(1));
-            }
-            else {
-                url = ctx.resolve(url);
-            }
+      	url = appCtx.resolve(url.substr(1));
+      }
+      else {
+      	url = ctx.resolve(url);
+      }
 
 			r.resources.push(url);
-            r.imports.push({namespace:ns, url:url});
+      r.imports.push({namespace:ns, url:url});
 		}
 		return r;
 	}
 
-	var IMPORTS_MAP = new Object(null);
-	var _moduleHandlers = {
-		'default' : function anonymousModule(m,scope){
-			m.definition.bind(scope)(scope);
-		},
-		'splash' : function splashModule(m,scope){
-			var s = m.definition.bind(scope)(scope);
-			if(typeof s == 'function') Loader.splashScreen = new s();
-		}
-	};
+var IMPORTS_MAP = new Object(null);
 
 
 function loadModule(m, scope,url){
@@ -699,16 +697,20 @@ SyncLoader.loadNext = function(){
 		SyncLoader.loadNext();
 		return;
 	}
-	//default import spec
-	IMPORTS_MAP[filename] = new ImportSpec();
 
 	var handler = _fileHandlers[fileExt(filename)];
+
 	if(!handler){
+		//default import spec
+			IMPORTS_MAP[filename] = new ImportSpec();
 			SyncLoader.loadNext();
 			return;
 	}
+
+	IMPORTS_MAP[filename] = handler.importSpec(filename);
+
 	_loaderStats.pendingImports++;
-	handler(filename, loader);
+	handler.load(filename, loader);
 }
 
 SyncLoader.prototype.onitemloaded = function(item){
@@ -740,6 +742,7 @@ function AsyncLoader(resources, oncomplete){
 	this.resources = resources;
 	this.oncomplete = oncomplete;
 
+	this.pending = this.resources.length;
 	if(typeof oncomplete == 'function')
 		_loaderStats.oncomplete.push(oncomplete);
 }
@@ -754,15 +757,18 @@ AsyncLoader.prototype.load = function(){
 		var filename = this.resources[i];
 		var mapped = IMPORTS_MAP[filename];
 		if(mapped) continue;
-		//default import spec
-		IMPORTS_MAP[filename] = new ImportSpec();
+
 
 		var handler = _fileHandlers[fileExt(filename)];
-		if(!handler) continue;
-
+		if(!handler) {
+			//default import spec
+			IMPORTS_MAP[filename] = new ImportSpec();
+			continue;
+		}
 		_loaderStats.pendingImports++;
 
-		handler(filename, this);
+		IMPORTS_MAP[filename] = handler.importSpec(filename);
+		handler.load(filename, this);
 	}
 }
 
@@ -781,10 +787,13 @@ AsyncLoader.prototype.onitemloaded = function(item){
 		}
 		*/
 		_loaderStats.pendingImports--;
-
+		this.pending--;
 
 		if(_loaderStats.pendingImports == 0){
 			_loadingComplete()
+		}
+		if(this.pending == 0){
+
 		}
 }
 
@@ -877,11 +886,23 @@ function _module(m){
 		current context
 	*/
 	var	imports = _required(m,context);
+
+	/*
+		resolve prerequisites
+	*/
+	var prereqs = _prerequisites(m,context);
+
 	/* get module proc for this module */
 	IMPORTS_MAP[context.source] = new ModuleSpec(scope,imports,m);
 
 	/*Load dependencies*/
-	load(imports.resources);
+	if(prereqs) {
+		load(prereqs, function(){
+			load(imports.resources);
+		})
+	} else {
+		load(imports.resources);
+	}
 }
 
 _module.list= function list(){
@@ -918,6 +939,9 @@ _module.splash = function(m){
 				_loaderStats.loadingIndicator  = new splash();
 			}
 		}
+}
+
+_module.extension = function(){
 }
 
 

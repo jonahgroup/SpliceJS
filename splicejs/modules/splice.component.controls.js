@@ -7,7 +7,7 @@ required:[
 ,	{ Events      : '/{sjshome}/modules/splice.event.js'}
 ,	{'SpliceJS.UI':'splice.ui.js'}
 ,	{'Controllers':'splice.controls/splice.controls.controllers.js'}
-,   {'Buttons':'splice.controls/splice.controls.buttons.js'}
+, {'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
 ,	{'Charts':'splice.controls/splice.controls.charts.js'}
 ,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
@@ -41,7 +41,7 @@ definition:function(scope){
 	var
         imports = scope.imports
     ;
-    
+
     var
         Class = imports.Inheritance.Class
 	,	UIControl = imports.SpliceJS.UI.UIControl

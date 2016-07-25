@@ -27,6 +27,7 @@ definition:function(scope){
 	,	DomMulticastEvent = imports.Views.DomMulticastEvent
   ;
 
+
 	var Button = Class(function ButtonController(args){
 		this.base(args);
 
