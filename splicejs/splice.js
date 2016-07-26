@@ -431,9 +431,20 @@ try {
 		}
 	}
 
+	/*
+		Loads resources on existing stack
+	*/
 	function load(resources,oncomplete){
 		if(_allowAsync()) new AsyncLoader(resources,oncomplete).load();
 		else new SyncLoader(resources,oncomplete).load();
+	}
+
+	/*
+		Loads resources on a new stack
+	*/
+	function loadnew(resources, oncomplete){
+		if(_allowAsync()) new AsyncLoader(resources,oncomplete,true).load();
+		else new SyncLoader(resources,oncomplete, true).load();
 	}
 
 	/*
@@ -507,6 +518,44 @@ try {
 		}
 		return 0;
 	}
+
+
+	function _dependencies(items, ctx){
+		if(!items || items.length <= 0) return null;
+		var r = {resources:[], imports:[]},
+		appCtx = context(config.appBase);
+
+		for(var i=0; i < items.length; i++){
+			var item = items[i], url = '', ns = '';
+
+			//name space includes
+			if(typeof(item)  == 'object'){
+				for(var key in item){
+				if(item.hasOwnProperty(key)) {
+					url = item[key];
+					ns = key;
+					break;
+				}
+				}
+			}  //no namespace includes
+			else {
+				url = item;
+			}
+			//this means that our url is relative to application context
+			//i.e. absolute to application's base url
+			if(url[0] == '/') {
+				url = appCtx.resolve(url.substr(1));
+			}
+			else {
+				url = ctx.resolve(url);
+			}
+
+			r.resources.push(url);
+			r.imports.push({namespace:ns, url:url});
+		}
+		return r;
+	}
+
 
 	function _required(m,ctx){
 		var r = {resources:[], imports:[]};
@@ -642,7 +691,7 @@ ImportSpec.prototype.execute = function(){}
 
 
 var _loaderStats = {
-	pendingImports:0,	loadingIndicator:null,
+	pendingImports:[0],	loadingIndicator:null,
 	oncomplete:[], loaders:[],
 	showLoadingIndicator:function(){
 		if(_loaderStats.loadingIndicator) {
@@ -738,13 +787,18 @@ SyncLoader.syncOnItemLoaded = function(item){
 /*
 	Asynchronous loader
 */
-function AsyncLoader(resources, oncomplete){
+function AsyncLoader(resources, oncomplete, isNewStack){
 	this.resources = resources;
 	this.oncomplete = oncomplete;
+	this.stackId = _loaderStats.pendingImports.length-1;
+	if(isNewStack) {
+		this.stackId = _loaderStats.pendingImports.push(0)-1;
+  }
 
-	this.pending = this.resources.length;
-	if(typeof oncomplete == 'function')
-		_loaderStats.oncomplete.push(oncomplete);
+	if(typeof oncomplete == 'function') {
+		_loaderStats.oncomplete[this.stackId] = _loaderStats.oncomplete[this.stackId] || [];
+		_loaderStats.oncomplete[this.stackId].push(oncomplete);
+	}
 }
 
 AsyncLoader.prototype.load = function(){
@@ -762,12 +816,12 @@ AsyncLoader.prototype.load = function(){
 		var handler = _fileHandlers[fileExt(filename)];
 		if(!handler) {
 			//default import spec
-			IMPORTS_MAP[filename] = new ImportSpec();
+			IMPORTS_MAP[filename] = new ImportSpec(this.stackId);
 			continue;
 		}
-		_loaderStats.pendingImports++;
+		_loaderStats.pendingImports[this.stackId]++;
 
-		IMPORTS_MAP[filename] = handler.importSpec(filename);
+		IMPORTS_MAP[filename] = handler.importSpec(filename, this.stackId);
 		handler.load(filename, this);
 	}
 }
@@ -786,18 +840,15 @@ AsyncLoader.prototype.onitemloaded = function(item){
 			importSpec.execute();
 		}
 		*/
-		_loaderStats.pendingImports--;
-		this.pending--;
+		_loaderStats.pendingImports[this.stackId]--;
 
-		if(_loaderStats.pendingImports == 0){
-			_loadingComplete()
+		if(_loaderStats.pendingImports[this.stackId] == 0){
+			_loadingComplete(this.stackId);
 		}
-		if(this.pending == 0){
 
-		}
 }
 
-function _loadingComplete(){
+function _loadingComplete(stackId){
 	log.debug("Loading is complete");
 	if(_loaderStats.loadingIndicator) {
 		_loaderStats.loadingIndicator.hide();
@@ -806,14 +857,14 @@ function _loadingComplete(){
 	/* module loading is complete execute dependency tree*/
 	log.debug("Run dependency tree");
 	try {
-		executeImportsTree();
+		executeImportsTree(stackId);
 	} catch(ex) {
 
 	}
-	var oncomplete = _loaderStats.oncomplete.pop();
+	var oncomplete = _loaderStats.oncomplete[stackId].pop();
 	while(oncomplete){
 		if(typeof(oncomplete) == 'function') oncomplete();
-		oncomplete = _loaderStats.oncomplete.pop();
+		oncomplete = _loaderStats.oncomplete[stackId].pop();
 	}
 }
 
@@ -832,7 +883,7 @@ function executeImportSpec(importSpec){
 		importSpec.execute();
 }
 
-function executeImportsTree(){
+function executeImportsTree(stackId){
 
 	var result = [];
 	var keys = Object.keys(IMPORTS_MAP);
@@ -859,7 +910,7 @@ function _getModuleContext(){
 */
 function ModuleSpec(scope,imports,m){
 	this.scope = scope;
-	this.imports = imports.resources;
+	this.imports = !imports || imports.resources;
 	this.namedImports = imports;
 	this.__sjs_module__ = m;
 }
@@ -881,27 +932,28 @@ function _module(m){
 	scope.__$js_uri__ = {path:context.path, url:context.source };
 	scope.add('sjs',mixin(Object.create(null),_core),true);
 	scope.add('exports',_exports(scope));
+
 	/*
 		resolve required resources relative to
 		current context
 	*/
-	var	imports = _required(m,context);
+	var	imports = _dependencies(m.required,context);
 
 	/*
 		resolve prerequisites
 	*/
-	var prereqs = _prerequisites(m,context);
+	var prereqs = _dependencies(m.prerequisite,context);
 
 	/* get module proc for this module */
 	IMPORTS_MAP[context.source] = new ModuleSpec(scope,imports,m);
 
 	/*Load dependencies*/
 	if(prereqs) {
-		load(prereqs, function(){
-			load(imports.resources);
+		loadnew(prereqs.resources, function(){
+			!imports || load(imports.resources);
 		})
 	} else {
-		load(imports.resources);
+		!imports || load(imports.resources);
 	}
 }
 
