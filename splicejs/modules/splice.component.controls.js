@@ -1,9 +1,10 @@
 /* global _ */
 sjs.module({
-type:'component'
-,
+prerequisite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
-    { Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
+  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
 ,	{ Events      : '/{sjshome}/modules/splice.event.js'}
 ,	{'SpliceJS.UI':'splice.ui.js'}
 ,	{'Controllers':'splice.controls/splice.controls.controllers.js'}
@@ -31,7 +32,7 @@ required:[
 ,	{'Buttons':'splice.controls/splice.controls.slider.js'}
 ,	{'DataControls':'splice.controls/splice.controls.treetable.js'}
 ,	'splice.controls/splice.controls.css'
-,   'splice.controls/splice.controls.html'
+, 'splice.controls/splice.controls.html'
 ]
 ,
 definition:function(scope){

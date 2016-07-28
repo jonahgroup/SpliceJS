@@ -392,8 +392,8 @@ try {
 
 	var _fileHandlers = {
 		'.js': {
-			importSpec:function(filename){
-				return new ImportSpec();
+			importSpec:function(filename,stackId){
+				return new ImportSpec(stackId);
 			},
 			load: function(filename,loader){
 			//document script loader
@@ -435,6 +435,14 @@ try {
 		Loads resources on existing stack
 	*/
 	function load(resources,oncomplete){
+		/* get base context */
+		var ctx = context();
+		/* check is resources are abs urls, if not resolve to abs url*/
+		for(var i=0; i<resources.length; i++){
+			if(!isAbsUrl(resources[i]))
+				resources[i] = ctx.resolve(resources[i]);
+		}
+
 		if(_allowAsync()) new AsyncLoader(resources,oncomplete).load();
 		else new SyncLoader(resources,oncomplete).load();
 	}
@@ -450,7 +458,6 @@ try {
 	/*
 		loader function
 	*/
-
 	function applyImports(imports){
 		var scope = this;
         if(!scope.imports) scope.add('imports',new Namespace());
@@ -627,31 +634,6 @@ try {
 var IMPORTS_MAP = new Object(null);
 
 
-function loadModule(m, scope,url){
-    if(!m)
-        throw 'Invalid module defintion "'+ m + '" in ' + url;
-    if(typeof(m.definition) != 'function')
-        throw 'Invalid module defintion "'+ typeof(m.definition) + '" in ' + url;
-
-    var	required = _required(m,scope.context);
-
-		/* if currentScript property is supported use async loading */
-		if(document.currentScript != null ) {
-			load.call(scope,required.resources, function(){});
-			return;
-		}
-
-		/* othweise use synchronous loading */
-    load.call(scope,required.resources, function(){
-        applyImports.call(scope,required.imports);
-
-        var handler = _moduleHandlers[(m!=null?m.type:null)||'default'];
-        if(handler == null) throw 'Handler for "' + m.type + '" is not found' ;
-
-        handler(m,scope);
-        if(url != null) IMPORTS_MAP[url] = scope.__sjs_module_exports__;
-    });
-}
 /*
 function _module(m){
     var loader = Loader.currentLoader;
@@ -684,8 +666,9 @@ function _module(m){
 
 /*------------------------------------------------------------------------*/
 
-function ImportSpec(){
+function ImportSpec(stackId){
 	this.imports = null;
+	this.stackId = stackId || 0;
 }
 ImportSpec.prototype.execute = function(){}
 
@@ -929,7 +912,7 @@ function _module(m){
 
 	/*init module scope*/
 	var scope = new Namespace(null);
-	scope.__$js_uri__ = {path:context.path, url:context.source };
+	scope.__sjs_uri__ = {path:context.path, url:context.source };
 	scope.add('sjs',mixin(Object.create(null),_core),true);
 	scope.add('exports',_exports(scope));
 
@@ -944,8 +927,14 @@ function _module(m){
 	*/
 	var prereqs = _dependencies(m.prerequisite,context);
 
+	/*
+		which stack are we loading on?
+	*/
+	var stackId = IMPORTS_MAP[context.source].stackId;
+
 	/* get module proc for this module */
 	IMPORTS_MAP[context.source] = new ModuleSpec(scope,imports,m);
+	IMPORTS_MAP[context.source].stackId = stackId;
 
 	/*Load dependencies*/
 	if(prereqs) {
@@ -985,7 +974,11 @@ _module.listPending = function listPending(){
 /*special splash screen module*/
 _module.splash = function(m){
 		var context = _getModuleContext();
+
+		var stackId = IMPORTS_MAP[context.source].stackId;
+
 		IMPORTS_MAP[context.source] = {
+			stackId : stackId,
 			execute:function(){
 				var splash = m({sjs:mixin(Object.create(null),_core)});
 				_loaderStats.loadingIndicator  = new splash();
