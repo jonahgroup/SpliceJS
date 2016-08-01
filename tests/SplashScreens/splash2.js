@@ -1,4 +1,4 @@
-global.sjs.module.splash(  function(scope){
+sjs.module.splash(  function(scope){
   var document = scope.sjs.document;
 
   var style = "position:absolute; left:0px; top:0px; right:0px; bottom:0px; transition:opacity 0.4s;     background-color: rgba(10,10,10,0.8);";
@@ -49,6 +49,7 @@ global.sjs.module.splash(  function(scope){
       var dom = this.dom;
       this.dom.addEventListener('transitionend',function(e){
           document.body.removeChild(dom);
+          
       },false);
     },
 

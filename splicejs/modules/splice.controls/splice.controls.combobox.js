@@ -1,9 +1,11 @@
 sjs.module({
-  type:'component',
+prerequisite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
   required:[
     { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-    {'SpliceJS.Controls':'splice.controls.dropdownlist.js'}
-    // 'splice.controls.combobox.html'
+    {'SpliceJS.Controls':'splice.controls.dropdownlist.js'},
+    'splice.controls.combobox.html'
   ],
   definition:function(scope){
 

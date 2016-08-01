@@ -1,12 +1,12 @@
 sjs.module({
-type:'component'
-,
+prerequisite:[
+	'/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.pageloader.html'
-]
-,
+],
 definition:function(scope){
 
 	var

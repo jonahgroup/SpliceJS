@@ -31,6 +31,8 @@ definition:function(scope){
   };
 
   scope.exports(
-    DocumentApplication, Controller
+    DocumentApplication, 
+    Controller, 
+    imports.Core.DefineComponents
   );
 }});

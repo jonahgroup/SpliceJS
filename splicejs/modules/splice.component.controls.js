@@ -4,11 +4,11 @@ prerequisite:[
   '/{sjshome}/modules/splice.module.extensions.js'
 ],
 required:[
-  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
+  	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
 ,	{ Events      : '/{sjshome}/modules/splice.event.js'}
 ,	{'SpliceJS.UI':'splice.ui.js'}
 ,	{'Controllers':'splice.controls/splice.controls.controllers.js'}
-, {'Buttons':'splice.controls/splice.controls.buttons.js'}
+, 	{'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
 ,	{'Charts':'splice.controls/splice.controls.charts.js'}
 ,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
@@ -32,7 +32,7 @@ required:[
 ,	{'Buttons':'splice.controls/splice.controls.slider.js'}
 ,	{'DataControls':'splice.controls/splice.controls.treetable.js'}
 ,	'splice.controls/splice.controls.css'
-, 'splice.controls/splice.controls.html'
+, 	'splice.controls/splice.controls.html'
 ]
 ,
 definition:function(scope){
@@ -112,7 +112,7 @@ definition:function(scope){
 		{GridLayout:        imports.Grids.GridLayout},
         {CellContainer:     imports.Grids.CellContainer},
 		{D3Canvas:			imports.Charts.D3Canvas},
-		{Map:				imports.Maps.Map},
+		//{Map:				imports.Maps.Map},
 		/* selectors */
 		{DropDownSelector:	imports.Selectors.DropDownSelector},
 		{DropDownList:		imports.Selectors.DropDownList},
@@ -135,7 +135,7 @@ definition:function(scope){
 		{PageLoader:		imports.Navigation.PageLoader},
 		{ToolTip:			imports.Navigation.ToolTip},
 		/* Editors */
-		{CodeEditor:		imports.Editors.CodeEditor},
+		//{CodeEditor:		imports.Editors.CodeEditor},
 		/* Controllers*/
 		{ListItemController:imports.DataControls.ListItemController}
 	);

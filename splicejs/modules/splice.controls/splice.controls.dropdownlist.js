@@ -1,10 +1,12 @@
 sjs.module({
-type:'component'
-,
+prerequisite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Data: '/{sjshome}/modules/splice.dataitem.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Events: '/{sjshome}/modules/splice.event.js'},
+	{ Component: '/{sjshome}/modules/splice.component.core.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
 	{'SpliceJS.Controls':'splice.controls.listbox.js'},
@@ -21,12 +23,16 @@ definition:function(scope){
 	var
 		Class = imports.Inheritance.Class
 	,	Events = imports.Events
-	, MulticastEvent = imports.Events.MulticastEvent
+	, 	MulticastEvent = imports.Events.MulticastEvent
 	,	DataItem = imports.Data.DataItem
 	,	UIControl = imports.SpliceJS.UI.UIControl
+	,	DefineComponents = imports.Component.DefineComponents
 	;
 
-		/**
+	
+	var components = DefineComponents(scope);
+	
+	/**
 	 * Drop down list
 	 * */
 	var DropDownListController = Class(function DropDownListController(args){

@@ -1,7 +1,8 @@
 /* global d3 */
 sjs.module({
-type:'component'
-,
+prerequisite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},

@@ -3,35 +3,36 @@ sjs.module({
 required:[
 	{ Inheritance   : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Animation	    : '/{sjshome}/modules/splice.animation.js'},
-	{ Component			: '/{sjshome}/modules/splice.component.core.js'},
-	{ Data					: '/{sjshome}/modules/splice.dataitem.js'},
-	{ Events				: '/{sjshome}/modules/splice.event.js'},
-	{ Views					: '/{sjshome}/modules/splice.view.js'},
-	{ Document  		: '/{sjshome}/modules/splice.document.js'}
+	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
+	{ Data			: '/{sjshome}/modules/splice.dataitem.js'},
+	{ Events		: '/{sjshome}/modules/splice.event.js'},
+	{ Views			: '/{sjshome}/modules/splice.view.js'},
+	{ Document  	: '/{sjshome}/modules/splice.document.js'}
 ],
 definition:function component(scope){
-	//enable strict mode
-	"use strict";
+//enable strict mode
+"use strict";
 
-	// importing framework features makes our code less verbose
-	var debug = scope.sjs.log.debug
-	,   log = scope.sjs.log
-  ,   imports = scope.imports
-  ;
+// importing framework features makes our code less verbose
+var 
+	debug = scope.sjs.log.debug
+, 	log = scope.sjs.log
+, 	imports = scope.imports
+;
 
-	var
-	  Class 			= imports.Inheritance.Class
-	, Animate 		= imports.Animation.Animate
-	, Controller 	= imports.Component.Controller
-	,	Events 				= imports.Events
-	, MulticastEvent = imports.Events.MulticastEvent
-	,	View 					= imports.Views.View
-	,	DataItem 			= imports.Data.DataItem
-	, DataItemStub  = imports.Data.DataItemStub
-  , ArrayDataItem   = imports.Data.ArrayDataItem
-  , IDataContract   = imports.Data.IDataContract
-	, Document = imports.Document
-	;
+var
+	Class			= imports.Inheritance.Class
+, 	Animate 		= imports.Animation.Animate
+, 	Controller 		= imports.Component.Controller
+, 	Events 			= imports.Events
+, 	MulticastEvent 	= imports.Events.MulticastEvent
+, 	View 			= imports.Views.View
+, 	DataItem 		= imports.Data.DataItem
+, 	DataItemStub  	= imports.Data.DataItemStub
+, 	ArrayDataItem   = imports.Data.ArrayDataItem
+, 	IDataContract   = imports.Data.IDataContract
+, 	Document 		= imports.Document
+;
 
 
 	/**

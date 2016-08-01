@@ -1,11 +1,12 @@
 sjs.module({
-type:'component'
-,
+prerequisite:[
+	'/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
 	{ Events      : '/{sjshome}/modules/splice.event.js'},
 	{ Views		  	: '/{sjshome}/modules/splice.view.js'},
-  { Async       : '/{sjshome}/modules/splice.async.js'},
+  	{ Async       : '/{sjshome}/modules/splice.async.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	{'Doc':'/{sjshome}/modules/splice.document.js'},

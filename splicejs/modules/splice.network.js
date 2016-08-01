@@ -24,7 +24,7 @@ definition:function(scope){
 	HttpRequest.prototype.request = function(type,config){
 
 	 	var params = ''
-        ,   separator = ''
+    ,   separator = ''
 	 	,   requestURL = config.url
 	 	,   self = this;
 

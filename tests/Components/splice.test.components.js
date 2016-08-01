@@ -1,6 +1,8 @@
 global.sjs.module({
-type:'component'
-,
+prerequisite:[
+  '../SplashScreens/splash2.js',
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
   '/{sjshome}/modules/splice.animation.js',
   '/{sjshome}/modules/splice.network.js',
@@ -19,7 +21,7 @@ required:[
 ,
 definition:function(scope){
 
-  var
+  var 
     sjs = scope.sjs
   , imports = scope.imports
   , log = scope.sjs.log
@@ -28,14 +30,15 @@ definition:function(scope){
   var
     Class = imports.Inheritance.Class
   , Controller = imports.Component.Controller
+  , DefineComponents = imports.Component.DefineComponents
   , Events = imports.Events
   , MulticastEvent = imports.Events.MulticastEvent
   ;
 
-  var   DataItem = imports.SpliceJS.Ui.DataItem
-  ,     ArrayDataItem = imports.SpliceJS.Ui.ArrayDataItem;
-
-
+  var 
+    DataItem = imports.SpliceJS.Ui.DataItem
+  , ArrayDataItem = imports.SpliceJS.Ui.ArrayDataItem
+  ;
 
   var provinces = [
     'Ontario','British Columbia', 'Alberta', 'Quebec','New Brunswick',
@@ -45,13 +48,13 @@ definition:function(scope){
 
   var provincesOfProvinces = [
     provinces
-  ]
+  ];
 
   var a = [
     {name:'Ontario', isChecked:false},
     {name:'Alberta', isChecked:true},
     {name:'British Columbia', isChecked:true, population:10000,
-    office:{address:{street:'king'}}},
+      office:{address:{street:'king'}}},
     {name:'Quebec', isChecked:true}
   ];
 
@@ -66,19 +69,23 @@ definition:function(scope){
     {plot:'Line',name:'series1',data:[10,20,5,23]}
   ];
 
- var scatterChart = [
-      {plot: 'Scatter',    name: 'series1', data: [[12,14], [16,12], [65,45], [165,50], [180,327], [190,365], [200,45]]},
-      {plot: 'Scatter',    name: 'series2', data: [[13,14], [13,341], [65,122], [165,12], [32,56], [234,365], [123,45]]},
-      {plot: 'ScatterLine',name:'line1',data:[[0,0],[250,370]]}
- ];
-
-  var barchart = {
-
-  };
+  var scatterChart = [
+    { plot: 'Scatter', name: 'series1', 
+        data: [[12,14], [16,12], [65,45], [165,50], [180,327], [190,365], [200,45]]
+    },
+    { plot: 'Scatter', name: 'series2', 
+      data: [[13,14], [13,341], [65,122], [165,12], [32,56], [234,365], [123,45]]
+    },
+    { plot: 'ScatterLine', name:'line1',
+      data:[[0,0],[250,370]]
+    }
+  ];
 
   var newProvince = new DataItem({
       name:'',isChecked:false
   });
+
+  var components = DefineComponents(scope);
 
   var ComponentsTest = Class(function ComponentsTest(){
     this.base();
@@ -92,23 +99,22 @@ definition:function(scope){
     });
 
     this.sourceTestCheck = {checked:true};
-
     this.provinces = new DataItem(a);
     this.provincesOfProvinces = new DataItem();
 
   }).extend(Controller);
 
   ComponentsTest.prototype.initialize = function(){
-    this.onDisplay.subscribe(function(){
-      this.onNewProvince(newProvince);
+    this.provincesOfProvinces.setValue(provincesOfProvinces);
+  };
+
+  ComponentsTest.prototype.onDisplay = function(){
+     this.onNewProvince(newProvince);
       this.onProvinces(provinces2);
       this.onChartsData(charts);
       this.onScatterChartData(scatterChart);
       this.onTestCheck(this.sourceTestCheck);
-    }, this);
-
-    this.provincesOfProvinces.setValue(provincesOfProvinces);
-  };
+  }
 
   ComponentsTest.prototype.addProvince = function(){
     var p = newProvince.getValue();
@@ -134,7 +140,7 @@ definition:function(scope){
 
   ComponentsTest.prototype.formatButton = function(item){
     var v = item.getValue();
-    if(v == 'Alberta') {
+    if(v == 'Alberta'){
         return 'background-color:#ff0000; font-size:2em;';
     }
     if(v == 'Quebec'){
@@ -178,7 +184,7 @@ definition:function(scope){
 
   //module exports
   scope.exports(
-    ComponentsTest, foo, testDataItem
+    ComponentsTest, foo, testDataItem, components
   );
 
   new imports.Component.DocumentApplication(scope).run();

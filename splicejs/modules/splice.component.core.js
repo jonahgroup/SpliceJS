@@ -5,9 +5,6 @@ sjs.module({
   and allows adding custom behavior to how imports are handled
   starts a new loading stack
 */
-prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
-],
 required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
   { Networking  : '/{sjshome}/modules/splice.network.js'},
@@ -25,7 +22,8 @@ definition:function(scope){
   , sjs = scope.sjs
   ;
 
-  var http = imports.Networking.http
+  var 
+  	http = imports.Networking.http
   , doc = imports.Document
   , Tokenizer = imports.Syntax.Tokenizer
   , View = imports.Views.View
@@ -35,38 +33,19 @@ definition:function(scope){
 
   var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
 
-/*
-  Template spec
-*/
+  function DefineComponents(scope,templateFile,componentMap){
+	  //get all html imports in current scope
+	  var resources = scope.__sjs_module_imports__.resources;
+	  for(var i in resources){
+		  var ext = sjs.filext(resources[i]); 
+		  if( ext !== '.html') continue;
 
-function TemplateSpec(){
-}
+		  var key = sjs.context(scope.__sjs_uri__.path).resolve(resources[i]);
+		  var m = sjs.module(key);
 
-TemplateSpec.prototype.execute = function(){
-
-}
-
-
-
-
-
-  /*
-  ----------------------------------------------------------
-  	Component module handler
-  */
-  function componentModule(_module,_scope){
-    compileTemplates(_scope);
-    _module.definition.bind(_scope)(_scope);
-  }
-
-
-  sjs.extension.module({
-    'component' : componentModule
-  });
-
-
-  function DefineComponents(scope,templateFile){
-
+		  extractComponents.call(scope,m.dom);
+		  compileTemplates(scope);
+	  }
   };
 
   /*
@@ -75,7 +54,7 @@ TemplateSpec.prototype.execute = function(){
   */
 
 	/**
-	 * Object descriptor
+ 	 * Object descriptor
 	 * @type: data type of the object to be created
 	 * @parameters:	parameters to be passed to the object behind proxy
 	 * */
@@ -98,7 +77,7 @@ TemplateSpec.prototype.execute = function(){
       //look in the inmports
       if(!obj) obj = scope.imports.lookup(args.type);
       // looks in the components
-			if(!obj) obj = scope.components.lookup(args.type);
+			if(!obj) obj = scope.__sjs_components__.lookup(args.type);
 
 			if(!obj) throw 'Proxy object type ' + args.type + ' is not found';
 			if(typeof obj !== 'function') throw 'Proxy object type ' + args.type + ' is already an object';
@@ -268,14 +247,9 @@ TemplateSpec.prototype.execute = function(){
   		return _propertyValueLocator.bind(obj);
   	};
 
-
-
-
   /*
   ----------------------------------------------------------
-
   	Binding Model
-
   */
   	var BINDING_TYPES = {
   			SELF 		 : 1
@@ -372,7 +346,7 @@ TemplateSpec.prototype.execute = function(){
     };
 
     Controller.prototype.onDisplay = function(){
-      this.onDisplay();
+      
       if(!this.children) return;
       for(var i=0; i< this.children.length; i++){
         var child = this.children[i];
@@ -670,25 +644,22 @@ TemplateSpec.prototype.execute = function(){
 
 
   	var container = document.createElement('span');
-  	function extractTemplates(fileSource){
+
+
+  	function extractComponents(dom){
   		//var start  = window.performance.now();
-      if(!this) return;
-  		if(!this.components)
-  			this.components = sjs.namespace(); //component exports
-
-  		container.innerHTML = fileSource;
-
-  		var nodes = container.querySelectorAll('sjs-component');
+		if(!this.__sjs_components__) this.add('__sjs_components__',new sjs.namespace());
+  		var nodes = dom.querySelectorAll('sjs-component');
   		for(var i=0; i<nodes.length; i++){
   			var node = nodes[i];
-  			this.components[node.attributes['sjs-type'].value] = new Template(node);
-  			this.components.length = i + 1;
+  			this.__sjs_components__[node.attributes['sjs-type'].value] = new Template(node);
+  			this.__sjs_components__.length = i + 1;
   		}
 
   		//var end = window.performance.now();
   		//perf.total += (end-start);
   		//log.info('template collection performance step: ' +  (end-start) + ' total: ' + perf.total) ;
-  		return this.components;
+  		return this.__sjs_components__;
   	};
 
 
@@ -986,7 +957,7 @@ TemplateSpec.prototype.execute = function(){
       }
 
       //2. is target is event subscribe to it
-      if(targetValue && targetValue.__sjs_event__ == true &&
+      if(targetValue && targetValue.__sjs_event__ === true &&
         typeof(sourceValue) == 'function'){
         targetValue.subscribe(sourceValue,sourceInstance);
         return;
@@ -1004,10 +975,8 @@ TemplateSpec.prototype.execute = function(){
         return;
       }
 
-
       //4. value to value binding
       target.setValue(sourceValue);
-
 
       log.info('---- target source ------');
 
@@ -1027,14 +996,14 @@ TemplateSpec.prototype.execute = function(){
   	 * */
   	function compileTemplates(scope){
       //no components in this module
-  		if(!scope.components || scope.components.length < 1) return; //no templates in this module
+  		if(!scope.__sjs_components__ || scope.__sjs_components__.length < 1) return; //no templates in this module
 
-  		var keys = Object.keys(scope.components);
+  		var keys = Object.keys(scope.__sjs_components__);
 
   		for(var i=0; i< keys.length; i++) {
-  			var template = scope.components[keys[i]];
-        if(! (template instanceof Template)) continue;
-  			compileTemplate.call(scope,template);
+  			var template = scope.__sjs_components__[keys[i]];
+        	if(! (template instanceof Template)) continue;
+  				compileTemplate.call(scope,template);
   		}
   	};
 
@@ -1049,22 +1018,22 @@ TemplateSpec.prototype.execute = function(){
   	 * @param moduleName - a module where template can be located
   	 * @returns {HTMLElement|*} a DOM of the template (aka build version).
   	 */
-     function compileTemplate(template){
-    		var scope = this; //module scope
-    		/*
-    		 * Run notations and scripts to form a
-    		 * final template DOM
-    		 * */
-    		_resolveCustomElements.call(scope,template);
+	function compileTemplate(template){
+		var scope = this; //module scope
+		/*
+			* Run notations and scripts to form a
+			* final template DOM
+			* */
+		_resolveCustomElements.call(scope,template);
 
-    		var component = createComponent(template.controller, template, scope);
-    		scope.components[template.type] = component;
+		var component = createComponent(template.controller, template, scope);
+		scope.__sjs_components__[template.type] = component;
         // export only components and
         if(component.isComponent && component.template.export != null)
           scope.__sjs_module_exports__[
               component.template.export?component.template.export:template.type
           ] = component;
-    		return component;
+    	return component;
   	};
 
 

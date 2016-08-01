@@ -1,48 +1,48 @@
 /* global sjs */
 sjs.module({
-type:'component'
-,
+prerequisite:[
+	'/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
+	{ Inheritance 	: '/{sjshome}/modules/splice.inheritance.js' },
 	{ Events 	  	: '/{sjshome}/modules/splice.event.js' },
-	{ Views				: '/{sjshome}/modules/splice.view.js'},
-	{'SpliceJS.UI':'../splice.ui.js'},
-	{'Doc': '{sjshome}/modules/splice.document.js'},
+	{ Views			: '/{sjshome}/modules/splice.view.js'},
+	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
+	{'SpliceJS.UI'	: '../splice.ui.js'},
+	{'Doc' : '{sjshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
 	'splice.controls.buttons.html'
 ]
 ,
 definition:function(scope){
 	var
-      imports = scope.imports
-    ,	debug = scope.sjs.log.debug
+      	imports = scope.imports
+    , 	debug = scope.sjs.log.debug
     ;
 
 	var
-    Class = imports.Inheritance.Class
-	,	UIControl = imports.SpliceJS.UI.UIControl
-	, Events = imports.Events
-	, MulticastEvent = imports.Events.MulticastEvent
-	, Views = imports.Views
-	,	DomMulticastEvent = imports.Views.DomMulticastEvent
-  ;
+    	Class = imports.Inheritance.Class
+	, 	UIControl = imports.SpliceJS.UI.UIControl
+	, 	Events = imports.Events
+	, 	MulticastEvent = imports.Events.MulticastEvent
+	, 	Views = imports.Views
+	, 	DomMulticastEvent = imports.Views.DomMulticastEvent
+	;
 
 
 	var Button = Class(function ButtonController(args){
 		this.base(args);
-
 		Events.attach(this,{
 			onClick : MulticastEvent
 		});
-
 	}).extend(UIControl);
 
 
 	Button.prototype.initialize = function(){
 
 		Events.attach(this.views.root,{
-			onclick			:	Views.DomMulticastStopEvent,
-    	onmousedown	: Views.DomMulticastStopEvent
+			onclick		: Views.DomMulticastStopEvent,
+    		onmousedown	: Views.DomMulticastStopEvent
 		});
 
 		this.views.root.onclick.subscribe(function(){

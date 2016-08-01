@@ -24,10 +24,10 @@ SOFTWARE.
 try {
 	!require;
 } catch(ex){
-		window.require = function(m){
-			if(m == 'splice.window.js') return window;
-			if(m == 'splice.document.js') return document;
-		}
+	window.require = function(m){
+		if(m == 'splice.window.js') return window;
+		if(m == 'splice.document.js') return document;
+	}
 }
 
 (function(window, document){
@@ -79,9 +79,9 @@ try {
 			sjsMain:	main.getAttribute('sjs-main'),
 			splash:		main.getAttribute('sjs-splash'),
 			version:	main.getAttribute('sjs-version'),
-			mode:			main.getAttribute('sjs-start-mode'),
-			loadMode: main.getAttribute('sjs-load-mode'),
-      debug:    main.getAttribute('sjs-debug') == 'true' ? true:false
+			mode:		main.getAttribute('sjs-start-mode'),
+			loadMode: 	main.getAttribute('sjs-load-mode'),
+      		debug:    	main.getAttribute('sjs-debug') == 'true' ? true:false
 		});
 
 		var sjsConfig = node.getAttribute('sjs-config');
@@ -392,8 +392,8 @@ try {
 
 	var _fileHandlers = {
 		'.js': {
-			importSpec:function(filename,stackId){
-				return new ImportSpec(stackId);
+			importSpec:function(filename){
+				return new ImportSpec(filename);
 			},
 			load: function(filename,loader){
 			//document script loader
@@ -445,14 +445,6 @@ try {
 
 		if(_allowAsync()) new AsyncLoader(resources,oncomplete).load();
 		else new SyncLoader(resources,oncomplete).load();
-	}
-
-	/*
-		Loads resources on a new stack
-	*/
-	function loadnew(resources, oncomplete){
-		if(_allowAsync()) new AsyncLoader(resources,oncomplete,true).load();
-		else new SyncLoader(resources,oncomplete, true).load();
 	}
 
 	/*
@@ -666,15 +658,20 @@ function _module(m){
 
 /*------------------------------------------------------------------------*/
 
-function ImportSpec(stackId){
+function ImportSpec(fileName){
 	this.imports = null;
-	this.stackId = stackId || 0;
+	this.prerequisites = null;
+	this.fileName = fileName;
 }
-ImportSpec.prototype.execute = function(){}
+ImportSpec.prototype = { 
+	execute : function(){
+		this.isProcessed = true;
+	}
+}
 
 
 var _loaderStats = {
-	pendingImports:[0],	loadingIndicator:null,
+	pendingImports:0,	loadingIndicator:null,
 	oncomplete:[], loaders:[],
 	showLoadingIndicator:function(){
 		if(_loaderStats.loadingIndicator) {
@@ -770,21 +767,17 @@ SyncLoader.syncOnItemLoaded = function(item){
 /*
 	Asynchronous loader
 */
-function AsyncLoader(resources, oncomplete, isNewStack){
+function AsyncLoader(resources, oncomplete){
 	this.resources = resources;
 	this.oncomplete = oncomplete;
-	this.stackId = _loaderStats.pendingImports.length-1;
-	if(isNewStack) {
-		this.stackId = _loaderStats.pendingImports.push(0)-1;
-  }
 
 	if(typeof oncomplete == 'function') {
-		_loaderStats.oncomplete[this.stackId] = _loaderStats.oncomplete[this.stackId] || [];
-		_loaderStats.oncomplete[this.stackId].push(oncomplete);
+		_loaderStats.oncomplete.push(oncomplete);
 	}
 }
 
-AsyncLoader.prototype.load = function(){
+AsyncLoader.prototype = {
+	load : function(){
 
 	if(_loaderStats.loadingIndicator) {
 		_loaderStats.loadingIndicator.show();
@@ -799,39 +792,41 @@ AsyncLoader.prototype.load = function(){
 		var handler = _fileHandlers[fileExt(filename)];
 		if(!handler) {
 			//default import spec
-			IMPORTS_MAP[filename] = new ImportSpec(this.stackId);
+			var spec = new ImportSpec(fileName);
+			IMPORTS_MAP[filename] = spec;
+			spec.status = "loading";
 			continue;
 		}
-		_loaderStats.pendingImports[this.stackId]++;
+		_loaderStats.pendingImports++;
 
-		IMPORTS_MAP[filename] = handler.importSpec(filename, this.stackId);
-		handler.load(filename, this);
+		IMPORTS_MAP[filename] = handler.importSpec(filename);
+		handler.load(filename, this, IMPORTS_MAP[filename]);
+	}
+},
+
+	onitemloaded : function(item){
+			var importSpec = IMPORTS_MAP[item];
+			if(_loaderStats.loadingIndicator) {
+				_loaderStats.loadingIndicator.update(0,1,item);
+			}
+			
+			//get current module context
+			var ctx = context(item);
+
+
+			/*
+			//execute import if no import dependencies are present
+			if(!importSpec.imports || importSpec.imports.length == 0) {
+				importSpec.execute();
+			}
+			*/
+			if(--_loaderStats.pendingImports == 0){
+				_loadingComplete();
+			}
 	}
 }
 
-AsyncLoader.prototype.onitemloaded = function(item){
-		var importSpec = IMPORTS_MAP[item];
-
-
-		if(_loaderStats.loadingIndicator) {
-			_loaderStats.loadingIndicator.update(0,1,item);
-		}
-
-/*
-		//execute import if no import dependencies are present
-		if(!importSpec.imports || importSpec.imports.length == 0) {
-			importSpec.execute();
-		}
-		*/
-		_loaderStats.pendingImports[this.stackId]--;
-
-		if(_loaderStats.pendingImports[this.stackId] == 0){
-			_loadingComplete(this.stackId);
-		}
-
-}
-
-function _loadingComplete(stackId){
+function _loadingComplete(){
 	log.debug("Loading is complete");
 	if(_loaderStats.loadingIndicator) {
 		_loaderStats.loadingIndicator.hide();
@@ -839,35 +834,82 @@ function _loadingComplete(stackId){
 
 	/* module loading is complete execute dependency tree*/
 	log.debug("Run dependency tree");
-	try {
-		executeImportsTree(stackId);
-	} catch(ex) {
-
-	}
-	var oncomplete = _loaderStats.oncomplete[stackId].pop();
+	
+	executeImportsTree();
+		
+	var oncomplete = _loaderStats.oncomplete.pop();
 	while(oncomplete){
 		if(typeof(oncomplete) == 'function') oncomplete();
-		oncomplete = _loaderStats.oncomplete[stackId].pop();
+		oncomplete = _loaderStats.oncomplete.pop();
 	}
+
+	// incase only prerequisites were processed check for other panding modules
+	continueLoading();
 }
 
-function executeImportSpec(importSpec){
-		if(typeof importSpec.execute  != "function") return;
+var dfsStack = [];
+function isDfsCycle(spec){
+	var isCycle = false;
+	for(var i=(dfsStack.length -2); i>=0; i--){
+		if(spec === dfsStack[i]) {
+			isCycle = true;
+			break;
+		}
+	}
+	if(!isCycle) return false;
+	//print cycle and throw exception
+	if(isCycle === true) {
+		for(var i=(dfsStack.length -1); i>=0; i--){
+			log.error(dfsStack[i].fileName);
+		}
+		throw 'Cyclical dependency';
+	}
+	return false;
+}
 
-		if(!importSpec.imports || importSpec.imports.length == 0) {
-				importSpec.execute();
-				return;
+/**
+ * @param {ImportSpec} importSpec 
+*/
+function executeImportSpec(importSpec){
+		if(importSpec.isProcessed  === true) return;
+		
+		if(isDfsCycle(importSpec)) {  
+			log.debug("Cycle detected");
+			return;
 		}
 
+		if( (!importSpec.prerequisites || importSpec.prerequisites.length ==0 ) &&
+			(!importSpec.imports || importSpec.imports.length == 0)) {
+			importSpec.execute();
+			return;
+		}
+
+		//run prerequisites first
+		if(importSpec.prerequisites)
+		for(var i=0; i< importSpec.prerequisites.length; i++){
+			var importUrl = importSpec.prerequisites[i];
+			dfsStack.push(IMPORTS_MAP[importUrl]);
+			executeImportSpec(IMPORTS_MAP[importUrl]);
+			dfsStack.pop();
+		}		
+
+		//run import modules
 		for(var i = 0; i < importSpec.imports.length; i++ ){
 			var importUrl = importSpec.imports[i];
-			executeImportSpec(IMPORTS_MAP[importUrl]);
+			var depSpec = IMPORTS_MAP[importUrl];
+			//import had not been loaded yet, exit
+			if(!depSpec) return;
+			dfsStack.push(depSpec);
+			executeImportSpec(depSpec);
+			dfsStack.pop();
 		}
 		importSpec.execute();
 }
 
-function executeImportsTree(stackId){
-
+/** 
+ * 
+ */
+function executeImportsTree(){
 	var result = [];
 	var keys = Object.keys(IMPORTS_MAP);
 	for(var key in keys ){
@@ -875,7 +917,6 @@ function executeImportsTree(stackId){
 		executeImportSpec(proc);
 	}
 	return result;
-
 }
 
 function _getModuleContext(){
@@ -888,18 +929,66 @@ function _getModuleContext(){
 	return ctx;
 }
 
+/**  
+ * Return a list of imports that are yet to be loaded
+ */
+function _pendingImports(spec){
+	if(spec.isProcessed) return null;
+	if(!spec.imports || spec.imports.length == 0) return null;
+
+	var result = [];
+	for(var i=0; i<spec.imports.length; i++){
+		var s = IMPORTS_MAP[spec.imports[i]];
+		if(!s) result.push(spec.imports[i]);
+	}
+
+	if(result.length == 0 ) return null;
+	return result;
+}
+
+function forMap(m,fn){
+	if(typeof(fn) != 'function') return;
+	var keys = Object.keys(m);
+	for(var key in keys ){
+		fn(IMPORTS_MAP[keys[key]]);
+	}
+}
+
+function continueLoading(){
+	forMap(IMPORTS_MAP, function(spec){
+		var imports = _pendingImports(spec);
+		if(!imports) return;
+		setTimeout(function(){
+			load(imports);
+		},1);
+	});
+}
+
+function isPendingPrerequisites(spec){
+	if(spec.isProcessed) return false;
+	if(!spec.prerequisites) return false;
+	var prereq = spec.prerequisites.resources; 
+	if(!prereq || prereq.length == 0) return false;
+	for(var i=0; i < prereq.length; i++){
+		var s = IMPORTS_MAP[prereq[i]];
+		if(!s) return true;
+	}
+	return false;
+}
+
 /*
 	Module processor
 */
 function ModuleSpec(scope,imports,m){
 	this.scope = scope;
-	this.imports = !imports || imports.resources;
+	this.imports = imports ? imports.resources : null;
 	this.namedImports = imports;
 	this.__sjs_module__ = m;
 }
 ModuleSpec.prototype.execute = function(){
-	this.execute = null;
-	applyImports.call(this.scope,this.namedImports.imports);
+	this.isProcessed = true;
+	if(this.namedImports && this.namedImports.imports)
+		applyImports.call(this.scope,this.namedImports.imports);
 	this.__sjs_module__.definition.bind(this.scope)(this.scope);
 }
 
@@ -908,6 +997,11 @@ ModuleSpec.prototype.execute = function(){
 	m - module descriptor
 */
 function _module(m){
+
+	if(typeof m === 'string') {
+		return IMPORTS_MAP[m];
+	}
+
 	var context = _getModuleContext();
 
 	/*init module scope*/
@@ -932,24 +1026,31 @@ function _module(m){
 	*/
 	var stackId = IMPORTS_MAP[context.source].stackId;
 
+	// create module spec
+	var spec = new ModuleSpec(scope,imports,m);
+	spec.stackId = stackId;
+	spec.prerequisites = prereqs;
+	spec.fileName = context.source;
+
+	//tell module scope about its imports
+	scope.__sjs_module_imports__ = imports;
+
 	/* get module proc for this module */
-	IMPORTS_MAP[context.source] = new ModuleSpec(scope,imports,m);
-	IMPORTS_MAP[context.source].stackId = stackId;
+	IMPORTS_MAP[context.source] = spec;
+
 
 	/*Load dependencies*/
-	if(prereqs) {
-		loadnew(prereqs.resources, function(){
-			!imports || load(imports.resources);
-		})
-	} else {
-		!imports || load(imports.resources);
+	if(isPendingPrerequisites(spec)) {
+		load(prereqs.resources);
+	} else if(imports) {
+		load(imports.resources);
 	}
 }
 
 _module.list= function list(){
 	return mixin({},IMPORTS_MAP);
   //  return mixin({},IMPORTS_MAP);
-};
+}
 
 _module.listProcessed = function listProcessed(){
 	var result = [];
@@ -958,7 +1059,7 @@ _module.listProcessed = function listProcessed(){
 		if(IMPORTS_MAP[keys[key]].isProcessed) result.push(IMPORTS_MAP[keys[key]]);
 	}
 	return result;
-};
+}
 
 _module.listPending = function listPending(){
 	var result = [];
@@ -969,24 +1070,20 @@ _module.listPending = function listPending(){
 		result.push(IMPORTS_MAP[keys[key]]);
 	}
 	return result;
-};
-
-/*special splash screen module*/
-_module.splash = function(m){
-		var context = _getModuleContext();
-
-		var stackId = IMPORTS_MAP[context.source].stackId;
-
-		IMPORTS_MAP[context.source] = {
-			stackId : stackId,
-			execute:function(){
-				var splash = m({sjs:mixin(Object.create(null),_core)});
-				_loaderStats.loadingIndicator  = new splash();
-			}
-		}
 }
 
-_module.extension = function(){
+/* special splash screen module */
+_module.splash = function(m){
+	var context = _getModuleContext();
+	var stackId = IMPORTS_MAP[context.source].stackId;
+	IMPORTS_MAP[context.source] = {
+		stackId : stackId,
+		execute:function(){
+			this.isProcessed = true;
+			var splash = m({sjs:mixin(Object.create(null),_core)});
+			_loaderStats.loadingIndicator  = new splash();
+		}
+	}
 }
 
 
@@ -996,14 +1093,11 @@ function addTo(s,t){
 		if(t[keys[key]]) continue;
 		t[keys[key]] = s[keys[key]];
 	}
-};
+}
 
 var extension = mixin(Object.create(null), {
 	loader: function(obj){
 		addTo(obj,_fileHandlers);
-	},
-	module: function(obj){
-		addTo(obj,_moduleHandlers);
 	}
 });
 
@@ -1036,6 +1130,8 @@ var _core = mixin(Object.create(null),{
 	extension   : extension,
  	log 		: log,
 	document	: document,
+	ImportSpec	: ImportSpec,
+	filext		:fileExt
 });
 
 var _debug = mixin(Object.create(null),{

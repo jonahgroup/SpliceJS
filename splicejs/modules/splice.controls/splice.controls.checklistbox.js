@@ -5,7 +5,9 @@
   Need a way to extend components including templates
 */
 sjs.module({
-type:'component',
+prerequisite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
   { Component		: '/{sjshome}/modules/splice.component.core.js'},

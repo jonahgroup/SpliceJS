@@ -1,9 +1,11 @@
 sjs.module({
-type:'component',
+prerequisite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Inheritance 	: '/{sjshome}/modules/splice.inheritance.js'},
 	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Events		: '/{sjshome}/modules/splice.event.js'},
 	'splice.controls.calendar.html',
 	'splice.controls.calendar.css'
 ],

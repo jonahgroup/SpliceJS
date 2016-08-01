@@ -1,14 +1,13 @@
 sjs.module({
-type:'component'
-,
+prerequisite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
-		{'SpliceJS.UI':'../splice.ui.js'},
-		{'SpliceJS.Controls':'splice.controls.selectors.js'},
-		{'SpliceJS.Controls':'splice.controls.checklistbox.js'},
-		'splice.controls.dropdownchecklist.html'
-]
-,
-
+	{'SpliceJS.UI':'../splice.ui.js'},
+	{'SpliceJS.Controls':'splice.controls.selectors.js'},
+	{'SpliceJS.Controls':'splice.controls.checklistbox.js'},
+	'splice.controls.dropdownchecklist.html'
+],
 definition:function(sjs){
 		"use strict";
 

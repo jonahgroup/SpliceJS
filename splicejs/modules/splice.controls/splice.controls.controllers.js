@@ -1,18 +1,18 @@
-/* global _*/
+/* global sjs*/
 sjs.module({
-type:'component'
-,
+prerequisite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Component: '/{sjshome}/modules/splice.component.core.js'},
-	{ Events: '/{sjshome}/modules/splice.event.js'},
-  { Async:    '/{sjshome}/modules/splice.async.js'},
-	{'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
+	{ Inheritance: 	'/{sjshome}/modules/splice.inheritance.js'},
+	{ Component: 	'/{sjshome}/modules/splice.component.core.js'},
+	{ Events: 		'/{sjshome}/modules/splice.event.js'},
+  	{ Async:    	'/{sjshome}/modules/splice.async.js'},
+	{'SpliceJS.UI':	'/{sjshome}/modules/splice.ui.js'},
 	 'splice.controls.controllers.html'
-]
-,
+],
 definition:function(scope){
-    "use strict";
+	"use strict";
 	var
         sjs = scope.sjs
     ,   imports = scope.imports
@@ -20,8 +20,8 @@ definition:function(scope){
 
 	var Class = imports.Inheritance.Class
 	,	Controller = imports.Component.Controller
-	, UIControl = imports.SpliceJS.UI.UIControl
-  , asyncLoop = imports.Async.asyncLoop
+	, 	UIControl = imports.SpliceJS.UI.UIControl
+  	, 	asyncLoop = imports.Async.asyncLoop
 	,	Events = imports.Events
 	;
 
@@ -32,7 +32,6 @@ definition:function(scope){
 		Events.attach(this,{
 			onStyleSelect : Events.MulticastEvent
 		});
-
 	}).extend(UIControl);
 
 	DomIterator.prototype.initialize = function(){
@@ -67,7 +66,6 @@ definition:function(scope){
 			//cache elements
 			this.elements.push(element);
 		}
-
 	};
 
 	DomIterator.prototype.onDataIn = function(dataItem){
@@ -97,9 +95,6 @@ definition:function(scope){
             return true;
 
         }.bind(this));
-
-
-
 
 /*
 		//create new elements
