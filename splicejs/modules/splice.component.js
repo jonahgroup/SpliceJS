@@ -33,6 +33,6 @@ definition:function(scope){
   scope.exports(
     DocumentApplication, 
     Controller, 
-    imports.Core.DefineComponents
+    imports.Core.defineComponents
   );
 }});

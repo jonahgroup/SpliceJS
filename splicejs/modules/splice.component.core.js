@@ -33,7 +33,7 @@ definition:function(scope){
 
   var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
 
-  function DefineComponents(scope,templateFile,componentMap){
+  function defineComponents(scope){
 	  //get all html imports in current scope
 	  var resources = scope.__sjs_module_imports__;
 	  for(var i in resources){
@@ -46,6 +46,7 @@ definition:function(scope){
 		  extractComponents.call(scope,m.dom);
 		  compileTemplates(scope);
 	  }
+	  return scope.__sjs_components__;
   };
 
   /*
@@ -283,7 +284,7 @@ definition:function(scope){
   	/**
   	 *	@scope|Namespace - component scope
   	 */
-  	Binding.prototype.getTargetInstance = function(originInstance, scope){
+  	Binding.prototype.getTargetInstance = function getTargetInstance(originInstance, scope){
 
   		switch(this._type){
 
@@ -297,7 +298,7 @@ definition:function(scope){
 
   				var	parent = originInstance;
   				// 1. component lookup
-  				var vartype = scope.components.lookup(this.vartype);
+  				var vartype = scope.__sjs_components__.lookup(this.vartype);
   				// 2. imports lookup
   				if(!vartype) vartype = scope.lookup(this.vartype);
   				// 3. target not found
@@ -779,7 +780,7 @@ definition:function(scope){
   		,	attributes = collectAttributes(node,RESERVED_ATTRIBUTES);
 
 
-  		var _type = '__inlineTemplate__'+(scope.components.sequence++)
+  		var _type = '__inlineTemplate__'+(scope.__sjs_components__.sequence++)
   		,	json = '';
 
   		if(attributes) attributes = ',' + attributes;
@@ -920,7 +921,7 @@ definition:function(scope){
   			var parent = instance;
         //find the type
   			//1. component lookup
-  			var vartype = scope.components.lookup(binding.vartype);
+  			var vartype = scope.__sjs_components__.lookup(binding.vartype);
   			//2. imports lookup
   			if(!vartype)
   				vartype = scope.lookup(binding.vartype);
@@ -1184,10 +1185,8 @@ definition:function(scope){
 
 
     scope.exports(
-      Template,
-      Controller,
-      DefineComponents,
-      compileTemplate,
+      Template, Controller, 
+	  defineComponents, compileTemplate,
       {Proxy:proxy}
     );
 

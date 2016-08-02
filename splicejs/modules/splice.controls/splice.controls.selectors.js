@@ -27,25 +27,25 @@ definition:function(scope){
 	,	dom         = imports.Doc.dom
 	,	UIControl   = imports.SpliceJS.UI.UIControl
 	,	Class       = imports.Inheritance.Class
-	, Controller  = imports.Component.Controller
+	, 	Controller  = imports.Component.Controller
 	,	Events      = imports.Events
-	, Views 			= imports.Views
+	, 	Views 		= imports.Views
 	,	display     = imports.Views.View.display
 	,	DomMulticastEvent = imports.Views.DomMulticastEvent
-	, DefineComponents = imports.Component.DefineComponents
-	, MulticastEvent = imports.Events.MulticastEvent
+	, 	Component = imports.Component
+	, 	MulticastEvent = imports.Events.MulticastEvent
 	;
-	//static single instance
-	var dropDownContainer = null//new scope.components.DropDownContainerResizable()
-	,	selectorElement = null;
-
+	
 	function _offFocusReaper(){
 		_hide();
 	};
 
 	//define components
-	var components = DefineComponents(scope,'splice.controls.selectors.html');
+	var components = Component.defineComponents(scope);
 
+	//static single instance
+	var dropDownContainer = new components.DropDownContainerResizable()
+	,	selectorElement = null;
 
 	//
 	var DropDownController = Class(function DropDownController(args){

@@ -21,23 +21,20 @@ required:[
 ,
 definition:function(scope){
 
-  var 
-    sjs = scope.sjs
-  , imports = scope.imports
-  , log = scope.sjs.log
+  var sjs = scope.sjs
+  ,   imports = scope.imports
+  ,   log = scope.sjs.log
   ;
 
-  var
-    Class = imports.Inheritance.Class
-  , Controller = imports.Component.Controller
-  , DefineComponents = imports.Component.DefineComponents
-  , Events = imports.Events
-  , MulticastEvent = imports.Events.MulticastEvent
+  var Class = imports.Inheritance.Class
+  ,   Controller = imports.Component.Controller
+  ,   Events = imports.Events
+  ,   MulticastEvent = imports.Events.MulticastEvent
+  ,   Component = imports.Component
   ;
 
-  var 
-    DataItem = imports.SpliceJS.Ui.DataItem
-  , ArrayDataItem = imports.SpliceJS.Ui.ArrayDataItem
+  var DataItem = imports.SpliceJS.Ui.DataItem
+  ,   ArrayDataItem = imports.SpliceJS.Ui.ArrayDataItem
   ;
 
   var provinces = [
@@ -85,7 +82,7 @@ definition:function(scope){
       name:'',isChecked:false
   });
 
-  var components = DefineComponents(scope);
+  var components = Component.defineComponents(scope);
 
   var ComponentsTest = Class(function ComponentsTest(){
     this.base();

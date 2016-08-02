@@ -20,17 +20,16 @@ definition:function(scope){
 	,	imports = scope.imports
 	;
 
-	var
-		Class = imports.Inheritance.Class
+	var	Class = imports.Inheritance.Class
 	,	Events = imports.Events
 	, 	MulticastEvent = imports.Events.MulticastEvent
 	,	DataItem = imports.Data.DataItem
 	,	UIControl = imports.SpliceJS.UI.UIControl
-	,	DefineComponents = imports.Component.DefineComponents
+	,	Component = imports.Component
 	;
 
 	
-	var components = DefineComponents(scope);
+	var components = Component.defineComponents(scope);
 	
 	/**
 	 * Drop down list

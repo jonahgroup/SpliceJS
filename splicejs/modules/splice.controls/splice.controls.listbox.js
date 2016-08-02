@@ -3,10 +3,11 @@ prerequisite:[
 	'/{sjshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Events      : '/{sjshome}/modules/splice.event.js'},
-	{ Views		  	: '/{sjshome}/modules/splice.view.js'},
-  	{ Async       : '/{sjshome}/modules/splice.async.js'},
+	{ Inheritance: 	'/{sjshome}/modules/splice.inheritance.js'},
+	{ Events: 		'/{sjshome}/modules/splice.event.js'},
+	{ Views: 		'/{sjshome}/modules/splice.view.js'},
+  	{ Async: 		'/{sjshome}/modules/splice.async.js'},
+	{ Component:	'/{sjshome}/modules/splice.component.core.js'},	
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	{'Doc':'/{sjshome}/modules/splice.document.js'},
@@ -17,24 +18,29 @@ required:[
 definition:function(scope){
 	"use strict";
 
-	var
-		sjs = scope.sjs
-  , log = scope.sjs.log
+	var	sjs = scope.sjs
+	, 	log = scope.sjs.log
 	,	debug =	scope.sjs.log.debug
 	,	components = scope.components
-	, imports = scope.imports
-  ;
+	, 	imports = scope.imports
+  	;
 
 	var	UIControl   = imports.SpliceJS.UI.UIControl
 	,	DataItem    = imports.SpliceJS.UI.DataItem
-	, Class       = imports.Inheritance.Class
-  , asyncLoop   = imports.Async.asyncLoop
+	, 	Class       = imports.Inheritance.Class
+  	, 	asyncLoop   = imports.Async.asyncLoop
 	,	dom         = imports.Doc.dom
 	,	View        = imports.Views.View
-	, Views 			= imports.Views
-	, MulticastEvent = imports.Events.MulticastEvent
-	, DomMulticastEvent = imports.Views.DomMulticastEvent
+	, 	Views 			= imports.Views
+	, 	MulticastEvent = imports.Events.MulticastEvent
+	, 	DomMulticastEvent = imports.Views.DomMulticastEvent
+	, 	Component = imports.Component
 	;
+
+
+	//define components
+	var components = Component.defineComponents(scope);
+
 
 	var ListBoxController = Class(function ListBoxController(){
 			this.base();
@@ -273,7 +279,6 @@ definition:function(scope){
 		else
 			return new components.StretchListBox(args);
 	});
-
 
 
 	scope.add(
