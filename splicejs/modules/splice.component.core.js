@@ -1,10 +1,5 @@
 sjs.module({
-/*
-  is a prerequisite for the module to load corredctly
-  prerequisite is run before the module imports are processed
-  and allows adding custom behavior to how imports are handled
-  starts a new loading stack
-*/
+
 required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
   { Networking  : '/{sjshome}/modules/splice.network.js'},
@@ -14,40 +9,40 @@ required:[
   { Views       : '/{sjshome}/modules/splice.view.js'},
   { Data        : '/{sjshome}/modules/splice.dataitem.js'}
 ],
+
 definition:function(scope){
-  "use strict";
-  var
-    imports = scope.imports
-  , log = scope.sjs.log
-  , sjs = scope.sjs
-  ;
+"use strict";
 
-  var 
-  	http = imports.Networking.http
-  , doc = imports.Document
-  , Tokenizer = imports.Syntax.Tokenizer
-  , View = imports.Views.View
-  , DataItem = imports.Data.DataItem
-  , DataItemStub = imports.Data.DataItemStub
-  ;
+var imports = scope.imports
+, 	log = scope.sjs.log
+, 	sjs = scope.sjs
+;
 
-  var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
+var http = imports.Networking.http
+, 	doc = imports.Document
+, 	Tokenizer = imports.Syntax.Tokenizer
+, 	View = imports.Views.View
+, 	DataItem = imports.Data.DataItem
+, 	DataItemStub = imports.Data.DataItemStub
+;
 
-  function defineComponents(scope){
-	  //get all html imports in current scope
-	  var resources = scope.__sjs_module_imports__;
-	  for(var i in resources){
-		  var ext = sjs.filext(resources[i].url); 
-		  if( ext !== '.html') continue;
+var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
 
-		  var key = resources[i].url;
-		  var m = sjs.module(key);
+function defineComponents(scope){
+	//get all html imports in current scope
+	var resources = scope.__sjs_module_imports__;
+	for(var i in resources){
+		var ext = sjs.filext(resources[i].url); 
+		if( ext !== '.html') continue;
 
-		  extractComponents.call(scope,m.dom);
-		  compileTemplates(scope);
-	  }
-	  return scope.__sjs_components__;
-  };
+		var key = resources[i].url;
+		var m = sjs.module(key);
+
+		extractComponents.call(scope,m.dom);
+		compileTemplates(scope);
+	}
+	return scope.__sjs_components__;
+};
 
   /*
   ----------------------------------------------------------

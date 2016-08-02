@@ -201,14 +201,15 @@ definition:function(scope){
 	};
 
 
-
 	
-	var
-		Class 	    = imports.Inheritance.Class
+	
+	var	Class 	    = imports.Inheritance.Class
 	,	event		= imports.Events.event
-	, Controller 	= imports.Component.Controller
+	, 	Controller 	= imports.Component.Controller
+	,	Component 	= imports.Component
 	;
 
+	var components = Component.defineComponents(scope);
 
 	var Calendar = Class(function CalendarController(){
 		this.base();

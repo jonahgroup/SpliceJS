@@ -14,14 +14,12 @@ definition:function component(scope){
 "use strict";
 
 // importing framework features makes our code less verbose
-var 
-	debug = scope.sjs.log.debug
+var debug = scope.sjs.log.debug
 , 	log = scope.sjs.log
 , 	imports = scope.imports
 ;
 
-var
-	Class			= imports.Inheritance.Class
+var	Class			= imports.Inheritance.Class
 , 	Animate 		= imports.Animation.Animate
 , 	Controller 		= imports.Component.Controller
 , 	Events 			= imports.Events

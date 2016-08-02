@@ -1,4 +1,5 @@
-sjs.module.splash(  function(scope){
+sjs.module({
+definition:function(scope){
   var document = scope.sjs.document;
 
   var style = "position:absolute; left:0px; top:0px; right:0px; bottom:0px; transition:opacity 0.4s;     background-color: rgba(10,10,10,0.8);";
@@ -56,9 +57,23 @@ sjs.module.splash(  function(scope){
     update:function(complete,total,itemName){
       if(!itemName) return;
       this.label.innerHTML = itemName.substring(itemName.lastIndexOf('/')+1);
-
     }
   };
 
-  return Splash;
-});
+  //singletop splashscreen
+  var splash = scope.sjs.setLoadingIndicator(new Splash());
+ 
+
+  function showSplash(){
+    splash.show();
+  }
+
+  function hideSplash(){
+    splash.hide();
+  }
+
+  scope.exports(showSplash, hideSplash);
+
+  showSplash();
+
+}});

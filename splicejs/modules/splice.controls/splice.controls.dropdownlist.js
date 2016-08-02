@@ -1,6 +1,9 @@
 sjs.module({
+/*
+	DropdownList control 
+*/
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+	'/{sjshome}/modules/splice.module.extensions.js'
 ],
 required:[
 	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
@@ -11,8 +14,7 @@ required:[
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
 	{'SpliceJS.Controls':'splice.controls.listbox.js'},
 	'splice.controls.dropdownlist.html'
-]
-,
+],
 definition:function(scope){
 	"use strict";
 

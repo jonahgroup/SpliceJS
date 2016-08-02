@@ -1,6 +1,6 @@
 global.sjs.module({
 prerequisite:[
-  '../SplashScreens/splash2.js',
+  {Splash:'../SplashScreens/splash2.js'},
   '/{sjshome}/modules/splice.module.extensions.js'
 ],
 required:[
@@ -31,6 +31,7 @@ definition:function(scope){
   ,   Events = imports.Events
   ,   MulticastEvent = imports.Events.MulticastEvent
   ,   Component = imports.Component
+  ,   Splash = imports.Splash
   ;
 
   var DataItem = imports.SpliceJS.Ui.DataItem
@@ -106,11 +107,11 @@ definition:function(scope){
   };
 
   ComponentsTest.prototype.onDisplay = function(){
-     this.onNewProvince(newProvince);
-      this.onProvinces(provinces2);
-      this.onChartsData(charts);
-      this.onScatterChartData(scatterChart);
-      this.onTestCheck(this.sourceTestCheck);
+    this.onNewProvince(newProvince);
+    this.onProvinces(provinces2);
+    this.onChartsData(charts);
+    this.onScatterChartData(scatterChart);
+    this.onTestCheck(this.sourceTestCheck);
   }
 
   ComponentsTest.prototype.addProvince = function(){
@@ -127,7 +128,7 @@ definition:function(scope){
   },
 
   ComponentsTest.prototype.provinceSelected = function(item){
-      console.log('Selected province is:' + item);
+    console.log('Selected province is:' + item);
   }
 
   ComponentsTest.prototype.deleteItem = function(item){
@@ -184,6 +185,6 @@ definition:function(scope){
     ComponentsTest, foo, testDataItem, components
   );
 
+  Splash.hideSplash();
   new imports.Component.DocumentApplication(scope).run();
-
 }});
