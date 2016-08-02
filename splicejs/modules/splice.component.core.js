@@ -35,12 +35,12 @@ definition:function(scope){
 
   function DefineComponents(scope,templateFile,componentMap){
 	  //get all html imports in current scope
-	  var resources = scope.__sjs_module_imports__.resources;
+	  var resources = scope.__sjs_module_imports__;
 	  for(var i in resources){
-		  var ext = sjs.filext(resources[i]); 
+		  var ext = sjs.filext(resources[i].url); 
 		  if( ext !== '.html') continue;
 
-		  var key = sjs.context(scope.__sjs_uri__.path).resolve(resources[i]);
+		  var key = resources[i].url;
 		  var m = sjs.module(key);
 
 		  extractComponents.call(scope,m.dom);

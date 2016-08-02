@@ -1,11 +1,11 @@
 sjs.module({
 required:[
-    { Networking  : '/{sjshome}/modules/splice.network.js'}
+  { Networking  : '/{sjshome}/modules/splice.network.js'}
 ],
 definition:function(scope){
-  var imports = scope.imports; 
-  var http = imports.Networking.http;
-  var ImportSpec = scope.sjs.ImportSpec;
+  var imports = scope.imports 
+  ,   http = imports.Networking.http
+  ,   ImportSpec = scope.sjs.ImportSpec;
     /*
     ----------------------------------------------------------
       HTML File Handler
@@ -65,7 +65,7 @@ definition:function(scope){
         linkref.onload = function(){
           if(!linkref.readyState || linkref.readyState == 'complete') {
           //	URL_CACHE[filename] = true;
-            loader.onitemloaded();
+            loader.onitemloaded(filename);
           }
         };
         head.appendChild(linkref);

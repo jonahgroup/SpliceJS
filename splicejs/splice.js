@@ -80,7 +80,6 @@ try {
 			splash:		main.getAttribute('sjs-splash'),
 			version:	main.getAttribute('sjs-version'),
 			mode:		main.getAttribute('sjs-start-mode'),
-			loadMode: 	main.getAttribute('sjs-load-mode'),
       		debug:    	main.getAttribute('sjs-debug') == 'true' ? true:false
 		});
 
@@ -93,13 +92,6 @@ try {
 				//async load here
 		}
 	};
-
-	/* checks if parallel script loading can be used */
-	function _allowAsync(){
-		//return false;
-		if(config.loadMode === 'sync') return false;
-		return !(document['currentScript'] === undefined);
-	}
 
 	function mixin(_t, _s){
 		if(!_s) return _t;
@@ -400,7 +392,7 @@ try {
 			var head = document.head || document.getElementsByTagName('head')[0];
 			var script = document.createElement('script');
 			script.setAttribute("type", "text/javascript");
-			if(_allowAsync()) script.setAttribute("async","");
+			script.setAttribute("async","");
 			script.setAttribute("src", filename);
 
 			script.onload = script.onreadystatechange = function(){
@@ -414,23 +406,6 @@ try {
 	};
 
 
-	function detectCircular(loader,print){
-		//examine stack of loaders to resolve cicular dependencies
-		for(var i=0; i < Loader.loaders.length; i++){
-			var l = Loader.loaders[i];
-			if(print){
-				log.debug(i + ': ' + l.currentFile);
-				continue;
-			}
-			if(l == loader) continue; //ignore current loader
-			if(loader.currentFile == l.currentFile) {
-				log.debug('----------- Loader stack -----------------')
-				detectCircular(loader,true);
-				throw "Circular module dependecy detected, please resolve";
-			}
-		}
-	}
-
 	/*
 		Loads resources on existing stack
 	*/
@@ -442,9 +417,7 @@ try {
 			if(!isAbsUrl(resources[i]))
 				resources[i] = ctx.resolve(resources[i]);
 		}
-
-		if(_allowAsync()) new AsyncLoader(resources,oncomplete).load();
-		else new SyncLoader(resources,oncomplete).load();
+		new AsyncLoader(resources,oncomplete).load();
 	}
 
 	/*
@@ -552,7 +525,7 @@ try {
 			r.resources.push(url);
 			r.imports.push({namespace:ns, url:url});
 		}
-		return r;
+		return r.imports;
 	}
 
 
@@ -626,34 +599,7 @@ try {
 var IMPORTS_MAP = new Object(null);
 
 
-/*
-function _module(m){
-    var loader = Loader.currentLoader;
 
-    if(this instanceof Loader) loader = this;
-
-    var scope = new Namespace(null); //our module scope
-    var path = context(loader.currentFile).path;
-    var url = loader.currentFile;
-
-		log.debug("a: " + document.currentScript.src);
-		log.debug("b: " + url)
-		log.debug("c: " + document.scripts[document.scripts.length - 1].src);
-		log.debug("-------------------------------------------------");
-
-    scope.__sjs_uri__ = {path:path, url:url };
-    scope.add('__sjs_file__',url);
-		scope.add('sjs',mixin(Object.create(null),_core),true);
-    scope.add('exports',_exports(scope));
-    scope.add('context',context(path));
-
-    scope.add('load',(function load(r,c){
-        return loadModule({required:r, definition:c},this,null);
-    }).bind(scope) ,true)
-
-    return loadModule(m,scope,url);
-};
-*/
 
 
 /*------------------------------------------------------------------------*/
@@ -682,86 +628,19 @@ var _loaderStats = {
 		if(_loaderStats.loadingIndicator) {
 			_loaderStats.loadingIndicator.update(0,1,item);
 		}
-	}
-
+	},
+	moduleSpec:null
 };
 
-/*
-	Synchronized loader, loads imports sequentially
-*/
-function SyncLoader(resources, oncomplete){
-	this.resources = resources;
-	this.oncomplete = oncomplete;
-	this.pending = resources.length;
 
-	if(typeof oncomplete == 'function')
-		_loaderStats.oncomplete.push(oncomplete);
-}
-
-SyncLoader.prototype.load = function(){
-	if(this.resources.length == 0) return;
-	_loaderStats.showLoadingIndicator();
-	if(_loaderStats.loaders.push(this) == 1)	SyncLoader.loadNext();
-}
-
-
-SyncLoader.prototype.nextResource = function(){
-	if(this.pending == 0 ) return null;
-	var resource = this.resources[this.resources.length - this.pending];
-	this.pending--;
-	return resource;
-}
-
-SyncLoader.loadNext = function(){
-	var loader = peek(_loaderStats.loaders);
-	if(!loader) return;
-
-	var filename = loader.nextResource();
-	if(!filename) {
-		SyncLoader.syncOnItemLoaded(filename);
-		return;
+function to(array,fn){
+	if(typeof fn != 'function') return [];
+	var result = []
+	,	keys = Object.keys(array);
+	for(var key in keys ){
+		result.push(fn(array[keys[key]]));
 	}
-	var mapped = IMPORTS_MAP[filename];
-	if(mapped) {
-		SyncLoader.loadNext();
-		return;
-	}
-
-	var handler = _fileHandlers[fileExt(filename)];
-
-	if(!handler){
-		//default import spec
-			IMPORTS_MAP[filename] = new ImportSpec();
-			SyncLoader.loadNext();
-			return;
-	}
-
-	IMPORTS_MAP[filename] = handler.importSpec(filename);
-
-	_loaderStats.pendingImports++;
-	handler.load(filename, loader);
-}
-
-SyncLoader.prototype.onitemloaded = function(item){
-	_loaderStats.pendingImports--;
-	SyncLoader.syncOnItemLoaded(item);
-}
-
-SyncLoader.syncOnItemLoaded = function(item){
-	_loaderStats.updateLoadingIndicator(item);
-	var loader = peek(_loaderStats.loaders);
-
-	if(loader.pending == 0)	{
-		_loaderStats.loaders.pop();
-	}
-
-	//we are done here all files have been loaded
-	if(	_loaderStats.pendingImports == 0 &&
-			_loaderStats.loaders.length == 0) {
-				_loadingComplete();
-				return;
-			}
-	SyncLoader.loadNext();
+	return result;
 }
 
 /*
@@ -792,7 +671,7 @@ AsyncLoader.prototype = {
 		var handler = _fileHandlers[fileExt(filename)];
 		if(!handler) {
 			//default import spec
-			var spec = new ImportSpec(fileName);
+			var spec = new ImportSpec(filename);
 			IMPORTS_MAP[filename] = spec;
 			spec.status = "loading";
 			continue;
@@ -805,19 +684,50 @@ AsyncLoader.prototype = {
 },
 
 	onitemloaded : function(item){
-			var importSpec = IMPORTS_MAP[item];
+			var spec = IMPORTS_MAP[item] = (_loaderStats.moduleSpec || IMPORTS_MAP[item]);
+			 
+			if(!spec) {
+				log.error("wtf no spec");
+			}
+
 			if(_loaderStats.loadingIndicator) {
 				_loaderStats.loadingIndicator.update(0,1,item);
 			}
 			
 			//get current module context
 			var ctx = context(item);
+			
+			//process ModuleSpec
+			if(spec instanceof ModuleSpec){
+				
+				//set scope URI
+				spec.scope.__sjs_uri__ = item; 
+				
 
+				//resolve prerequisites
+				var prereqs = spec.prerequisites = _dependencies(spec.__sjs_module__.prerequisite,ctx);
+				
+
+				//	resolve required resources relative to
+				//	current context
+				var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.required,ctx);
+				
+
+				//Load dependencies
+				if(isPendingPrerequisites(prereqs)) {
+					load(to(prereqs,function(i){return i.url}));
+				} else if(imports) {
+					load(to(imports,function(i){return i.url}));
+				}
+			}
+
+			//clear current module spec, resource loaded next maybe not be a module
+			_loaderStats.moduleSpec = null;
 
 			/*
 			//execute import if no import dependencies are present
-			if(!importSpec.imports || importSpec.imports.length == 0) {
-				importSpec.execute();
+			if(!spec.imports || spec.imports.length == 0) {
+				spec.execute();
 			}
 			*/
 			if(--_loaderStats.pendingImports == 0){
@@ -887,16 +797,15 @@ function executeImportSpec(importSpec){
 		//run prerequisites first
 		if(importSpec.prerequisites)
 		for(var i=0; i< importSpec.prerequisites.length; i++){
-			var importUrl = importSpec.prerequisites[i];
-			dfsStack.push(IMPORTS_MAP[importUrl]);
-			executeImportSpec(IMPORTS_MAP[importUrl]);
+			var preq = importSpec.prerequisites[i];
+			dfsStack.push(IMPORTS_MAP[preq.url]);
+			executeImportSpec(IMPORTS_MAP[preq.url]);
 			dfsStack.pop();
 		}		
 
 		//run import modules
 		for(var i = 0; i < importSpec.imports.length; i++ ){
-			var importUrl = importSpec.imports[i];
-			var depSpec = IMPORTS_MAP[importUrl];
+			var depSpec = IMPORTS_MAP[importSpec.imports[i].url];
 			//import had not been loaded yet, exit
 			if(!depSpec) return;
 			dfsStack.push(depSpec);
@@ -919,15 +828,6 @@ function executeImportsTree(){
 	return result;
 }
 
-function _getModuleContext(){
-	var ctx = null;
-	if(_allowAsync) ctx =  context(document.currentScript.src);
-	else
-	ctx = context(document.scripts[document.scripts.length-1].src);
-
-	log.debug("module path:"); log.debug(ctx);
-	return ctx;
-}
 
 /**  
  * Return a list of imports that are yet to be loaded
@@ -938,7 +838,7 @@ function _pendingImports(spec){
 
 	var result = [];
 	for(var i=0; i<spec.imports.length; i++){
-		var s = IMPORTS_MAP[spec.imports[i]];
+		var s = IMPORTS_MAP[spec.imports[i].url];
 		if(!s) result.push(spec.imports[i]);
 	}
 
@@ -959,18 +859,15 @@ function continueLoading(){
 		var imports = _pendingImports(spec);
 		if(!imports) return;
 		setTimeout(function(){
-			load(imports);
+			load(to(imports,function(i){return i.url}));
 		},1);
 	});
 }
 
-function isPendingPrerequisites(spec){
-	if(spec.isProcessed) return false;
-	if(!spec.prerequisites) return false;
-	var prereq = spec.prerequisites.resources; 
+function isPendingPrerequisites(prereq){
 	if(!prereq || prereq.length == 0) return false;
 	for(var i=0; i < prereq.length; i++){
-		var s = IMPORTS_MAP[prereq[i]];
+		var s = IMPORTS_MAP[prereq[i].url];
 		if(!s) return true;
 	}
 	return false;
@@ -979,16 +876,14 @@ function isPendingPrerequisites(spec){
 /*
 	Module processor
 */
-function ModuleSpec(scope,imports,m){
+function ModuleSpec(scope,m){
 	this.scope = scope;
-	this.imports = imports ? imports.resources : null;
-	this.namedImports = imports;
 	this.__sjs_module__ = m;
 }
 ModuleSpec.prototype.execute = function(){
 	this.isProcessed = true;
-	if(this.namedImports && this.namedImports.imports)
-		applyImports.call(this.scope,this.namedImports.imports);
+	if(this.imports)
+		applyImports.call(this.scope,this.imports);
 	this.__sjs_module__.definition.bind(this.scope)(this.scope);
 }
 
@@ -1002,49 +897,17 @@ function _module(m){
 		return IMPORTS_MAP[m];
 	}
 
-	var context = _getModuleContext();
-
 	/*init module scope*/
 	var scope = new Namespace(null);
-	scope.__sjs_uri__ = {path:context.path, url:context.source };
+//	scope.__sjs_uri__ = {path:context.path, url:context.source };
 	scope.add('sjs',mixin(Object.create(null),_core),true);
 	scope.add('exports',_exports(scope));
 
-	/*
-		resolve required resources relative to
-		current context
-	*/
-	var	imports = _dependencies(m.required,context);
-
-	/*
-		resolve prerequisites
-	*/
-	var prereqs = _dependencies(m.prerequisite,context);
-
-	/*
-		which stack are we loading on?
-	*/
-	var stackId = IMPORTS_MAP[context.source].stackId;
-
 	// create module spec
-	var spec = new ModuleSpec(scope,imports,m);
-	spec.stackId = stackId;
-	spec.prerequisites = prereqs;
-	spec.fileName = context.source;
+	_loaderStats.moduleSpec = new ModuleSpec(scope,m);
 
-	//tell module scope about its imports
-	scope.__sjs_module_imports__ = imports;
-
-	/* get module proc for this module */
-	IMPORTS_MAP[context.source] = spec;
-
-
-	/*Load dependencies*/
-	if(isPendingPrerequisites(spec)) {
-		load(prereqs.resources);
-	} else if(imports) {
-		load(imports.resources);
-	}
+	// //tell module scope about its imports
+	// scope.__sjs_module_imports__ = imports;
 }
 
 _module.list= function list(){
@@ -1074,10 +937,7 @@ _module.listPending = function listPending(){
 
 /* special splash screen module */
 _module.splash = function(m){
-	var context = _getModuleContext();
-	var stackId = IMPORTS_MAP[context.source].stackId;
-	IMPORTS_MAP[context.source] = {
-		stackId : stackId,
+	_loaderStats.moduleSpec = {
 		execute:function(){
 			this.isProcessed = true;
 			var splash = m({sjs:mixin(Object.create(null),_core)});

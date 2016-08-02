@@ -71,7 +71,7 @@ definition:function(scope){
 
 
 	var PullOutPanel = Class( function PullOutPanelController(){
-		this.super();
+		this.base();
 	}).extend(UIControl);
 
 

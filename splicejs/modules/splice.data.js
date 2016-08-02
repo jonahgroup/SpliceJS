@@ -87,7 +87,7 @@ definition:function(scope){
 	 *
 	 */
 	var NumericIterator = Class(function NumericIterator(n,callback){
-		this.super(callback);
+		this.base(callback);
 		this.n = n;
 		this.position = 0;
 		this.length = n;
@@ -123,7 +123,7 @@ definition:function(scope){
 	 * Wraps callback around target iterator
 	 */
 	var NestedIterator = Class(function NestedIterator(iterator,callback){
-		this.super(callback);
+		this.base(callback);
 		this.iterator = iterator;
 		this.length = iterator.length;
 	}).extend(Iterator);
@@ -148,7 +148,7 @@ definition:function(scope){
 	 * Iterates over array elements
 	 */
 	var ArrayIterator = Class(function ArrayIterator(array,callback){
-		this.super(callback);
+		this.base(callback);
 		this.array = array;
 		this.position = 0;
 		this.length = array.length;
@@ -182,7 +182,7 @@ definition:function(scope){
 		Creates paged view of the source iterator
 	*/
 	var PagingIterator = Class(function PagingIterator(source, pagesize,callback){
-		this.super(callback);
+		this.base(callback);
 		this.i = source;
 		this.size = pagesize;
 		this.page = 0;
@@ -231,7 +231,7 @@ definition:function(scope){
 	 * Creates frame view of the source iterator
 	 */
 	 var FrameXIterator = Class(function FrameXIterator(source, size, step, callback){
-		this.super(callback);
+		this.base(callback);
 		this.i = source;
 
 		this.length = size;
@@ -271,7 +271,7 @@ definition:function(scope){
 	  *	Breaks up collection into ranges
 	  */
 	var RangeIterator = Class(function RangeIterator(source, start, size, callback){
-		this.super(callback);
+		this.base(callback);
 		this.length = size;
 		this.i = source;
 
@@ -302,7 +302,7 @@ definition:function(scope){
 	 * Iterates over object properties
 	 */
 	var ObjectIterator = Class(function ObjectIterator(obj, callback){
-		this.super(callback);
+		this.base(callback);
 		this.obj = obj;
 		this.keys = Object.keys(obj);
 		this.position = 0;
@@ -326,7 +326,7 @@ definition:function(scope){
 	/**
 	 * */
 	var FrameArrayIterator = Class(function FrameArrayIterator(array, start, end, transformFunction){
-		this.super(array, transformFunction);
+		this.base(array, transformFunction);
 		this.position = start;
 		this.initialFrozenPosition = start;
 		this.endPosition = Math.min(end, this.array.length);
@@ -349,7 +349,7 @@ definition:function(scope){
 	/**
 	 * */
 	var FrameIterator = Class(function FrameIterator(array, size, step, transformFunction){
-		this.super(transformFunction);
+		this.base(transformFunction);
 		this.data 	= array;
 		this.size 	= size;
 		this.step 	= step || Math.ceil(this.data.length * 0.2);
