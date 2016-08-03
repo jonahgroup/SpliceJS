@@ -485,6 +485,42 @@ function _vercomp(v1,v2){
 }
 
 
+
+function qualifyImport(url){
+	var parts = url.split('|');
+	//nothing to qualify its just a URL
+	if(parts.length == 1) return url;
+	
+	//unable to qualify url since config version is not present
+	if(!config.version) return null;
+	
+	//version qualifier
+	var regex = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/;
+
+	//parse config version
+	var rc = regex.exec(config.version);
+	//no mercy for invalid syntax
+	if(!rc) throw 'Invalid version configuration parameter: ' + config.version;
+
+	//only version quallifier is supported
+	//qualify version at parts[0]
+	var r = regex.exec(_trim(parts[0]));
+	
+	//no mercy for invalid syntax	
+	if(r == null) throw 'Invalid version qualifier: ' + url; 
+
+	//target platform
+	var v = {target : r[1],	min : r[2], max : r[4] || r[2]=='*'?'*':r[4]}; 
+	var vc = {target : rc[1], min : rc[2], max : rc[4]};
+
+	//targets dont match
+	if((v.target || null) != (vc.target || null)) return null;
+
+	var pass = (_vercomp(v.min, vc.min) <= 0 &&  _vercomp(v.max, vc.min) >= 0);
+	if(pass) 	return _trim(parts[parts.length -1]);
+	return null;
+}
+
 function _dependencies(items, ctx){
 	if(!items || items.length <= 0) return null;
 	var r = {resources:[], imports:[]},
@@ -496,16 +532,20 @@ function _dependencies(items, ctx){
 		//name space includes
 		if(typeof(item)  == 'object'){
 			for(var key in item){
-			if(item.hasOwnProperty(key)) {
-				url = item[key];
-				ns = key;
-				break;
-			}
+				if(item.hasOwnProperty(key)) {
+					url = item[key];
+					ns = key;
+					break;
+				}
 			}
 		}  //no namespace includes
 		else {
 			url = item;
 		}
+
+		//check if import qualifes based on the url modifiers |
+		if(!(url = qualifyImport(url))) continue;
+
 		//this means that our url is relative to application context
 		//i.e. absolute to application's base url
 		if(url[0] == '/') {

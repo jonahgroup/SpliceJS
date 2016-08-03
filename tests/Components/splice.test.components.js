@@ -14,9 +14,12 @@ required:[
   {Events : '/{sjshome}/modules/splice.event.js'},
   {'SpliceJS.Ui':'/{sjshome}/modules/splice.ui.js'},
   {'SpliceJS.Controls':'/{sjshome}/modules/splice.component.controls.js'},
-  'splice.test.components.css',
+  
+  'desktop:*|splice.test.components.css',
+  'mobile:*|splice.test.components.mobile.css',
+  'mobile:*|splice.test.components.mobile.meta',
   'splice.test.components.html',
-  'splice.test.components.templates.html'
+  
 ]
 ,
 definition:function(scope){

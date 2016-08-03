@@ -71,9 +71,41 @@ definition:function(scope){
         head.appendChild(linkref);
       }
     }
+
+  /*
+    Meta Handler
+  */
+  var metaHandler = {
+    importSpec:function(filename,stackId){
+      return new ImportSpec();
+    },
+    load:function(filename, loader, spec){
+      http.get({
+          url: filename,
+          onok:function(response){
+            
+            var metaJson = JSON.parse(response.text);
+            var head = document.head || document.getElementsByTagName('head')[0];
+            
+            for(var i=0; i<metaJson.length; i++){
+              var meta = document.createElement('meta');
+              var keys = Object.keys(metaJson[i]);
+              for(var key in keys){
+                meta.setAttribute(keys[key],metaJson[i][keys[key]]);
+              }  
+              head.appendChild(meta);
+            }
+            loader.onitemloaded(filename);
+          }
+      });
+    }
+  };
+
+
     sjs.extension.loader({
       '.css' : cssHandler,
-      '.html': htmlHandler
+      '.html': htmlHandler,
+      '.meta': metaHandler
     });
 
 }

@@ -6,14 +6,11 @@ required:[
 ],
 definition:function(scope){
 
-  var 
-    imports = scope.imports
-  ;
+  var imports = scope.imports;
 
-  var
-    Class = imports.Inheritance.Class
-    ComponentTemplate = imports.Core.Template
-    Controller = imports.Core.Controller
+  var Class = imports.Inheritance.Class
+  ,   ComponentTemplate = imports.Core.Template
+  ,   Controller = imports.Core.Controller
   ;
 
   var DocumentApplication = Class(function DocumentApplication(_scope){
