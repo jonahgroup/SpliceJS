@@ -30,7 +30,6 @@ definition:function(scope){
 	, 	Controller  = imports.Component.Controller
 	,	Events      = imports.Events
 	, 	Views 		= imports.Views
-	,	display     = imports.Views.View.display
 	,	DomMulticastEvent = imports.Views.DomMulticastEvent
 	, 	Component = imports.Component
 	, 	MulticastEvent = imports.Events.MulticastEvent
@@ -97,8 +96,8 @@ definition:function(scope){
 
 
 	function _hide() {
-	    display.clear(dropDownContainer);
-			selectorElement.class('-sjs-dropdown-open').remove();
+	    dropDownContainer.remove();
+		selectorElement.class('-sjs-dropdown-open').remove();
 	};
 
 
@@ -146,7 +145,7 @@ definition:function(scope){
 
 		//append drop down to the document root
 		// add content to the content element
-		display(dropDownContainer).content(this.dropDownItemInst).replace();
+		dropDownContainer.display().content(this.dropDownItemInst).replace();
 
 
 		left = pos.x;

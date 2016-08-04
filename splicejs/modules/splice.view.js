@@ -67,7 +67,6 @@ definition:function(scope){
     return nodes;
   };
 
-
 	function _propertyValueLocator(path){
 				var npath = path.split('.')
 				,	result = this;
@@ -98,28 +97,23 @@ definition:function(scope){
 	};
 
 
-  	function display(view){
-  		if(view instanceof Controller) {
-  			document.body.appendChild(view.views.root.htmlElement);
-  			view.onAttach();
-  			view.onDisplay();
-  			return view;
-  		}
-  		if(view instanceof View){
-  			document.body.appendChild(view.htmlElement);
-  			return view;
-  		}
-  	};
+function display(view,target){
+	target = target || document.body;
+	
+	if(target instanceof View)
+		target = target.htmlElement;
+	
+	target.appendChild(view.htmlElement);
+	return view;
+	
+}
 
+function remove(view){
+
+}
 
   	display.clear = function(view) {
   		if(!view) return {display : display};
-
-  		if(view instanceof Controller ){
-  			if(view.views.root.htmlElement.parentNode === document.body)
-  				document.body.removeChild(view.views.root.htmlElement);
-  			return {display : display };
-  		}
 
   		if(view instanceof View ){
   			document.body.removeChild(view.htmlElement);

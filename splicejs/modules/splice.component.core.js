@@ -318,91 +318,114 @@ function defineComponents(scope){
 
 
 
-  /**
-  	Controller class
-  */
-  function Controller(){
+/** 
+ * Base controller class that handles component's lifecycle
+*/
+function Controller(){
+	this.views = {};
+	if(!this.children)	this.children = [];
+  	if(!this.__sjs_visual_children__) this.__sjs_visual_children__ = [];
+};
 
-  		this.views = {};
+Controller.prototype = {
+	onAttach : function(){
+		//Controller is attached to the DOM
+	},
+	onDisplay : function(){
+		//Controller is being displayed
+	},
+	onRemove : function(){
+		//Called when component is removed from the DOM tree
+	},
+	onDispose : function(){
+		//Controller is being disposed
+	}
+}
 
-  		if(!this.children)	this.children = [];
-  		if(!this.__sjs_visual_children__) this.__sjs_visual_children__ = [];
-  	};
+Controller.prototype.toString = function(){
+	return getFunctionName(this.constructor);
+};
+
+Controller.prototype.initialize = function(){
+	var fn = sjs.fname(this.constructor)
+	if(fn === 'Controller') return;
+	log.warn(fn + '.initialize is not implemented');
+};
+/** 
+ * Display target must be either a view or another controller
+ * If target is a controller instance then current root 
+ * is added to the targets root by default or into location
+ * specified under sjs-element attribute when target is a view
+ * */	
+Controller.prototype.display = function(target){
+	if(target instanceof Controller)
+		target = target.views.root; 	
+
+	View.display(this.views.root,target);
+
+	this.onAttach();	
+	this.onDisplay();
+	if(!this.children) return;
+		for(var i=0; i< this.children.length; i++){
+		var child = this.children[i];
+		if(typeof child.onAttach === 'function')
+			child.onAttach();
+		if(typeof child.onDisplay === 'function')
+			child.onDisplay();
+	}
+	return this;	
+}
+
+Controller.prototype.remove = function(){
+
+}
+
+Controller.prototype.reflow = function(){
+
+} 
+
+function abandonVisualParent(controller){
+	var children = controller.__sjs_visual_parent__.__sjs_visual_children__;
+	for(var i=0; i < children.length; i++){
+		if(children[i] == controller) children.splice(i,1);
+		break;
+	}
+	controller.__sjs_visual_parent__ = null;
+};
+
+function gainVisualParent(controller,parent){
+	controller.__sjs_visual_parent__ = parent;
+	var children = parent.__sjs_visual_children__;
+	for(var i=0; i<children.length; i++){
+		if(children[i] == controller) return;
+	}
+	children.push(controller);
+};
 
 
-    Controller.prototype.onAttach = function(){
-      if(!this.children) return;
+function decodeContent(content){
+	if(typeof content === 'string'){
+		return document.createTextNode(content);
+	}
 
-      for(var i=0; i< this.children.length; i++){
-        var child = this.children[i];
-        child.__sjs_is_attached__ = this.__sjs_is_attached__;
-        if(typeof child.onAttach === 'function')
-          child.onAttach();
-      }
-    };
+	if(typeof content === 'number'){
+		return document.createTextNode(content);
+	}
 
-    Controller.prototype.onDisplay = function(){
-      
-      if(!this.children) return;
-      for(var i=0; i< this.children.length; i++){
-        var child = this.children[i];
-        if(typeof child.onDisplay === 'function')
-          child.onDisplay();
-      }
-    };
+	if(content instanceof Controller){
+		//update visual parent
+//		abandonVisualParent(content);
+//		gainVisualParent(content, this);
+		return content.views.root;
+	}
 
-  	Controller.prototype.toString = function(){
-  		return getFunctionName(this.constructor);
-  	};
+	return null;
+};
 
-  	Controller.prototype.initialize = function(){
-  		var fn = sjs.fname(this.constructor)
-  		if(fn === 'Controller') return;
-  		log.warn(fn + '.initialize is not implemented');
-  	};
-
-  	function abandonVisualParent(controller){
-  		var children = controller.__sjs_visual_parent__.__sjs_visual_children__;
-  		for(var i=0; i < children.length; i++){
-  			if(children[i] == controller) children.splice(i,1);
-  			break;
-  		}
-  		controller.__sjs_visual_parent__ = null;
-  	};
-
-  	function gainVisualParent(controller,parent){
-  		controller.__sjs_visual_parent__ = parent;
-  		var children = parent.__sjs_visual_children__;
-  		for(var i=0; i<children.length; i++){
-  			if(children[i] == controller) return;
-  		}
-  		children.push(controller);
-  	};
-
-
-  	function decodeContent(content){
-  		if(typeof content === 'string'){
-  			return document.createTextNode(content);
-  		}
-
-  		if(typeof content === 'number'){
-  			return document.createTextNode(content);
-  		}
-
-  		if(content instanceof Controller){
-  			//update visual parent
-  	//		abandonVisualParent(content);
-  	//		gainVisualParent(content, this);
-  			return content.views.root;
-  		}
-
-  		return null;
-  	};
-
-  	function invalidateContent(){
-  		this._lastWidth = null;
-  		this._lastHeight = null;
-  	};
+function invalidateContent(){
+	this._lastWidth = null;
+	this._lastHeight = null;
+};
 
   /*
   if(content instanceof Controller ){
@@ -417,75 +440,75 @@ function defineComponents(scope){
 
   */
 
-  	function _applyContent(content, key, callback){
-  		var view = this.views.root;
-  		var result = 0;
+function _applyContent(content, key, callback){
+	var view = this.views.root;
+	var result = 0;
 
-  		if(content == null) return result;
+	if(content == null) return result;
 
-  		if(key != null && view.contentMap[key] == null)
-  			return result = -1;
+	if(key != null && view.contentMap[key] == null)
+		return result = -1;
 
-  		//proxy content
-  		if(content.__sjs_isproxy__ === true ){
-  			return _applyContent.call(this,new content({parent:this}), key, callback);
-  		}
+	//proxy content
+	if(content.__sjs_isproxy__ === true ){
+		return _applyContent.call(this,new content({parent:this}), key, callback);
+	}
 
-  		//no content map, simple view, default map must be present
-  		if(content instanceof Controller) {
-  			if(!content.views || !content.views.root) return this;
-  			callback.call(view,content.views.root, key);
-  			return result;
-  		}
-  		callback.call(view, content, key);
-  		return result;
-  	}
+	//no content map, simple view, default map must be present
+	if(content instanceof Controller) {
+		if(!content.views || !content.views.root) return this;
+		callback.call(view,content.views.root, key);
+		return result;
+	}
+	callback.call(view, content, key);
+	return result;
+}
 
-  	function _controllerContentMapper(content,callback){
-  		if(content == null) return;
-  		var type = typeof(content),
-  		isContent = 0;
+function _controllerContentMapper(content,callback){
+	if(content == null) return;
+	var type = typeof(content),
+	isContent = 0;
 
-   		if( type == 'object' &&
-  			 !(content instanceof Controller) && !(content instanceof View) ) {
-  		  // composed content, represented by content object's properties
-  			var keys = Object.keys(content);
-  			if(!keys || keys.length < 1) {
-  				_applyContent.call(this,content.toString(), null, callback);
-  				return;
-  			}
-  			for(var i=0; i<keys.length; i++){
-  				isContent +=_applyContent.call(this,content[keys[i]], keys[i], callback);
-  			}
-  			if(isContent < 0){
-  				_applyContent.call(this,content.toString(), null, callback);
-  			}
-  			return this;
-  		}
-  		_applyContent.call(this,content, null, callback);
-  		return this;
-  	};
+	if( type == 'object' &&
+			!(content instanceof Controller) && !(content instanceof View) ) {
+		// composed content, represented by content object's properties
+		var keys = Object.keys(content);
+		if(!keys || keys.length < 1) {
+			_applyContent.call(this,content.toString(), null, callback);
+			return;
+		}
+		for(var i=0; i<keys.length; i++){
+			isContent +=_applyContent.call(this,content[keys[i]], keys[i], callback);
+		}
+		if(isContent < 0){
+			_applyContent.call(this,content.toString(), null, callback);
+		}
+		return this;
+	}
+	_applyContent.call(this,content, null, callback);
+	return this;
+};
 
-  	//set content of the controller
-  	Controller.prototype.content = function(content){
-  		var self = this;
-  		return {
-  			replace: function(){_controllerContentMapper.call(self,content, View.replaceContent)},
-  			add: 		 function(){_controllerContentMapper.call(self,content, View.addContent)},
-  			remove:  function(){_controllerContentMapper.call(self,content, View.removeContent)}
-  		}
-  	};
+//set content of the controller
+Controller.prototype.content = function(content){
+	var self = this;
+	return {
+		replace: function(){_controllerContentMapper.call(self,content, View.replaceContent)},
+		add: 		 function(){_controllerContentMapper.call(self,content, View.addContent)},
+		remove:  function(){_controllerContentMapper.call(self,content, View.removeContent)}
+	}
+};
 
-  	//iterate over children and release event listeners
-  	Controller.prototype.dispose = function(){
-  			for(var i=0; i<this.children.length; i++){
-  				var child = this.children[i];
-  				if(child instanceof Controller){
-  					child.dispose();
-  				}
-  			}// end for children
-  			log.info('releasing events');
-  	};
+//iterate over children and release event listeners
+Controller.prototype.dispose = function(){
+	for(var i=0; i<this.children.length; i++){
+		var child = this.children[i];
+		if(child instanceof Controller){
+			child.dispose();
+		}
+	}// end for children
+	log.info('releasing events');
+};
 
 
   	function Template(dom){
