@@ -104,12 +104,12 @@ function display(view,target){
 		target = target.htmlElement;
 	
 	target.appendChild(view.htmlElement);
+	view.visualParent = target;
 	return view;
-	
 }
 
 function remove(view){
-
+	view.visualParent.removeChild(view.htmlElement);
 }
 
   	display.clear = function(view) {
@@ -492,6 +492,7 @@ function remove(view){
   };
 
   View.display = display;
+	View.remove = remove;
 
   View.prototype.add = View.addContent;
   View.prototype.replace = View.replaceContent;

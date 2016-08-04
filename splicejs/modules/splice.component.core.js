@@ -377,7 +377,8 @@ Controller.prototype.display = function(target){
 }
 
 Controller.prototype.remove = function(){
-
+	View.remove(this.views.root);
+	this.onRemove();
 }
 
 Controller.prototype.reflow = function(){
