@@ -26,8 +26,11 @@ definition:function(scope){
 	, 	Events = imports.Events
 	, 	MulticastEvent = imports.Events.MulticastEvent
 	, 	Views = imports.Views
+	,	Component = imports.Component
 	, 	DomMulticastEvent = imports.Views.DomMulticastEvent
 	;
+
+	var components = Component.defineComponents(scope);
 
 
 	var Button = Class(function ButtonController(args){

@@ -31,7 +31,8 @@ definition:function(scope){
   	, 	asyncLoop   = imports.Async.asyncLoop
 	,	dom         = imports.Doc.dom
 	,	View        = imports.Views.View
-	, 	Views 			= imports.Views
+	, 	Views 		= imports.Views
+	,	Events = imports.Events
 	, 	MulticastEvent = imports.Events.MulticastEvent
 	, 	DomMulticastEvent = imports.Views.DomMulticastEvent
 	, 	Component = imports.Component

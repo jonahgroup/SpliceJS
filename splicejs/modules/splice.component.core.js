@@ -29,6 +29,7 @@ var http = imports.Networking.http
 var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
 
 function defineComponents(scope){
+	if(!scope) throw 'scope parameter is expected';
 	//get all html imports in current scope
 	var resources = scope.__sjs_module_imports__;
 	for(var i in resources){
@@ -53,6 +54,7 @@ function defineComponents(scope){
  	 * Object descriptor
 	 * @type: data type of the object to be created
 	 * @parameters:	parameters to be passed to the object behind proxy
+	 * Proxy comes with scope attached in its closure 
 	 * */
 	var proxy = function proxy(args){
 		/*
@@ -339,6 +341,12 @@ Controller.prototype = {
 	},
 	onDispose : function(){
 		//Controller is being disposed
+	},
+	onBindingsReady : function(){
+		//Bindings have been resolved
+	},
+	onTemplateReady : function(){
+		//Template is ready and child controls are initialized
 	}
 }
 
@@ -1153,9 +1161,9 @@ Controller.prototype.dispose = function(){
   			var obj = new controller(args);
 
   			obj.__sjs_type__ = template.type;
-        obj.__sjs_visual_children__ = [];
-        obj.__sjs_args__ = args;
-        obj.children = [];
+        	obj.__sjs_visual_children__ = [];
+        	obj.__sjs_args__ = args;
+        	obj.children = [];
   			obj.scope = scope;
 
   			/*
@@ -1167,11 +1175,13 @@ Controller.prototype.dispose = function(){
   			 * Bind declarative parameters
   			 */
   			bindDeclarations(args, obj, args._includer_scope);
-  			/*
+  			obj.onBindingsReady();
+			  
+			/*
   				Instantiate Template
   			*/
    			template.getInstance(obj, args, scope);
-
+			obj.onTemplateReady();   
 
   			obj.initialize();
   			//controller.apply(obj, [args]);

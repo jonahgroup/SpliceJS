@@ -35,6 +35,7 @@ definition:function(scope){
 	
 	/**
 	 * Drop down list
+	 * sjs-include parameters are passed as constructor arguments
 	 * */
 	var DropDownListController = Class(function DropDownListController(args){
 		this.base();
@@ -43,10 +44,11 @@ definition:function(scope){
 			onDropDown 		: MulticastEvent,
 			onListData 		: MulticastEvent,
 			onDataItem 		: MulticastEvent,
-			onItemSelected: MulticastEvent,
+			onItemSelected	: MulticastEvent,
 		});
 
 		this.selectedItemPath = null;
+		this.selectorItem = args.selectorItemTemplate;
 
 	}).extend(UIControl);
 
@@ -60,9 +62,14 @@ definition:function(scope){
 			this.children.selector.close();
 		},this);
 
-		if(this.defaultSelectedItem){
-			this.children.selector.dataIn(new DataItem(this.defaultSelectedItem));
+		if(this.selectorItem){
+			this.children.selector.setItemTemplate(this.selectorItem);
 		}
+
+		if(this.defaultSelectedItem){
+			//this.children.selector.dataIn(new DataItem(this.defaultSelectedItem));
+		}
+
 
 	};
 

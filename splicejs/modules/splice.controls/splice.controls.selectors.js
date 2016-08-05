@@ -43,7 +43,7 @@ definition:function(scope){
 	var components = Component.defineComponents(scope);
 
 	//static single instance
-	var dropDownContainer = new components.DropDownContainerResizable()
+	var dropDownContainer = null
 	,	selectorElement = null;
 
 	//
@@ -64,10 +64,10 @@ definition:function(scope){
 
 
 	DropDownController.prototype.initialize = function(){
-			/*
-					Subscribe to onclick instead of mousedown, because firing mousedown
-					will immediately execute event within dropDown() closing the dropdown
-			*/
+		/*
+		Subscribe to onclick instead of mousedown, because firing mousedown
+		will immediately execute event within dropDown() closing the dropdown
+		*/
 		Events.attach(this.views.root,{
 			onmousedown : Views.DomMulticastStopEvent
 		})
@@ -75,13 +75,19 @@ definition:function(scope){
 			this.dropDown();
 		},this);
 
-	};
+		//create instance of dropdown container
+		dropDownContainer = new components.DropDownContainerResizable();
+	}
+
+	DropDownController.prototype.setItemTemplate = function(tmpl){
+		this.content(tmpl).replace();
+	}
 
 	DropDownController.prototype.dataIn = function(data){
 		if(this.itemTemplate){
-				var item = this.itemTemplate({parent:this});
-				item.dataIn(data);
-				return;
+			var item = this.itemTemplate({parent:this});
+			item.dataIn(data);
+			return;
 		}
 		UIControl.prototype.dataIn.call(this,data);
 	};

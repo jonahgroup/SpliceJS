@@ -8,20 +8,21 @@ required:[
 ,
 definition:function(scope){
 
-  var
-    sjs = scope.sjs
-  , imports = scope.imports
+  var	sjs = scope.sjs
+  , 	imports = scope.imports
   ;
 
-  var
-    Tokenizer = imports.Syntax.Tokenizer
-    Document = imports.Document
-    Class = imports.Inheritance.Class
-    Events = imports.Events
+  var Tokenizer = imports.Syntax.Tokenizer
+  , 	Document = imports.Document
+  ,  	Class = imports.Inheritance.Class
+  ,  	Events = imports.Events
   ;
 
-  function dfs(dom, target, filterFn, nodesFn){
-    if(!dom) return;
+	/**
+	 * Runs Depth-First-Search on DOM tree 
+	 */
+	function dfs(dom, target, filterFn, nodesFn){
+  	if(!dom) return;
 
     if(typeof filterFn === 'function') {
       var node = filterFn(dom);
@@ -29,7 +30,6 @@ definition:function(scope){
     } else {
       target.push(dom);
     }
-
 
     var children = [];
     if(typeof nodesFn === 'function'){
@@ -43,15 +43,14 @@ definition:function(scope){
       var n = dom.childNodes[i];
       dfs(n,target,filterFn, nodesFn);
     }
-  };
+	}
 
   function selectNodes(dom,filterFn, nodesFn){
-    var nodes = new Array();
+  	var nodes = new Array();
     dfs(dom,nodes,filterFn, nodesFn);
     if(nodes.length < 1) nodes = null;
     return nodes;
-  };
-
+  }
 
   function selectTextNodes(dom,filterFn){
     var nodes = new Array();
