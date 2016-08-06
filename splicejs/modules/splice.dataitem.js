@@ -307,7 +307,7 @@ definition:function(scope){
       Module private methods
     */
     function _path(dataItem, path){
-      if(path == null || path === '') return dataItem;
+      if(!path || path == null || path === '') return dataItem;
 
       var source = _recGetSource(dataItem,0);
       var parts = path.toString().split('.');

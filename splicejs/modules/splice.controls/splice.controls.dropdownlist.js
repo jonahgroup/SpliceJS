@@ -94,7 +94,7 @@ definition:function(scope){
 	}
 
 	DropDownListController.prototype.listItemSelected = function(item){
-		this.children.selector.dataIn(item);
+		this.children.selector.dataIn(item.path(this.selectedItemPath));
 		this.children.selector.close();
 		this.onItemSelected(item);
 	}
