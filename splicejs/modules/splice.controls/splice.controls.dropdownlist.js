@@ -67,7 +67,7 @@ definition:function(scope){
 		}
 
 		if(this.defaultSelectedItem){
-			//this.children.selector.dataIn(new DataItem(this.defaultSelectedItem));
+			this.children.selector.dataIn(new DataItem(this.defaultSelectedItem));
 		}
 
 

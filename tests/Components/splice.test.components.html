@@ -73,12 +73,16 @@
   <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
     {
         defaultSelectedItem:'Select Province',
+      
         selectorItemTemplate:
         <sjs-include sjs-type="SpliceJS.Controls.Button">
         {
-            dataIn:binding('onDataOut').parent
+            trapMouseInput:true,
+            dataIn:binding('onDataOut').parent,
+            onClick:binding('showPopup').type('Components')
         }
         </sjs-include>,
+
         //selectedItemPath:'name',
         dataIn: binding('provincesOfProvinces.0').parent,
         onItemSelected: binding('provinceSelected').parent,

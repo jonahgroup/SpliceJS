@@ -51,7 +51,8 @@ definition:function(scope){
 		this.base(args);
 
 		Events.attach(this,{
-			onDropDown : Events.MulticastEvent
+			onDropDown : Events.MulticastEvent,
+			onDataOut:Events.MulticastEvent
 		});
 
 		this.dropDownItem = this.dropDownItem;
@@ -80,20 +81,18 @@ definition:function(scope){
 	}
 
 	DropDownController.prototype.setItemTemplate = function(tmpl){
+		this.itemTemplate = tmpl;
 		this.content(tmpl).replace();
 	}
 
 	DropDownController.prototype.dataIn = function(data){
-		if(this.itemTemplate){
-			var item = this.itemTemplate({parent:this});
-			item.dataIn(data);
-			return;
-		}
-		UIControl.prototype.dataIn.call(this,data);
+		this.onDataIn(data);
+		this.onDataOut(data);
 	};
 
 	DropDownController.prototype.onDataIn = function(item){
-		this.content(item.getValue()).replace();
+		if(!this.itemTemplate)
+			this.content(item.getValue()).replace();
 	};
 
 	DropDownController.prototype.close = function () {

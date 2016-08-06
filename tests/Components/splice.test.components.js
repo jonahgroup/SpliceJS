@@ -124,11 +124,11 @@ definition:function(scope){
 
   ComponentsTest.prototype.testCheck = function(item){
     console.log(item);
-  },
+  }
 
   ComponentsTest.prototype.provincesSelection = function(provinces){
     console.log(provinces);
-  },
+  }
 
   ComponentsTest.prototype.provinceSelected = function(item){
     console.log('Selected province is:' + item);
@@ -138,6 +138,10 @@ definition:function(scope){
     console.log(item);
     item.remove();
   };
+
+  ComponentsTest.prototype.showPopup = function(){
+    console.log('I am a popup');
+  }
 
   ComponentsTest.prototype.formatButton = function(item){
     var v = item.getValue();

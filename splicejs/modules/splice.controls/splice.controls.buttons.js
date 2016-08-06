@@ -95,18 +95,17 @@ definition:function(scope){
 
 	CheckBox.prototype.initialize = function(){
 		Events.attach(this.views.root,{
-			onclick 		:	DomMulticastEvent.stop,
-      onmousedown : DomMulticastEvent.stop
+			onclick 	:	Views.DomMulticastStopEvent,
+      		onmousedown : 	Views.DomMulticastStopEvent
 		}).onclick.subscribe(function(){
-				this.isChecked = !this.isChecked;
+			this.isChecked = !this.isChecked;
 
-				if(this.dataItem) {
-					this.dataItem.setValue(this.isChecked);
-				}
+			if(this.dataItem) {
+				this.dataItem.setValue(this.isChecked);
+			}
 
-				this.check(this.isChecked);
-				this.onChecked(this.dataItem);
-
+			this.check(this.isChecked);
+			this.onChecked(this.dataItem);
 		},this);
 	}
 
@@ -182,14 +181,15 @@ definition:function(scope){
 
 	TextField.prototype.initialize = function(){
 
-		event(this.views.root).attach({
-			onkeyup		:	event.unicast,
-			onchange 	: event.unicast
+		Events.attach(this.views.root, {
+			onkeyup		: Views.DomMulticastStopEvent,
+			onchange 	: Views.DomMulticastStopEvent
 		});
 
 		if(this.trapMouseInput === true){
-			event(this.views.root).attach({
-				onmousedown : event.unicast.stop
+			Events.attach(this.views.root, {
+				onmousedown : Views.DomMulticastStopEvent,
+				onclick:Views.DomMulticastStopEvent
 			});
 		}
 
