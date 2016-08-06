@@ -47,9 +47,6 @@ definition:function(scope){
     'Saskatchewan', 'Prince Edward Island','Newfoundland'
   ];
 
-  var provincesOfProvinces = [
-    provinces
-  ];
 
   var a = [
     {name:'Ontario', isChecked:false},
@@ -58,6 +55,11 @@ definition:function(scope){
       office:{address:{street:'king'}}},
     {name:'Quebec', isChecked:true}
   ];
+
+  var provincesOfProvinces = [
+    a
+  ];
+
 
   for(var i=0; i<10; i++){
       a.push({name:'Ontario ' + i, isChecked:false});

@@ -342,6 +342,9 @@ Controller.prototype = {
 	onDispose : function(){
 		//Controller is being disposed
 	},
+	onBeforeBinding : function(){
+		//Called just before binding resolution
+	},
 	onBindingsReady : function(){
 		//Bindings have been resolved
 	},
@@ -1174,6 +1177,7 @@ Controller.prototype.dispose = function(){
   			/*
   			 * Bind declarative parameters
   			 */
+			obj.onBeforeBinding();  
   			bindDeclarations(args, obj, args._includer_scope);
   			obj.onBindingsReady();
 			  

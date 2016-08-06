@@ -20,6 +20,7 @@ definition:function(scope){
 
 	var sjs = scope.sjs
 	,	imports = scope.imports
+	,	mixin = scope.sjs.mixin
 	;
 
 	var	Class = imports.Inheritance.Class
@@ -46,9 +47,12 @@ definition:function(scope){
 			onDataItem 		: MulticastEvent,
 			onItemSelected	: MulticastEvent,
 		});
-
+		
 		this.selectedItemPath = null;
-		this.selectorItem = args.selectorItemTemplate;
+	
+		
+		this.selectorItemTemplate = args.selectorItemTemplate;
+		this.listItemPath = args.listItemPath;
 
 	}).extend(UIControl);
 
@@ -62,14 +66,13 @@ definition:function(scope){
 			this.children.selector.close();
 		},this);
 
-		if(this.selectorItem){
-			this.children.selector.setItemTemplate(this.selectorItem);
+		if(this.selectorItemTemplate){
+			this.children.selector.setItemTemplate(this.selectorItemTemplate);
 		}
 
 		if(this.defaultSelectedItem){
 			this.children.selector.dataIn(new DataItem(this.defaultSelectedItem));
 		}
-
 
 	};
 

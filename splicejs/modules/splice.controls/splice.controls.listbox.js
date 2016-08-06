@@ -43,31 +43,30 @@ definition:function(scope){
 	var components = Component.defineComponents(scope);
 
 
-	var ListBoxController = Class(function ListBoxController(){
-			this.base();
-			this.listItems = [];
+	var ListBoxController = Class(function ListBoxController(args){
+		this.base();
+		this.listItems = [];
 
-			Events.attach(this,{
-				onListItem : MulticastEvent,
-				onDataItem : MulticastEvent,
-				onResize   : MulticastEvent
-			});
+		Events.attach(this,{
+			onListItem : MulticastEvent,
+			onDataItem : MulticastEvent,
+			onResize   : MulticastEvent
+		});
 	}).extend(UIControl);
 
 
 	ListBoxController.prototype.initialize = function(){
-			Events.attach(this.views.root, {
-				onmousedown	:	Views.DomMulticastStopEvent
-			}).onmousedown.subscribe(_itemClick,this);
+		Events.attach(this.views.root, {
+			onmousedown	:	Views.DomMulticastStopEvent
+		}).onmousedown.subscribe(_itemClick,this);
 
-			if(this.children.contentClient) {
-				this.dom = this.children.contentClient.views.root;
-			}
-			else {
-				this.dom = this.views.root;
-			}
-
-			if(!this.itemTemplate) this.itemTemplate = DefaultListItem;
+		if(this.children.contentClient) {
+			this.dom = this.children.contentClient.views.root;
+		}
+		else {
+			this.dom = this.views.root;
+		}
+		if(!this.itemTemplate) this.itemTemplate = DefaultListItem;
 	};
 
 	/**
@@ -96,8 +95,8 @@ definition:function(scope){
 	ListBoxController.prototype.dataItemChanged = function(item){
 		var i = item.fullPath().split('.')[0];
 		var di = null;
-		if(this.dataItemPath)
-			di = this.dataItem.path(i+'.'+this.dataItemPath);
+		if(this.listItemPath)
+			di = this.dataItem.path(i+'.'+this.listItemPath);
 		else
 			di = this.dataItem.path(i);
 
@@ -133,8 +132,8 @@ definition:function(scope){
 		// update existing items if any
 		for(var i=0; i<this.listItems.length; i++){
 			var item = this.listItems[i];
-			 if(this.dataItemPath)
- 			 	item.dataIn(dataItem.path(i+'.'+this.dataItemPath));
+			 if(this.listItemPath)
+ 			 	item.dataIn(dataItem.path(i+'.'+this.listItemPath));
  			 else
  			 	item.dataIn(dataItem.path(i));
 		}
@@ -147,8 +146,8 @@ definition:function(scope){
 
 				var itm = null;
 
-				if(this.dataItemPath)
-				 itm = dataItem.path(i+'.'+this.dataItemPath);
+				if(this.listItemPath)
+				 itm = dataItem.path(i+'.'+this.listItemPath);
 				else
 				 itm = dataItem.path(i);
 
@@ -169,8 +168,8 @@ definition:function(scope){
 				item = new this.itemTemplate({parent:this});
 				this.listItems.push(item);
 
-				if(this.dataItemPath)
-				 item.dataIn(dataItem.path(i+'.'+this.dataItemPath));
+				if(this.listItemPath)
+				 item.dataIn(dataItem.path(i+'.'+this.listItemPath));
 				else
 				 item.dataIn(dataItem.path(i));
 
