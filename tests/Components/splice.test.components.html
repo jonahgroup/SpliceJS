@@ -73,6 +73,21 @@
   <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
     {
         defaultSelectedItem:'Select Province',
+        selectedItemPath:'name',
+        listItemPath:'name',
+        dataIn: binding('provincesOfProvinces.0').parent,
+        onItemSelected: binding('provinceSelected').parent,
+        css:{list: 'test-drop-down-list'}
+    }
+  </sjs-include>
+</td>
+</tr>
+
+  <td>Templated ComboBox</td>
+  <td>
+  <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
+    {
+        defaultSelectedItem:'Select Province',
       
         selectorItemTemplate:
         <sjs-include sjs-type="SpliceJS.Controls.Button">
@@ -90,12 +105,29 @@
         css:{list: 'test-drop-down-list'}
     }
   </sjs-include>
+  <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
+    {
+        defaultSelectedItem:'Select Province',
+      
+        selectorItemTemplate:
+        <sjs-include sjs-type="SpliceJS.Controls.TextField">
+        {
+            trapMouseInput:true,
+            dataIn:binding('onDataOut').parent,
+            onClick:binding('showPopup').type('Components')
+        }
+        </sjs-include>,
 
-
-
-
+        selectedItemPath:'name',
+        listItemPath:'name',
+        dataIn: binding('provincesOfProvinces.0').parent,
+        onItemSelected: binding('provinceSelected').parent,
+        css:{list: 'test-drop-down-list'}
+    }
+  </sjs-include>
 </td>
 </tr>
+
 <!--
 
 <tr>

@@ -31,11 +31,14 @@ definition:function(scope){
 	,	Component = imports.Component
 	;
 
-	
+	/*
+		generate components based on template declaration
+		within template files .html
+	*/
 	var components = Component.defineComponents(scope);
 	
 	/**
-	 * Drop down list
+	 * DropDownList
 	 * sjs-include parameters are passed as constructor arguments
 	 * */
 	var DropDownListController = Class(function DropDownListController(args){
