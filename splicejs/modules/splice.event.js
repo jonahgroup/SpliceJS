@@ -16,6 +16,16 @@ definition:function(scope){
       Class = imports.Inheritance.Class
     ;
 
+    function Subscription(instance, callback){
+      this.instance = instance;
+      this.callback = callback;
+    }
+    Subscription.prototype = {
+      disable:function(){this.isDisabled = true;},
+      enable:function(){this.isDisabled = false;}
+    };
+
+
     /*
         ------------------------------------------------------------------------------
 
@@ -31,7 +41,6 @@ definition:function(scope){
         Events
     */
     var MulticastEvent = Class(function MulticastEvent(){
-
     }).extend(BaseEvent);
 
     MulticastEvent.prototype.attach = function(instance, property){
@@ -41,10 +50,7 @@ definition:function(scope){
     }
 
 
-
-
     var UnicastEvent = Class(function UnicastEvent(){
-
     }).extend(BaseEvent);
 
     UnicastEvent.prototype.attach = function(instance,property){
@@ -100,9 +106,10 @@ definition:function(scope){
       if(!_closure.callbacks) _closure.callbacks = [[]];
 
       var callbacks = _closure.callbacks[_closure.idx];
-      callbacks.push([callback, instance]);
+      var subs = new Subscription(instance,callback);
+      callbacks.push(subs);
 
-      return this.__sjs_owner__;
+      return subs;
     }
 
     function _multicastUnsubscribe(_closure,callback){
@@ -123,7 +130,8 @@ definition:function(scope){
       var callbacks = this.callbacks[this.idx];
 
       for(var key in callbacks){
-        callbacks[key][0].apply(callbacks[key][1],arguments);
+        if(callbacks[key].isDisabled === true) continue;
+        callbacks[key].callback.apply(callbacks[key].instance,arguments);
       }
     }
 
@@ -145,12 +153,14 @@ definition:function(scope){
 
     function _unicastSubscribe(_closure,callback,instance){
       if(!instance) instance = this.__sjs_owner__;
-      _closure[0] = [callback, instance];
-      return this.__sjs_owner__;
+      _closure[0] = new Subscription(instance,callback);
+      return _closure[0];
     }
 
     function _unicastRun(){
-      this[0][0].apply(this[0][1],arguments);
+      //do not run disabled subscriptions
+      if(this[0].isDisabled === true) return;
+      this[0].callback.apply(this[0].instance,arguments);
     }
 
 

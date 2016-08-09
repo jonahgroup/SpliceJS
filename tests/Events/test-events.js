@@ -2,16 +2,11 @@
 global.sjs.module({
 required:[
   {'Event':'/{sjshome}/modules/splice.event.js'}
-]
-,
+],
 definition:function(scope){
     "use strict";
-    var
-      log = scope.sjs.log
-    ;
-
-    var
-      event = scope.imports.Event;
+    var log = scope.sjs.log
+    ,   event = scope.imports.Event;
     ;
 
     var orders = [
@@ -22,19 +17,24 @@ definition:function(scope){
     function Test_EventsTest(){
         var instance = {};
 
-
         var x = event.attach(instance,{
           onBroadcast :event.MulticastEvent,
           onNotify    :event.UnicastEvent
         });
 
-        x.onBroadcast.subscribe(function(e){
+        var s1 = x.onBroadcast.subscribe(function(e){
+          log.info("Subscriber 0:" + e);
+        });
+        
+        var s2  = x.onNotify.subscribe(function(e){
           log.info("Subscriber 1:" + e);
-        }).onNotify.subscribe(function(e){
-          log.info("Subscriber:" + e);
-        }).onBroadcast.subscribe(function(e){
+        });
+        
+        var s3 = x.onBroadcast.subscribe(function(e){
           log.info("Subscriber 2:" + e);
         });
+
+        s2.disable();
 
         instance.onNotify("this is a test");
         instance.onBroadcast("this is a broadcast");
