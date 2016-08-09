@@ -89,8 +89,8 @@ definition:function(scope){
         if(callback == fnE) throw 'Recursive event subscription on ' + fname(instance.constructor) + ' "' + fname(callback)+'"';
         return _multicastSubscribe.call(fnE,_closure,callback,instance);
       };
-      fnE.unsubscribe = function(fn){
-        //log.error('Multicast event unsubsribe is not implemented');
+      fnE.unsubscribe = function(callback){
+        return _multicastUnsubscribe.call(fnE,_closure,callback);
       };
       return fnE;
     }
@@ -104,6 +104,19 @@ definition:function(scope){
 
       return this.__sjs_owner__;
     }
+
+    function _multicastUnsubscribe(_closure,callback){
+      if(!_closure.callbacks) return;
+      var callbacks = _closure.callbacks[_closure.idx];
+      for(var i = callbacks.length-1; i >= 0; i--){
+        if(callbacks[i][0] == callback) { 
+          callbacks.splice(i,1);
+          return; 
+        }
+      }
+    }
+
+
 
     function _multicastRun(){
       if(!this.callbacks) return;

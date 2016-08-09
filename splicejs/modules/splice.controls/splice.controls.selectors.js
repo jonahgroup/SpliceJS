@@ -88,6 +88,11 @@ definition:function(scope){
 			this.content(item.getValue()).replace();
 	};
 
+	DropDownController.prototype.onDataItemChanged = function(item){
+		this.onDataIn(item);
+	};
+
+
 	DropDownController.prototype.close = function () {
 	    _hide();
 	};

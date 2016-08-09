@@ -117,7 +117,8 @@ var	Class			= imports.Inheritance.Class
 		// invoke data-item handler
 		this.onDataIn(this.dataItem);
 		//pass dataItem forward to other listening controls
-		this.onDataOut(this.dataItem);
+		if(typeof this.onDataOut === 'function')
+			this.onDataOut(this.dataItem);
 	};
 
   UIControl.prototype.onDataItemChanged = function(){}

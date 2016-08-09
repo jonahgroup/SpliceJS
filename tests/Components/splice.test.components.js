@@ -60,6 +60,10 @@ definition:function(scope){
     a
   ];
 
+  var b = [
+    {name:'Pffff', isChecked:false},
+    {name:'Pffff', isChecked:false}
+  ];
 
   for(var i=0; i<10; i++){
       a.push({name:'Ontario ' + i, isChecked:false});
@@ -126,6 +130,14 @@ definition:function(scope){
 
   ComponentsTest.prototype.testCheck = function(item){
     console.log(item);
+  }
+
+  ComponentsTest.prototype.changeDataSet = function(){
+    // var t = this.provincesOfProvinces.path('0.1.name');
+    // console.log(t.getValue());
+    
+    // t.setValue("Changed by controller");
+    this.provincesOfProvinces.setValue([b]);
   }
 
   ComponentsTest.prototype.provincesSelection = function(provinces){
