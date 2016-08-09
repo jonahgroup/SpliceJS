@@ -78,6 +78,9 @@ definition:function(scope){
 		this.content(item.getValue()).replace();
     };
 
+	Button.prototype.onDataItemChanged = function(){
+		this.content(this.dataItem.getValue()).replace();
+	};
 
 	/**
 	 *
@@ -193,7 +196,7 @@ definition:function(scope){
 			});
 		}
 
-		if(this.isRealTime){
+		if(this.isRealtime){
 			this.views.root.onkeyup.subscribe(_textFieldOnKey, this);
 		}
 		else {

@@ -39,12 +39,12 @@ var	Class			= imports.Inheritance.Class
 	var UIControl = Class(function UIControl(args){
 		this.base(args);
 
-    if(args) this.observeDataItem = args.observeDataItem;
+    	if(args) this.observeDataItem = args.observeDataItem;
 
 		Events.attach(this, {
-			onDataOut : MulticastEvent,
+			onDataOut 	: MulticastEvent,
 			onReflow 	: MulticastEvent,
-      onStyle 	: MulticastEvent
+      		onStyle 	: MulticastEvent
 		});
 
 		//data attachment point
@@ -54,7 +54,7 @@ var	Class			= imports.Inheritance.Class
 			this.prevDisplayState = this.elements.root.style.display;
 			this.views.root.style.display = 'none';
 		}
-		this.dataItem = new DataItemStub(this.onDataItemChanged,this);
+		
 	}).extend(Controller).implement(IDataContract);
 
 	UIControl.prototype.hide = function(){
@@ -101,12 +101,26 @@ var	Class			= imports.Inheritance.Class
 	/*!!!!! make sure to unsubscribe when data items changes */
 	UIControl.prototype.dataIn = function(item){
 
+		//unsubscribed from existing dataitem
+		if(this.dataItem) {
+			this.dataItem.unsubscribe(this.onDataItemChanged);
+		}
+
 		// datapath is only set externally
 		this.dataItem = item;
-				// invoke data-item handler
-		this.onDataIn(this.dataItem);
 
+		//track dataitem if flag is set
+		if(this.observeDataItem === true) {
+			this.dataItem.subscribe(this.onDataItemChanged,this);
+		}
+
+		// invoke data-item handler
+		this.onDataIn(this.dataItem);
+		//pass dataItem forward to other listening controls
+		this.onDataOut(this.dataItem);
 	};
+
+  UIControl.prototype.onDataItemChanged = function(){}
 
   UIControl.prototype.processStyle = function(style){
         if(style == null || style == undefined) return;

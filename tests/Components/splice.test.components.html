@@ -73,6 +73,7 @@
   <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
     {
         defaultSelectedItem:'Select Province',
+        observeDataItem:true,
         selectedItemPath:'name',
         listItemPath:'name',
         dataIn: binding('provincesOfProvinces.0').parent,
@@ -93,6 +94,7 @@
         <sjs-include sjs-type="SpliceJS.Controls.Button">
         {
             trapMouseInput:true,
+            observeDataItem:true,
             dataIn:binding('onDataOut').parent,
             onClick:binding('showPopup').type('Components')
         }
@@ -113,6 +115,7 @@
         <sjs-include sjs-type="SpliceJS.Controls.TextField">
         {
             trapMouseInput:true,
+            isRealtime:true,
             dataIn:binding('onDataOut').parent,
             onClick:binding('showPopup').type('Components')
         }

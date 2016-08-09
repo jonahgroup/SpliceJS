@@ -5,11 +5,11 @@ required:[
 ],
 definition:function(scope){
     "use strict";
-    var
-      sjs = scope.sjs
-    , fname = scope.sjs.fname
-    , imports = scope.imports
-    , mixin = scope.sjs.mixin
+    var sjs = scope.sjs
+    ,   fname = scope.sjs.fname
+    ,   imports = scope.imports
+    ,   mixin = scope.sjs.mixin
+    ,   log = scope.sjs.log
     ;
 
     var
@@ -88,7 +88,10 @@ definition:function(scope){
       fnE.subscribe = function(callback,instance){
         if(callback == fnE) throw 'Recursive event subscription on ' + fname(instance.constructor) + ' "' + fname(callback)+'"';
         return _multicastSubscribe.call(fnE,_closure,callback,instance);
-      }
+      };
+      fnE.unsubscribe = function(fn){
+        //log.error('Multicast event unsubsribe is not implemented');
+      };
       return fnE;
     }
 

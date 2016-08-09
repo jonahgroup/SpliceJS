@@ -193,9 +193,11 @@ definition:function(scope){
         item.parent.eventmap[item._path] = item;
         item = item.parent;
       }
-
     };
 
+    DataItem.prototype.unsubscribe = function(fn){
+      if(this.onChange) this.onChange.unsubscribe(fn);
+    };
 
 
     /**

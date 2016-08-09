@@ -11,8 +11,7 @@ required:[
 	{'Doc'          : '/{sjshome}/modules/splice.document.js'},
 	'splice.controls.selectors.css',
 	'splice.controls.selectors.html'
-]
-,
+],
 definition:function(scope){
 	"use strict";
 
@@ -51,8 +50,7 @@ definition:function(scope){
 		this.base(args);
 
 		Events.attach(this,{
-			onDropDown : Events.MulticastEvent,
-			onDataOut:Events.MulticastEvent
+			onDropDown : Events.MulticastEvent
 		});
 
 		this.dropDownItem = this.dropDownItem;
@@ -61,7 +59,7 @@ definition:function(scope){
 		this.dropDownContainerSize = {left:0,top:0};
 		this.dataPath = '';
 
-	}).extend(Controller);
+	}).extend(UIControl);
 
 
 	DropDownController.prototype.initialize = function(){
@@ -84,11 +82,6 @@ definition:function(scope){
 		this.itemTemplate = tmpl;
 		this.content(tmpl).replace();
 	}
-
-	DropDownController.prototype.dataIn = function(data){
-		this.onDataIn(data);
-		this.onDataOut(data);
-	};
 
 	DropDownController.prototype.onDataIn = function(item){
 		if(!this.itemTemplate)
