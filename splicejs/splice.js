@@ -50,7 +50,7 @@ var _pd_ = '/'; //WEB
 if(_platform_ == 'UNX') _pd_ = '/';
 else if(_platform_ == 'WIN') _pd_ = '\\';
 
-//_not_pd_ is used for in-string replacement must be properly escaped
+//_not_pd_ is used for in-string replacement must be correctly escaped
 var _not_pd_ = _pd_ == '/'?'\\\\':'/';
 
 var config = {platform: _platform_};
@@ -69,7 +69,7 @@ function loadConfiguration(onLoad){
 
 	// splice js script must have sjs-main attribute
 	if(main == null) {
-		log.warn('Application entry module is not defined.');
+		log.warn('Application entry point is not defined.');
 		return;
 		//throw "SpliceJS script element must have 'sjs-main' attribute";
 	}
@@ -260,7 +260,7 @@ if(contextUrl) {
 
 if(!ctx && config.appBase) ctx = config.appBase;
 
-	if(ctx != null && ctx && ctx[ctx.length-1] != _pd_)
+	if(ctx != null && ctx && ctx.substr(ctx.length-1) != _pd_)
 		throw 'Context URL must end with "'+ _pd_ +'"';
 
 	return {
@@ -559,73 +559,6 @@ function _dependencies(items, ctx){
 		r.imports.push({namespace:ns, url:url});
 	}
 	return r.imports;
-}
-
-
-function _required(m,ctx){
-	var r = {resources:[], imports:[]};
-    if(!m || (!m.required && !m.version)) return r;
-
-	var items = [];
-	//all required
-	if(m.required instanceof Array) items = m.required;
-
-
-    var appCtx = context(config.appBase);
-
-	//versioned required
-	if(typeof m.version == 'object' && config.version){
-		var v = _parseVersion(config.version);
-      	//extract versions
-		var keys = Object.keys(m.version);
-      	var versions = [];
-		for(var key in keys){
-        	versions.push({version:_parseVersion(keys[key], true), required:m.version[keys[key]]});
-		}
-
-		//evaluate versions
-		for(var i=0; i<versions.length; i++){
-      		var ver = versions[i].version;
-
-			//compare target
-			if(ver.target) {
-        		if(v.target != ver.target ) continue;
-      		}
-      		//compare versions
-      		var pass = (_vercomp(ver.min, v.min) <= 0 &&  _vercomp(ver.max, v.min) >= 0);
-			if(pass == true) _acopy(versions[i].required, items);
-		}
-	}
-
-	for(var i=0; i < items.length; i++){
-		var item = items[i], url = '', ns = '';
-
-		//name space includes
-		if(typeof(item)  == 'object'){
-			for(var key in item){
-				if(item.hasOwnProperty(key)) {
-					url = item[key];
-					ns = key;
-					break;
-				}
-			}
-		}  //no namespace includes
-		else {
-			url = item;
-		}
-		//this means that our url is relative to application context
-		//i.e. absolute to application's base url
-		if(url[0] == '/') {
-			url = appCtx.resolve(url.substr(1));
-		}
-		else {
-			url = ctx.resolve(url);
-		}
-
-		r.resources.push(url);
-		r.imports.push({namespace:ns, url:url});
-	}
-	return r;
 }
 
 var IMPORTS_MAP = new Object(null);
@@ -964,21 +897,12 @@ var extension = mixin(Object.create(null), {
 	}
 });
 
-function loadMain(config){
+function start(config){
+	//load main modules
 	if(config.sjsMain != null && config.sjsMain){
 		log.info('Loading main module: ' + config.sjsMain);
 		load([config.sjsMain]);
 	}
-}
-
-function start(config){
-	//load main modules
-	if(config.splash != null && config.splash){
-		load([config.splash], function(){
-			loadMain(config);
-		});
-	}
-	else loadMain(config);
 }
 
 var _core = mixin(Object.create(null),{
@@ -1017,10 +941,9 @@ try {
 }catch(ex){
 }
 
-
+//entry point
 loadConfiguration(function(config){
     PATH_VARIABLES['{sjshome}'] = config.sjsHome;
-    new window.Image().src = context().resolve('resources/images/bootloading.gif');
 
     if(config.debug == true){
        _core.debug = _debug;
@@ -1029,7 +952,7 @@ loadConfiguration(function(config){
     if(config.mode == 'onload'){
         window.onload = function(){ start(config);}
     }
-    else if(config.mode == 'node'){
+    else if(config.mode == 'console'){
         start(config);
     }
     else {
