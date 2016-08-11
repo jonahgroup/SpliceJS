@@ -69,7 +69,7 @@ function loadConfiguration(onLoad){
 
 	// splice js script must have sjs-main attribute
 	if(main == null) {
-		log.warn('Application entry point is not defined.');
+		log.warn('Application entry module is not defined.');
 		return;
 		//throw "SpliceJS script element must have 'sjs-main' attribute";
 	}

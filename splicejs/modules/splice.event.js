@@ -65,8 +65,7 @@ definition:function(scope){
         ------------------------------------------------------------------------------
         Private functions
     */
-    /**
-    */
+  
     function _attachEvent(o,p,e){
       if(!o || !p) return e;
 
@@ -87,47 +86,52 @@ definition:function(scope){
     */
 
     function _createMulticastEvent(){
-      var _closure = {idx:0};
-      var fnE = function MulticastEvent(){
+      var _closure = {subs:[]};
+      var f = function MulticastEvent(){
         _multicastRun.apply(_closure,arguments);
       };
-      fnE.subscribe = function(callback,instance){
-        if(callback == fnE) throw 'Recursive event subscription on ' + fname(instance.constructor) + ' "' + fname(callback)+'"';
-        return _multicastSubscribe.call(fnE,_closure,callback,instance);
+      f.subscribe = function(callback,instance){
+        if(callback == f) throw 'Recursive event subscription on ' + fname(instance.constructor) + ' "' + fname(callback)+'"';
+        return _multicastSubscribe.call(f,_closure,callback,instance);
       };
-      fnE.unsubscribe = function(callback){
-        return _multicastUnsubscribe.call(fnE,_closure,callback);
+      f.unsubscribe = function(callback){
+        return _multicastUnsubscribe.call(f,_closure,callback);
       };
-      return fnE;
+      f.dispose = function(){
+        return _multicastDispose(_closure);
+      };
+      f.subscribers = function(){
+        return _closure.subs.length;  
+      };
+      return f;
     }
 
     function _multicastSubscribe(_closure,callback,instance){
       if(!instance) instance = this.__sjs_owner__;
-      if(!_closure.callbacks) _closure.callbacks = [[]];
-
-      var callbacks = _closure.callbacks[_closure.idx];
-      var subs = new Subscription(instance,callback);
-      callbacks.push(subs);
-
-      return subs;
+      var sub = new Subscription(instance,callback);
+      _closure.subs.push(sub);
+      return sub;
     }
 
     function _multicastUnsubscribe(_closure,callback){
-      if(!_closure.callbacks) return;
-      var callbacks = _closure.callbacks[_closure.idx];
-      for(var i = callbacks.length-1; i >= 0; i--){
-        if(callbacks[i][0] == callback) { 
-          callbacks.splice(i,1);
+      if(!_closure.subs) return;
+      var subs = _closure.subs;
+      for(var i = subs.length-1; i >= 0; i--){
+        
+        if( subs[i] == callback || subs[i].callback == callback) { 
+          subs.splice(i,1);
           return; 
         }
       }
     }
 
-
+    function _multicastDispose(_closure){
+      _closure.subs = [];
+    }
 
     function _multicastRun(){
-      if(!this.callbacks) return;
-      var callbacks = this.callbacks[this.idx];
+      if(!this.subs) return;
+      var callbacks = this.subs;
 
       for(var key in callbacks){
         if(callbacks[key].isDisabled === true) continue;
@@ -141,26 +145,37 @@ definition:function(scope){
       Unicast event
     */
     function _createUnicastEvent(){
-      var _closure = [];
-      var fnE = function UnicastEvent(){
+      var _closure = {subs:[]};
+      var f = function UnicastEvent(){
         _unicastRun.apply(_closure,arguments);
       };
-      fnE.subscribe = function(callback,instance){
-        return _unicastSubscribe.call(fnE,_closure,callback,instance);
+      f.subscribe = function(callback,instance){
+        return _unicastSubscribe.call(f,_closure,callback,instance);
       };
-      return fnE;
+      f.dispose = function(){
+        _closure.subs = [];
+      };
+      f.unsubscribe = function(callback){
+        if(_closure.subs[0] === callback || _closure.subs[0].callback === callback)
+          _closure.subs = [];
+      };
+      f.subscribers = function(){
+        return _closure.subs.length;  
+      };
+      return f;
     }
 
     function _unicastSubscribe(_closure,callback,instance){
       if(!instance) instance = this.__sjs_owner__;
-      _closure[0] = new Subscription(instance,callback);
-      return _closure[0];
+      _closure.subs[0] = new Subscription(instance,callback);
+      return _closure.subs[0];
     }
 
     function _unicastRun(){
+      if(!this.subs[0]) return;
       //do not run disabled subscriptions
-      if(this[0].isDisabled === true) return;
-      this[0].callback.apply(this[0].instance,arguments);
+      if(this.subs[0].isDisabled === true) return;
+      this.subs[0].callback.apply(this.subs[0].instance,arguments);
     }
 
 
