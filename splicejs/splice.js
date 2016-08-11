@@ -377,6 +377,16 @@ Namespace.prototype = {
 		}
 };
 
+function currentScript(){
+	if(document.currentScript) return document.currentScript.src;
+	for(var i=document.scripts.length-1; i>=0; i--){
+		var s = document.scripts[i]; 
+		if(s.readyState && s.readyState == 'interactive') return s.src;
+	}
+	return null;
+}
+
+
 var _fileHandlers = {
 	'.js': {
 		importSpec:function(filename){
@@ -396,7 +406,7 @@ var _fileHandlers = {
 				};	
 			} else if(script.onreadystatechange !== undefined){
 				script.onreadystatechange = function(){
-					if(script.readyState == 'loaded') {
+					if(script.readyState == 'loaded' || script.readyState == 'complete') {
 						loader.onitemloaded(filename);
 					}
 				}
@@ -634,7 +644,7 @@ AsyncLoader.prototype = {
 	},
 
 	onitemloaded : function(item){
-		var spec = IMPORTS_MAP[item] = (_loaderStats.moduleSpec || IMPORTS_MAP[item]);
+		var spec = IMPORTS_MAP[item] = (IMPORTS_MAP[item] instanceof ModuleSpec ? IMPORTS_MAP[item] : _loaderStats.moduleSpec || IMPORTS_MAP[item]);
 		//clear current module spec, resource loaded next maybe not be a module
 		_loaderStats.moduleSpec = null;
 
@@ -862,7 +872,11 @@ function _module(m){
 	};
 
 	// create module spec
-	_loaderStats.moduleSpec = new ModuleSpec(scope,m);
+	var spec = new ModuleSpec(scope,m);
+	var current = currentScript();
+
+	if(current) IMPORTS_MAP[current] = spec;
+	_loaderStats.moduleSpec = spec;
 
 }
 
