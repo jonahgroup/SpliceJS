@@ -69,7 +69,7 @@ function loadConfiguration(onLoad){
 
 	// splice js script must have sjs-main attribute
 	if(main == null) {
-		log.warn('Application entry point is not defined.');
+		log.warn('Application entry point is not defined, "splice.js" script must have "sjs-main" attribute');
 		return;
 		//throw "SpliceJS script element must have 'sjs-main' attribute";
 	}
@@ -78,7 +78,6 @@ function loadConfiguration(onLoad){
 		appBase: 	context(window.location.href).path,
 		sjsHome:	context(main.getAttribute('src')).path,
 		sjsMain:	main.getAttribute('sjs-main'),
-		splash:		main.getAttribute('sjs-splash'),
 		version:	main.getAttribute('sjs-version'),
 		mode:		main.getAttribute('sjs-start-mode'),
 		debug:    	main.getAttribute('sjs-debug') == 'true' ? true:false
@@ -379,6 +378,7 @@ Namespace.prototype = {
 
 function currentScript(){
 	if(document.currentScript) return document.currentScript.src;
+	if(document.scripts)
 	for(var i=document.scripts.length-1; i>=0; i--){
 		var s = document.scripts[i]; 
 		if(s.readyState && s.readyState == 'interactive') return s.src;

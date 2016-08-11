@@ -350,6 +350,10 @@ Controller.prototype = {
 	},
 	onTemplateReady : function(){
 		//Template is ready and child controls are initialized
+	},
+	onReflow:function(top, left, width, height, isBubble){
+		//Called when component's size information is required of provided
+		//in some layout situation size could be calculated starting with a child
 	}
 }
 

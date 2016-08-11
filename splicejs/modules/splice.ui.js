@@ -378,11 +378,11 @@ var	Class			= imports.Inheritance.Class
 	var KeyListener = Class(function KeyListener(){
 
 		event(this).attach({
-			onEsc		:	event.multicast,
+			onEsc	: event.multicast,
 			onEnter	: event.multicast,
 			onRight : event.multicast,
 			onLeft  : event.multicast,
-			onUp		: event.multicast,
+			onUp	: event.multicast,
 			onDown 	: event.multicast
 		});
 
@@ -392,7 +392,7 @@ var	Class			= imports.Inheritance.Class
 				case 27: this.onEsc(); 		break;
 				case 13: this.onEnter(); 	break;
 				case 37: this.onLeft(); 	break;
-				case 38: this.onUp();			break;
+				case 38: this.onUp();		break;
 				case 39: this.onRight(); 	break;
 				case 40: this.onDown();		break;
 			}
