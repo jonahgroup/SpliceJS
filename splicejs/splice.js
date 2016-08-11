@@ -629,7 +629,9 @@ AsyncLoader.prototype = {
 
 	onitemloaded : function(item){
 		var spec = IMPORTS_MAP[item] = (_loaderStats.moduleSpec || IMPORTS_MAP[item]);
-			 
+		//clear current module spec, resource loaded next maybe not be a module
+		_loaderStats.moduleSpec = null;
+
 		if(!spec) {
 			log.error("wtf no spec");
 		}
@@ -665,8 +667,7 @@ AsyncLoader.prototype = {
 			}
 		}
 
-		//clear current module spec, resource loaded next maybe not be a module
-		_loaderStats.moduleSpec = null;
+
 
 		/*
 		//execute import if no import dependencies are present
