@@ -18,8 +18,7 @@ required:[
   'desktop:*|splice.test.components.css',
   'mobile:*|splice.test.components.mobile.css',
   'mobile:*|splice.test.components.mobile.meta',
-  'splice.test.components.html',
-  
+  'splice.test.components.html'
 ]
 ,
 definition:function(scope){

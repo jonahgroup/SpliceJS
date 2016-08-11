@@ -390,11 +390,17 @@ var _fileHandlers = {
 			script.setAttribute("async","");
 			script.setAttribute("src", filename);
 
-			script.onload = script.onreadystatechange = function(){
-				if(!script.readyState || script.readyState == 'complete' || script.readyState == 'loaded') {
+			if(script.onload !== undefined){
+				script.onload = function(e){
 					loader.onitemloaded(filename);
+				};	
+			} else if(script.onreadystatechange !== undefined){
+				script.onreadystatechange = function(){
+					if(script.readyState == 'loaded') {
+						loader.onitemloaded(filename);
+					}
 				}
-			};
+			}
 			head.appendChild(script);
 		}
 	}
