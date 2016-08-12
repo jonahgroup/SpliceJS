@@ -53,7 +53,10 @@ else if(_platform_ == 'WIN') _pd_ = '\\';
 //_not_pd_ is used for in-string replacement must be correctly escaped
 var _not_pd_ = _pd_ == '/'?'\\\\':'/';
 
-var config = {platform: _platform_};
+var config = {platform: _platform_},
+	//version qualifier
+	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/;
+
 
 function loadConfiguration(onLoad){
 	var main = null;
@@ -510,17 +513,15 @@ function qualifyImport(url){
 	//unable to qualify url since config version is not present
 	if(!config.version) return null;
 	
-	//version qualifier
-	var regex = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/;
 
 	//parse config version
-	var rc = regex.exec(config.version);
+	var rc = regexVer.exec(config.version);
 	//no mercy for invalid syntax
 	if(!rc) throw 'Invalid version configuration parameter: ' + config.version;
 
 	//only version quallifier is supported
 	//qualify version at parts[0]
-	var r = regex.exec(_trim(parts[0]));
+	var r = regexVer.exec(_trim(parts[0]));
 	
 	//no mercy for invalid syntax	
 	if(r == null) throw 'Invalid version qualifier: ' + url; 
@@ -870,6 +871,7 @@ function _module(m){
 		_loaderStats.loadingIndicator = splash;
 		return splash;
 	};
+	scope.sjs.ImportSpec	= ImportSpec;
 
 	// create module spec
 	var spec = new ModuleSpec(scope,m);
@@ -929,7 +931,7 @@ function start(config){
 var _core = mixin(Object.create(null),{
 	config      : function() {return mixin({},config)},
   	namespace   : Namespace,
-	pathVar 	: setPathVar,
+	setvar 		: setPathVar,
 	context  	: context,
 	mixin		: mixin,
 	'module'    : _module,
@@ -938,21 +940,10 @@ var _core = mixin(Object.create(null),{
 	extension   : extension,
  	log 		: log,
 	document	: document,
-	ImportSpec	: ImportSpec,
-	filext		:fileExt
+	
+	filext		: fileExt
 });
 
-var _debug = mixin(Object.create(null),{
-    spv :spv,
-    split:_split,
-    collapseUrl: collapseUrl,
-    isAbsUrl:isAbsUrl,
-    fileExt:fileExt,
-    peek: peek,
-    trim: _trim,
-    _parseVersion:_parseVersion
-
-});
 
 
 window.sjs = _core;
@@ -966,9 +957,19 @@ try {
 loadConfiguration(function(config){
     PATH_VARIABLES['{sjshome}'] = config.sjsHome;
 
-    if(config.debug == true){
-       _core.debug = _debug;
-    }
+
+	if(config.debug == true){
+		_core.debug =  mixin(Object.create(null),{
+			spv :spv,
+			split:_split,
+			collapseUrl: collapseUrl,
+			isAbsUrl:isAbsUrl,
+			fileExt:fileExt,
+			peek: peek,
+			trim: _trim,
+			_parseVersion:_parseVersion
+		});
+	}
 
     if(config.mode == 'onload'){
         window.onload = function(){ start(config);}
@@ -980,5 +981,8 @@ loadConfiguration(function(config){
         _core.start = function(){start(config);}
     }
 });
+
+
+
 
 })( (require('splice.window.js')), (require('splice.document.js')));

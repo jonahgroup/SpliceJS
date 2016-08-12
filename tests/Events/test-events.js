@@ -32,9 +32,6 @@ definition:function(scope){
         var s3 = x.onBroadcast.subscribe(function(e){
           m1+=e;
         });
-
-
-
         var s2  = x.onNotify.subscribe(function(e){
           u0+=e;
         });
