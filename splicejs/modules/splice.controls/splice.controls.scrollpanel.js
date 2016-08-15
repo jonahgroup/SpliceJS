@@ -184,12 +184,12 @@ definition:function(scope){
 		 * create new ones if not
 		 * */
 		if(!thumb.vertical) {
-			thumb.vertical = create('div').class.add('-scroll-bar-thumb-vertical').element;
+			thumb.vertical = create('div').cl.add('-scroll-bar-thumb-vertical').element;
 			parent._scroll_bar_vertical = thumb.vertical;
 		}
 
 		if(!thumb.horizontal) {
-			thumb.horizontal = create('div').class.add('-scroll-bar-thumb-horizontal').element;
+			thumb.horizontal = create('div').cl.add('-scroll-bar-thumb-horizontal').element;
 			parent._scroll_bar_horizontal = thumb.horizontal;
 		}
 

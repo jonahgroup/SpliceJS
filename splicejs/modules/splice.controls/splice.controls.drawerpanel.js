@@ -25,7 +25,7 @@ definition:function(scope){
 	/* DrawerPanel*/
 
 	var DrawerPanel = Class(function DrawerPanelController(){
-			this.super();
+			this.base();
 
 			this.isOpen = false;
 

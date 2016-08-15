@@ -7,8 +7,7 @@ required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.popup.html',
 	'splice.controls.popup.css'
-]
-,
+],
 definition:function(scope){
     "use strict";
 	var
@@ -20,7 +19,7 @@ definition:function(scope){
 	,	UIControl = imports.SpliceJS.UI.UIControl
 
 	var Popup = Class(function PopupController(){
-		this.super();
+		this.base();
 
 		this.ratio = { width: 4, height: 3 };
 

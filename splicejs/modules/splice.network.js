@@ -55,11 +55,13 @@ definition:function(scope){
 		    this.transport.setRequestHeader('Content-Type', 'text/html; charset=utf-8');
 		}
 
+
+
     /*
         in ie8 onreadystatechange is attached to a quasy window object
         [this] inside handler function will refer to window object and not transport object
     */
-    this.transport.onload = function(){
+    function onLoadHandler(){
         var transport = self.transport;
 
         var response = {
@@ -78,6 +80,16 @@ definition:function(scope){
                 break;
         }
     }
+
+    if(this.transport.onload !== undefined ) {
+        this.transport.onload = onLoadHandler;
+    }
+    else {
+        this.transport.onreadystatechange = function(e){
+            if(self.transport.readyState == 4 ) onLoadHandler();
+        }    
+    }
+
 
     if (type == 'POST' && !params) params = config.data;
 		this.transport.send(params);

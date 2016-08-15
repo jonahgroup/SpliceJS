@@ -24,13 +24,13 @@ definition:function(scope){
 	;
 
 	var TreeView = Class( function TreeViewController(){
-		this.super();
+		this.base();
 		this.onDataIn.subscribe(renderTree, this);
 	}).extend(UIControl);
 
 
 	var Tree = Class(function TreeController(){
-		this.super();
+		this.base();
 
 		this.onDataIn.subscribe(function(data){
 			this.elements.treeRoot.innerHTML = data;

@@ -846,12 +846,12 @@ function _objectToMap(onitem){
 
 		var _export  = {
 			each		:function(callback){return forEach.call(d,callback);},
-			filter	:function(callback){return filter.call(d,callback);},
+			filter		:function(callback){return filter.call(d,callback);},
 			group		:function(callback,gfn){return groupBy.call(d,callback,gfn);},
 			first		:function(callback){return first.call(d);},
 			nth			:function(callback){return nth.call(d);},
-			page    :function(size,start) { return new Paginator(d, size, start);},
-			frame   :function(size,move){return new Frame(d,size,move);},
+			page    	:function(size,start) { return new Paginator(d, size, start);},
+			frame   	:function(size,move){return new Frame(d,size,move);},
 			sort		:function(callback){return sort.call(d,callback);},
 			size		:function(callback){return size.call(d,callback);},
 			add			:function(toadd){return add.call(d,toadd);},
@@ -859,7 +859,7 @@ function _objectToMap(onitem){
 							return asyncIterator(d, callback, pageSize, oncomplete, onint);}
 						},
 			array		:function(){return d;},
-			result  :function(){return itr.current();},
+			result  	:function(){return itr.current();},
 			tree		:function(prop){return {
 					dfs:function(callback){
 						_dfs(d,prop,callback,0);

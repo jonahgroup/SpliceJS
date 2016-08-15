@@ -23,7 +23,7 @@ definition:function(scope){
 	;
 
 	var Map = Class(function MapController(){
-		this.super();
+		this.base();
 		this.onDisplay.subscribe(this.display,this);
 	}).extend(UIControl);
 

@@ -250,7 +250,7 @@ function remove(view){
   function ViewReflow(){
   }
 
-  ViewReflow.prototype.default = function(){
+  ViewReflow.prototype.simple = function(){
   	return this;
   }
 
@@ -364,7 +364,7 @@ function remove(view){
   	this.reflow = new ViewReflow(this);
   };
 
-  View.prototype.class = function(className){
+  View.prototype.cl = function(className){
   	var self = this;
   	return {
   		remove: function(){

@@ -60,11 +60,11 @@ definition:function(scope){
 
 
     var FilterListItem = Class(function FilterListItemController(){
-        this.super();
+        this.base();
     }).extend(ListItemController);
 
     FilterListItem.prototype.dataIn = function(item){
-        this.super.dataIn.call(this,item);
+        ListItemController.prototype.dataIn.call(this,item);
 
         if(item.isApplied === true) {
           this.select();
@@ -73,7 +73,7 @@ definition:function(scope){
 
 
     FilterListItem.prototype.select = function(){
-      dom(this.elements.root).class.add('selected');
+      dom(this.elements.root).cl.add('selected');
     };
 
 }

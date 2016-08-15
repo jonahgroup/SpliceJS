@@ -20,7 +20,7 @@ definition:function(scope){
 
 
 	var PageLoader = Class(function PageLoaderController(){
-		this.super();
+		this.base();
 	}).extend(UIControl);
 
 

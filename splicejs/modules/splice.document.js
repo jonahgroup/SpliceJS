@@ -364,7 +364,7 @@ definition:function(scope){
 				}
 				return dom(null);
 			},
-			"class":classOp(element),
+			cl:classOp(element),
 
 			box: function(){
 				return _box(element);

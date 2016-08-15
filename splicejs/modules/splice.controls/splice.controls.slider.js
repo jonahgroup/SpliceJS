@@ -25,7 +25,7 @@ definition:function(scope){
 
 
   var Slider = Class(function SliderController(args) {
-      this.super(args);
+      this.base(args);
 
       this.onAttach.subscribe(this.attach, this);
       this.onDisplay.subscribe(this.display, this);

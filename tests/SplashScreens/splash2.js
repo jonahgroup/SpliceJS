@@ -48,10 +48,15 @@ definition:function(scope){
       sjs.log.info('Splash screen hide');
       this.dom.style.opacity = 0;
       var dom = this.dom;
-      this.dom.addEventListener('transitionend',function(e){
-          document.body.removeChild(dom);
-          
-      },false);
+
+      if(this.dom.addEventListener) {
+        this.dom.addEventListener('transitionend',function(e){
+            document.body.removeChild(dom);
+            
+        },false);
+      } else {
+        document.body.removeChild(dom);
+      }
     },
 
     update:function(complete,total,itemName){

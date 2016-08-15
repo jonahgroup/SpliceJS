@@ -27,7 +27,7 @@ definition:function(scope){
 	 */
 
 	var ViewPanel = Class(function ViewPanelController(){
-		this.super();
+		this.base();
 
 		this.viewInstances = [];
 

@@ -28,6 +28,15 @@ var http = imports.Networking.http
 
 var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
 
+//Array.prototype.indexOf in IE9>
+function indexOf(a,k){
+	if(a.indexOf) return a.indexOf(k);
+	for(var i=0; i<a.length; i++){
+		if(a[i] == k) return i;
+	}
+	return -1;
+}
+
 function defineComponents(scope){
 	if(!scope) throw 'scope parameter is expected';
 	//get all html imports in current scope
@@ -541,8 +550,8 @@ Controller.prototype.dispose = function(){
   		//export attribute exists
   		if(this.dom.attributes['sjs-export']) {
   			var exp = dom.getAttribute('sjs-export');
-  			if(!exp) this.export = this.type;
-  			else this.export = exp;
+  			if(!exp) this._export = this.type;
+  			else this._export = exp;
   		}
 
   		/*
@@ -576,9 +585,9 @@ Controller.prototype.dispose = function(){
      var component = createComponent(template.controller, template, scope);
      scope.components[template.type] = component;
      // export only components and
-     if(component.isComponent && component.template.export != null)
+     if(component.isComponent && component.template._export != null)
        scope.__sjs_module_exports__[
-           component.template.export?component.template.export:template.type
+           component.template._export?component.template._export:template.type
        ] = component;
      return component;
     };
@@ -671,8 +680,8 @@ Controller.prototype.dispose = function(){
 
   		//apply style
   		if(views.root){
-  			if(parameters && parameters.class)
-  				views.root.class(parameters.class).add();
+  			if(parameters && parameters['class'])
+  				views.root.cl(parameters['class']).add();
   		}
 
   	};
@@ -748,7 +757,7 @@ Controller.prototype.dispose = function(){
   			var attr = attributes[i]
   			,	name = propertyName(attr.name,true);
 
-  			if(RESERVED_ATTRIBUTES.indexOf(name) < 0) continue;
+  			if(indexOf(RESERVED_ATTRIBUTES,name) < 0) continue;
 
   			if(name == 'name') {
   				name = '__sjs_name__';
@@ -1064,9 +1073,9 @@ Controller.prototype.dispose = function(){
 		var component = createComponent(template.controller, template, scope);
 		scope.__sjs_components__[template.type] = component;
         // export only components and
-        if(component.isComponent && component.template.export != null)
+        if(component.isComponent && component.template._export != null)
           scope.__sjs_module_exports__[
-              component.template.export?component.template.export:template.type
+              component.template._export?component.template._export:template.type
           ] = component;
     	return component;
   	};

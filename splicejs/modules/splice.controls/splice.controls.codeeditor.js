@@ -21,7 +21,7 @@ definition:function(scope){
 	;
 
 	var CodeEditor = Class(function CodeEditorController(){
-		this.super();
+		this.base();
 		var location  = this.file;
 
 		var self = this;

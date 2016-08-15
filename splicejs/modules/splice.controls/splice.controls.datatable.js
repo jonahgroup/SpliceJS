@@ -39,7 +39,7 @@ definition:function(scope){
 	,	cssvalue 	= imports.Doc.cssvalue
 	,	data 		= imports.Data.data
 	,	fdata 		= imports.Data.data
-	,	compare 	= imports.Data.compare.default
+	,	compare 	= imports.Data.defaultComparator
 	,	DataStep 	= imports.Data.DataStep
 	,   UIControl   = imports.SpliceJS.UI.UIControl
 	,	Event 		= imports.Events.event
@@ -51,7 +51,7 @@ definition:function(scope){
 	 * */
 	var DataTable = Class(function DataTableController(args){
 		/* call parent constructor */
-		this.super(args);
+		this.base(args);
 
 		//get body and header tables, they may be one and same table
 		this.bodyTable = this.ref.body.elements.table;
@@ -364,7 +364,7 @@ definition:function(scope){
 		var className = headCell.sortOrder == 1?'up':'down';
 
 		dom(headCell.elements.root).append(dom(this.sortTrigger.concrete.dom));
-		dom(this.sortTrigger.concrete.dom).class.remove('up down').add(className);
+		dom(this.sortTrigger.concrete.dom).cl.remove('up down').add(className);
 
 		this.dataSteps.sort.run();
 		renderTable.call(this);
@@ -453,7 +453,7 @@ definition:function(scope){
 			if(this.isTreeTable)
 				data_row = new TreeRow(new this.bodyRowTemplate({parent:this, columnCount:columnCount}));
 			else
-				data_row = new this.bodyRowTemplate({parent:this, columnCount});
+				data_row = new this.bodyRowTemplate({parent:this, columnCount:columnCount});
 
 			this.dataRows.push(data_row);
 			data_row.dataIn({
@@ -672,11 +672,11 @@ definition:function(scope){
 				this.s.paddingLeft = (item.level * 20) +'px';
 
 				if(item.children === true) {
-					this.arrow.class.add('arrow');
+					this.arrow.cl.add('arrow');
 				}
 
 				if(item.expanded === true){
-					this.arrow.class.add('down');
+					this.arrow.cl.add('down');
 				}
 	};
 

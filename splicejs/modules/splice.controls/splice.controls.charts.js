@@ -46,7 +46,7 @@ definition:function(scope){
 	;
 
 	var Chart = Class(function ChartController(){
-		this.super();	//call parent constructor
+		this.base();	//call parent constructor
 
 		var self = this
 		,	width = this.width

@@ -120,14 +120,14 @@ definition:function(scope){
 	CheckBox.prototype.check = function(isChecked){
 		this.isChecked = isChecked;
 		if(isChecked === true) {
-			this.views.root.class('checked').add();
+			this.views.root.cssc('checked').add();
 		} else {
-			this.views.root.class('checked').remove();
+			this.views.root.cssc('checked').remove();
 		}
 	};
 
 	CheckBox.prototype.clear = function(){
-		this.views.root.class('checked').remove();
+		this.views.root.cssc('checked').remove();
 	};
 
 

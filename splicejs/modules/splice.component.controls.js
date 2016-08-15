@@ -10,7 +10,7 @@ required:[
 ,	{'Controllers':'splice.controls/splice.controls.controllers.js'}
 , 	{'Buttons':'splice.controls/splice.controls.buttons.js'}
 ,	{'DataControls':'splice.controls/splice.controls.datatable.js'}
-,	{'Charts':'splice.controls/splice.controls.charts.js'}
+//,	{'Charts':'splice.controls/splice.controls.charts.js'}
 ,	{'DataControls':'splice.controls/splice.controls.listbox.js'}
 ,	{'DataControls':'splice.controls/splice.controls.treeview.js'}
 ,	{'DataControls':'splice.controls/splice.controls.checklistbox.js'}
@@ -18,7 +18,7 @@ required:[
 ,	{'Panels':'splice.controls/splice.controls.scrollpanel.js'}
 ,	{'Panels':'splice.controls/splice.controls.viewpanel.js'}
 ,	{'Grids':'splice.controls/splice.controls.gridlayout.js'}
-,	{'Charts':'splice.controls/splice.controls.d3canvas.js'}
+//,	{'Charts':'splice.controls/splice.controls.d3canvas.js'}
 ,	{'Maps':'splice.controls/splice.controls.map.js'}
 ,	{'Selectors':'splice.controls/splice.controls.selectors.js'}
 ,	{'Selectors':'splice.controls/splice.controls.datepicker.js'}
@@ -107,11 +107,11 @@ definition:function(scope){
 		{ViewPanel:			imports.Panels.ViewPanel},
 		{ScrollPanel:		imports.Panels.ScrollPanel},
 		/* charts */
-		{Chart:				imports.Charts.Chart},
-		{Dial:				imports.Charts.Dial},
+		//{Chart:				imports.Charts.Chart},
+		//{Dial:				imports.Charts.Dial},
 		{GridLayout:        imports.Grids.GridLayout},
         {CellContainer:     imports.Grids.CellContainer},
-		{D3Canvas:			imports.Charts.D3Canvas},
+		//{D3Canvas:			imports.Charts.D3Canvas},
 		//{Map:				imports.Maps.Map},
 		/* selectors */
 		{DropDownSelector:	imports.Selectors.DropDownSelector},

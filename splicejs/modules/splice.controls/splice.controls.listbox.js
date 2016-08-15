@@ -194,7 +194,7 @@ definition:function(scope){
 
 	var DefaultListItem = Class(function DefaultListItem(){
 		this.views = {
-			root: View('<div sjs-content="default"></div>').class('-sjs-listbox-item').add()
+			root: View('<div sjs-content="default"></div>').cl('-sjs-listbox-item').add()
 		}
 	});
 
@@ -226,7 +226,7 @@ definition:function(scope){
 	}).extend(UIControl);
 
 	ListItemController.prototype.initialize = function(){
-		this.views.root.class('-sjs-listbox-item').add();
+		this.views.root.cl('-sjs-listbox-item').add();
 	};
 
 

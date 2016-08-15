@@ -47,7 +47,7 @@ definition:function(scope){
 
 
 	var D3CanvasController = Class(function D3CanvasController(){
-		this.super();
+		this.base();
 
 		this.d3 = new D3(this.elements.root);
 

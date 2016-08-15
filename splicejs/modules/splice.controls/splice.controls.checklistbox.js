@@ -120,9 +120,9 @@ required:[
     function _check(){
       var value = this.dataItemCheck.getValue();
       if(value === true) {
-        this.views.root.class('checked').add();
+        this.views.root.cl('checked').add();
       } else {
-        this.views.root.class('checked').remove();
+        this.views.root.cl('checked').remove();
       }
     }
 

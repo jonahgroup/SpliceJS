@@ -19,7 +19,7 @@ definition:function(scope){
 	,	UIControl = imports.SpliceJS.UI.UIControl;
 
 	var TreeTable = Class(function TreeTableController(){
-		this.super();
+		this.base();
 	}).extend(UIControl);
 
 	TreeTable.prototype.dataIn = function(){

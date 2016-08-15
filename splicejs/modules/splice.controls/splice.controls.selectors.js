@@ -100,7 +100,7 @@ definition:function(scope){
 
 	function _hide() {
 	    dropDownContainer.remove();
-		selectorElement.class('-sjs-dropdown-open').remove();
+		selectorElement.cl('-sjs-dropdown-open').remove();
 	};
 
 
@@ -134,7 +134,7 @@ definition:function(scope){
 
 		//release previous selector if any
 		if(selectorElement){
-			selectorElement.class('-sjs-dropdown-open').remove();
+			selectorElement.cl('-sjs-dropdown-open').remove();
 		}
 
 		//create instance of the dropdown content item
@@ -143,7 +143,7 @@ definition:function(scope){
 		}
 
 		//keep track of the current drop down controller statically
-		selectorElement = this.views.selector.class('-sjs-dropdown-open').add();
+		selectorElement = this.views.selector.cl('-sjs-dropdown-open').add();
 
 
 		//append drop down to the document root

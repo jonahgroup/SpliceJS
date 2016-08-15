@@ -55,7 +55,9 @@ var _not_pd_ = _pd_ == '/'?'\\\\':'/';
 
 var config = {platform: _platform_},
 	//version qualifier
-	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/;
+	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
+	addedScript = null
+	;
 
 
 function loadConfiguration(onLoad){
@@ -381,11 +383,16 @@ Namespace.prototype = {
 
 function currentScript(){
 	if(document.currentScript) return document.currentScript.src;
+	if(addedScript) {
+		log.info('found via added script');
+		return addedScript.src;
+	}
 	if(document.scripts)
 	for(var i=document.scripts.length-1; i>=0; i--){
 		var s = document.scripts[i]; 
 		if(s.readyState && s.readyState == 'interactive') return s.src;
 	}
+	log.error('Current script not found');
 	return null;
 }
 
@@ -414,7 +421,9 @@ var _fileHandlers = {
 					}
 				}
 			}
+			addedScript = script;
 			head.appendChild(script);
+			addedScript = null;
 		}
 	}
 };
@@ -506,6 +515,7 @@ function _vercomp(v1,v2){
 
 
 function qualifyImport(url){
+	if(!url) return null;
 	var parts = url.split('|');
 	//nothing to qualify its just a URL
 	if(parts.length == 1) return url;
@@ -648,6 +658,8 @@ AsyncLoader.prototype = {
 		var spec = IMPORTS_MAP[item] = (IMPORTS_MAP[item] instanceof ModuleSpec ? IMPORTS_MAP[item] : _loaderStats.moduleSpec || IMPORTS_MAP[item]);
 		//clear current module spec, resource loaded next maybe not be a module
 		_loaderStats.moduleSpec = null;
+
+		spec.fileName = item;
 
 		if(!spec) {
 			log.error("wtf no spec");
@@ -877,7 +889,10 @@ function _module(m){
 	var spec = new ModuleSpec(scope,m);
 	var current = currentScript();
 
-	if(current) IMPORTS_MAP[current] = spec;
+	if(current) { 
+		spec.fileName = current;
+		IMPORTS_MAP[current] = spec; 
+	}
 	_loaderStats.moduleSpec = spec;
 
 }
