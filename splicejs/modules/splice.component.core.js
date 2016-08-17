@@ -28,6 +28,15 @@ var http = imports.Networking.http
 
 var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];
 
+if(!Function.prototype.bind) {
+	if(!Function.prototype.apply) return;
+	Function.prototype.bind = function(t){
+		var foo = this;
+		return function(){ foo.apply(t,arguments); };
+	};
+}
+
+
 //Array.prototype.indexOf in IE9>
 function indexOf(a,k){
 	if(a.indexOf) return a.indexOf(k);

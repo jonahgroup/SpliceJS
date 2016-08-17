@@ -113,13 +113,7 @@ function mixin(_t, _s){
 	return _t;
 };
 
-if(!Function.prototype.bind) {
-	if(!Function.prototype.apply) return;
-	Function.prototype.bind = function(t){
-		var foo = this;
-		return function(){ foo.apply(t,arguments); };
-	};
-}
+
 
 /*
  * No support for Object.create
