@@ -56,8 +56,7 @@ var _not_pd_ = _pd_ == '/'?'\\\\':'/';
 var config = {platform: _platform_},
 	//version qualifier
 	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
-	addedScript = null
-	;
+	addedScript = null,	currentModuleSpec = null;
 
 
 function loadConfiguration(onLoad){
@@ -384,13 +383,17 @@ Namespace.prototype = {
 function currentScript(){
 	if(document.currentScript) return document.currentScript.src;
 	if(addedScript) {
-		log.info('found via added script');
+		log.debug('found via added script');
 		return addedScript.src;
 	}
-	if(document.scripts)
-	for(var i=document.scripts.length-1; i>=0; i--){
-		var s = document.scripts[i]; 
-		if(s.readyState && s.readyState == 'interactive') return s.src;
+	if(document.scripts) {
+		for(var i=document.scripts.length-1; i>=0; i--){
+			var s = document.scripts[i]; 
+			if(s.readyState && s.readyState == 'interactive') { 
+				log.debug('Interactive script found: ' + s.src);
+				return s.src; 
+			}
+		}
 	}
 	log.error('Current script not found');
 	return null;
@@ -655,15 +658,15 @@ AsyncLoader.prototype = {
 	},
 
 	onitemloaded : function(item){
-		var spec = IMPORTS_MAP[item] = (IMPORTS_MAP[item] instanceof ModuleSpec ? IMPORTS_MAP[item] : _loaderStats.moduleSpec || IMPORTS_MAP[item]);
+		var spec = IMPORTS_MAP[item];
+
 		//clear current module spec, resource loaded next maybe not be a module
-		_loaderStats.moduleSpec = null;
+		if(spec instanceof ImportSpec && currentModuleSpec ) {
+			spec = IMPORTS_MAP[item] = currentModuleSpec;
+			currentModuleSpec = null;
+		}
 
 		spec.fileName = item;
-
-		if(!spec) {
-			log.error("wtf no spec");
-		}
 
 		if(_loaderStats.loadingIndicator) {
 			_loaderStats.loadingIndicator.update(0,1,item);
@@ -892,8 +895,9 @@ function _module(m){
 	if(current) { 
 		spec.fileName = current;
 		IMPORTS_MAP[current] = spec; 
+	} else {
+		currentModuleSpec = spec;
 	}
-	_loaderStats.moduleSpec = spec;
 
 }
 
