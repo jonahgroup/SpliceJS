@@ -1,4 +1,10 @@
 sjs.module({
+prerequisite:[
+  '/{sjshome}/modules/splice.module.extensions.js'
+],
+required:[
+  '/{sjshome}/resources/images/bootloading.gif'
+], 
 definition:function(scope){
   var document = scope.sjs.document;
 

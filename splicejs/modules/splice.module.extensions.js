@@ -78,13 +78,17 @@ definition:function(scope){
       *
       * */
       var head = document.head || document.getElementsByTagName('head')[0];
+      
       linkref.onload = function(){
         if(!linkref.readyState || linkref.readyState == 'complete') {
         //	URL_CACHE[filename] = true;
           loader.onitemloaded(filename);
         }
       };
+      
       head.appendChild(linkref);
+     
+      
     }
   };
 
@@ -145,7 +149,8 @@ definition:function(scope){
     '.css' : cssHandler,
     '.html': htmlHandler,
     '.meta': metaHandler,
-    '.png' : imageHandler
+    '.png' : imageHandler,
+    '.gif' : imageHandler
   });
 
 }

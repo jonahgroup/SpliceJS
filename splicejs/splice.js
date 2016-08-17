@@ -772,6 +772,7 @@ function executeImportSpec(importSpec){
 	}		
 
 	//run import modules
+	if(importSpec.imports)
 	for(var i = 0; i < importSpec.imports.length; i++ ){
 		var depSpec = IMPORTS_MAP[importSpec.imports[i].url];
 		//import had not been loaded yet, exit
