@@ -48,7 +48,7 @@ definition:function(scope){
 			onDropDown 		: MulticastEvent,
 			onListData 		: MulticastEvent,
 			onDataItem 		: MulticastEvent,
-			onItemSelected	: MulticastEvent,
+			onItemSelected	: MulticastEvent
 		});
 		
 		this.selectedItemPath = null;

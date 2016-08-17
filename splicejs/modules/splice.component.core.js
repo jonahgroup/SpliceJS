@@ -149,6 +149,28 @@ function defineComponents(scope){
 	};
 
 
+	/** 
+	 * DOM element selectors
+	 * 
+	 */
+	function selectNodes(dom, sel, test){
+		//works on all modern browsers
+		var nodes = null;//dom.querySelectorAll('sjs-component');
+		//nothing was returned by querySelectAll
+		//1. no components
+		//2. old browser <IE9
+		if(!nodes || nodes.length == 0) nodes = new Array();
+		else return nodes;
+
+		if(typeof test !== 'function') return nodes;
+
+		doc.dfs(dom,nodes,test);
+		return nodes;
+	}
+
+
+
+
   	function bindDeclarations(parameters, instance, scope){
   		if(!parameters) return;
 
@@ -202,8 +224,12 @@ function defineComponents(scope){
   	*/
     //!!!!!!!!!!!!!!!!!!!!! MOVE TO ANOTHER MODULE !!!!!!!!!!!!!!!!!!!!!!!!!
   	function buildContentMap(element){
-  		var contentNodes = element.querySelectorAll('[sjs-content]')
-  		,	cMap = {};
+  		var contentNodes = selectNodes(element,'[sjs-content]', function(node){
+			  if(!node.attributes) return null;
+			  if(node.attributes['sjs-content']) return node;
+			  return null;
+		  })
+		,	cMap = {};
 
   		if(!contentNodes) return;
   		var node = element;
@@ -595,8 +621,11 @@ Controller.prototype.dispose = function(){
 
 
   	Template.prototype.processIncludeAnchors = function(dom, controller, scope){
-  		var anchors = dom.querySelectorAll('[data-sjs-tmp-anchor]');
-
+  		var anchors = selectNodes(dom,'[data-sjs-tmp-anchor]', function(node){
+			  if(!node.attributes) return null;
+			  if(node.attributes['data-sjs-tmp-anchor']) return node;
+			  return null;
+		});  
   		for(var i=0; i < anchors.length; i++){
 
   			var childId = anchors[i].getAttribute('data-sjs-child-id');
@@ -622,11 +651,14 @@ Controller.prototype.dispose = function(){
   		var deepClone = build.cloneNode(true);
   		deepClone.normalize();
 
-
-
   		/* process dom references */
-  		var elements = deepClone.querySelectorAll('[sjs-element]');
-  		var element = deepClone;
+  		var elements = selectNodes(deepClone,'[sjs-element]', function(node){
+			  if(!node.attributes) return null;
+			  if(node.attributes['sjs-element']) return node;
+			  return null;
+		}); 
+		  
+		var element = deepClone;
 
   		if(controllerInstance)
   		for(var i=0; i< elements.length; i++){
@@ -693,8 +725,13 @@ Controller.prototype.dispose = function(){
   	function extractComponents(dom){
   		//var start  = window.performance.now();
 		if(!this.__sjs_components__) this.add('__sjs_components__',new sjs.namespace());
-  		var nodes = dom.querySelectorAll('sjs-component');
-  		for(var i=0; i<nodes.length; i++){
+  		
+		var nodes = selectNodes(dom,'sjs-component',function(node){
+			if(node.tagName == 'SJS-COMPONENT') return node;
+			return null;
+		});
+		  	
+		for(var i=0; i<nodes.length; i++){
   			var node = nodes[i];
   			this.__sjs_components__[node.attributes['sjs-type'].value] = new Template(node);
   			this.__sjs_components__.length = i + 1;

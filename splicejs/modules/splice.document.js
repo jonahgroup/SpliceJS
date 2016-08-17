@@ -403,6 +403,7 @@ definition:function(scope){
 
 	scope.exports(
 		isHTMLElement,
+		dfs,
 		{style:style},
 		{select:{
 			nodes:	selectNodes,

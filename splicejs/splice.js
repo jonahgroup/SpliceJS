@@ -859,7 +859,7 @@ ModuleSpec.prototype.execute = function(){
 	
 	if(this.imports)
 		applyImports.call(this.scope,this.imports);
-	this.__sjs_module__.definition.bind(this.scope)(this.scope);
+	this.__sjs_module__.definition.call(this.scope, this.scope);
 }
 
 /*

@@ -349,7 +349,7 @@ definition:function(scope){
 
 		data(records).sort(sortComparator(columnIndex, order)).asc();
 		return {	headers: headers,
-					data:records,
+					data:records
 		};
 	};
 
