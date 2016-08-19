@@ -636,7 +636,10 @@ AsyncLoader.prototype = {
 		for(var i=0; i<this.resources.length; i++){
 			var filename = this.resources[i];
 			var mapped = IMPORTS_MAP[filename];
-			if(mapped) continue;
+			if(mapped) { 
+				loadingTree.modules[filename] = mapped;
+				continue;
+			}
 
 			//save reference of the tree loading current file
 			loadingTreeMap[filename] = loadingTree;
@@ -695,12 +698,22 @@ AsyncLoader.prototype = {
 			//	current context
 			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.required,ctx);
 
+			//place imports onto the current loading tree
+			//with a null importSpec
+			to(imports,function(i){
+				loadingTree.modules[i.url] = null;
+				return null;
+			});
+
 			//Load dependencies
 			if(prereqs) {
 				//prerequisite loading starts on a new tree
 				var treeId = loadingTreeStack.push(loadingTree);
 				loadingTree = {pending:0, modules:Map(), id:treeId};
-				load(to(prereqs,function(i){return i.url}));
+				load(to(prereqs,function(i){
+					loadingTree.modules[i.url] = null;
+					return i.url;
+				}));
 			} else if(imports) {
 				load(to(imports,function(i){return i.url}));
 			}
@@ -838,7 +851,7 @@ function forMap(m,fn){
 }
 
 function continueLoading(){
-
+	loadingTree = loadingTreeStack.pop();
 	var moreToLoad = new Array();
 	forMap(loadingTree.modules, function(spec){
 		var imports = _pendingImports(spec);
@@ -891,7 +904,8 @@ function _module(m){
 
 	/*init module scope*/
 	var scope = new Namespace(null);
-
+	scope.add('imports',new Namespace());
+	scope.imports.add('sjs',mixin(Object.create(null),_core),true);
 	scope.add('sjs',mixin(Object.create(null),_core),true);
 	scope.add('exports',_exports(scope));
 	
