@@ -56,7 +56,10 @@ var _not_pd_ = _pd_ == '/'?'\\\\':'/';
 var config = {platform: _platform_},
 	//version qualifier
 	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
-	addedScript = null,	currentModuleSpec = null;
+	addedScript = null,	currentModuleSpec = null,
+	IMPORTS_MAP = Map(), loadingTreeMap = [], 
+	loadingTree = {modules:Map(), pending:0, id:0}, 
+	loadingTreeStack = new Array();
 
 
 function loadConfiguration(onLoad){
@@ -584,8 +587,8 @@ function _dependencies(items, ctx){
 	}
 	return r.imports;
 }
+function Map(){return new Object(null);}
 
-var IMPORTS_MAP = new Object(null);
 
 function ImportSpec(fileName){
 	this.imports = null;
@@ -635,28 +638,35 @@ AsyncLoader.prototype = {
 			var mapped = IMPORTS_MAP[filename];
 			if(mapped) continue;
 
+			//save reference of the tree loading current file
+			loadingTreeMap[filename] = loadingTree;
 
 			var handler = _fileHandlers[fileExt(filename)];
 			if(!handler) {
 				//default import spec
 				var spec = new ImportSpec(filename);
 				IMPORTS_MAP[filename] = spec;
+				loadingTree.modules[filename] = spec;
 				spec.status = "loading";
 				continue;
 			}
-			_loaderStats.pendingImports++;
+		
+			loadingTree.pending++;
 
-			IMPORTS_MAP[filename] = handler.importSpec(filename);
-			handler.load(filename, this, IMPORTS_MAP[filename]);
+			var spec =  handler.importSpec(filename);	
+			IMPORTS_MAP[filename] = loadingTree.modules[filename] = spec;
+			
+			handler.load(filename, this, spec);
 		}
 	},
 
 	onitemloaded : function(item){
 		var spec = IMPORTS_MAP[item];
+		var myLoadingTree = loadingTreeMap[item];
 
 		//clear current module spec, resource loaded next maybe not be a module
 		if(spec instanceof ImportSpec && currentModuleSpec ) {
-			spec = IMPORTS_MAP[item] = currentModuleSpec;
+			spec = IMPORTS_MAP[item] = loadingTree.modules[item] = currentModuleSpec;
 			currentModuleSpec = null;
 		}
 
@@ -665,7 +675,10 @@ AsyncLoader.prototype = {
 		if(_loaderStats.loadingIndicator) {
 			_loaderStats.loadingIndicator.update(0,1,item);
 		}
-		
+
+		myLoadingTree.pending--;
+
+
 		//get current module context
 		var ctx = context(item);
 		
@@ -674,36 +687,37 @@ AsyncLoader.prototype = {
 			
 			//set scope URI
 			spec.scope.__sjs_uri__ = item; 
-			
 
 			//resolve prerequisites
 			var prereqs = spec.prerequisites = _dependencies(spec.__sjs_module__.prerequisite,ctx);
-			
 
 			//	resolve required resources relative to
 			//	current context
 			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.required,ctx);
-			
 
 			//Load dependencies
-			if(isPendingPrerequisites(prereqs)) {
+			if(prereqs) {
+				//prerequisite loading starts on a new tree
+				var treeId = loadingTreeStack.push(loadingTree);
+				loadingTree = {pending:0, modules:Map(), id:treeId};
 				load(to(prereqs,function(i){return i.url}));
 			} else if(imports) {
 				load(to(imports,function(i){return i.url}));
 			}
 		}
-
-
-
-		/*
+		
 		//execute import if no import dependencies are present
-		if(!spec.imports || spec.imports.length == 0) {
-			spec.execute();
-		}
-		*/
-		if(--_loaderStats.pendingImports == 0){
+		// if(!spec.imports || spec.imports.length == 0) {
+		// 	spec.execute();
+		// }
+
+
+		if(loadingTree.pending == 0){
 			_loadingComplete();
 		}
+		// if(--_loaderStats.pendingImports == 0){
+		// 	_loadingComplete();
+		// }
 	}
 }
 
@@ -713,7 +727,7 @@ function _loadingComplete(){
 	/* module loading is complete execute dependency tree*/
 	log.debug("Run dependency tree");
 	
-	executeImportsTree();
+	executeLoadingTree();
 		
 	var oncomplete = _loaderStats.oncomplete.pop();
 	while(oncomplete){
@@ -787,11 +801,11 @@ function executeImportSpec(importSpec){
 /** 
  * 
  */
-function executeImportsTree(){
+function executeLoadingTree(){
 	var result = [];
-	var keys = Object.keys(IMPORTS_MAP);
+	var keys = Object.keys(loadingTree.modules);
 	for(var key in keys ){
-		var proc = IMPORTS_MAP[keys[key]];
+		var proc = loadingTree.modules[keys[key]];
 		executeImportSpec(proc);
 	}
 	return result;
@@ -819,18 +833,23 @@ function forMap(m,fn){
 	if(typeof(fn) != 'function') return;
 	var keys = Object.keys(m);
 	for(var key in keys ){
-		fn(IMPORTS_MAP[keys[key]]);
+		fn(m[keys[key]]);
 	}
 }
 
 function continueLoading(){
-	forMap(IMPORTS_MAP, function(spec){
+
+	var moreToLoad = new Array();
+	forMap(loadingTree.modules, function(spec){
 		var imports = _pendingImports(spec);
 		if(!imports) return;
-		setTimeout(function(){
+		to(imports,function(i){moreToLoad.push(i.url);});
+	});
+/*
+	setTimeout(function(){
 			load(to(imports,function(i){return i.url}));
 		},1);
-	});
+		*/
 }
 
 function isPendingPrerequisites(prereq){
