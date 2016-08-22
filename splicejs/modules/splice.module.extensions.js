@@ -39,7 +39,7 @@ definition:function(scope){
               ,   match = null;  
               while((match = cStart.exec(response.text))){
                 var end = cEnd.exec(response.text);
-                log.info(match);
+               // log.info(match);
               }
 
               spec.dom.innerHTML = response.text;

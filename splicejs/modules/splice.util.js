@@ -1,6 +1,7 @@
 sjs.module({
-definition:function(sjs){
+definition:function(scope){
 
+var sjs = scope.sjs;
 
 function join(separator, collection, start){
   if(start == null) start = 0;
@@ -16,7 +17,7 @@ function join(separator, collection, start){
 
 
 
-sjs.exports({
+scope.exports({
   Text:{
     join:join
   }

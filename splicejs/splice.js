@@ -57,9 +57,7 @@ var config = {platform: _platform_},
 	//version qualifier
 	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
 	addedScript = null,	currentModuleSpec = null,
-	IMPORTS_MAP = Map(), loadingTreeMap = [], 
-	loadingTree = {modules:Map(), pending:0, id:0}, 
-	loadingTreeStack = new Array();
+	importsMap = Map(), currentFrame = new Array(),	frameStack = new Array();
 
 
 function loadConfiguration(onLoad){
@@ -433,14 +431,20 @@ var _fileHandlers = {
 	Loads resources on existing stack
 */
 function load(resources,oncomplete){
-	/* get base context */
+	// get base context
 	var ctx = context();
-	/* check is resources are abs urls, if not resolve to abs url*/
+
+	//setup frame
+	var frame = new Array();
+	
+	// check if resources are abs urls, if not resolve to abs url
+	// place resource urls onto a frame 
 	for(var i=0; i<resources.length; i++){
-		if(!isAbsUrl(resources[i]))
-			resources[i] = ctx.resolve(resources[i]);
+		if(!isAbsUrl(resources[i])) resources[i] = ctx.resolve(resources[i]);
+		frame.push(resources[i]);	
 	}
-	new AsyncLoader(resources,oncomplete).load();
+	//load frame
+	Loader.loadFrame(frame);
 }
 
 /*
@@ -452,7 +456,7 @@ function applyImports(imports){
 	for(var i=0; i<imports.length; i++){
 		if(!imports[i].namespace) continue;
 		var ns = imports[i].namespace;
-		var x = IMPORTS_MAP[imports[i].url];
+		var x = importsMap[imports[i].url];
 		if(!x || !x.scope) continue;
 		x = x.scope.__sjs_module_exports__;
 		var keys = Object.keys(x);
@@ -637,27 +641,27 @@ AsyncLoader.prototype = {
 			var filename = this.resources[i];
 			var mapped = IMPORTS_MAP[filename];
 			if(mapped) { 
-				loadingTree.modules[filename] = mapped;
+				currentFrame.modules[filename] = mapped;
 				continue;
 			}
 
 			//save reference of the tree loading current file
-			loadingTreeMap[filename] = loadingTree;
+			moduleFrameMap[filename] = currentFrame;
 
 			var handler = _fileHandlers[fileExt(filename)];
 			if(!handler) {
 				//default import spec
 				var spec = new ImportSpec(filename);
 				IMPORTS_MAP[filename] = spec;
-				loadingTree.modules[filename] = spec;
+				currentFrame.modules[filename] = spec;
 				spec.status = "loading";
 				continue;
 			}
 		
-			loadingTree.pending++;
+			currentFrame.pending++;
 
 			var spec =  handler.importSpec(filename);	
-			IMPORTS_MAP[filename] = loadingTree.modules[filename] = spec;
+			IMPORTS_MAP[filename] = currentFrame.modules[filename] = spec;
 			
 			handler.load(filename, this, spec);
 		}
@@ -665,11 +669,11 @@ AsyncLoader.prototype = {
 
 	onitemloaded : function(item){
 		var spec = IMPORTS_MAP[item];
-		var myLoadingTree = loadingTreeMap[item];
+		var myLoadingTree = moduleFrameMap[item];
 
 		//clear current module spec, resource loaded next maybe not be a module
 		if(spec instanceof ImportSpec && currentModuleSpec ) {
-			spec = IMPORTS_MAP[item] = loadingTree.modules[item] = currentModuleSpec;
+			spec = IMPORTS_MAP[item] = currentFrame.modules[item] = currentModuleSpec;
 			currentModuleSpec = null;
 		}
 
@@ -701,17 +705,17 @@ AsyncLoader.prototype = {
 			//place imports onto the current loading tree
 			//with a null importSpec
 			to(imports,function(i){
-				loadingTree.modules[i.url] = null;
+				currentFrame.modules[i.url] = null;
 				return null;
 			});
 
 			//Load dependencies
 			if(prereqs) {
 				//prerequisite loading starts on a new tree
-				var treeId = loadingTreeStack.push(loadingTree);
-				loadingTree = {pending:0, modules:Map(), id:treeId};
+				var treeId = frameStack.push(currentFrame);
+				currentFrame = {pending:0, modules:Map(), id:treeId};
 				load(to(prereqs,function(i){
-					loadingTree.modules[i.url] = null;
+					currentFrame.modules[i.url] = null;
 					return i.url;
 				}));
 			} else if(imports) {
@@ -725,7 +729,7 @@ AsyncLoader.prototype = {
 		// }
 
 
-		if(loadingTree.pending == 0){
+		if(currentFrame.pending == 0){
 			_loadingComplete();
 		}
 		// if(--_loaderStats.pendingImports == 0){
@@ -733,6 +737,119 @@ AsyncLoader.prototype = {
 		// }
 	}
 }
+
+
+var Loader = {
+	loadFrame:function(frame){
+		//set current frame
+		currentFrame = frame;
+		
+		//loop through modules in the frame
+		//skip the already loaded ones
+		for(var i=0; i < frame.length; i++){
+			var filename = frame[i];
+			var spec = importsMap[filename];
+			//check for null and undefined 
+			if(spec != null){
+				continue;
+			}
+			//get handler for current file
+			var handler = _fileHandlers[fileExt(filename)];
+
+			//skip unknown files
+			if(!handler) continue;
+
+			//get import spec from the handler			
+			spec = importsMap[filename] = handler.importSpec(filename); 
+			
+			//load file
+			handler.load(filename,this,spec);
+		}
+	},
+	onitemloaded:function(item){
+		var spec = importsMap[item];
+		//clear current module spec, resource loaded next may not be a module
+		if(spec instanceof ImportSpec && currentModuleSpec ) {
+			spec = importsMap[item] = currentModuleSpec;
+			currentModuleSpec = null;
+		}
+		
+		//mark import spec as loaded 
+		spec.isLoaded = true;
+		
+
+		//process dependencies for module specs
+		if(spec instanceof ModuleSpec){
+
+			//get current module context
+			var ctx = context(item);
+
+			//set scope URI
+			spec.scope.__sjs_uri__ = item; 
+
+			//resolve prerequisites
+			var prereqs = spec.prerequisites = _dependencies(spec.__sjs_module__.prerequisite,ctx);
+
+			//	resolve required resources relative to
+			//	current context
+			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.required,ctx);	
+		
+			//place imports onto the current module frame
+			//if modules have already been encountered, skip them
+			if(imports) {
+				to(imports,function(i){
+					currentFrame.push(i.url);
+					return;
+				});
+			}
+
+			//if prerequisites are present, save current frame and create new frame
+			if(prereqs){
+				frameStack.push(currentFrame);
+				this.loadFrame(to(prereqs,function(i){
+					return i.url;
+				}));	
+			}
+
+		}
+
+		//check if current frame is load complete
+		while(currentFrame && isFrameLoaded(currentFrame)){
+			executeFrame(currentFrame);
+			currentFrame = frameStack.pop();
+		}
+		
+		//continue loading
+		if(currentFrame) this.loadFrame(currentFrame);
+		else {
+			log.info('Loading complete');
+		}
+
+
+	}
+}
+
+function isFrameLoaded(frame){
+	if(!frame) return false;
+//	log.info(frame);
+	for(var i=0; i<frame.length; i++){
+	//	log.info('Frame check ' + frame[i] );
+		if(importsMap[frame[i]] && importsMap[frame[i]].isLoaded) { 
+		//	log.info('...loaded');
+			continue; 
+		}
+		return false;
+	}
+//	log.info('Frame is loaded');
+	return true;
+}
+
+function executeFrame(frame){
+	for(var i=0; i<frame.length; i++){
+		executeImportSpec(importsMap[frame[i]]);
+	}
+}
+
 
 function _loadingComplete(){
 	log.debug("Loading is complete");
@@ -793,15 +910,15 @@ function executeImportSpec(importSpec){
 	if(importSpec.prerequisites)
 	for(var i=0; i< importSpec.prerequisites.length; i++){
 		var preq = importSpec.prerequisites[i];
-		dfsStack.push(IMPORTS_MAP[preq.url]);
-		executeImportSpec(IMPORTS_MAP[preq.url]);
+		dfsStack.push(importsMap[preq.url]);
+		executeImportSpec(importsMap[preq.url]);
 		dfsStack.pop();
 	}		
 
 	//run import modules
 	if(importSpec.imports)
 	for(var i = 0; i < importSpec.imports.length; i++ ){
-		var depSpec = IMPORTS_MAP[importSpec.imports[i].url];
+		var depSpec = importsMap[importSpec.imports[i].url];
 		//import had not been loaded yet, exit
 		if(!depSpec) return;
 		dfsStack.push(depSpec);
@@ -816,9 +933,9 @@ function executeImportSpec(importSpec){
  */
 function executeLoadingTree(){
 	var result = [];
-	var keys = Object.keys(loadingTree.modules);
+	var keys = Object.keys(currentFrame.modules);
 	for(var key in keys ){
-		var proc = loadingTree.modules[keys[key]];
+		var proc = currentFrame.modules[keys[key]];
 		executeImportSpec(proc);
 	}
 	return result;
@@ -851,9 +968,9 @@ function forMap(m,fn){
 }
 
 function continueLoading(){
-	loadingTree = loadingTreeStack.pop();
+	currentFrame = frameStack.pop();
 	var moreToLoad = new Array();
-	forMap(loadingTree.modules, function(spec){
+	forMap(currentFrame.modules, function(spec){
 		var imports = _pendingImports(spec);
 		if(!imports) return;
 		to(imports,function(i){moreToLoad.push(i.url);});
@@ -899,7 +1016,7 @@ ModuleSpec.prototype.execute = function(){
 function _module(m){
 
 	if(typeof m === 'string') {
-		return IMPORTS_MAP[m];
+		return importsMap[m];
 	}
 
 	/*init module scope*/
@@ -922,7 +1039,7 @@ function _module(m){
 
 	if(current) { 
 		spec.fileName = current;
-		IMPORTS_MAP[current] = spec; 
+		importsMap[current] = spec; 
 	} else {
 		currentModuleSpec = spec;
 	}
@@ -930,7 +1047,7 @@ function _module(m){
 }
 
 _module.list= function list(){
-	return mixin({},IMPORTS_MAP);
+	return mixin({},importsMap);
 }
 
 _module.listProcessed = function listProcessed(){

@@ -8,6 +8,8 @@ definition:function(scope){
     log = scope.sjs.log
     ;
 
+    log.info('Network ran');
+
   /*
   ----------------------------------------------------------
   	HttpRequest
