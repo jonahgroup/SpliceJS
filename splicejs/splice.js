@@ -57,7 +57,7 @@ var config = {platform: _platform_},
 	//version qualifier
 	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
 	addedScript = null,	currentModuleSpec = null,
-	importsMap = Map(), currentFrame = new Array(),	frameStack = new Array();
+	importsMap = Map(), currentFrame = null, frameStack = new Array();
 
 
 function loadConfiguration(onLoad){
@@ -435,14 +435,13 @@ function load(resources,oncomplete){
 	var ctx = context();
 
 	//setup frame
-	var frame = new Array();
-	
 	// check if resources are abs urls, if not resolve to abs url
 	// place resource urls onto a frame 
-	for(var i=0; i<resources.length; i++){
-		if(!isAbsUrl(resources[i])) resources[i] = ctx.resolve(resources[i]);
-		frame.push(resources[i]);	
-	}
+	var frame = new ImportFrame(to(resources,function(i){
+		if(!isAbsUrl(i)) return ctx.resolve(i);
+		return i;
+	}));
+	
 	//load frame
 	Loader.loadFrame(frame);
 }
@@ -614,8 +613,9 @@ var _loaderStats = {
 
 
 function to(array,fn){
-	if(typeof fn != 'function') return [];
-	var result = []
+	if(!array) return new Array();
+	if(typeof fn != 'function') return new Array();
+	var result = new Array()
 	,	keys = Object.keys(array);
 	for(var key in keys ){
 		result.push(fn(array[keys[key]]));
@@ -737,17 +737,38 @@ AsyncLoader.prototype = {
 		// }
 	}
 }
+/** 
+ * 
+*/
+function ImportFrame(imports){
+	this.imports = imports;
+	this.pendingImports = 0;
+	this.parent = null;
+	if(imports)
+		this.pendingImports = imports.length;
+}
 
+ImportFrame.prototype = {
+	oncomplete:function(){
+
+	},
+	onitemloaded:function(item){
+		if(--this.pendingImports == 0) this.oncomplete();
+	}
+}
 
 var Loader = {
 	loadFrame:function(frame){
 		//set current frame
 		currentFrame = frame;
 		
+
+		var imports = frame.imports;
+
 		//loop through modules in the frame
 		//skip the already loaded ones
-		for(var i=0; i < frame.length; i++){
-			var filename = frame[i];
+		for(var i=0; i < imports.length; i++){
+			var filename = imports[i];
 			var spec = importsMap[filename];
 			//check for null and undefined 
 			if(spec != null){
@@ -761,7 +782,7 @@ var Loader = {
 
 			//get import spec from the handler			
 			spec = importsMap[filename] = handler.importSpec(filename); 
-			
+			spec.frame = frame;
 			//load file
 			handler.load(filename,this,spec);
 		}
@@ -788,29 +809,39 @@ var Loader = {
 			spec.scope.__sjs_uri__ = item; 
 
 			//resolve prerequisites
-			var prereqs = spec.prerequisites = _dependencies(spec.__sjs_module__.prerequisite,ctx);
+			var prereqs = spec.prerequisites = to(
+				_dependencies(spec.__sjs_module__.prerequisite,ctx), 
+				function(i){
+					i.parent = spec; return i;
+				}
+			);
 
 			//	resolve required resources relative to
 			//	current context
-			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.required,ctx);	
-		
-			//place imports onto the current module frame
-			//if modules have already been encountered, skip them
-			if(imports) {
-				to(imports,function(i){
-					currentFrame.push(i.url);
-					return;
-				});
-			}
+			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = to(
+				_dependencies(spec.__sjs_module__.required,ctx),
+				function(i){
+					i.parent = spec; return i;
+				});	
+
+			//get imports frame
+			//imports frame may not be processed until 
+			//prerequisites are loaded and run
+			var importsFrame = new ImportFrame(imports);
+
+			var prereqFrame = to(prereqs,function(i){
+				return i.url;
+			});
+
+			frameStack.push(currentFrame);
 
 			//if prerequisites are present, save current frame and create new frame
 			if(prereqs){
-				frameStack.push(currentFrame);
-				this.loadFrame(to(prereqs,function(i){
-					return i.url;
-				}));	
+				frameStack.push(importsFrame);
+				this.loadFrame(prereqFrame);	
+			} else if(imports) {
+				this.loadFrame(importsFrame);
 			}
-
 		}
 
 		//check if current frame is load complete
@@ -1039,6 +1070,7 @@ function _module(m){
 
 	if(current) { 
 		spec.fileName = current;
+		spec.frame = importsMap[current].frame;
 		importsMap[current] = spec; 
 	} else {
 		currentModuleSpec = spec;
