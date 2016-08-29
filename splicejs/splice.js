@@ -390,7 +390,7 @@ function currentScript(){
 			}
 		}
 	}
-	log.error('Current script not found');
+	log.debug('Current script not found');
 	return null;
 }
 
@@ -437,13 +437,10 @@ function load(resources,oncomplete){
 	//setup frame
 	// check if resources are abs urls, if not resolve to abs url
 	// place resource urls onto a frame 
-	var frame = new ImportFrame(to(resources,function(i){
+	Loader.loadFrame(to(resources,function(i){
 		if(!isAbsUrl(i)) return ctx.resolve(i);
 		return i;
 	}));
-	
-	//load frame
-	Loader.loadFrame(frame);
 }
 
 /*
@@ -516,6 +513,10 @@ function _vercomp(v1,v2){
 }
 
 
+function ImportItem(ns,url){
+	this.namespace = ns;
+	this.url = url;
+}
 
 function qualifyImport(url){
 	if(!url) return null;
@@ -586,7 +587,7 @@ function _dependencies(items, ctx){
 		}
 
 		r.resources.push(url);
-		r.imports.push({namespace:ns, url:url});
+		r.imports.push(new ImportItem(ns,url));
 	}
 	return r.imports;
 }
@@ -596,6 +597,7 @@ function Map(){return new Object(null);}
 function ImportSpec(fileName){
 	this.imports = null;
 	this.prerequisites = null;
+	this.frames = new Array();
 	this.fileName = fileName;
 }
 ImportSpec.prototype = { 
@@ -618,7 +620,10 @@ function to(array,fn){
 	var result = new Array()
 	,	keys = Object.keys(array);
 	for(var key in keys ){
-		result.push(fn(array[keys[key]]));
+		var item = fn(array[keys[key]]);
+		//dont insert null or undefined
+		if(item == null) continue;
+		result.push(item);
 	}
 	return result;
 }
@@ -737,43 +742,30 @@ AsyncLoader.prototype = {
 		// }
 	}
 }
-/** 
- * 
-*/
-function ImportFrame(imports){
-	this.imports = imports;
-	this.pendingImports = 0;
-	this.parent = null;
-	if(imports)
-		this.pendingImports = imports.length;
-}
 
-ImportFrame.prototype = {
-	oncomplete:function(){
-
-	},
-	onitemloaded:function(item){
-		if(--this.pendingImports == 0) this.oncomplete();
-	}
-}
 
 var Loader = {
+	pending:0,
+	root:null,
 	loadFrame:function(frame){
-		//set current frame
-		currentFrame = frame;
-		
+		var imports = frame;
 
-		var imports = frame.imports;
+		//assign root
+		if(!this.root) this.root = imports;
 
 		//loop through modules in the frame
 		//skip the already loaded ones
 		for(var i=0; i < imports.length; i++){
 			var filename = imports[i];
+
+			if(filename instanceof ImportItem){
+				filename = filename.url;
+			}
+
 			var spec = importsMap[filename];
 			//check for null and undefined 
-			if(spec != null){
-				continue;
-			}
+			if(spec != null) continue;
+			
 			//get handler for current file
 			var handler = _fileHandlers[fileExt(filename)];
 
@@ -782,7 +774,9 @@ var Loader = {
 
 			//get import spec from the handler			
 			spec = importsMap[filename] = handler.importSpec(filename); 
-			spec.frame = frame;
+			
+			this.pending++;
+
 			//load file
 			handler.load(filename,this,spec);
 		}
@@ -791,10 +785,13 @@ var Loader = {
 		var spec = importsMap[item];
 		//clear current module spec, resource loaded next may not be a module
 		if(spec instanceof ImportSpec && currentModuleSpec ) {
+			currentModuleSpec.frames = spec.frames;
 			spec = importsMap[item] = currentModuleSpec;
 			currentModuleSpec = null;
 		}
 		
+		this.pending--;
+
 		//mark import spec as loaded 
 		spec.isLoaded = true;
 		
@@ -809,77 +806,103 @@ var Loader = {
 			spec.scope.__sjs_uri__ = item; 
 
 			//resolve prerequisites
-			var prereqs = spec.prerequisites = to(
-				_dependencies(spec.__sjs_module__.prerequisite,ctx), 
-				function(i){
-					i.parent = spec; return i;
-				}
-			);
+			var prereqs = spec.prerequisites = _dependencies(spec.__sjs_module__.prerequisite,ctx);
 
 			//	resolve required resources relative to
 			//	current context
-			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = to(
-				_dependencies(spec.__sjs_module__.required,ctx),
-				function(i){
-					i.parent = spec; return i;
-				});	
+			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.required,ctx);
 
-			//get imports frame
-			//imports frame may not be processed until 
-			//prerequisites are loaded and run
-			var importsFrame = new ImportFrame(imports);
-
-			var prereqFrame = to(prereqs,function(i){
-				return i.url;
-			});
-
-			frameStack.push(currentFrame);
 
 			//if prerequisites are present, save current frame and create new frame
-			if(prereqs){
-				frameStack.push(importsFrame);
-				this.loadFrame(prereqFrame);	
-			} else if(imports) {
-				this.loadFrame(importsFrame);
+			if(prereqs && prereqs.length > 0){
+				this.loadFrame(prereqs);	
+			} else if(imports && imports.length > 0) {
+				this.loadFrame(imports);
 			}
 		}
-
-		//check if current frame is load complete
-		while(currentFrame && isFrameLoaded(currentFrame)){
-			executeFrame(currentFrame);
-			currentFrame = frameStack.pop();
-		}
 		
-		//continue loading
-		if(currentFrame) this.loadFrame(currentFrame);
-		else {
-			log.info('Loading complete');
+		if(this.pending == 0) {
+				log.info('Loading complete');
+				processFrame(this.root);
+		}
+	}
+}
+
+
+function processFrame(frame, oncomplete){
+	if(!frame || frame.length == 0) {
+		return;
+	}
+	var runCount = 0;
+	for(var i=0; i<frame.length; i++){
+		var url =  frame[i];
+		if(url instanceof ImportItem) url = url.url;
+
+		var spec = importsMap[url];
+
+		var toLoad = {
+			imports: to(spec.imports,function(i){
+				if(importsMap[i.url] && importsMap[i.url].isLoaded) 
+					return null;
+				return i;
+			}),
+			prereqs: to(spec.prerequisites,function(i){
+				if(importsMap[i.url] && importsMap[i.url].isLoaded) 
+					return null;
+				return i;
+			})
+		};
+
+
+		var toExec = {
+			imports: to(spec.imports,function(i){
+				if(importsMap[i.url] && importsMap[i.url].isProcessed) 
+					return null;
+				return i;
+			}),
+			prereqs: to(spec.prerequisites,function(i){
+				if(importsMap[i.url] && importsMap[i.url].isProcessed) 
+					return null;
+				return i;
+			})
+		};
+
+		//load prereqs if any
+		if(toLoad.prereqs.length > 0) {
+			Loader.loadFrame(toLoad.prereqs);
+			continue;
 		}
 
+		var pEx = 0, pIm = 0;
 
-	}
-}
-
-function isFrameLoaded(frame){
-	if(!frame) return false;
-//	log.info(frame);
-	for(var i=0; i<frame.length; i++){
-	//	log.info('Frame check ' + frame[i] );
-		if(importsMap[frame[i]] && importsMap[frame[i]].isLoaded) { 
-		//	log.info('...loaded');
-			continue; 
+		//run prerequisites
+		if(toExec.prereqs.length > 0) {
+			pEx = processFrame(toExec.prereqs);
+			if(pEx < toExec.prereqs.length ) continue;
 		}
-		return false;
+
+		//load remaining imports 
+		if(toLoad.imports.length > 0) {
+			Loader.loadFrame(toLoad.imports);
+			continue;
+		}
+
+		//run prerequisites
+		if(toExec.imports.length > 0) {
+			pIm = processFrame(toExec.imports);
+			if(pIm < toExec.imports.length ) continue;
+		}
+
+		//nothing to load nothing to run then run the spec
+		if(	toExec.imports.length + toExec.prereqs.length - pEx - pIm === 0) {
+			if(!spec.isProcessed) spec.execute();
+			runCount++;
+		}
 	}
-//	log.info('Frame is loaded');
-	return true;
+	return runCount;
 }
 
-function executeFrame(frame){
-	for(var i=0; i<frame.length; i++){
-		executeImportSpec(importsMap[frame[i]]);
-	}
-}
+
 
 
 function _loadingComplete(){
@@ -1026,9 +1049,11 @@ function isPendingPrerequisites(prereq){
 	Module processor
 */
 function ModuleSpec(scope,m){
+	//module scope reference 
 	this.scope = scope;
 	this.__sjs_module__ = m;
 }
+
 ModuleSpec.prototype.execute = function(){
 	this.isProcessed = true;
 	
@@ -1070,7 +1095,7 @@ function _module(m){
 
 	if(current) { 
 		spec.fileName = current;
-		spec.frame = importsMap[current].frame;
+		spec.frames = importsMap[current].frames;
 		importsMap[current] = spec; 
 	} else {
 		currentModuleSpec = spec;
