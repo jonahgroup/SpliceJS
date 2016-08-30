@@ -79,13 +79,18 @@ definition:function(scope){
       * */
       var head = document.head || document.getElementsByTagName('head')[0];
       
+      /*
       linkref.onload = function(){
         if(!linkref.readyState || linkref.readyState == 'complete') {
         //	URL_CACHE[filename] = true;
           loader.onitemloaded(filename);
         }
       };
-      
+      */
+      //lets not wait for CSS to load since CSS are processed by the browser
+      setTimeout(function(){
+        loader.onitemloaded(filename);
+      },1);
       head.appendChild(linkref);
      
       
