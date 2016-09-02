@@ -35,8 +35,10 @@ required:[
 , 	'splice.controls/splice.controls.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
 	"use strict";
+
+	var scope = this;
 
 	/* imports */
 	var

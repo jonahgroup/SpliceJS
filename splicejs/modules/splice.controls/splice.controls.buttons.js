@@ -14,10 +14,13 @@ required:[
 	'splice.controls.buttons.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
+	var scope = this
+	,	sjs = this.imports.sjs;
+	
 	var
       	imports = scope.imports
-    , 	debug = scope.sjs.log.debug
+    , 	debug = sjs.log.debug
     ;
 
 	var

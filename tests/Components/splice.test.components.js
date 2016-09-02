@@ -1,4 +1,4 @@
-global.sjs.module({
+sjs.module({
 prerequisite:[
   {Splash:'../SplashScreens/splash2.js'},
   '/{sjshome}/modules/splice.module.extensions.js'
@@ -20,11 +20,13 @@ required:[
   'splice.test.components.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
 
-  var sjs = scope.sjs
+  var scope = this;
+
+  var sjs = scope.imports.sjs
   ,   imports = scope.imports
-  ,   log = scope.sjs.log
+  ,   log = scope.imports.sjs.log
   ;
 
   var Class = imports.Inheritance.Class

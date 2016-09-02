@@ -1,6 +1,8 @@
 
 sjs.module({
-definition:function(scope){
+definition:function(){
+
+var scope = this;
 
 var STRINGBODY = 0
 , 	FORMAT = 1

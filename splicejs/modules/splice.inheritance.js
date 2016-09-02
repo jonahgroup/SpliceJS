@@ -1,6 +1,8 @@
 global.sjs.module({
-definition:function(scope){
+definition:function(){
   
+	var scope = this;
+
   var sjs = scope.sjs;
   /*
   	Inheritance model

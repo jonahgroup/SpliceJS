@@ -1,6 +1,6 @@
 sjs.module({
-definition:function(scope){
-
+definition:function(){
+var scope = this;
 
 //todo: add loop JOIN method to put them on the same timer
     var asyncLoop = function asyncLoop(from, to, pageSize, oncallback, oncomplete, onpage){

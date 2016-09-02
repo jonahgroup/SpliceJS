@@ -11,9 +11,11 @@ required:[
 	'splice.controls.treeview.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
+	var scope = this;
+	
 	var
-		sjs = scope.sjs
+		sjs = scope.imports.sjs
     ,   imports = scope.imports
 	;
 

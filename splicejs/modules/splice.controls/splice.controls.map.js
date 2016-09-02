@@ -11,9 +11,10 @@ required:[
 	'splice.controls.map.html',
 ]
 ,
-definition:function(scope){
-	var 
-        sjs = scope.sjs
+definition:function(){
+	var scope = this;
+	
+	var sjs = scope.imports.sjs
         imports = scope.imports
     ;
 

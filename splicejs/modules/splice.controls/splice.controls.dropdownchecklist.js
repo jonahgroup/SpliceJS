@@ -11,8 +11,10 @@ required:[
 definition:function(sjs){
 		"use strict";
 
-	var scope = this.scope
-	,	Class = this.sjs.Class
+	var scope = this
+	,	sjs = this.imports.sjs;
+
+	var	Class = this.sjs.Class
 	,	Event = this.sjs.Event
 	,	exports = sjs.exports;
 

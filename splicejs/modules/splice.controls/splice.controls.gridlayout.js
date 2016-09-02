@@ -11,9 +11,11 @@ required:[
 	'splice.controls.gridlayout.html'
 ]
 ,
-definition:function(scope){
-	var sjs = scope.sjs
-	,	log = scope.sjs.log
+definition:function(){
+	var scope = this
+	,	sjs = this.imports.sjs;
+
+	var log = sjs.log
     ,   imports = scope.imports
 	;
 

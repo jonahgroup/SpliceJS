@@ -12,13 +12,14 @@ required:[
 	'splice.controls.selectors.css',
 	'splice.controls.selectors.html'
 ],
-definition:function(scope){
+definition:function(){
 	"use strict";
 
+	var scope = this
+	,	sjs = scope.imports.sjs;
+
 	/* framework imports */
-	var
-        sjs = scope.sjs
-    ,   imports = scope.imports
+	var imports = scope.imports
 	;
 
 	/* dependency imports */

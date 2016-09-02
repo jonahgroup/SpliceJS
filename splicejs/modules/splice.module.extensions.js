@@ -2,11 +2,17 @@ sjs.module({
 required:[
   { Networking  : '/{sjshome}/modules/splice.network.js'}
 ],
-definition:function(scope){
-  var imports = scope.imports 
-  ,   http = imports.Networking.http
-  ,   ImportSpec = scope.sjs.ImportSpec
-  ,   log = scope.sjs.log;
+definition:function(){
+  var scope = this;
+  
+  var 
+      imports = scope.imports 
+  ,   sjs = scope.imports.sjs;
+
+  var 
+      http = imports.Networking.http
+  ,   ImportSpec = imports.ImportSpec
+  ,   log = scope.imports.sjs.log;
   
 
   /*

@@ -4,7 +4,9 @@ required:[
   {Core : '/{sjshome}/modules/splice.component.core.js'},
   {Controls : '/{sjshome}/modules/splice.component.controls.js'}
 ],
-definition:function(scope){
+definition:function(){
+
+  var scope = this;
 
   var imports = scope.imports;
 

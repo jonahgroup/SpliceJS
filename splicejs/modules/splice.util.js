@@ -1,7 +1,9 @@
 sjs.module({
 definition:function(scope){
+  "use strict";
+  var scope = this;
 
-var sjs = scope.sjs;
+  var sjs = scope.imports.sjs;
 
 function join(separator, collection, start){
   if(start == null) start = 0;

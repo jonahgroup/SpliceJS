@@ -18,6 +18,12 @@ definition:function(scope){
     );
 
 
+    // scope.load({
+    //     required:[''],
+    //     definition:function(scope){
+
+    // }})
+
     function LocalClass(){}
 
     scope.add(

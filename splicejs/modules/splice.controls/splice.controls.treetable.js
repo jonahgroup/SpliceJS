@@ -8,7 +8,9 @@ required:[
 	'splice.controls.treetable.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
+
+	var scope = this;
 
 	var
 		imports = scope.imports

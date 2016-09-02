@@ -3,13 +3,16 @@ required:[
   { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
   { Sync      : '/{sjshome}/modules/splice.async.js'}
 ],
-definition:function(scope){
+definition:function(){
     "use strict";
-    var sjs = scope.sjs
-    ,   fname = scope.sjs.fname
+
+    var scope = this;
+    var sjs = scope.imports.sjs;
+    var 
+        fname = sjs.fname
     ,   imports = scope.imports
-    ,   mixin = scope.sjs.mixin
-    ,   log = scope.sjs.log
+    ,   mixin = sjs.mixin
+    ,   log = sjs.log
     ;
 
     var

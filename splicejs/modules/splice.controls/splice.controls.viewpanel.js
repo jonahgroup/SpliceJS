@@ -11,8 +11,9 @@ required:[
 ,
 definition:function(scope){
 
-	var
-		sjs = scope.sjs
+	var scope = this;
+
+	var	sjs = scope.imports.sjs
     ,   imports = scope.imports
 	//,	overlay = sjs.display.overlay
 	;

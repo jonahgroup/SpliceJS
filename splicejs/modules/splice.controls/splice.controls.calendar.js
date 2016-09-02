@@ -9,11 +9,13 @@ required:[
 	'splice.controls.calendar.html',
 	'splice.controls.calendar.css'
 ],
-definition:function(scope){
+definition:function(){
 	"use strict"
-    var 
-        sjs = scope.sjs
-    ,    imports = scope.imports
+	var scope = this
+	;
+
+    var sjs = scope.imports.sjs
+    	imports = scope.imports
     ;
 
 	var	DAYS_MONTH = [

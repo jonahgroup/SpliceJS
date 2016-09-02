@@ -11,11 +11,13 @@ required:[
 	{'SpliceJS.UI':	'/{sjshome}/modules/splice.ui.js'},
 	 'splice.controls.controllers.html'
 ],
-definition:function(scope){
+definition:function(){
 	"use strict";
+	var scope = this
+	,	sjs = this.imports.sjs;
+
 	var
-        sjs = scope.sjs
-    ,   imports = scope.imports
+    	imports = scope.imports
     ;
 
 	var Class = imports.Inheritance.Class

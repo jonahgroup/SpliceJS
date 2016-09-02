@@ -5,7 +5,7 @@ function AnimationLoop(callback){
 	window.requestAnimationFrame(AnimationLoop(callback));
 }
 */
-definition:function(scope){
+definition:function(){
 	"use strict";
 
 	//extends the instance of the library
@@ -154,7 +154,7 @@ definition:function(scope){
 	}
 
 	//module exports
-	scope.exports(
+	this.exports(
 		StoryBoard, Animation, Animate
 	);
 }});

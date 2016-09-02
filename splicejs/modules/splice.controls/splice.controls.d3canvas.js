@@ -10,11 +10,13 @@ required:[
 	'splice.controls.d3canvas.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
+
+	var scope = this
+	,	sjs = this.imports.sjs;
 
 	var
-	    sjs = scope.sjs
-    ,   imports = scope.imports
+    	imports = scope.imports
 	;
 
 	var

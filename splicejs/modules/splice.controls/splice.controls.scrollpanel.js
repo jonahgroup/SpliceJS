@@ -12,15 +12,14 @@ required:[
 	'splice.controls.scrollpanel.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
+	var scope = this
+	,	sjs = scope.imports.sjs;
 
-	var 
-	 	isTouch 	= false
+	var isTouch 	= false
 	, 	isMobile 	= false;
 
-    var 
-        sjs = scope.sjs
-    ,   imports = scope.imports
+    var imports = scope.imports
     ;
 
 	var	select = imports.Doc.select

@@ -15,12 +15,14 @@ required:[
 	{'SpliceJS.Controls':'splice.controls.listbox.js'},
 	'splice.controls.dropdownlist.html'
 ],
-definition:function(scope){
+definition:function(){
 	"use strict";
 
-	var sjs = scope.sjs
-	,	imports = scope.imports
-	,	mixin = scope.sjs.mixin
+	var scope = this
+	,	sjs = scope.imports.sjs;
+
+	var imports = scope.imports
+	,	mixin = sjs.mixin
 	;
 
 	var	Class = imports.Inheritance.Class

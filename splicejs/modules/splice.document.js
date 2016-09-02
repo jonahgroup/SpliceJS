@@ -4,9 +4,11 @@ required:[
 	{Syntax:'/{sjshome}/modules/splice.syntax.js'}
 ]
 ,
-definition:function(scope){
+definition:function(){
     "use strict";
-    var 
+    var scope = this;
+	
+	var 
         sjs = scope.sjs
     ,   imports = scope.imports
     ;

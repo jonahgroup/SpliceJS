@@ -10,12 +10,14 @@ required:[
   { Data        : '/{sjshome}/modules/splice.dataitem.js'}
 ],
 
-definition:function(scope){
+definition:function(){
 "use strict";
 
+var scope = this;
+
 var imports = scope.imports
-, 	log = scope.sjs.log
-, 	sjs = scope.sjs
+, 	log = scope.imports.sjs.log
+, 	sjs = scope.imports.sjs
 ;
 
 var http = imports.Networking.http

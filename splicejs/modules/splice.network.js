@@ -1,11 +1,11 @@
 /* global sjs */
 sjs.module({
-definition:function(scope){
+definition:function(){
   "use strict";
 
 	//configuration constants
 	var
-    log = scope.sjs.log
+        log = this.imports.sjs.log
     ;
 
     log.info('Network ran');
@@ -222,7 +222,7 @@ definition:function(scope){
 
 
   // module exports
-	scope.exports(
+	this.exports(
     remote,
     {http : { get:  HttpRequest.get, post: HttpRequest.post }}
 	);

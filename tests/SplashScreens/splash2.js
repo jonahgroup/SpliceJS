@@ -5,8 +5,10 @@ prerequisite:[
 required:[
   '/{sjshome}/resources/images/bootloading.gif'
 ], 
-definition:function(scope){
-  var document = scope.sjs.document;
+definition:function(){
+  var scope = this;
+
+  var document = this.imports.sjs.document;
 
   var style = "position:absolute; left:0px; top:0px; right:0px; bottom:0px; transition:opacity 0.4s;     background-color: rgba(10,10,10,0.8);";
 
@@ -14,7 +16,7 @@ definition:function(scope){
 
   var spinnerStyle = 'position:absolute; left:50%; height:33px; width:84px;' +
              'margin-left:-42px;'+
-             'background-image:url(\''+scope.sjs.context().resolve('/{sjshome}/resources/images/bootloading.gif')+'\');'+
+             'background-image:url(\''+scope.imports.sjs.context().resolve('/{sjshome}/resources/images/bootloading.gif')+'\');'+
              'border-bottom:1px solid #7d7d7d;'+
              'background-position:top center;'+
              'background-repeat:no-repeat;'
@@ -72,7 +74,7 @@ definition:function(scope){
   };
 
   //singletop splashscreen
-  var splash = scope.sjs.setLoadingIndicator(new Splash());
+  var splash = this.imports.sjs.setLoadingIndicator(new Splash());
  
 
   function showSplash(){
@@ -83,7 +85,7 @@ definition:function(scope){
     splash.hide();
   }
 
-  scope.exports(showSplash, hideSplash);
+  this.exports(showSplash, hideSplash);
 
   showSplash();
 

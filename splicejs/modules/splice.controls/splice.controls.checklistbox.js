@@ -19,11 +19,13 @@ required:[
   'splice.controls.checklistbox.css',
   'splice.controls.checklistbox.html'
 ],
-  definition:function(scope){
+  definition:function(){
+
+    var scope = this
+    ,   sjs = this.imports.sjs;
 
     var 
-        sjs = scope.sjs
-    ,   imports = scope.imports
+        imports = scope.imports
     ;
 
     var

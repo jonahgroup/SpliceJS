@@ -18,8 +18,11 @@ required:[
 	'splice.controls.datatable.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
 	"use strict";
+
+	var scope = this
+	,	sjs = scope.imports.sjs;
 
 	function _if(obj){
 		if(!obj) return {};
@@ -28,8 +31,8 @@ definition:function(scope){
 
 	// import dependencies
 	var imports = scope.imports
-    ,   mixin = scope.sjs.mixin
-	,	debug = scope.sjs.log.debug
+    ,   mixin = sjs.mixin
+	,	debug = sjs.log.debug
 	;
 
 	var	Class 	    = imports.Inheritance.Class

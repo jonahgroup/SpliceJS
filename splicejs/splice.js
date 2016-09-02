@@ -430,14 +430,14 @@ var _fileHandlers = {
 /*
 	Loads resources on existing stack
 */
-function load(resources,oncomplete){
+function load(resources){
 	// get base context
 	var ctx = context();
 
 	//setup frame
 	// check if resources are abs urls, if not resolve to abs url
 	// place resource urls onto a frame 
-	Loader.loadFrame(to(resources,function(i){
+	new Loader().loadFrame(to(resources,function(i){
 		if(!isAbsUrl(i)) return ctx.resolve(i);
 		return i;
 	}));
@@ -631,122 +631,8 @@ function to(array,fn){
 /*
 	Asynchronous loader
 */
-function AsyncLoader(resources, oncomplete){
-	this.resources = resources;
-	this.oncomplete = oncomplete;
-
-	if(typeof oncomplete == 'function') {
-		_loaderStats.oncomplete.push(oncomplete);
-	}
-}
-
-AsyncLoader.prototype = {
-	load : function(){
-		for(var i=0; i<this.resources.length; i++){
-			var filename = this.resources[i];
-			var mapped = IMPORTS_MAP[filename];
-			if(mapped) { 
-				currentFrame.modules[filename] = mapped;
-				continue;
-			}
-
-			//save reference of the tree loading current file
-			moduleFrameMap[filename] = currentFrame;
-
-			var handler = _fileHandlers[fileExt(filename)];
-			if(!handler) {
-				//default import spec
-				var spec = new ImportSpec(filename);
-				IMPORTS_MAP[filename] = spec;
-				currentFrame.modules[filename] = spec;
-				spec.status = "loading";
-				continue;
-			}
-		
-			currentFrame.pending++;
-
-			var spec =  handler.importSpec(filename);	
-			IMPORTS_MAP[filename] = currentFrame.modules[filename] = spec;
-			
-			handler.load(filename, this, spec);
-		}
-	},
-
-	onitemloaded : function(item){
-		var spec = IMPORTS_MAP[item];
-		var myLoadingTree = moduleFrameMap[item];
-
-		//clear current module spec, resource loaded next maybe not be a module
-		if(spec instanceof ImportSpec && currentModuleSpec ) {
-			spec = IMPORTS_MAP[item] = currentFrame.modules[item] = currentModuleSpec;
-			currentModuleSpec = null;
-		}
-
-		spec.fileName = item;
-
-		if(_loaderStats.loadingIndicator) {
-			_loaderStats.loadingIndicator.update(0,1,item);
-		}
-
-		myLoadingTree.pending--;
-
-
-		//get current module context
-		var ctx = context(item);
-		
-		//process ModuleSpec
-		if(spec instanceof ModuleSpec){
-			
-			//set scope URI
-			spec.scope.__sjs_uri__ = item; 
-
-			//resolve prerequisites
-			var prereqs = spec.prerequisites = _dependencies(spec.__sjs_module__.prerequisite,ctx);
-
-			//	resolve required resources relative to
-			//	current context
-			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.required,ctx);
-
-			//place imports onto the current loading tree
-			//with a null importSpec
-			to(imports,function(i){
-				currentFrame.modules[i.url] = null;
-				return null;
-			});
-
-			//Load dependencies
-			if(prereqs) {
-				//prerequisite loading starts on a new tree
-				var treeId = frameStack.push(currentFrame);
-				currentFrame = {pending:0, modules:Map(), id:treeId};
-				load(to(prereqs,function(i){
-					currentFrame.modules[i.url] = null;
-					return i.url;
-				}));
-			} else if(imports) {
-				load(to(imports,function(i){return i.url}));
-			}
-		}
-		
-		//execute import if no import dependencies are present
-		// if(!spec.imports || spec.imports.length == 0) {
-		// 	spec.execute();
-		// }
-
-
-		if(currentFrame.pending == 0){
-			_loadingComplete();
-		}
-		// if(--_loaderStats.pendingImports == 0){
-		// 	_loadingComplete();
-		// }
-	}
-}
-
-
-var Loader = {
-	pending:0,
-	root:null,
+function Loader(){this.pending = 0; this.root = null;}
+Loader.prototype = {
 	loadFrame:function(frame){
 		var imports = frame;
 
@@ -823,13 +709,13 @@ var Loader = {
 		
 		if(this.pending == 0) {
 				log.info('Loading complete');
-				processFrame(this.root);
+				processFrame(this,this.root);
 		}
 	}
 }
 
 
-function processFrame(frame, oncomplete){
+function processFrame(loader,frame, oncomplete){
 	if(!frame || frame.length == 0) {
 		return;
 	}
@@ -869,7 +755,7 @@ function processFrame(frame, oncomplete){
 
 		//load prereqs if any
 		if(toLoad.prereqs.length > 0) {
-			Loader.loadFrame(toLoad.prereqs);
+			loader.loadFrame(toLoad.prereqs);
 			continue;
 		}
 
@@ -877,19 +763,19 @@ function processFrame(frame, oncomplete){
 
 		//run prerequisites
 		if(toExec.prereqs.length > 0) {
-			pEx = processFrame(toExec.prereqs);
+			pEx = processFrame(loader,toExec.prereqs);
 			if(pEx < toExec.prereqs.length ) continue;
 		}
 
 		//load remaining imports 
 		if(toLoad.imports.length > 0) {
-			Loader.loadFrame(toLoad.imports);
+			loader.loadFrame(toLoad.imports);
 			continue;
 		}
 
 		//run prerequisites
 		if(toExec.imports.length > 0) {
-			pIm = processFrame(toExec.imports);
+			pIm = processFrame(loader,toExec.imports);
 			if(pIm < toExec.imports.length ) continue;
 		}
 
@@ -900,27 +786,6 @@ function processFrame(frame, oncomplete){
 		}
 	}
 	return runCount;
-}
-
-
-
-
-function _loadingComplete(){
-	log.debug("Loading is complete");
-
-	/* module loading is complete execute dependency tree*/
-	log.debug("Run dependency tree");
-	
-	executeLoadingTree();
-		
-	var oncomplete = _loaderStats.oncomplete.pop();
-	while(oncomplete){
-		if(typeof(oncomplete) == 'function') oncomplete();
-		oncomplete = _loaderStats.oncomplete.pop();
-	}
-
-	// incase only prerequisites were processed check for other panding modules
-	continueLoading();
 }
 
 var dfsStack = [];
@@ -943,108 +808,6 @@ function isDfsCycle(spec){
 	return false;
 }
 
-/**
- * @param {ImportSpec} importSpec 
-*/
-function executeImportSpec(importSpec){
-	if(importSpec.isProcessed  === true) return;
-		
-	if(isDfsCycle(importSpec)) {  
-		log.debug("Cycle detected");
-		return;
-	}
-
-	if( (!importSpec.prerequisites || importSpec.prerequisites.length ==0 ) &&
-		(!importSpec.imports || importSpec.imports.length == 0)) {
-		importSpec.execute();
-		return;
-	}
-
-	//run prerequisites first
-	if(importSpec.prerequisites)
-	for(var i=0; i< importSpec.prerequisites.length; i++){
-		var preq = importSpec.prerequisites[i];
-		dfsStack.push(importsMap[preq.url]);
-		executeImportSpec(importsMap[preq.url]);
-		dfsStack.pop();
-	}		
-
-	//run import modules
-	if(importSpec.imports)
-	for(var i = 0; i < importSpec.imports.length; i++ ){
-		var depSpec = importsMap[importSpec.imports[i].url];
-		//import had not been loaded yet, exit
-		if(!depSpec) return;
-		dfsStack.push(depSpec);
-		executeImportSpec(depSpec);
-		dfsStack.pop();
-	}
-	importSpec.execute();
-}
-
-/** 
- * 
- */
-function executeLoadingTree(){
-	var result = [];
-	var keys = Object.keys(currentFrame.modules);
-	for(var key in keys ){
-		var proc = currentFrame.modules[keys[key]];
-		executeImportSpec(proc);
-	}
-	return result;
-}
-
-
-/**  
- * Return a list of imports that are yet to be loaded
- */
-function _pendingImports(spec){
-	if(spec.isProcessed) return null;
-	if(!spec.imports || spec.imports.length == 0) return null;
-
-	var result = [];
-	for(var i=0; i<spec.imports.length; i++){
-		var s = IMPORTS_MAP[spec.imports[i].url];
-		if(!s) result.push(spec.imports[i]);
-	}
-
-	if(result.length == 0 ) return null;
-	return result;
-}
-
-function forMap(m,fn){
-	if(typeof(fn) != 'function') return;
-	var keys = Object.keys(m);
-	for(var key in keys ){
-		fn(m[keys[key]]);
-	}
-}
-
-function continueLoading(){
-	currentFrame = frameStack.pop();
-	var moreToLoad = new Array();
-	forMap(currentFrame.modules, function(spec){
-		var imports = _pendingImports(spec);
-		if(!imports) return;
-		to(imports,function(i){moreToLoad.push(i.url);});
-	});
-/*
-	setTimeout(function(){
-			load(to(imports,function(i){return i.url}));
-		},1);
-		*/
-}
-
-function isPendingPrerequisites(prereq){
-	if(!prereq || prereq.length == 0) return false;
-	for(var i=0; i < prereq.length; i++){
-		var s = IMPORTS_MAP[prereq[i].url];
-		if(!s) return true;
-	}
-	return false;
-}
-
 /*
 	Module processor
 */
@@ -1062,8 +825,32 @@ ModuleSpec.prototype.execute = function(){
 	
 	if(this.imports)
 		applyImports.call(this.scope,this.imports);
-	this.__sjs_module__.definition.call(this.scope, this.scope);
+	this.__sjs_module__.definition.call(this.scope);
 }
+
+function setupModule(scope, m){
+	if(scope) return scope;
+
+	/*init module scope*/
+	scope = new Namespace(null);
+	scope.add('imports',new Namespace());
+	scope.imports.add('sjs',mixin(Object.create(null),_core),true);
+		scope.add('exports',_exports(scope));
+	scope.add('load', function(resources){
+
+		new Loader().loadFrame()
+	});
+
+	//module scope calls only
+	scope.imports.sjs.setLoadingIndicator = function(splash){
+		_loaderStats.loadingIndicator = splash;
+		return splash;
+	};
+	scope.imports.ImportSpec = ImportSpec;
+
+	return scope;
+}
+
 
 /*
 	Loads a module
@@ -1074,20 +861,8 @@ function _module(m){
 	if(typeof m === 'string') {
 		return importsMap[m];
 	}
-
-	/*init module scope*/
-	var scope = new Namespace(null);
-	scope.add('imports',new Namespace());
-	scope.imports.add('sjs',mixin(Object.create(null),_core),true);
-	scope.add('sjs',mixin(Object.create(null),_core),true);
-	scope.add('exports',_exports(scope));
 	
-	//module scope calls only
-	scope.sjs.setLoadingIndicator = function(splash){
-		_loaderStats.loadingIndicator = splash;
-		return splash;
-	};
-	scope.sjs.ImportSpec	= ImportSpec;
+	var scope = setupModule(null,m);
 
 	// create module spec
 	var spec = new ModuleSpec(scope,m);
@@ -1095,7 +870,6 @@ function _module(m){
 
 	if(current) { 
 		spec.fileName = current;
-		spec.frames = importsMap[current].frames;
 		importsMap[current] = spec; 
 	} else {
 		currentModuleSpec = spec;
@@ -1168,6 +942,8 @@ var _core = mixin(Object.create(null),{
 
 
 window.sjs = _core;
+window.$js = _core;
+
 window.global  = {sjs: window.sjs };
 try {
     global.sjs = _core;
@@ -1202,8 +978,4 @@ loadConfiguration(function(config){
         _core.start = function(){start(config);}
     }
 });
-
-
-
-
 })( (require('splice.window.js')), (require('splice.document.js')));

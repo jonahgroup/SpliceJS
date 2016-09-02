@@ -15,12 +15,14 @@ required:[
 	'splice.controls.listbox.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
 	"use strict";
 
-	var	sjs = scope.sjs
-	, 	log = scope.sjs.log
-	,	debug =	scope.sjs.log.debug
+	var scope = this
+	,	sjs = this.imports.sjs;
+
+	var	log = sjs.log
+	,	debug =	sjs.log.debug
 	,	components = scope.components
 	, 	imports = scope.imports
   	;

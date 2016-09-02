@@ -9,11 +9,13 @@ required: [
     'splice.controls.slider.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
   "use strict";
   /* framework imports */
+  var scope = this;
+
   var
-    sjs = scope.sjs
+    sjs = scope.imports.sjs
   , imports = scope.imports
   ;
 

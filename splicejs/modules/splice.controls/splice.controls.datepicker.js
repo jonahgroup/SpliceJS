@@ -11,11 +11,14 @@ required:[
 	'splice.controls.datepicker.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
 	"use strict";
 
-	var sjs = scope.sjs
-	,	imports = scope.imports
+	var scope = this
+	,	sjs = scope.imports.sjs;
+
+	var 
+		imports = scope.imports
 	;
 
 	var

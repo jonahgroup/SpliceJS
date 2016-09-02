@@ -5,10 +5,14 @@ required:[
   {Util:'/{sjshome}/modules/splice.util.js'}
 ]
 ,
-definition:function(scope){
+definition:function(){
   "use strict";
+  
+  var scope = this;
+  var sjs = scope.imports.sjs;
+
   var
-      log = scope.sjs.log
+      log = sjs.log
   ,   imports = scope.imports
   ;
 

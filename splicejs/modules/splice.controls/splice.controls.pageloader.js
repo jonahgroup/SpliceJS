@@ -7,7 +7,8 @@ required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.pageloader.html'
 ],
-definition:function(scope){
+definition:function(){
+	var scope = this;
 
 	var
 		imports = scope.imports

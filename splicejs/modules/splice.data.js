@@ -3,10 +3,13 @@ sjs.module({
 required:[
 	{Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
 ],
-definition:function(scope){
+definition:function(){
     "use strict";
+
+	var scope = this;
+
 	var 
-		sjs = scope.sjs
+		sjs = scope.imports.sjs
     ,   imports = scope.imports
     ;
 

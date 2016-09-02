@@ -6,7 +6,10 @@ required:[
     { Events : '/{sjshome}/modules/splice.event.js'}
 ]
 ,
-definition:function(scope){
+definition:function(){
+ 	"use strict";
+	 
+	var scope = this;
 
   var	sjs = scope.sjs
   , 	imports = scope.imports

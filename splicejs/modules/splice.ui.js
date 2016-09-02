@@ -9,13 +9,15 @@ required:[
 	{ Views			: '/{sjshome}/modules/splice.view.js'},
 	{ Document  	: '/{sjshome}/modules/splice.document.js'}
 ],
-definition:function component(scope){
+definition:function component(){
 //enable strict mode
 "use strict";
 
+var scope = this;
+var sjs = scope.imports.sjs;
 // importing framework features makes our code less verbose
-var debug = scope.sjs.log.debug
-, 	log = scope.sjs.log
+var debug = sjs.log.debug
+, 	log = sjs.log
 , 	imports = scope.imports
 ;
 

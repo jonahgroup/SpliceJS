@@ -13,12 +13,14 @@ required:[
   'splice.controls.datafilter.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
     "use strict";
 
-    var
-        sjs = scope.sjs
-    ,   imports = scope.imports
+    var scope = this
+    ,   sjs = this.imports.sjs;
+
+    var 
+        imports = scope.imports
     ;
 
     var Class = imports.Inheritance.Class

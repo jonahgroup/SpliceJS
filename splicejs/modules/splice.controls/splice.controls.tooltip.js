@@ -9,8 +9,11 @@ required:[
   'splice.controls.tooltip.html'
 ]
 ,
-definition:function(scope){
+definition:function(){
   "use strict";
+
+  var scope = this;
+
   var
     imports = scope.imports
   ;

@@ -1,6 +1,8 @@
 /* global sjs*/
 sjs.module({
-definition:function(scope){
+definition:function(){
+  var scope = this;
+
   function date(d){
     return {
       reverseUTC:function(){
