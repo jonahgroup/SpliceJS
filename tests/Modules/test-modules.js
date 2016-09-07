@@ -1,16 +1,16 @@
 global.sjs.module({
-version:{
-    'tablet:1.5.0':[
-        {'UI':'importmodule.js'}      
-    ]
-},    
+required:[
+    {'UI':'importmodule.js'}      
+],    
 // required: [
 //     {'UI':'importmodule.js'}
 // ]
 //,
-definition:function(scope){
+definition:function(){
+    var scope = this;
+
     scope.imports.UI.saySomething();
-    scope.load(
+    scope.imports.$js.load(
         [{'Inheritance':'/{sjshome}/modules/splice.inheritance.js'}],
         function(scope){
             var Class = scope.imports.Inheritance.Class;

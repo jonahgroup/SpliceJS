@@ -1,6 +1,9 @@
-global.sjs.module({
-definition:function(scope){
-    var log = scope.sjs.log;
+$js.module({
+definition:function(){
+
+    var scope = this
+    ,   log = this.imports.sjs.log;
+    
     function saySomething(){
         log.info('Hi i an import module');
     }

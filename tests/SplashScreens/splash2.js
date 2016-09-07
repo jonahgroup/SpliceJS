@@ -1,4 +1,4 @@
-sjs.module({
+$js.module({
 prerequisite:[
   '/{sjshome}/modules/splice.module.extensions.js'
 ],
@@ -8,7 +8,7 @@ required:[
 definition:function(){
   var scope = this;
 
-  var document = this.imports.sjs.document;
+  var document = this.imports.$js.document;
 
   var style = "position:absolute; left:0px; top:0px; right:0px; bottom:0px; transition:opacity 0.4s;     background-color: rgba(10,10,10,0.8);";
 
@@ -16,7 +16,7 @@ definition:function(){
 
   var spinnerStyle = 'position:absolute; left:50%; height:33px; width:84px;' +
              'margin-left:-42px;'+
-             'background-image:url(\''+scope.imports.sjs.context().resolve('/{sjshome}/resources/images/bootloading.gif')+'\');'+
+             'background-image:url(\''+scope.imports.sjs.context.resolve('/{sjshome}/resources/images/bootloading.gif')+'\');'+
              'border-bottom:1px solid #7d7d7d;'+
              'background-position:top center;'+
              'background-repeat:no-repeat;'

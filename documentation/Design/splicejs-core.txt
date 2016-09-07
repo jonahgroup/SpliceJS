@@ -1,0 +1,59 @@
+- Modules
+  *scope -  is a context object passed as "this" in module definition function
+  {definition:function(){
+    var scope = this;
+  }}
+
+
+- Configuration
+  Custom configuration could be loaded using a config module, which is just a module
+  that calls configuration APIs within $js
+      $js.setVar -  set environment variable, once variable is set it may not be modified
+                      by another setVar() call during application's life.
+      $js.setVersion
+
+
+
+- Debug mode
+  Debug mode is enabled by setting "sjs-debug" attribute to "true"
+  on the main include script
+
+  <script src="../../splicejs/splice.js"
+          sjs-main="splice.test.components.js"
+          sjs-start-mode="onload"
+          sjs-version="mobile:*"
+          sjs-debug="true"></script>
+
+
+  When in debug mode, additional script api is added to the top level
+  $module function's namespace:
+    $js.list - lists entire import tree
+    $js.configlist - lists configuration parameters
+
+
+- Release mode
+  When in release mode, the only global available to the user is a module definition function
+  $module
+
+
+- Complete api list
+  * Global context
+    $js.module
+    $js.start - starts application entry point module
+
+  * Scope api
+    scope.imports - property which is a collection of imports
+    scope.exports - function defines module exports
+    scope.add - adds an object to the scope
+  * Module context
+    $js.setVar
+    $js.setVersion
+    $js.context.resolve
+    $js.context.absurl
+    $js.load(resources) {
+      - parameters
+          resources:string[] - module or other resources paths
+          all prerequisites are expected to be defined within the module
+          being loaded
+    }
+    $js.log

@@ -262,8 +262,8 @@ if(!ctx && config.appBase) ctx = config.appBase;
 		throw 'Context URL must end with "'+ _pd_ +'"';
 
 	return {
-	isAbs: isAbsUrl(ctx),
-	path:ctx,
+		isAbs: isAbsUrl(ctx),
+		path:ctx,
 		source:contextUrl,
 		resolve:function(url){
 			if(!url) return null;
@@ -648,6 +648,11 @@ Loader.prototype = {
 				filename = filename.url;
 			}
 
+			//update splash screen if available
+			if(_loaderStats.loadingIndicator){
+				_loaderStats.loadingIndicator.update(0,0,filename);
+			}
+
 			var spec = importsMap[filename];
 			//check for null and undefined 
 			if(spec != null) continue;
@@ -685,11 +690,12 @@ Loader.prototype = {
 		//process dependencies for module specs
 		if(spec instanceof ModuleSpec){
 
-			//get current module context
-			var ctx = context(item);
-
 			//set scope URI
 			spec.scope.__sjs_uri__ = item; 
+
+			//process resource spec that was just loaded
+			//get current module context
+			var ctx = context(spec.scope.__sjs_uri__);
 
 			//resolve prerequisites
 			var prereqs = spec.prerequisites = _dependencies(spec.__sjs_module__.prerequisite,ctx);
@@ -713,7 +719,6 @@ Loader.prototype = {
 		}
 	}
 }
-
 
 function processFrame(loader,frame, oncomplete){
 	if(!frame || frame.length == 0) {
@@ -819,33 +824,66 @@ function ModuleSpec(scope,m){
 
 ModuleSpec.prototype.execute = function(){
 	this.isProcessed = true;
-	
+
+	//setup module scope
+	setupModuleScope(this.scope,this);
+
 	if(this.prerequisites)
 		applyImports.call(this.scope,this.prerequisites);
 	
 	if(this.imports)
 		applyImports.call(this.scope,this.imports);
+
+	//run the module definition	
 	this.__sjs_module__.definition.call(this.scope);
 }
 
-function setupModule(scope, m){
-	if(scope) return scope;
+function setupModuleScope(scope, moduleSpec){
 
-	/*init module scope*/
-	scope = new Namespace(null);
 	scope.add('imports',new Namespace());
-	scope.imports.add('sjs',mixin(Object.create(null),_core),true);
-		scope.add('exports',_exports(scope));
-	scope.add('load', function(resources){
+	scope.add('exports',_exports(scope));
 
-		new Loader().loadFrame()
-	});
+	scope.imports.add('sjs',mixin(Object.create(null),_core),true);
+	scope.imports.add('$js',mixin(Object.create(null),_core),true);
+
 
 	//module scope calls only
 	scope.imports.sjs.setLoadingIndicator = function(splash){
 		_loaderStats.loadingIndicator = splash;
 		return splash;
 	};
+	/**
+	 * resources:string[] - module or other resources paths
+	 * all prerequisites are expected to be defined within the module
+	 * being loaded
+	 * 
+	 */
+
+	scope.imports.$js.load = function(resources){
+		//get current moduleSpec
+		var spec = importsMap[scope.__sjs_uri__];
+		
+		//get pseudo module name
+		var pseudoName = '__sjs_pseudom__0'; 
+
+		//compose pseudo module
+		_module({
+			name : pseudoName,
+			required : resources,
+			definition : function(){
+				log.debug('pseudo loaded');
+			}
+		});
+
+		var loader = new Loader();
+		loader.pending = 1;
+		loader.root = [pseudoName];
+		loader.onitemloaded(pseudoName);		
+
+	};
+
+	scope.imports.sjs.context = context(scope.__sjs_uri__);
+
 	scope.imports.ImportSpec = ImportSpec;
 
 	return scope;
@@ -862,16 +900,24 @@ function _module(m){
 		return importsMap[m];
 	}
 	
-	var scope = setupModule(null,m);
+	/*init module scope*/
+	var scope = new Namespace(null);
 
 	// create module spec
 	var spec = new ModuleSpec(scope,m);
+	
+	//get current script
 	var current = currentScript();
 
 	if(current) { 
 		spec.fileName = current;
 		importsMap[current] = spec; 
-	} else {
+	} 
+	else if(m.name){
+		spec.fileName = m.name;
+		importsMap[m.name] = spec;
+	}
+	else {
 		currentModuleSpec = spec;
 	}
 
