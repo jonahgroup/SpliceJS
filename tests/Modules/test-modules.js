@@ -12,8 +12,11 @@ definition:function(){
     scope.imports.UI.saySomething();
     scope.imports.$js.load(
         [{'Inheritance':'/{sjshome}/modules/splice.inheritance.js'}],
-        function(scope){
-            var Class = scope.imports.Inheritance.Class;
+        function(){
+            var log = this.imports.$js.log;
+            var Class = this.imports.Inheritance.Class;
+
+            log.debug('Pseudo import callback');
         }
     );
 

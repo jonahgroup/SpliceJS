@@ -859,19 +859,27 @@ function setupModuleScope(scope, moduleSpec){
 	 * 
 	 */
 
-	scope.imports.$js.load = function(resources){
-		//get current moduleSpec
-		var spec = importsMap[scope.__sjs_uri__];
-		
+	scope.imports.$js.load = function(resources,callback){
+				
 		//get pseudo module name
 		var pseudoName = '__sjs_pseudom__0'; 
-
+		var parentScope = scope;
 		//compose pseudo module
 		_module({
 			name : pseudoName,
 			required : resources,
 			definition : function(){
+
+				//get loaded and processed spec
+				var spec = importsMap[pseudoName];
 				log.debug('pseudo loaded');
+				log.debug(spec.fileName);
+				applyImports.call(parentScope,spec.imports);
+				
+				if(typeof callback === 'function'){
+					callback.call(parentScope);
+				}
+
 			}
 		});
 
