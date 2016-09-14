@@ -1,11 +1,7 @@
-global.sjs.module({
+$js.module({
 required:[
     {'UI':'importmodule.js'}      
 ],    
-// required: [
-//     {'UI':'importmodule.js'}
-// ]
-//,
 definition:function(){
     var scope = this;
 

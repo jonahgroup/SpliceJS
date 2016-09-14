@@ -1,11 +1,14 @@
 //node.js plug
-sjs.module({
+$js.module({
 required:[
   {'Event':'/{sjshome}/modules/splice.event.js'}
 ],
-definition:function(scope){
+definition:function(){
     "use strict";
-    var log = scope.sjs.log
+    //get scope
+    var scope = this;
+
+    var log = scope.imports.$js.log
     ,   event = scope.imports.Event;
     ;
 

@@ -57,7 +57,7 @@ var config = {platform: _platform_},
 	//version qualifier
 	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
 	addedScript = null,	currentModuleSpec = null,
-	importsMap = Map(), currentFrame = null, frameStack = new Array();
+	importsMap = new Object(null), currentFrame = null, frameStack = new Array();
 
 
 function loadConfiguration(onLoad){
@@ -125,10 +125,10 @@ if (typeof Object.create != 'function') {
 	var Object = function() {};
 	return function (prototype) {
 		if (arguments.length > 1) {
-		throw Error('Second argument not supported');
+		throw Error('second argument not supported');
 		}
 		if (typeof prototype != 'object') {
-		throw TypeError('Argument must be an object');
+		throw TypeError('argument must be an object');
 		}
 		Object.prototype = prototype;
 		var result = new Object();
@@ -259,7 +259,7 @@ if(contextUrl) {
 if(!ctx && config.appBase) ctx = config.appBase;
 
 	if(ctx != null && ctx && ctx.substr(ctx.length-1) != _pd_)
-		throw 'Context URL must end with "'+ _pd_ +'"';
+		throw 'context URL must end with "'+ _pd_ +'"';
 
 	return {
 		isAbs: isAbsUrl(ctx),
@@ -303,7 +303,7 @@ function fname(foo){
 		return 'anonymous';
 	}
 	*/
-if(typeof foo != 'function') throw 'Unable to obtain function name, argument is not a function'
+if(typeof foo != 'function') throw 'unable to obtain function name, argument is not a function'
 var match = /function(\s*[A-Za-z0-9_\$]*)\(/.exec(foo.toString());
 if(!match)  return 'anonymous';
 	var name = _trim(match[1]);
@@ -314,14 +314,14 @@ if(!match)  return 'anonymous';
 
 function _namespaceAdd(path,obj,isSealed){
 	if(!path) return this;
-	if(this.__sjs_seal__[path]) throw 'Namespace ' +path +' is sealed';
+	if(this.__sjs_seal__[path]) throw 'namespace ' +path +' is sealed';
 	var parts = path.split('.');
 	var target = this;
 	for(var i=0; i<parts.length-1; i++){
 		if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
 		target = target[parts[i]];
 	}
-	if(target[parts[parts.length-1]] != null) throw "Namespace conflict: " + path;
+	if(target[parts[parts.length-1]] != null) throw "namespace conflict: " + path;
 	target[parts[parts.length-1]] = obj;
 
 	if(isSealed == true) this.__sjs_seal__[path] = true;
@@ -531,14 +531,14 @@ function qualifyImport(url){
 	//parse config version
 	var rc = regexVer.exec(config.version);
 	//no mercy for invalid syntax
-	if(!rc) throw 'Invalid version configuration parameter: ' + config.version;
+	if(!rc) throw 'invalid version configuration parameter: ' + config.version;
 
 	//only version quallifier is supported
 	//qualify version at parts[0]
 	var r = regexVer.exec(_trim(parts[0]));
 	
 	//no mercy for invalid syntax	
-	if(r == null) throw 'Invalid version qualifier: ' + url; 
+	if(r == null) throw 'invalid version qualifier: ' + url; 
 
 	//target platform
 	var v = {target : r[1],	min : r[2], max : r[4] || r[2]=='*'?'*':r[4]}; 
@@ -591,8 +591,6 @@ function _dependencies(items, ctx){
 	}
 	return r.imports;
 }
-function Map(){return new Object(null);}
-
 
 function ImportSpec(fileName){
 	this.imports = null;
@@ -648,15 +646,19 @@ Loader.prototype = {
 				filename = filename.url;
 			}
 
+			var spec = importsMap[filename];
+
+			//resource has already been loaded
+			//check for null and undefined 
+			if(spec != null) continue; 
+			
+			
 			//update splash screen if available
 			if(_loaderStats.loadingIndicator){
 				_loaderStats.loadingIndicator.update(0,0,filename);
 			}
 
-			var spec = importsMap[filename];
-			//check for null and undefined 
-			if(spec != null) continue;
-			
+
 			//get handler for current file
 			var handler = _fileHandlers[fileExt(filename)];
 
@@ -665,7 +667,7 @@ Loader.prototype = {
 
 			//get import spec from the handler			
 			spec = importsMap[filename] = handler.importSpec(filename); 
-			
+
 			this.pending++;
 
 			//load file
@@ -676,7 +678,6 @@ Loader.prototype = {
 		var spec = importsMap[item];
 		//clear current module spec, resource loaded next may not be a module
 		if(spec instanceof ImportSpec && currentModuleSpec ) {
-			currentModuleSpec.frames = spec.frames;
 			spec = importsMap[item] = currentModuleSpec;
 			currentModuleSpec = null;
 		}
@@ -714,8 +715,8 @@ Loader.prototype = {
 		}
 		
 		if(this.pending == 0) {
-				log.info('Loading complete');
-				processFrame(this,this.root);
+			log.info('Loading complete');
+			processFrame(this,this.root);
 		}
 	}
 }
@@ -724,10 +725,14 @@ function processFrame(loader,frame, oncomplete){
 	if(!frame || frame.length == 0) {
 		return;
 	}
+	
 	var runCount = 0;
 	for(var i=0; i<frame.length; i++){
 		var url =  frame[i];
 		if(url instanceof ImportItem) url = url.url;
+
+		//check for cyclical dependency
+		isDfsCycle(url);
 
 		var spec = importsMap[url];
 
@@ -768,7 +773,11 @@ function processFrame(loader,frame, oncomplete){
 
 		//run prerequisites
 		if(toExec.prereqs.length > 0) {
+			//add current url onto stack to detect branching
+			dfsStack.push(url);
 			pEx = processFrame(loader,toExec.prereqs);
+			//pop the top on branch exit
+			dfsStack.pop();
 			if(pEx < toExec.prereqs.length ) continue;
 		}
 
@@ -780,7 +789,11 @@ function processFrame(loader,frame, oncomplete){
 
 		//run prerequisites
 		if(toExec.imports.length > 0) {
+			//add current url onto stack to detect branching
+			dfsStack.push(url);
 			pIm = processFrame(loader,toExec.imports);
+			//pop the top on branch exit
+			dfsStack.pop();
 			if(pIm < toExec.imports.length ) continue;
 		}
 
@@ -805,10 +818,11 @@ function isDfsCycle(spec){
 	if(!isCycle) return false;
 	//print cycle and throw exception
 	if(isCycle === true) {
-		for(var i=(dfsStack.length -1); i>=0; i--){
-			log.error(dfsStack[i].fileName);
+		log.error(spec);
+		for(var i=(dfsStack.length-1); i>=0; i--){
+			log.error(dfsStack[i]);
 		}
-		throw 'Cyclical dependency';
+		throw 'cyclical module dependency';
 	}
 	return false;
 }
@@ -826,8 +840,9 @@ ModuleSpec.prototype.execute = function(){
 	this.isProcessed = true;
 
 	//setup module scope
-	setupModuleScope(this.scope,this);
+	initScope(this.scope,this);
 
+	///
 	if(this.prerequisites)
 		applyImports.call(this.scope,this.prerequisites);
 	
@@ -838,7 +853,7 @@ ModuleSpec.prototype.execute = function(){
 	this.__sjs_module__.definition.call(this.scope);
 }
 
-function setupModuleScope(scope, moduleSpec){
+function initScope(scope, moduleSpec){
 
 	scope.add('imports',new Namespace());
 	scope.add('exports',_exports(scope));
@@ -1001,6 +1016,7 @@ window.$js = _core;
 window.global  = {sjs: window.sjs };
 try {
     global.sjs = _core;
+	global.$js = _core;
 }catch(ex){
 }
 
