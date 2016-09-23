@@ -1,6 +1,6 @@
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
   'splice.controls.propertyeditor.html'

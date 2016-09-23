@@ -59,7 +59,7 @@ console.log('--------------------- Data Testing ---------------- ');
 
 sjs({
 	required:[
-		{'Data':'{sjshome}/modules/splice.data.js'}
+		{'Data':'{$jshome}/modules/splice.data.js'}
 	],
 	definition:function(sjs){
 		var scope = this.scope;
@@ -100,7 +100,7 @@ sjs({
 		
 		console.log(bi.current());
 		
-		sjs.load([{'Applets':'{sjshome}/modules/splice.controls/splice.controls.buttons.js'}])(
+		sjs.load([{'Applets':'{$jshome}/modules/splice.controls/splice.controls.buttons.js'}])(
 			function(){
 				var v = new scope.Applets.Button();
 				console.log(v);	

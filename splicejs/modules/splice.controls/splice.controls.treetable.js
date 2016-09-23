@@ -1,10 +1,10 @@
-sjs.module({
+$js.module({
 prerequisite:[
-	'/{sjshome}/modules/splice.module.extensions.js'
+	'/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{'SpliceJS.UI': '/{sjshome}/modules/splice.ui.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+	{'SpliceJS.UI': '/{$jshome}/modules/splice.ui.js'},
 	'splice.controls.treetable.html'
 ]
 ,

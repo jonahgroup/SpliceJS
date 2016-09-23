@@ -1,15 +1,15 @@
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-  { Events      : '/{sjshome}/modules/splice.event.js'},
-  { Component		: '/{sjshome}/modules/splice.component.core.js'},
-  {'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
+  { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+  { Events      : '/{$jshome}/modules/splice.event.js'},
+  { Component		: '/{$jshome}/modules/splice.component.core.js'},
+  {'SpliceJS.UI':'/{$jshome}/modules/splice.ui.js'},
   {'SpliceJS.Controls':'splice.controls.buttons.js'},
   {'SpliceJS.Controls':'splice.controls.listbox.js'},
-  {'Doc':'/{sjshome}/modules/splice.document.js'},
+  {'Doc':'/{$jshome}/modules/splice.document.js'},
   'splice.controls.datafilter.html'
 ]
 ,
@@ -17,7 +17,7 @@ definition:function(){
     "use strict";
 
     var scope = this
-    ,   sjs = this.imports.sjs;
+    ,   sjs = this.imports.$js;
 
     var 
         imports = scope.imports

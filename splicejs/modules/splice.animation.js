@@ -1,4 +1,4 @@
-sjs.module({// this function causes stack overflow
+$js.module({// this function causes stack overflow
 /*
 function AnimationLoop(callback){
 	if(!callback()) return;

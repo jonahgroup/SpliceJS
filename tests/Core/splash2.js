@@ -1,4 +1,4 @@
-sjs.module({
+$js.module({
 type:'splash'
 ,  
 definition:function(sjs){
@@ -11,7 +11,7 @@ definition:function(sjs){
 
   var spinnerStyle = 'position:absolute; left:50%; height:33px; width:84px;' +
              'margin-left:-42px;'+
-             'background-image:url(\''+sjs.context().resolve('/{sjshome}/resources/images/bootloading.gif').aurl+'\');'+
+             'background-image:url(\''+sjs.context().resolve('/{$jshome}/resources/images/bootloading.gif').aurl+'\');'+
              'border-bottom:1px solid #7d7d7d;'+
              'background-position:top center;'+
              'background-repeat:no-repeat;'

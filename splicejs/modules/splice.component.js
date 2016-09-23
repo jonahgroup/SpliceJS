@@ -1,8 +1,8 @@
-sjs.module({
+$js.module({
 required:[
-  {Inheritance : '/{sjshome}/modules/splice.Inheritance.js'},
-  {Core : '/{sjshome}/modules/splice.component.core.js'},
-  {Controls : '/{sjshome}/modules/splice.component.controls.js'}
+  {Inheritance : '/{$jshome}/modules/splice.Inheritance.js'},
+  {Core : '/{$jshome}/modules/splice.component.core.js'},
+  {Controls : '/{$jshome}/modules/splice.component.controls.js'}
 ],
 definition:function(){
 

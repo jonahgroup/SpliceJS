@@ -1,11 +1,11 @@
 /* global sjs */
-sjs.module({
+$js.module({
 definition:function(){
   "use strict";
 
 	//configuration constants
 	var
-        log = this.imports.sjs.log
+        log = this.imports.$js.log
     ;
 
     log.info('Network ran');

@@ -7,7 +7,7 @@ definition:function(){
 
     scope.imports.UI.saySomething();
     scope.imports.$js.load(
-        [{'Inheritance':'/{sjshome}/modules/splice.inheritance.js'}],
+        [{'Inheritance':'/{$jshome}/modules/splice.inheritance.js'}],
         function(){
             var log = this.imports.$js.log;
             var Class = this.imports.Inheritance.Class;

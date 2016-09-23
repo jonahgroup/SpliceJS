@@ -1,9 +1,9 @@
-sjs.module({
+$js.module({
 prerequisite:[
-	'/{sjshome}/modules/splice.module.extensions.js'
+	'/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js' },
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.pageloader.html'
 ],

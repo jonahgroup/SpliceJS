@@ -1,7 +1,7 @@
 //node.js plug
 $js.module({
 required:[
-  {'Event':'/{sjshome}/modules/splice.event.js'}
+  {'Event':'/{$jshome}/modules/splice.event.js'}
 ],
 definition:function(){
     "use strict";

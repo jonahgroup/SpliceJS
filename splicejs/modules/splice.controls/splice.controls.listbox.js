@@ -1,16 +1,16 @@
-sjs.module({
+$js.module({
 prerequisite:[
-	'/{sjshome}/modules/splice.module.extensions.js'
+	'/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance: 	'/{sjshome}/modules/splice.inheritance.js'},
-	{ Events: 		'/{sjshome}/modules/splice.event.js'},
-	{ Views: 		'/{sjshome}/modules/splice.view.js'},
-  	{ Async: 		'/{sjshome}/modules/splice.async.js'},
-	{ Component:	'/{sjshome}/modules/splice.component.core.js'},	
+	{ Inheritance: 	'/{$jshome}/modules/splice.inheritance.js'},
+	{ Events: 		'/{$jshome}/modules/splice.event.js'},
+	{ Views: 		'/{$jshome}/modules/splice.view.js'},
+  	{ Async: 		'/{$jshome}/modules/splice.async.js'},
+	{ Component:	'/{$jshome}/modules/splice.component.core.js'},	
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
-	{'Doc':'/{sjshome}/modules/splice.document.js'},
+	{'Doc':'/{$jshome}/modules/splice.document.js'},
 	'splice.controls.listbox.css',
 	'splice.controls.listbox.html'
 ]
@@ -19,7 +19,7 @@ definition:function(){
 	"use strict";
 
 	var scope = this
-	,	sjs = this.imports.sjs;
+	,	sjs = this.imports.$js;
 
 	var	log = sjs.log
 	,	debug =	sjs.log.debug

@@ -1,19 +1,19 @@
-sjs.module({
+$js.module({
 prerequisite:[
   {Splash:'../SplashScreens/splash2.js'},
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-  '/{sjshome}/modules/splice.animation.js',
-  '/{sjshome}/modules/splice.network.js',
-  '/{sjshome}/modules/splice.document.js',
-  '/{sjshome}/modules/splice.data.js',
-  '/{sjshome}/modules/splice.text.js',
-  {Inheritance: '/{sjshome}/modules/splice.inheritance.js'},
-  {Component:'/{sjshome}/modules/splice.component.js'},
-  {Events : '/{sjshome}/modules/splice.event.js'},
-  {'SpliceJS.Ui':'/{sjshome}/modules/splice.ui.js'},
-  {'SpliceJS.Controls':'/{sjshome}/modules/splice.component.controls.js'},
+  '/{$jshome}/modules/splice.animation.js',
+  '/{$jshome}/modules/splice.network.js',
+  '/{$jshome}/modules/splice.document.js',
+  '/{$jshome}/modules/splice.data.js',
+  '/{$jshome}/modules/splice.text.js',
+  {Inheritance: '/{$jshome}/modules/splice.inheritance.js'},
+  {Component:'/{$jshome}/modules/splice.component.js'},
+  {Events : '/{$jshome}/modules/splice.event.js'},
+  {'SpliceJS.Ui':'/{$jshome}/modules/splice.ui.js'},
+  {'SpliceJS.Controls':'/{$jshome}/modules/splice.component.controls.js'},
   'desktop:*|splice.test.components.css',
   'mobile:*|splice.test.components.mobile.css',
   'mobile:*|splice.test.components.mobile.meta',
@@ -24,9 +24,9 @@ definition:function(){
 
   var scope = this;
 
-  var sjs = scope.imports.sjs
+  var sjs = scope.imports.$js
   ,   imports = scope.imports
-  ,   log = scope.imports.sjs.log
+  ,   log = scope.imports.$js.log
   ;
 
   var Class = imports.Inheritance.Class

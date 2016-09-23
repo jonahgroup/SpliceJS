@@ -1,12 +1,12 @@
-sjs.module({
+$js.module({
 prerequisite:[
-	'/{sjshome}/modules/splice.module.extensions.js'
+	'/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
-	'/{sjshome}/lib/leaflet-0.7.3/leaflet.css',
-	'/{sjshome}/lib/leaflet-0.7.3/leaflet-src.js',
+	'/{$jshome}/lib/leaflet-0.7.3/leaflet.css',
+	'/{$jshome}/lib/leaflet-0.7.3/leaflet-src.js',
 	'splice.controls.map.css',
 	'splice.controls.map.html',
 ]
@@ -14,7 +14,7 @@ required:[
 definition:function(){
 	var scope = this;
 	
-	var sjs = scope.imports.sjs
+	var sjs = scope.imports.$js
         imports = scope.imports
     ;
 

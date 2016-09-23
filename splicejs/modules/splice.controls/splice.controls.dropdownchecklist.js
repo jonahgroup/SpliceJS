@@ -1,6 +1,6 @@
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
 	{'SpliceJS.UI':'../splice.ui.js'},
@@ -12,7 +12,7 @@ definition:function(sjs){
 		"use strict";
 
 	var scope = this
-	,	sjs = this.imports.sjs;
+	,	sjs = this.imports.$js;
 
 	var	Class = this.sjs.Class
 	,	Event = this.sjs.Event

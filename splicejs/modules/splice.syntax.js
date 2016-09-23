@@ -1,9 +1,9 @@
-sjs.module({
+$js.module({
 definition:function(){
 var scope = this;
 
 var 
-    mixin = scope.imports.sjs.mixin
+    mixin = scope.imports.$js.mixin
 ;
 
 function Tokenizer(input, alphanum, space){

@@ -1,12 +1,12 @@
-global.sjs.module({
+$js.module({
 definition:function(){
   
 	var scope = this;
-
-  var sjs = scope.sjs;
-  /*
-  	Inheritance model
-  */
+	var sjs = scope.imports.$js;
+	
+	/*
+		Inheritance model
+	*/
 	function __super(inst,b,args){
 		if(!b) return;
 		__super(inst,b.constructor.__sjs_base__,args);

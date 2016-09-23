@@ -1,10 +1,10 @@
-sjs.module({
+$js.module({
 type:'component'
 ,
 required:[
-  {Inheritance: '/{sjshome}/modules/splice.inheritance.js'},
-  {Component:'/{sjshome}/modules/splice.component.js'},
-  {Controls : '/{sjshome}/modules/splice.component.controls.js'},
+  {Inheritance: '/{$jshome}/modules/splice.inheritance.js'},
+  {Component:'/{$jshome}/modules/splice.component.js'},
+  {Controls : '/{$jshome}/modules/splice.component.controls.js'},
   'main2.html'
 ]
 ,

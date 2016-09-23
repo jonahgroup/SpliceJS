@@ -1,11 +1,11 @@
-sjs.module({
+$js.module({
 definition:function splash(sjs){
 
   var document = sjs.document;
 
   var style = 'position:absolute; top:50%; left:50%; height:33px; width:84px;' +
              'margin-left:-42px;'+
-             'background-image:url(\''+sjs.context().resolve('/{sjshome}/resources/images/bootloading.gif').aurl+'\');'+
+             'background-image:url(\''+sjs.context().resolve('/{$jshome}/resources/images/bootloading.gif').aurl+'\');'+
              'border-bottom:1px solid #7d7d7d;'+
              'background-position:top center;'+
              'background-repeat:no-repeat;' +

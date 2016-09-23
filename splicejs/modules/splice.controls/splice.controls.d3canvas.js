@@ -1,19 +1,19 @@
 /* global d3 */
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
-	'/{sjshome}/lib/d3-3.5.5/d3.min.js',
+	'/{$jshome}/lib/d3-3.5.5/d3.min.js',
 	'splice.controls.d3canvas.html'
 ]
 ,
 definition:function(){
 
 	var scope = this
-	,	sjs = this.imports.sjs;
+	,	sjs = this.imports.$js;
 
 	var
     	imports = scope.imports

@@ -1,7 +1,7 @@
-sjs.module({
+$js.module({
 required:[
-  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-  { Events      : '/{sjshome}/modules/splice.event.js'},
+  { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+  { Events      : '/{$jshome}/modules/splice.event.js'},
 ]
 ,
 definition: function(scope){

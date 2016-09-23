@@ -1,7 +1,7 @@
 /* global sjs */
-sjs.module({
+$js.module({
 required:[
-  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+  { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 ]
 ,
 definition:function(scope){

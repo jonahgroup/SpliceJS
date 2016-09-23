@@ -1,7 +1,7 @@
 /* global sjs */
-sjs.module({
+$js.module({
 required:[
-	{Syntax:'/{sjshome}/modules/splice.syntax.js'}
+	{Syntax:'/{$jshome}/modules/splice.syntax.js'}
 ]
 ,
 definition:function(){

@@ -1,12 +1,12 @@
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'},
-	{ Data				:	'/{sjshome}/modules/splice.data.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+	{ Component		: '/{$jshome}/modules/splice.component.core.js'},
+	{ Events			: '/{$jshome}/modules/splice.event.js'},
+	{ Data				:	'/{$jshome}/modules/splice.data.js'},
 	{'SpliceJS.Controls' : 'splice.controls.d3canvas.js'},
 	{Charts 			: 'charts/splice.controls.charts.dial.js'},
 	{Charts 			: 'charts/splice.controls.charts.barchart.js'},

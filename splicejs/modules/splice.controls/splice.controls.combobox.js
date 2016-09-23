@@ -1,16 +1,16 @@
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
   required:[
-    { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+    { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
     {'SpliceJS.Controls':'splice.controls.dropdownlist.js'},
     'splice.controls.combobox.html'
   ],
   definition:function(){
 
     var scope = this
-    ,   sjs = this.imports.sjs;
+    ,   sjs = this.imports.$js;
 
     var
         imports = scope.imports;

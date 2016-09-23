@@ -1,11 +1,11 @@
-sjs.module({
+$js.module({
 type:'component'
 ,
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+	{ Events			: '/{$jshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
-	{'Text':'/{sjshome}/modules/splice.text.js'},
+	{'Text':'/{$jshome}/modules/splice.text.js'},
 	{'SpliceJS.Controls':'splice.controls.calendar.js'},
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
 	'splice.controls.datepicker.html'
@@ -15,7 +15,7 @@ definition:function(){
 	"use strict";
 
 	var scope = this
-	,	sjs = scope.imports.sjs;
+	,	sjs = scope.imports.$js;
 
 	var 
 		imports = scope.imports

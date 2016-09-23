@@ -1,7 +1,7 @@
 /* global sjs */
-sjs.module({
+$js.module({
 required:[
-	{Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
+	{Inheritance : '/{$jshome}/modules/splice.inheritance.js'}
 ],
 definition:function(){
     "use strict";
@@ -9,7 +9,7 @@ definition:function(){
 	var scope = this;
 
 	var 
-		sjs = scope.imports.sjs
+		sjs = scope.imports.$js
     ,   imports = scope.imports
     ;
 

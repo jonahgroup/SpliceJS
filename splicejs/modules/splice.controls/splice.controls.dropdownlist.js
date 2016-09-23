@@ -1,15 +1,15 @@
-sjs.module({
+$js.module({
 /*
 	DropdownList control 
 */
 prerequisite:[
-	'/{sjshome}/modules/splice.module.extensions.js'
+	'/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Data: '/{sjshome}/modules/splice.dataitem.js'},
-	{ Events: '/{sjshome}/modules/splice.event.js'},
-	{ Component: '/{sjshome}/modules/splice.component.core.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+	{ Data: '/{$jshome}/modules/splice.dataitem.js'},
+	{ Events: '/{$jshome}/modules/splice.event.js'},
+	{ Component: '/{$jshome}/modules/splice.component.core.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
 	{'SpliceJS.Controls':'splice.controls.listbox.js'},
@@ -19,7 +19,7 @@ definition:function(){
 	"use strict";
 
 	var scope = this
-	,	sjs = scope.imports.sjs;
+	,	sjs = scope.imports.$js;
 
 	var imports = scope.imports
 	,	mixin = sjs.mixin

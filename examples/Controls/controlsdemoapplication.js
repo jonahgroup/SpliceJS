@@ -1,8 +1,8 @@
 sjs({
 	
 required:[
-	{'SpliceJS.Controls': '{sjshome}/modules/splice.controls.js'},
-	{'Data': '{sjshome}/modules/splice.data.js'},
+	{'SpliceJS.Controls': '{$jshome}/modules/splice.controls.js'},
+	{'Data': '{$jshome}/modules/splice.data.js'},
 	 'controlsdemoapplication.css',
 	 'controlsdemoapplication.html',
 		

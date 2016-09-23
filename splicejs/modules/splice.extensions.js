@@ -1,12 +1,12 @@
-sjs.module({
+$js.module({
 required:[
-  '/{sjshome}/modules/splice.util.js',
-  '/{sjshome}/modules/splice.data.js',
-  '/{sjshome}/modules/splice.inheritance.js',
-  '/{sjshome}/modules/splice.view.js',
-  '/{sjshome}/modules/splice.text.js',
-  '/{sjshome}/modules/splice.network.js',
-  '/{sjshome}/modules/splice.component.js',
+  '/{$jshome}/modules/splice.util.js',
+  '/{$jshome}/modules/splice.data.js',
+  '/{$jshome}/modules/splice.inheritance.js',
+  '/{$jshome}/modules/splice.view.js',
+  '/{$jshome}/modules/splice.text.js',
+  '/{$jshome}/modules/splice.network.js',
+  '/{$jshome}/modules/splice.component.js',
 ],
 definition:function(scope){
   //aggregation module

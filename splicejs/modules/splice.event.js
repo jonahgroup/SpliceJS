@@ -1,13 +1,13 @@
-sjs.module({
+$js.module({
 required:[
-  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-  { Sync      : '/{sjshome}/modules/splice.async.js'}
+  { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+  { Sync      : '/{$jshome}/modules/splice.async.js'}
 ],
 definition:function(){
     "use strict";
 
     var scope = this;
-    var sjs = scope.imports.sjs;
+    var sjs = scope.imports.$js;
     var 
         fname = sjs.fname
     ,   imports = scope.imports

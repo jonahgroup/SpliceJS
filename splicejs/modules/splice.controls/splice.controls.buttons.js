@@ -1,22 +1,22 @@
 /* global sjs */
-sjs.module({
+$js.module({
 prerequisite:[
-	'/{sjshome}/modules/splice.module.extensions.js'
+	'/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance 	: '/{sjshome}/modules/splice.inheritance.js' },
-	{ Events 	  	: '/{sjshome}/modules/splice.event.js' },
-	{ Views			: '/{sjshome}/modules/splice.view.js'},
-	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
+	{ Inheritance 	: '/{$jshome}/modules/splice.inheritance.js' },
+	{ Events 	  	: '/{$jshome}/modules/splice.event.js' },
+	{ Views			: '/{$jshome}/modules/splice.view.js'},
+	{ Component		: '/{$jshome}/modules/splice.component.core.js'},
 	{'SpliceJS.UI'	: '../splice.ui.js'},
-	{'Doc' : '{sjshome}/modules/splice.document.js'},
+	{'Doc' : '{$jshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
 	'splice.controls.buttons.html'
 ]
 ,
 definition:function(){
 	var scope = this
-	,	sjs = this.imports.sjs;
+	,	sjs = this.imports.$js;
 	
 	var
       	imports = scope.imports

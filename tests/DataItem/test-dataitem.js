@@ -1,14 +1,14 @@
 //node.js plug
-global.sjs.module({
+$js.module({
 required:[
-  {'UI':'/{sjshome}/modules/splice.dataitem.js'}
+  {'UI':'/{$jshome}/modules/splice.dataitem.js'}
 ]
 ,
 definition:function(scope){
     "use strict";
-    var
-      log = scope.sjs.log
-    ;
+    var scope = this;
+
+    var log = scope.imports.$js.log;
 
     var
       DataItem = scope.imports.UI.DataItem

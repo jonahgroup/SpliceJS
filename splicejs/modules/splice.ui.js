@@ -1,20 +1,20 @@
 /*blobal sjs */
-sjs.module({
+$js.module({
 required:[
-	{ Inheritance   : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Animation	    : '/{sjshome}/modules/splice.animation.js'},
-	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
-	{ Data			: '/{sjshome}/modules/splice.dataitem.js'},
-	{ Events		: '/{sjshome}/modules/splice.event.js'},
-	{ Views			: '/{sjshome}/modules/splice.view.js'},
-	{ Document  	: '/{sjshome}/modules/splice.document.js'}
+	{ Inheritance   : '/{$jshome}/modules/splice.inheritance.js'},
+	{ Animation	    : '/{$jshome}/modules/splice.animation.js'},
+	{ Component		: '/{$jshome}/modules/splice.component.core.js'},
+	{ Data			: '/{$jshome}/modules/splice.dataitem.js'},
+	{ Events		: '/{$jshome}/modules/splice.event.js'},
+	{ Views			: '/{$jshome}/modules/splice.view.js'},
+	{ Document  	: '/{$jshome}/modules/splice.document.js'}
 ],
 definition:function component(){
 //enable strict mode
 "use strict";
 
 var scope = this;
-var sjs = scope.imports.sjs;
+var sjs = scope.imports.$js;
 // importing framework features makes our code less verbose
 var debug = sjs.log.debug
 , 	log = sjs.log

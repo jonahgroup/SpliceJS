@@ -1,10 +1,10 @@
 /* global JSPositioning */
-sjs.module({
+$js.module({
 
 required: [
-    { Inheritance   :  '/{sjshome}/modules/splice.inheritance.js'},
-    {'SpliceJS.UI'  : '/{sjshome}/modules/splice.ui.js'},
-	{ Animation     : '/{sjshome}/modules/splice.animation.js'},
+    { Inheritance   :  '/{$jshome}/modules/splice.inheritance.js'},
+    {'SpliceJS.UI'  : '/{$jshome}/modules/splice.ui.js'},
+	{ Animation     : '/{$jshome}/modules/splice.animation.js'},
 	'splice.controls.charts.dial.html'
 ],
 

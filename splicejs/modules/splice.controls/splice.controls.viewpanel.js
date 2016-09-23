@@ -1,9 +1,9 @@
-sjs.module({
+$js.module({
 prerequisite:[
-	'/{sjshome}/modules/splice.module.extensions.js'
+	'/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.viewpanel.html',
 	'splice.controls.viewpanel.css'
@@ -13,7 +13,7 @@ definition:function(scope){
 
 	var scope = this;
 
-	var	sjs = scope.imports.sjs
+	var	sjs = scope.imports.$js
     ,   imports = scope.imports
 	//,	overlay = sjs.display.overlay
 	;

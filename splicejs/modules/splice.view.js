@@ -1,9 +1,9 @@
 sjs.module ({
 required:[
-    { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-    { Syntax : '/{sjshome}/modules/splice.syntax.js'},
-    { Document  : '/{sjshome}/modules/splice.document.js'},
-    { Events : '/{sjshome}/modules/splice.event.js'}
+    { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+    { Syntax : '/{$jshome}/modules/splice.syntax.js'},
+    { Document  : '/{$jshome}/modules/splice.document.js'},
+    { Events : '/{$jshome}/modules/splice.event.js'}
 ]
 ,
 definition:function(){

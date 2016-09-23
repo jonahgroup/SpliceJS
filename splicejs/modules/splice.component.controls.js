@@ -1,11 +1,11 @@
 /* global _ */
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-  	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'}
-,	{ Events      : '/{sjshome}/modules/splice.event.js'}
+  	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'}
+,	{ Events      : '/{$jshome}/modules/splice.event.js'}
 ,	{'SpliceJS.UI':'splice.ui.js'}
 ,	{'Controllers':'splice.controls/splice.controls.controllers.js'}
 , 	{'Buttons':'splice.controls/splice.controls.buttons.js'}

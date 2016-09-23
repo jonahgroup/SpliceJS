@@ -1,13 +1,13 @@
-sjs.module({
+$js.module({
 
 required:[
-  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-  { Networking  : '/{sjshome}/modules/splice.network.js'},
-  { Document    : '/{sjshome}/modules/splice.document.js'},
-  { Syntax      : '/{sjshome}/modules/splice.syntax.js'},
-  { Events      : '/{sjshome}/modules/splice.event.js'},
-  { Views       : '/{sjshome}/modules/splice.view.js'},
-  { Data        : '/{sjshome}/modules/splice.dataitem.js'}
+  { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+  { Networking  : '/{$jshome}/modules/splice.network.js'},
+  { Document    : '/{$jshome}/modules/splice.document.js'},
+  { Syntax      : '/{$jshome}/modules/splice.syntax.js'},
+  { Events      : '/{$jshome}/modules/splice.event.js'},
+  { Views       : '/{$jshome}/modules/splice.view.js'},
+  { Data        : '/{$jshome}/modules/splice.dataitem.js'}
 ],
 
 definition:function(){
@@ -16,8 +16,8 @@ definition:function(){
 var scope = this;
 
 var imports = scope.imports
-, 	log = scope.imports.sjs.log
-, 	sjs = scope.imports.sjs
+, 	log = scope.imports.$js.log
+, 	sjs = scope.imports.$js
 ;
 
 var http = imports.Networking.http
@@ -57,7 +57,7 @@ function defineComponents(scope){
 		if( ext !== '.html') continue;
 
 		var key = resources[i].url;
-		var m = sjs.module(key);
+		var m = $js.module(key);
 
 		extractComponents.call(scope,m.dom);
 		compileTemplates(scope);

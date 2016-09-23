@@ -1,14 +1,14 @@
-sjs.module({
+$js.module({
 prerequisite:[
-	'/{sjshome}/modules/splice.module.extensions.js'
+	'/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance   : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Events		: '/{sjshome}/modules/splice.event.js'},
-	{ Component		: '/{sjshome}/modules/splice.component.core.js'	},
-	{ Views 		: '/{sjshome}/modules/splice.view.js'	},
+	{ Inheritance   : '/{$jshome}/modules/splice.inheritance.js'},
+	{ Events		: '/{$jshome}/modules/splice.event.js'},
+	{ Component		: '/{$jshome}/modules/splice.component.core.js'	},
+	{ Views 		: '/{$jshome}/modules/splice.view.js'	},
 	{'SpliceJS.UI'  : '../splice.ui.js'},
-	{'Doc'          : '/{sjshome}/modules/splice.document.js'},
+	{'Doc'          : '/{$jshome}/modules/splice.document.js'},
 	'splice.controls.selectors.css',
 	'splice.controls.selectors.html'
 ],
@@ -16,7 +16,7 @@ definition:function(){
 	"use strict";
 
 	var scope = this
-	,	sjs = scope.imports.sjs;
+	,	sjs = scope.imports.$js;
 
 	/* framework imports */
 	var imports = scope.imports

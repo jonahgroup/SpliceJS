@@ -1,11 +1,11 @@
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-  { Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
-  { Component   : '/{sjshome}/modules/splice.component.core.js'},
-  {'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
+  { Inheritance : '/{$jshome}/modules/splice.inheritance.js' },
+  { Component   : '/{$jshome}/modules/splice.component.core.js'},
+  {'SpliceJS.UI':'/{$jshome}/modules/splice.ui.js'},
   'splice.controls.tooltip.html'
 ]
 ,

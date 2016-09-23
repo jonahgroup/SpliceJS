@@ -1,10 +1,10 @@
-sjs.module({
+$js.module({
 prerequisite:[
-	'/{sjshome}/modules/splice.module.extensions.js'
+	'/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+	{ Events			: '/{$jshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	'splice.controls.treeview.css',
@@ -15,7 +15,7 @@ definition:function(){
 	var scope = this;
 	
 	var
-		sjs = scope.imports.sjs
+		sjs = scope.imports.$js
     ,   imports = scope.imports
 	;
 

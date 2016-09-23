@@ -1,18 +1,18 @@
 /* global sjs */
-sjs.module({
+$js.module({
 type:'component'
 ,
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
-	{ Events			: '/{sjshome}/modules/splice.event.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+	{ Component		: '/{$jshome}/modules/splice.component.core.js'},
+	{ Events			: '/{$jshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.buttons.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
 	{'SpliceJS.Controls':'splice.controls.datafilter.js'},
-	{'Doc':  '/{sjshome}/modules/splice.document.js'},
-	{'Data': '/{sjshome}/modules/splice.data.js'},
+	{'Doc':  '/{$jshome}/modules/splice.document.js'},
+	{'Data': '/{$jshome}/modules/splice.data.js'},
 	'splice.controls.css',
 	'splice.controls.datatable.css',
 	'splice.controls.datatable.html'
@@ -22,7 +22,7 @@ definition:function(){
 	"use strict";
 
 	var scope = this
-	,	sjs = scope.imports.sjs;
+	,	sjs = scope.imports.$js;
 
 	function _if(obj){
 		if(!obj) return {};

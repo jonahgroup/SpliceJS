@@ -1,18 +1,18 @@
-sjs.module({
+$js.module({
 required:[
-  { Networking  : '/{sjshome}/modules/splice.network.js'}
+  { Networking  : '/{$jshome}/modules/splice.network.js'}
 ],
 definition:function(){
   var scope = this;
   
   var 
       imports = scope.imports 
-  ,   sjs = scope.imports.sjs;
+  ,   sjs = scope.imports.$js;
 
   var 
       http = imports.Networking.http
   ,   ImportSpec = imports.ImportSpec
-  ,   log = scope.imports.sjs.log;
+  ,   log = scope.imports.$js.log;
   
 
   /*

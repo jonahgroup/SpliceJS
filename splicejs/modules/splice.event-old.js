@@ -1,9 +1,9 @@
-sjs.module({
+$js.module({
 required:[
-  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-  // { Document  : '/{sjshome}/modules/splice.document.js'},
-  // { Views     : '/{sjshome}/modules/splice.view.js'},
-  { Sync      : '/{sjshome}/modules/splice.async.js'}
+  { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+  // { Document  : '/{$jshome}/modules/splice.document.js'},
+  // { Views     : '/{$jshome}/modules/splice.view.js'},
+  { Sync      : '/{$jshome}/modules/splice.async.js'}
 ],
 definition:function(scope){
     "use strict";

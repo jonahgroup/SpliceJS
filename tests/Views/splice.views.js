@@ -1,6 +1,6 @@
-sjs.module({
+$js.module({
 required:[
-  {'Views': '/{sjshome}/modules/splice.view.js'}
+  {'Views': '/{$jshome}/modules/splice.view.js'}
 ]
 ,
 definition:function(sjs,scope){

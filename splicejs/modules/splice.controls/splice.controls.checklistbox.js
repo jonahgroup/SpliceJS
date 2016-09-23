@@ -4,16 +4,16 @@
   a !!! copy/paste code !!!!
   Need a way to extend components including templates
 */
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-  { Inheritance : '/{sjshome}/modules/splice.inheritance.js'},
-  { Component		: '/{sjshome}/modules/splice.component.core.js'},
-  { Events			: '/{sjshome}/modules/splice.event.js'},
-  {'SpliceJS.UI':'/{sjshome}/modules/splice.ui.js'},
-  {'Doc':'/{sjshome}/modules/splice.document.js'},
+  { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+  { Component		: '/{$jshome}/modules/splice.component.core.js'},
+  { Events			: '/{$jshome}/modules/splice.event.js'},
+  {'SpliceJS.UI':'/{$jshome}/modules/splice.ui.js'},
+  {'Doc':'/{$jshome}/modules/splice.document.js'},
   {'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
   {'SpliceJS.Controls':'splice.controls.listbox.js'},
   'splice.controls.checklistbox.css',
@@ -22,7 +22,7 @@ required:[
   definition:function(){
 
     var scope = this
-    ,   sjs = this.imports.sjs;
+    ,   sjs = this.imports.$js;
 
     var 
         imports = scope.imports

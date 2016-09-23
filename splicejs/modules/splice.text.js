@@ -1,5 +1,5 @@
 
-sjs.module({
+$js.module({
 definition:function(){
 
 var scope = this;

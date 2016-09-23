@@ -1,10 +1,10 @@
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance : '/{sjshome}/modules/splice.inheritance.js' },
-	{ Networking  : '/{sjshome}/modules/splice.network.js'},
+	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js' },
+	{ Networking  : '/{$jshome}/modules/splice.network.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'splice.controls.codeeditor.css',
 	'splice.controls.codeeditor.html'
@@ -12,7 +12,7 @@ required:[
 definition:function(){
 	
 	var scope = this
-	,	sjs = this.imports.sjs;
+	,	sjs = this.imports.$js;
 	
 	var
 		imports = scope.imports

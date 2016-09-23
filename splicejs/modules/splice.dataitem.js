@@ -1,18 +1,18 @@
-global.sjs.module({
+$js.module({
 required:[
-  {Inheritance:'/{sjshome}/modules/splice.inheritance.js'},
-  {Events:'/{sjshome}/modules/splice.event.js'},
-  {Util:'/{sjshome}/modules/splice.util.js'}
+  {Inheritance:'/{$jshome}/modules/splice.inheritance.js'},
+  {Events:'/{$jshome}/modules/splice.event.js'},
+  {Util:'/{$jshome}/modules/splice.util.js'}
 ]
 ,
 definition:function(){
   "use strict";
   
   var scope = this;
-  var sjs = scope.imports.sjs;
+  var $js = scope.imports.$js;
 
   var
-      log = sjs.log
+      log = $js.log
   ,   imports = scope.imports
   ;
 

@@ -1,13 +1,15 @@
-global.sjs.module({
+$js.module({
 required:[
-    {Inheritance:'/{sjshome}/modules/splice.inheritance.js'}    
+    {Inheritance:'/{$jshome}/modules/splice.inheritance.js'}    
 ]
 ,  
-definition:function(scope){
+definition:function(){
     
-    var sjs = scope.sjs
+    var scope = this;
+    
+    var sjs = scope.imports.$js
     ,   imports = scope.imports
-    ,   log = scope.sjs.log;
+    ,   log = scope.imports.$js.log;
     
     
     var Class = imports.Inheritance.Class;

@@ -2,11 +2,11 @@
 sjs({
 	
 	required:[
-		{'SpliceJS.UI': 	  '{sjshome}/modules/splice.ui.js'},
-		{'SpliceJS.Controls': '{sjshome}/modules/splice.controls/splice.controls.buttons.js'},
-		{'SpliceJS.Controls': '{sjshome}/modules/splice.controls/splice.controls.datatable.js'},
-		{'SpliceJS.Controls': '{sjshome}/modules/splice.controls/splice.controls.controllers.js'},
-		{'Data':'{sjshome}/modules/splice.data.js'},
+		{'SpliceJS.UI': 	  '{$jshome}/modules/splice.ui.js'},
+		{'SpliceJS.Controls': '{$jshome}/modules/splice.controls/splice.controls.buttons.js'},
+		{'SpliceJS.Controls': '{$jshome}/modules/splice.controls/splice.controls.datatable.js'},
+		{'SpliceJS.Controls': '{$jshome}/modules/splice.controls/splice.controls.controllers.js'},
+		{'Data':'{$jshome}/modules/splice.data.js'},
 		'sample.css',
 		'sample.html'
 	],

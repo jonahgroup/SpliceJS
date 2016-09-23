@@ -1,11 +1,11 @@
-sjs.module({
+$js.module({
 prerequisite:[
-  '/{sjshome}/modules/splice.module.extensions.js'
+  '/{$jshome}/modules/splice.module.extensions.js'
 ],
 required:[
-	{ Inheritance 	: '/{sjshome}/modules/splice.inheritance.js'},
-	{ Component		: '/{sjshome}/modules/splice.component.core.js'},
-	{ Events		: '/{sjshome}/modules/splice.event.js'},
+	{ Inheritance 	: '/{$jshome}/modules/splice.inheritance.js'},
+	{ Component		: '/{$jshome}/modules/splice.component.core.js'},
+	{ Events		: '/{$jshome}/modules/splice.event.js'},
 	'splice.controls.calendar.html',
 	'splice.controls.calendar.css'
 ],
@@ -14,7 +14,7 @@ definition:function(){
 	var scope = this
 	;
 
-    var sjs = scope.imports.sjs
+    var sjs = scope.imports.$js
     	imports = scope.imports
     ;
 

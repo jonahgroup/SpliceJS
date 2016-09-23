@@ -165,7 +165,7 @@ function _parseVersion(version, isWild){
 var PATH_VARIABLES = {};
 function setPathVar(key, value){
 	//do not allow setting sjs home variable
-	if(key === 'sjshome') return;
+	if(key === '$jshome') return;
 
 	if(!key || !value){
 		return mixin({},PATH_VARIABLES);
@@ -858,12 +858,10 @@ function initScope(scope, moduleSpec){
 	scope.add('imports',new Namespace());
 	scope.add('exports',_exports(scope));
 
-	scope.imports.add('sjs',mixin(Object.create(null),_core),true);
 	scope.imports.add('$js',mixin(Object.create(null),_core),true);
 
-
 	//module scope calls only
-	scope.imports.sjs.setLoadingIndicator = function(splash){
+	scope.imports.$js.setLoadingIndicator = function(splash){
 		_loaderStats.loadingIndicator = splash;
 		return splash;
 	};
@@ -902,11 +900,9 @@ function initScope(scope, moduleSpec){
 		loader.pending = 1;
 		loader.root = [pseudoName];
 		loader.onitemloaded(pseudoName);		
-
 	};
 
-	scope.imports.sjs.context = context(scope.__sjs_uri__);
-
+	scope.imports.$js.context = context(scope.__sjs_uri__);
 	scope.imports.ImportSpec = ImportSpec;
 
 	return scope;
@@ -1003,27 +999,22 @@ var _core = mixin(Object.create(null),{
 	load		: load,
 	extension   : extension,
  	log 		: log,
-	document	: document,
-	
+	document	: document,	
 	filext		: fileExt
 });
 
 
 
-window.sjs = _core;
 window.$js = _core;
-
-window.global  = {sjs: window.sjs };
+window.global  = {$js: window.$js };
 try {
-    global.sjs = _core;
-	global.$js = _core;
+    global.$js = _core;
 }catch(ex){
 }
 
 //entry point
 loadConfiguration(function(config){
-    PATH_VARIABLES['{sjshome}'] = config.sjsHome;
-
+    PATH_VARIABLES['{$jshome}'] = config.sjsHome;
 
 	if(config.debug == true){
 		_core.debug =  mixin(Object.create(null),{
