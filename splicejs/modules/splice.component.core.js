@@ -1,13 +1,14 @@
 $js.module({
 
 required:[
-  { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
-  { Networking  : '/{$jshome}/modules/splice.network.js'},
-  { Document    : '/{$jshome}/modules/splice.document.js'},
-  { Syntax      : '/{$jshome}/modules/splice.syntax.js'},
-  { Events      : '/{$jshome}/modules/splice.event.js'},
-  { Views       : '/{$jshome}/modules/splice.view.js'},
-  { Data        : '/{$jshome}/modules/splice.dataitem.js'}
+	{ Utils 	  : '/{$jshome}/modules/splice.util.js'},
+  	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
+  	{ Networking  : '/{$jshome}/modules/splice.network.js'},
+  	{ Document    : '/{$jshome}/modules/splice.document.js'},
+  	{ Syntax      : '/{$jshome}/modules/splice.syntax.js'},
+  	{ Events      : '/{$jshome}/modules/splice.event.js'},
+  	{ Views       : '/{$jshome}/modules/splice.view.js'},
+  	{ Data        : '/{$jshome}/modules/splice.dataitem.js'}
 ],
 
 definition:function(){
@@ -53,7 +54,7 @@ function defineComponents(scope){
 	//get all html imports in current scope
 	var resources = scope.__sjs_module_imports__;
 	for(var i in resources){
-		var ext = sjs.filext(resources[i].url); 
+		var ext = imports.Utils.File.ext(resources[i].url); 
 		if( ext !== '.html') continue;
 
 		var key = resources[i].url;
@@ -408,7 +409,7 @@ Controller.prototype.toString = function(){
 };
 
 Controller.prototype.initialize = function(){
-	var fn = sjs.fname(this.constructor)
+	var fn = imports.Utils.fname(this.constructor)
 	if(fn === 'Controller') return;
 	log.warn(fn + '.initialize is not implemented');
 };

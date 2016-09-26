@@ -1,9 +1,13 @@
 $js.module({
+required:[
+	{ Utils : '/{$jshome}/modules/splice.util.js'}
+],	
 definition:function(){
-var scope = this;
+var scope = this
+,	imports = this.imports;
 
 var 
-    mixin = scope.imports.$js.mixin
+    mixin = imports.Utils.mixin
 ;
 
 function Tokenizer(input, alphanum, space){

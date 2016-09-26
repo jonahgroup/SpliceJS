@@ -30,7 +30,7 @@ try {
 	}
 }
 
-(function(window, document){
+(function(window, document, global){
 
 "use strict";
 //logging setup
@@ -112,7 +112,7 @@ function mixin(_t, _s){
 		_t[keys[key]] = p;
 	}
 	return _t;
-};
+}
 
 
 
@@ -164,14 +164,9 @@ function _parseVersion(version, isWild){
 
 var PATH_VARIABLES = {};
 function setPathVar(key, value){
-	//do not allow setting sjs home variable
-	if(key === '$jshome') return;
-
-	if(!key || !value){
-		return mixin({},PATH_VARIABLES);
-	}
+	//path variable may be initialized
+	if(PATH_VARIABLES[key]) throw 'Path variable may only be set once';
 	PATH_VARIABLES[key] = value;
-	return mixin({},PATH_VARIABLES);
 }
 
 function _split(s,regEx,skip){
@@ -860,6 +855,9 @@ function initScope(scope, moduleSpec){
 
 	scope.imports.add('$js',mixin(Object.create(null),_core),true);
 
+	scope.imports.$js.document = document;
+	scope.imports.$js.namespace = Namespace;
+	
 	//module scope calls only
 	scope.imports.$js.setLoadingIndicator = function(splash){
 		_loaderStats.loadingIndicator = splash;
@@ -878,7 +876,7 @@ function initScope(scope, moduleSpec){
 		var pseudoName = '__sjs_pseudom__0'; 
 		var parentScope = scope;
 		//compose pseudo module
-		_module({
+		mdl({
 			name : pseudoName,
 			required : resources,
 			definition : function(){
@@ -892,7 +890,6 @@ function initScope(scope, moduleSpec){
 				if(typeof callback === 'function'){
 					callback.call(parentScope);
 				}
-
 			}
 		});
 
@@ -902,8 +899,14 @@ function initScope(scope, moduleSpec){
 		loader.onitemloaded(pseudoName);		
 	};
 
+	scope.imports.$js.setvar = function(n, v){
+		setPathVar(n,v);
+	};
+
 	scope.imports.$js.context = context(scope.__sjs_uri__);
-	scope.imports.ImportSpec = ImportSpec;
+	scope.imports.$js.log = log;
+	scope.imports.$js.ImportSpec = ImportSpec;
+	scope.imports.$js.extension = extension;
 
 	return scope;
 }
@@ -913,7 +916,7 @@ function initScope(scope, moduleSpec){
 	Loads a module
 	m - module descriptor
 */
-function _module(m){
+function mdl(m){
 
 	if(typeof m === 'string') {
 		return importsMap[m];
@@ -942,11 +945,11 @@ function _module(m){
 
 }
 
-_module.list= function list(){
+mdl.list= function list(){
 	return mixin({},importsMap);
 }
 
-_module.listProcessed = function listProcessed(){
+mdl.listProcessed = function listProcessed(){
 	var result = [];
 	var keys = Object.keys(IMPORTS_MAP);
 	for(var key in keys ){
@@ -955,7 +958,7 @@ _module.listProcessed = function listProcessed(){
 	return result;
 }
 
-_module.listPending = function listPending(){
+mdl.listPending = function listPending(){
 	var result = [];
 	var keys = Object.keys(IMPORTS_MAP);
 	for(var key in keys ){
@@ -988,29 +991,13 @@ function start(config){
 	}
 }
 
-var _core = mixin(Object.create(null),{
-	config      : function() {return mixin({},config)},
-  	namespace   : Namespace,
-	setvar 		: setPathVar,
-	context  	: context,
-	mixin		: mixin,
-	'module'    : _module,
-	fname		: fname,
-	load		: load,
-	extension   : extension,
- 	log 		: log,
-	document	: document,	
-	filext		: fileExt
+var _core = mixin(Object.create(null),{	
+	'module'    : mdl
 });
 
+//publish global binding
+window.$js = global.$js = _core;
 
-
-window.$js = _core;
-window.global  = {$js: window.$js };
-try {
-    global.$js = _core;
-}catch(ex){
-}
 
 //entry point
 loadConfiguration(function(config){
@@ -1039,4 +1026,7 @@ loadConfiguration(function(config){
         _core.start = function(){start(config);}
     }
 });
-})( (require('splice.window.js')), (require('splice.document.js')));
+})( (require('splice.window.js')), (require('splice.document.js')),(function(){
+	try {return global;}
+	catch(e) {return {};}
+})());

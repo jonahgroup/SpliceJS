@@ -11,7 +11,7 @@ definition:function(){
 
   var 
       http = imports.Networking.http
-  ,   ImportSpec = imports.ImportSpec
+  ,   ImportSpec = imports.$js.ImportSpec
   ,   log = scope.imports.$js.log;
   
 

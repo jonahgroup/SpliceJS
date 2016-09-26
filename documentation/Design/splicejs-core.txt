@@ -33,21 +33,29 @@
 
 - Release mode
   When in release mode, the only global available to the user is a module definition function
-  $module
+  $module(object)
+	- module function argument is a module definition object
+		{	name:string
+			prerequisite:[],
+			required:[],
+			definition:[],
 
+		} 
 
 - Complete api list
   * Global context
     $js.module
-    $js.start - starts application entry point module
+    $js.start - starts application entry point module, available only when application 
+		 start mode is set to manual, sis-start-mode=“manual”
 
   * Scope api
     scope.imports - property which is a collection of imports
     scope.exports - function defines module exports
     scope.add - adds an object to the scope
+
   * Module context
-    $js.setVar
-    $js.setVersion
+    
+    $js.extension - extension may only be set once per application instance
     $js.context.resolve
     $js.context.absurl
     $js.load(resources) {
@@ -57,3 +65,4 @@
           being loaded
     }
     $js.log
+    $js.setvar(varname, varvalue)
