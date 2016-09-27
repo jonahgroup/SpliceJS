@@ -1,6 +1,6 @@
 _.Module({
 
-required:['../resources/fontfaces.css',
+imports:['../resources/fontfaces.css',
           'basicapplication.css',
           'basicapplication.html'],
 

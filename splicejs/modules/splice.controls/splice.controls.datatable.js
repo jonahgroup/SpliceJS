@@ -2,7 +2,7 @@
 $js.module({
 type:'component'
 ,
-required:[
+imports:[
 	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 	{ Component		: '/{$jshome}/modules/splice.component.core.js'},
 	{ Events			: '/{$jshome}/modules/splice.event.js'},

@@ -1,6 +1,6 @@
 $js.module({
 
-required:[
+imports:[
 	{ Utils 	  : '/{$jshome}/modules/splice.util.js'},
   	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
   	{ Networking  : '/{$jshome}/modules/splice.network.js'},

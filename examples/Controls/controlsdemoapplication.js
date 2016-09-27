@@ -1,6 +1,6 @@
 sjs({
 	
-required:[
+imports:[
 	{'SpliceJS.Controls': '{$jshome}/modules/splice.controls.js'},
 	{'Data': '{$jshome}/modules/splice.data.js'},
 	 'controlsdemoapplication.css',

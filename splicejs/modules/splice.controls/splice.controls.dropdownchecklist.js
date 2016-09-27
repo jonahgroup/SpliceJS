@@ -2,7 +2,7 @@ $js.module({
 prerequisite:[
   '/{$jshome}/modules/splice.module.extensions.js'
 ],
-required:[
+imports:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.selectors.js'},
 	{'SpliceJS.Controls':'splice.controls.checklistbox.js'},

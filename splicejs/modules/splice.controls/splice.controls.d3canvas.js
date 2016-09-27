@@ -3,7 +3,7 @@ $js.module({
 prerequisite:[
   '/{$jshome}/modules/splice.module.extensions.js'
 ],
-required:[
+imports:[
 	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'/{$jshome}/lib/d3-3.5.5/d3.min.js',

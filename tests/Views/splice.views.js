@@ -1,5 +1,5 @@
 $js.module({
-required:[
+imports:[
   {'Views': '/{$jshome}/modules/splice.view.js'}
 ]
 ,

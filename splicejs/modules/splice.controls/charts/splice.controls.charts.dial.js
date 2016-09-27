@@ -1,7 +1,7 @@
 /* global JSPositioning */
 $js.module({
 
-required: [
+imports: [
     { Inheritance   :  '/{$jshome}/modules/splice.inheritance.js'},
     {'SpliceJS.UI'  : '/{$jshome}/modules/splice.ui.js'},
 	{ Animation     : '/{$jshome}/modules/splice.animation.js'},

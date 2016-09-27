@@ -1,5 +1,5 @@
 $js.module({
-required:[
+imports:[
     {'UI':'importmodule.js'}      
 ],    
 definition:function(){
@@ -18,7 +18,7 @@ definition:function(){
 
 
     // scope.load({
-    //     required:[''],
+    //     imports:[''],
     //     definition:function(scope){
 
     // }})

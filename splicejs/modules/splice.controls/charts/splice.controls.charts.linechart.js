@@ -1,6 +1,6 @@
 /* global sjs */
 $js.module({
-required:[
+imports:[
   { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 ]
 ,

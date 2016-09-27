@@ -1,5 +1,5 @@
 $js.module({
-required:[
+imports:[
   { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
   { Sync      : '/{$jshome}/modules/splice.async.js'}
 ],

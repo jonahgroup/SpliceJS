@@ -1,7 +1,7 @@
 $js.module({
 type:'component'
 ,
-required:[
+imports:[
 	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 	{ Events			: '/{$jshome}/modules/splice.event.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},

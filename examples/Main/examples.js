@@ -1,6 +1,6 @@
 sjs({
 
-required:[
+imports:[
 	'examples.html',
 	'examples.css'
 

@@ -1,5 +1,5 @@
 $js.module({
-required:[
+imports:[
   {Inheritance : '/{$jshome}/modules/splice.Inheritance.js'},
   {Core : '/{$jshome}/modules/splice.component.core.js'},
   {Controls : '/{$jshome}/modules/splice.component.controls.js'}

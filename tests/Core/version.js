@@ -8,7 +8,7 @@ version:{
   ]
 }
 ,
-required:[
+imports:[
 ]
 ,
 definition:function (sjs){

@@ -3,7 +3,7 @@ prerequisite:[
   {Splash:'../SplashScreens/splash2.js'},
   '/{$jshome}/modules/splice.module.extensions.js'
 ],
-required:[
+imports:[
   '/{$jshome}/modules/splice.animation.js',
   '/{$jshome}/modules/splice.network.js',
   '/{$jshome}/modules/splice.document.js',

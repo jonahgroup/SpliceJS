@@ -1,7 +1,7 @@
 $js.module({
 type:'component'
 ,
-required:[
+imports:[
   {Inheritance: '/{$jshome}/modules/splice.inheritance.js'},
   {Component:'/{$jshome}/modules/splice.component.js'},
   {Controls : '/{$jshome}/modules/splice.component.controls.js'},

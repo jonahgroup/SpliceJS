@@ -3,7 +3,7 @@ $js.module({
 prerequisite:[
 	'/{$jshome}/modules/splice.module.extensions.js'
 ],
-required:[
+imports:[
 	{ Inheritance 	: '/{$jshome}/modules/splice.inheritance.js' },
 	{ Events 	  	: '/{$jshome}/modules/splice.event.js' },
 	{ Views			: '/{$jshome}/modules/splice.view.js'},

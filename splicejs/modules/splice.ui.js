@@ -1,6 +1,6 @@
 /*blobal sjs */
 $js.module({
-required:[
+imports:[
 	{ Inheritance   : '/{$jshome}/modules/splice.inheritance.js'},
 	{ Animation	    : '/{$jshome}/modules/splice.animation.js'},
 	{ Component		: '/{$jshome}/modules/splice.component.core.js'},

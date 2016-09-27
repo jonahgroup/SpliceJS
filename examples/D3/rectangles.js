@@ -1,7 +1,7 @@
 //http://bl.ocks.org/mbostock/1123639
 _.Module({
 
-required:[
+imports:[
 	_.home('modules/splice.controls/splice.controls.d3canvas.js'),
 	'rectangles.html'
 ],

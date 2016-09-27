@@ -1,6 +1,6 @@
 _.Module({
 
-required:[_.home('modules/splice.controls.js'),
+imports:[_.home('modules/splice.controls.js'),
 		  '../BasicApplication/basicapplication.js',
 		  '../ScrollPanel/scrollpanelapplication.js',
 		  '../D3/rectangles.js',

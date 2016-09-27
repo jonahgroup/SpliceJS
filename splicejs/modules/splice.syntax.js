@@ -1,5 +1,5 @@
 $js.module({
-required:[
+imports:[
 	{ Utils : '/{$jshome}/modules/splice.util.js'}
 ],	
 definition:function(){

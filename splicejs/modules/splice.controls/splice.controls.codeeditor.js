@@ -2,7 +2,7 @@ $js.module({
 prerequisite:[
   '/{$jshome}/modules/splice.module.extensions.js'
 ],
-required:[
+imports:[
 	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js' },
 	{ Networking  : '/{$jshome}/modules/splice.network.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},

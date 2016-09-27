@@ -2,7 +2,7 @@ $js.module({
 prerequisite:[
   '/{$jshome}/modules/splice.module.extensions.js'
 ],
-  required:[
+  imports:[
     { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
     {'SpliceJS.Controls':'splice.controls.dropdownlist.js'},
     'splice.controls.combobox.html'

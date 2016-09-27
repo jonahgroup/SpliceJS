@@ -1,6 +1,6 @@
 /* global sjs */
 $js.module({
-required:[
+imports:[
 	{Syntax:'/{$jshome}/modules/splice.syntax.js'}
 ]
 ,

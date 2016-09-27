@@ -1,5 +1,5 @@
 $js.module({
-required:[
+imports:[
   { Networking  : '/{$jshome}/modules/splice.network.js'}
 ],
 definition:function(){

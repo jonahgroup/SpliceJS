@@ -58,7 +58,7 @@ sjs(function(sjs){
 console.log('--------------------- Data Testing ---------------- ');
 
 sjs({
-	required:[
+	imports:[
 		{'Data':'{$jshome}/modules/splice.data.js'}
 	],
 	definition:function(sjs){

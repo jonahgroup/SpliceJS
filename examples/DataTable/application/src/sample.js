@@ -1,7 +1,7 @@
 /* global sjs */
 sjs({
 	
-	required:[
+	imports:[
 		{'SpliceJS.UI': 	  '{$jshome}/modules/splice.ui.js'},
 		{'SpliceJS.Controls': '{$jshome}/modules/splice.controls/splice.controls.buttons.js'},
 		{'SpliceJS.Controls': '{$jshome}/modules/splice.controls/splice.controls.datatable.js'},

@@ -1,6 +1,6 @@
 _.Module({
 
-required:[ 
+imports:[ 
 	
 	'webdashboard.css',
 	'webdashboard.htmlt',

@@ -2,7 +2,7 @@ $js.module({
 prerequisite:[
   '/{$jshome}/modules/splice.module.extensions.js'
 ],
-required:[
+imports:[
   '/{$jshome}/resources/images/bootloading.gif'
 ], 
 definition:function(){

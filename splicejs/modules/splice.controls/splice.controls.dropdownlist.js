@@ -5,7 +5,7 @@ $js.module({
 prerequisite:[
 	'/{$jshome}/modules/splice.module.extensions.js'
 ],
-required:[
+imports:[
 	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 	{ Data: '/{$jshome}/modules/splice.dataitem.js'},
 	{ Events: '/{$jshome}/modules/splice.event.js'},

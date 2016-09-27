@@ -698,7 +698,7 @@ Loader.prototype = {
 
 			//	resolve required resources relative to
 			//	current context
-			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.required,ctx);
+			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.imports,ctx);
 
 
 			//if prerequisites are present, save current frame and create new frame

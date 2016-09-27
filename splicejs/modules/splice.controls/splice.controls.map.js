@@ -2,7 +2,7 @@ $js.module({
 prerequisite:[
 	'/{$jshome}/modules/splice.module.extensions.js'
 ],
-required:[
+imports:[
 	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
 	{'SpliceJS.UI':'../splice.ui.js'},
 	'/{$jshome}/lib/leaflet-0.7.3/leaflet.css',

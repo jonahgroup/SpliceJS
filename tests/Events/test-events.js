@@ -1,6 +1,6 @@
 //node.js plug
 $js.module({
-required:[
+imports:[
   {'Event':'/{$jshome}/modules/splice.event.js'}
 ],
 definition:function(){

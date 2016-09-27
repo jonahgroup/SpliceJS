@@ -37,7 +37,7 @@
 	- module function argument is a module definition object
 		{	name:string
 			prerequisite:[],
-			required:[],
+			imports:[],
 			definition:[],
 
 		} 

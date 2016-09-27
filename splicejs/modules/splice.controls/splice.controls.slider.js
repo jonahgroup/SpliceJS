@@ -2,7 +2,7 @@
 prerequisite:[
     '/{$jshome}/modules/splice.module.extensions.js'
 ],
-required: [
+imports: [
     { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
     {'SpliceJS.UI':'../splice.ui.js'},
     'splice.controls.slider.css',

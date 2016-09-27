@@ -1,6 +1,6 @@
 //node.js plug
 $js.module({
-required:[
+imports:[
   {'UI':'/{$jshome}/modules/splice.dataitem.js'}
 ]
 ,

@@ -1,5 +1,5 @@
 sjs.module ({
-required:[
+imports:[
     { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
     { Syntax : '/{$jshome}/modules/splice.syntax.js'},
     { Document  : '/{$jshome}/modules/splice.document.js'},
