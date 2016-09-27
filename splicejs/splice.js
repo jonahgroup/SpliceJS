@@ -299,9 +299,19 @@ function fname(foo){
 	}
 	*/
 if(typeof foo != 'function') throw 'unable to obtain function name, argument is not a function'
+//match function name
 var match = /function(\s*[A-Za-z0-9_\$]*)\(/.exec(foo.toString());
-if(!match)  return 'anonymous';
-	var name = _trim(match[1]);
+//if no match found try ES6 function-class match
+if(!match)
+	match  = /function class(\s*[A-Za-z0-9_\$]*\s*)\{/.exec(foo.toString());
+if(!match) 
+	match  = /class(\s*[A-Za-z0-9_\$]*\s*)\{/.exec(foo.toString());
+
+
+if(!match) return 'anonymous';
+
+
+var name = _trim(match[1]);
 	if(!name) return 'anonymous';
 	return name;
 }
@@ -444,6 +454,7 @@ function load(resources){
 function applyImports(imports){
 	var scope = this;
 	if(!scope.imports) scope.add('imports',new Namespace());
+	if(!imports || imports.length <= 0) return;
 	for(var i=0; i<imports.length; i++){
 		if(!imports[i].namespace) continue;
 		var ns = imports[i].namespace;
@@ -878,7 +889,7 @@ function initScope(scope, moduleSpec){
 		//compose pseudo module
 		mdl({
 			name : pseudoName,
-			required : resources,
+			imports : resources,
 			definition : function(){
 
 				//get loaded and processed spec

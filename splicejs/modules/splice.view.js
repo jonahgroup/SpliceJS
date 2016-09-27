@@ -1,4 +1,4 @@
-sjs.module ({
+$js.module ({
 imports:[
     { Inheritance : '/{$jshome}/modules/splice.inheritance.js'},
     { Syntax : '/{$jshome}/modules/splice.syntax.js'},

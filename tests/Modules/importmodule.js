@@ -1,5 +1,5 @@
 $js.module({
-imports:[{'test':'test-modules.js'}],
+//imports:[{'test':'test-modules.js'}],
 definition:function(){
 
     var scope = this

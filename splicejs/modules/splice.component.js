@@ -15,17 +15,18 @@ definition:function(){
   ,   Controller = imports.Core.Controller
   ;
 
-  var DocumentApplication = Class(function DocumentApplication(_scope){
-    this.scope = _scope;
+  var DocumentApplication = Class(function DocumentApplication(document,scope){
+    this.scope = scope;
+    this.document = document;
     if(!this.scope.components)
       this.scope.components = sjs.namespace();
   });
 
   DocumentApplication.prototype.run =  function(){
-    var bodyTemplate = new ComponentTemplate(sjs.document.body);
+    var bodyTemplate = new ComponentTemplate(this.document.body);
     bodyTemplate.compile(this.scope);
     var controller = new Controller();
-    bodyTemplate.processIncludeAnchors(sjs.document.body,controller,this.scope);
+    bodyTemplate.processIncludeAnchors(this.document.body,controller,this.scope);
     controller.onDisplay();
   };
 

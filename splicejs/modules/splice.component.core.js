@@ -1,5 +1,7 @@
 $js.module({
-
+prerequisite:[
+  '/{$jshome}/modules/splice.component.module.extensions.js'
+],
 imports:[
 	{ Utils 	  : '/{$jshome}/modules/splice.util.js'},
   	{ Inheritance : '/{$jshome}/modules/splice.inheritance.js'},

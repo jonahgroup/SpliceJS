@@ -1,7 +1,6 @@
 $js.module({
 prerequisite:[
-  {Splash:'../SplashScreens/splash2.js'},
-  '/{$jshome}/modules/splice.module.extensions.js'
+  {Component:'/{$jshome}/modules/splice.component.js'},
 ],
 imports:[
   '/{$jshome}/modules/splice.animation.js',
@@ -10,7 +9,6 @@ imports:[
   '/{$jshome}/modules/splice.data.js',
   '/{$jshome}/modules/splice.text.js',
   {Inheritance: '/{$jshome}/modules/splice.inheritance.js'},
-  {Component:'/{$jshome}/modules/splice.component.js'},
   {Events : '/{$jshome}/modules/splice.event.js'},
   {'SpliceJS.Ui':'/{$jshome}/modules/splice.ui.js'},
   {'SpliceJS.Controls':'/{$jshome}/modules/splice.component.controls.js'},
@@ -34,7 +32,6 @@ definition:function(){
   ,   Events = imports.Events
   ,   MulticastEvent = imports.Events.MulticastEvent
   ,   Component = imports.Component
-  ,   Splash = imports.Splash
   ;
 
   var DataItem = imports.SpliceJS.Ui.DataItem
@@ -206,6 +203,5 @@ definition:function(){
     ComponentsTest, foo, testDataItem, components
   );
 
-  Splash.hideSplash();
-  new imports.Component.DocumentApplication(scope).run();
+  new imports.Component.DocumentApplication(imports.$js.document, scope).run();
 }});

@@ -5,6 +5,20 @@ imports:[
 definition:function(){
     var scope = this;
 
+    function LocalClass(){}
+    
+    class LocalClassES6 {
+
+    };
+
+    //add items to the scope
+    scope.add(LocalClassES6);
+    scope.add(LocalClass);
+
+    scope.add( 
+         {test:10}
+    );
+
     scope.imports.UI.saySomething();
     scope.imports.$js.load(
         [{'Inheritance':'/{$jshome}/modules/splice.inheritance.js'}],
@@ -17,18 +31,10 @@ definition:function(){
     );
 
 
-    // scope.load({
-    //     imports:[''],
-    //     definition:function(scope){
 
-    // }})
+    
 
-    function LocalClass(){}
-
-    scope.add(
-         LocalClass, 
-         {test:10}
-    );
+    
 
 
     scope.LocalClass;
