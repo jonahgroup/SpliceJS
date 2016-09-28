@@ -26,24 +26,18 @@ definition:function(){
 
     //read items from the scope
     if(new scope.LocalClass().n + new scope.LocalClassES6().n == 20)
-        $js.log.info('Pass...');
+        console.info('Pass...');
 
     scope.imports.UI.saySomething();
     scope.imports.$js.load(
         [{'Inheritance':'/{$jshome}/modules/splice.inheritance.js'}],
         function(){
-            var log = this.imports.$js.log;
+            
             var Class = this.imports.Inheritance.Class;
 
-            log.debug('Pseudo import callback');
+            console.debug('Pseudo import callback');
         }
     );
-
-
-
-    
-
-    
 
 
     scope.LocalClass;

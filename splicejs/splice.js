@@ -33,14 +33,9 @@ try {
 (function(window, document, global){
 
 "use strict";
-//logging setup
-var log = !window.console ? {} : window.console;
-//console log interface
-if(!log.error) 	log.error = function(){};
-if(!log.debug) 	log.debug = function(){};
-if(!log.info) 	log.info  = function(){};
-if(!log.warn) 	log.warn = function(){};
-if(!log.warn) 	log.log = function(){};
+
+//plug console if it does not exist
+var console = window.console | {error:function(){}};
 
 //path delimiter
 var _platform_ = window.__sjs_platform__;
@@ -74,9 +69,7 @@ function loadConfiguration(onLoad){
 
 	// splice js script must have sjs-main attribute
 	if(main == null) {
-		log.warn('Application entry point is not defined, "splice.js" script must have "sjs-main" attribute');
-		return;
-		//throw "SpliceJS script element must have 'sjs-main' attribute";
+		throw 'Application entry point is not defined, "splice.js" script must have "sjs-main" attribute';
 	}
 
 	mixin(config, {
@@ -101,10 +94,7 @@ function loadConfiguration(onLoad){
 function mixin(_t, _s){
 	if(!_s) return _t;
 	var keys = Object.keys(_s);
-	if(	_s == window || _s == document ||
-			_t == window || _t == document
-			){
-		log.error("Invalid object access " + _s.toString());
+	if(	_s == window || _s == document || _t == window || _t == document){
 		return _t;
 	}
 	for(var key in keys){
@@ -383,19 +373,16 @@ Namespace.prototype = {
 function currentScript(){
 	if(document.currentScript) return document.currentScript.src;
 	if(addedScript) {
-		log.debug('found via added script');
 		return addedScript.src;
 	}
 	if(document.scripts) {
 		for(var i=document.scripts.length-1; i>=0; i--){
 			var s = document.scripts[i]; 
 			if(s.readyState && s.readyState == 'interactive') { 
-				log.debug('Interactive script found: ' + s.src);
 				return s.src; 
 			}
 		}
 	}
-	log.debug('Current script not found');
 	return null;
 }
 
@@ -719,9 +706,7 @@ Loader.prototype = {
 				this.loadFrame(imports);
 			}
 		}
-		
 		if(this.pending == 0) {
-			log.info('Loading complete');
 			processFrame(this,this.root);
 		}
 	}
@@ -824,9 +809,9 @@ function isDfsCycle(spec){
 	if(!isCycle) return false;
 	//print cycle and throw exception
 	if(isCycle === true) {
-		log.error(spec);
+		console.error(spec);
 		for(var i=(dfsStack.length-1); i>=0; i--){
-			log.error(dfsStack[i]);
+			console.error(dfsStack[i]);
 		}
 		throw 'cyclical module dependency';
 	}
@@ -894,8 +879,6 @@ function initScope(scope, moduleSpec){
 
 				//get loaded and processed spec
 				var spec = importsMap[pseudoName];
-				log.debug('pseudo loaded');
-				log.debug(spec.fileName);
 				applyImports.call(parentScope,spec.imports);
 				
 				if(typeof callback === 'function'){
@@ -915,7 +898,6 @@ function initScope(scope, moduleSpec){
 	};
 
 	scope.imports.$js.context = context(scope.__sjs_uri__);
-	scope.imports.$js.log = log;
 	scope.imports.$js.ImportSpec = ImportSpec;
 	scope.imports.$js.extension = extension;
 
@@ -960,25 +942,6 @@ mdl.list= function list(){
 	return mixin({},importsMap);
 }
 
-mdl.listProcessed = function listProcessed(){
-	var result = [];
-	var keys = Object.keys(IMPORTS_MAP);
-	for(var key in keys ){
-		if(IMPORTS_MAP[keys[key]].isProcessed) result.push(IMPORTS_MAP[keys[key]]);
-	}
-	return result;
-}
-
-mdl.listPending = function listPending(){
-	var result = [];
-	var keys = Object.keys(IMPORTS_MAP);
-	for(var key in keys ){
-		var spec = IMPORTS_MAP[keys[key]];
-		if(!spec.isProcessed && typeof(spec.execute) == "function" )
-		result.push(IMPORTS_MAP[keys[key]]);
-	}
-	return result;
-}
 
 function addTo(s,t){
 	var keys = Object.keys(s);
@@ -997,7 +960,6 @@ var extension = mixin(Object.create(null), {
 function start(config){
 	//load main modules
 	if(config.sjsMain != null && config.sjsMain){
-		log.info('Loading main module: ' + config.sjsMain);
 		load([config.sjsMain]);
 	}
 }
@@ -1013,19 +975,6 @@ window.$js = global.$js = _core;
 //entry point
 loadConfiguration(function(config){
     PATH_VARIABLES['{$jshome}'] = config.sjsHome;
-
-	if(config.debug == true){
-		_core.debug =  mixin(Object.create(null),{
-			spv :spv,
-			split:_split,
-			collapseUrl: collapseUrl,
-			isAbsUrl:isAbsUrl,
-			fileExt:fileExt,
-			peek: peek,
-			trim: _trim,
-			_parseVersion:_parseVersion
-		});
-	}
 
     if(config.mode == 'onload'){
         window.onload = function(){ start(config);}

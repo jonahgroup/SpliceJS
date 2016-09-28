@@ -11,6 +11,7 @@ imports:[
 	{'SpliceJS.UI':'../splice.ui.js'},
 	{'SpliceJS.Controls':'splice.controls.scrollpanel.js'},
 	{'Doc':'/{$jshome}/modules/splice.document.js'},
+	{ Utils			: '/{$jshome}/modules/splice.util.js'},
 	'splice.controls.listbox.css',
 	'splice.controls.listbox.html'
 ]
@@ -21,9 +22,7 @@ definition:function(){
 	var scope = this
 	,	sjs = this.imports.$js;
 
-	var	log = sjs.log
-	,	debug =	sjs.log.debug
-	,	components = scope.components
+	var	components = scope.components
 	, 	imports = scope.imports
   	;
 
@@ -38,6 +37,8 @@ definition:function(){
 	, 	MulticastEvent = imports.Events.MulticastEvent
 	, 	DomMulticastEvent = imports.Views.DomMulticastEvent
 	, 	Component = imports.Component
+	,	log	= imports.Utils.log
+	,	debug = imports.Utils.log.debug
 	;
 
 

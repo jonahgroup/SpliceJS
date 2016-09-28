@@ -60,10 +60,17 @@ function join(separator, collection, start){
   return result;
 }
 
-
+//logging setup
+var log = !window.console ? {} : window.console;
+//console log interface
+if(!log.error) 	log.error = function(){};
+if(!log.debug) 	log.debug = function(){};
+if(!log.info) 	log.info  = function(){};
+if(!log.warn) 	log.warn = function(){};
+if(!log.log) 	log.log = function(){};
 
 scope.exports({
-  mixin,fname,
+  log,mixin,fname,
   Text:{
     join:join, trim:trim
   }, 

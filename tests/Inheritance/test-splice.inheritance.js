@@ -1,6 +1,7 @@
 $js.module({
 imports:[
-    {Inheritance:'/{$jshome}/modules/splice.inheritance.js'}    
+    {Inheritance:'/{$jshome}/modules/splice.inheritance.js'},
+    {Utils:'/{$jshome}/modules/splice.util.js'}        
 ]
 ,  
 definition:function(){
@@ -9,7 +10,7 @@ definition:function(){
     
     var sjs = scope.imports.$js
     ,   imports = scope.imports
-    ,   log = scope.imports.$js.log;
+    ,   log = scope.imports.Utils.log;
     
     
     var Class = imports.Inheritance.Class;

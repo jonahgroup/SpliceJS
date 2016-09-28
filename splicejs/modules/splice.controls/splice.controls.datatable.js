@@ -13,6 +13,7 @@ imports:[
 	{'SpliceJS.Controls':'splice.controls.datafilter.js'},
 	{'Doc':  '/{$jshome}/modules/splice.document.js'},
 	{'Data': '/{$jshome}/modules/splice.data.js'},
+	{ Utils	: '/{$jshome}/modules/splice.util.js'},
 	'splice.controls.css',
 	'splice.controls.datatable.css',
 	'splice.controls.datatable.html'
@@ -32,7 +33,6 @@ definition:function(){
 	// import dependencies
 	var imports = scope.imports
     ,   mixin = sjs.mixin
-	,	debug = sjs.log.debug
 	;
 
 	var	Class 	    = imports.Inheritance.Class
@@ -46,7 +46,9 @@ definition:function(){
 	,	DataStep 	= imports.Data.DataStep
 	,   UIControl   = imports.SpliceJS.UI.UIControl
 	,	Event 		= imports.Events.event
-	,	Controller  = imports.Component.Controller;
+	,	Controller  = imports.Component.Controller
+	,	log 			= imports.Utils.log
+	,	debug 			= imports.Utils.log.debug
 	;
 
 	/**
