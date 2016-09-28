@@ -19,11 +19,10 @@ definition:function(){
 	"use strict";
 
 	var scope = this
-	,	sjs = scope.imports.$js;
+	,	imports = scope.imports;
 
-	var imports = scope.imports
-	,	mixin = sjs.mixin
-	;
+	var sjs = scope.imports.$js
+	,	log = scope.imports.$js.log;
 
 	var	Class = imports.Inheritance.Class
 	,	Events = imports.Events
@@ -63,7 +62,7 @@ definition:function(){
 
 
 	DropDownListController.prototype.onDataItemChanged = function(item){
-
+		log.info('DropDownListController: DataItem changed');	
 	};
 
 	DropDownListController.prototype.initialize = function(){

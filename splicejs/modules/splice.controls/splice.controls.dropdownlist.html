@@ -8,6 +8,8 @@
 				<sjs-include class="binding('css.list').type('DropDownList')"
 							 sjs-type="SpliceJS.Controls.ListBox">
 					{
+						observeDataItem:binding('observeDataItem').parent, //experimental
+
 						dataIn:binding('onDataOut').type('DropDownList'),
 						listItemPath:binding('listItemPath').type('DropDownList'),
 						itemTemplate:binding('itemTemplate').type('DropDownList'),

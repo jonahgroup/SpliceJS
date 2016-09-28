@@ -93,6 +93,10 @@ definition:function(){
 		this.onDataItem(this.dataItem.path(idx));
 	};
 
+	ListBoxController.prototype.onDataItemChanged = function(item){
+		log.info('DataItem changed');
+	};
+
 
 	ListBoxController.prototype.dataItemChanged = function(item){
 		var i = item.fullPath().split('.')[0];
@@ -116,6 +120,7 @@ definition:function(){
 
 		}
 	};
+
 
 	ListBoxController.prototype.onDataIn = function(dataItem){
 		var list = dataItem.getValue()

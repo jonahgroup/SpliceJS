@@ -1051,7 +1051,7 @@ Controller.prototype.dispose = function(){
         return;
       }
 
-      //2. is target is event subscribe to it
+      //2. if target is event subscribe to it
       if(targetValue && targetValue.__sjs_event__ === true &&
         typeof(sourceValue) == 'function'){
         targetValue.subscribe(sourceValue,sourceInstance);

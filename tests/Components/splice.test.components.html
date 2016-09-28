@@ -85,7 +85,7 @@
   <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
     {
         defaultSelectedItem:'Select Province',
-        observeDataItem:true,
+        observeDataItem:true, //indicates DataItem listener
         selectedItemPath:'name',
         listItemPath:'name',
         dataIn: binding('provincesOfProvinces.0').parent,
@@ -95,7 +95,8 @@
   </sjs-include>
 </td>
 </tr>
-
+<!--
+<tr>
   <td>Templated ComboBox</td>
   <td>
   <sjs-include sjs-type="SpliceJS.Controls.ComboBox">
@@ -142,7 +143,7 @@
   </sjs-include>
 </td>
 </tr>
-
+-->
 <!--
 
 <tr>
