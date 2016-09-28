@@ -7,7 +7,8 @@ imports:[
 	{ Data			: '/{$jshome}/modules/splice.dataitem.js'},
 	{ Events		: '/{$jshome}/modules/splice.event.js'},
 	{ Views			: '/{$jshome}/modules/splice.view.js'},
-	{ Document  	: '/{$jshome}/modules/splice.document.js'}
+	{ Document  	: '/{$jshome}/modules/splice.document.js'},
+	{ Utils			: '/{$jshome}/modules/splice.util.js'}
 ],
 definition:function component(){
 //enable strict mode
@@ -16,9 +17,7 @@ definition:function component(){
 var scope = this;
 var sjs = scope.imports.$js;
 // importing framework features makes our code less verbose
-var debug = sjs.log.debug
-, 	log = sjs.log
-, 	imports = scope.imports
+var imports = scope.imports
 ;
 
 var	Class			= imports.Inheritance.Class
@@ -32,6 +31,8 @@ var	Class			= imports.Inheritance.Class
 , 	ArrayDataItem   = imports.Data.ArrayDataItem
 , 	IDataContract   = imports.Data.IDataContract
 , 	Document 		= imports.Document
+,	log 			= imports.Utils.log
+,	debug 			= imports.Utils.log.debug
 ;
 
 

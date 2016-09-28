@@ -8,6 +8,7 @@ imports:[
 	{ Events 	  	: '/{$jshome}/modules/splice.event.js' },
 	{ Views			: '/{$jshome}/modules/splice.view.js'},
 	{ Component		: '/{$jshome}/modules/splice.component.core.js'},
+	{ Utils			: '/{$jshome}/modules/splice.util.js'},
 	{'SpliceJS.UI'	: '../splice.ui.js'},
 	{'Doc' : '{$jshome}/modules/splice.document.js'},
 	'splice.controls.buttons.css',
@@ -18,9 +19,7 @@ definition:function(){
 	var scope = this
 	,	sjs = this.imports.$js;
 	
-	var
-      	imports = scope.imports
-    , 	debug = sjs.log.debug
+	var	imports = scope.imports
     ;
 
 	var
@@ -31,6 +30,8 @@ definition:function(){
 	, 	Views = imports.Views
 	,	Component = imports.Component
 	, 	DomMulticastEvent = imports.Views.DomMulticastEvent
+	,	log 			= imports.Utils.log
+	,	debug 			= imports.Utils.log.debug
 	;
 
 	var components = Component.defineComponents(scope);

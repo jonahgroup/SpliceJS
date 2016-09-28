@@ -19,7 +19,6 @@ definition:function(){
 var scope = this;
 
 var imports = scope.imports
-, 	log = scope.imports.$js.log
 , 	sjs = scope.imports.$js
 ;
 
@@ -29,6 +28,8 @@ var http = imports.Networking.http
 , 	View = imports.Views.View
 , 	DataItem = imports.Data.DataItem
 , 	DataItemStub = imports.Data.DataItemStub
+,	log	= imports.Utils.log
+,	debug = imports.Utils.log.debug
 ;
 
 var RESERVED_ATTRIBUTES = ["type", "name", "singleton", "class", "width", "height", "layout", "controller"];

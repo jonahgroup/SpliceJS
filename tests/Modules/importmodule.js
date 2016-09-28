@@ -2,11 +2,10 @@ $js.module({
 //imports:[{'test':'test-modules.js'}],
 definition:function(){
 
-    var scope = this
-    ,   log = this.imports.$js.log;
+    var scope = this;
     
     function saySomething(){
-        log.info('Hi i am an import module');
+        console.info('Hi i am an import module');
     }
     
     scope.exports(

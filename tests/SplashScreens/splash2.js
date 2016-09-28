@@ -48,14 +48,11 @@ definition:function(){
   Splash.prototype = {
     //doc is a document reference
     show:function(doc){
-      sjs.log.info('Splash screen show');
       document.body.appendChild(this.dom);
-
     },
     hide:function(){
       //return;
       //document.body.removeChild(this.dom);
-      sjs.log.info('Splash screen hide');
       this.dom.style.opacity = 0;
       var dom = this.dom;
 
