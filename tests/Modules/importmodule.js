@@ -6,7 +6,7 @@ definition:function(){
     ,   log = this.imports.$js.log;
     
     function saySomething(){
-        log.info('Hi i an import module');
+        log.info('Hi i am an import module');
     }
     
     scope.exports(

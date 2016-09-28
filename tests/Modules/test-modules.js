@@ -3,12 +3,17 @@ imports:[
     {'UI':'importmodule.js'}      
 ],    
 definition:function(){
-    var scope = this;
+    var scope = this
+    ,   $js = this.imports.$js;
 
-    function LocalClass(){}
+    function LocalClass(){
+        this.n = 10;
+    }
     
     class LocalClassES6 {
-
+       constructor() {
+            this.n = 10;
+        }
     };
 
     //add items to the scope
@@ -18,6 +23,10 @@ definition:function(){
     scope.add( 
          {test:10}
     );
+
+    //read items from the scope
+    if(new scope.LocalClass().n + new scope.LocalClassES6().n == 20)
+        $js.log.info('Pass...');
 
     scope.imports.UI.saySomething();
     scope.imports.$js.load(
