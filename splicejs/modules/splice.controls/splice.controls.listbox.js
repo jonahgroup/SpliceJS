@@ -99,43 +99,9 @@ definition:function(){
 	};
 
 
-	ListBoxController.prototype.dataItemChanged = function(item){
-		var i = item.fullPath().split('.')[0];
-		var di = null;
-		if(this.listItemPath)
-			di = this.dataItem.path(i+'.'+this.listItemPath);
-		else
-			di = this.dataItem.path(i);
-
-		if(this.listItems[i]) {
-			this.listItems[i].dataIn(di);
-		} else {
-			var item = new this.itemTemplate({parent:this});
-			this.listItems.push(item);
-			item.dataIn(di);
-
-			item.views.root.htmlElement.__sjs_item_index__ = i;
-			this.dom.add(item.views.root);
-			if(typeof item.onAttached == 'function')
-				item.onAttached();
-
-		}
-	};
-
-
 	ListBoxController.prototype.onDataIn = function(dataItem){
 		var list = dataItem.getValue()
 		, item = null;
-
-        //check changes
-        dataItem.changes(
-            function(){},
-            function(item){
-                log.log('List item change' + item._path);
-            },
-            function(){}
-       );
-
 
 		// update existing items if any
 		for(var i=0; i<this.listItems.length; i++){
@@ -149,45 +115,36 @@ definition:function(){
 		// add new items
 		asyncLoop(this.listItems.length,list.length-1,100,function(i){
         if(this.itemTemplate) {
-				item = new this.itemTemplate({parent:this});
-				this.listItems.push(item);
+			item = new this.itemTemplate({parent:this});
+			this.listItems.push(item);
 
-				var itm = null;
+			var itm = null;
 
-				if(this.listItemPath)
-				 itm = dataItem.path(i+'.'+this.listItemPath);
-				else
-				 itm = dataItem.path(i);
+			if(this.listItemPath)
+				itm = dataItem.path(i+'.'+this.listItemPath);
+			else
+				itm = dataItem.path(i);
 
-				 item.dataIn(itm);
+				item.dataIn(itm);
 
-				item.views.root.htmlElement.__sjs_item_index__ = i;
-				this.dom.add(item.views.root);
-				if(typeof item.onAttached == 'function')
-					item.onAttached();
-			    return true;
+			item.views.root.htmlElement.__sjs_item_index__ = i;
+			this.dom.add(item.views.root);
+			if(typeof item.onAttached == 'function')
+				item.onAttached();
+			return true;
             }
         }.bind(this));
 
-
-        /*
-        for(var i= this.listItems.length; i<list.length; i++) {
-			if(this.itemTemplate) {
-				item = new this.itemTemplate({parent:this});
-				this.listItems.push(item);
-
-				if(this.listItemPath)
-				 item.dataIn(dataItem.path(i+'.'+this.listItemPath));
-				else
-				 item.dataIn(dataItem.path(i));
-
-				item.views.root.htmlElement.__sjs_item_index__ = i;
-				this.dom.add(item.views.root);
-				if(typeof item.onAttached == 'function')
-					item.onAttached();
+		//delete items
+		if(list.length < this.listItems.length){
+			for(var i = list.length; i<this.listItems.length;i++){
+				var di = this.listItems[i];
+				this.dom.htmlElement.removeChild(di.views.root.htmlElement);
+				log.info(i);
 			}
-		}*/
+		}
 
+      
 		this.reflow();
 		if(!this.children.scrollPanel) this.onResize(this);
 	};

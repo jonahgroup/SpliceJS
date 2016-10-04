@@ -44,17 +44,6 @@ definition:function(){
       });
 
 
-
-    /*
-    ------------------------------------------------------------------------------
-    DataItemStub
-
-    */
-    var DataItemStub = function DataItemStub(changeHandler,instance){
-      this.handler = changeHandler;
-      this.instance = instance;
-    }
-
     /*
         ------------------------------------------------------------------------------
         DataItem class
@@ -406,17 +395,8 @@ definition:function(){
   		}
   	};
 
-
-
-
-
-
-
-
-
     scope.exports(
         {IDataContract : IDataContract},
-        DataItemStub,
         DataItem, DelegateDataItem, ArrayDataItem
     );
 

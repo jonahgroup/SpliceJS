@@ -118,7 +118,7 @@ definition:function(){
     this.onChartsData(charts);
     this.onScatterChartData(scatterChart);
     this.onTestCheck(this.sourceTestCheck);
-  }
+  };
 
   ComponentsTest.prototype.addProvince = function(){
     var p = newProvince.getValue();
@@ -127,7 +127,7 @@ definition:function(){
 
   ComponentsTest.prototype.testCheck = function(item){
     console.log(item);
-  }
+  };
 
   ComponentsTest.prototype.changeDataSet = function(){
     // var t = this.provincesOfProvinces.path('0.1.name');
@@ -135,15 +135,15 @@ definition:function(){
     
     // t.setValue("Changed by controller");
     this.provincesOfProvinces.setValue([b]);
-  }
+  };
 
   ComponentsTest.prototype.provincesSelection = function(provinces){
     console.log(provinces);
-  }
+  };
 
   ComponentsTest.prototype.provinceSelected = function(item){
     console.log('Selected province is:' + item);
-  }
+  };
 
   ComponentsTest.prototype.deleteItem = function(item){
     console.log(item);
@@ -152,7 +152,7 @@ definition:function(){
 
   ComponentsTest.prototype.showPopup = function(){
     console.log('I am a popup');
-  }
+  };
 
   ComponentsTest.prototype.formatButton = function(item){
     var v = item.getValue();

@@ -27,7 +27,6 @@ var	Class			= imports.Inheritance.Class
 , 	MulticastEvent 	= imports.Events.MulticastEvent
 , 	View 			= imports.Views.View
 , 	DataItem 		= imports.Data.DataItem
-, 	DataItemStub  	= imports.Data.DataItemStub
 , 	ArrayDataItem   = imports.Data.ArrayDataItem
 , 	IDataContract   = imports.Data.IDataContract
 , 	Document 		= imports.Document
@@ -106,7 +105,7 @@ var	Class			= imports.Inheritance.Class
 
 		//unsubscribed from existing dataitem
 		if(this.dataItem) {
-			this.dataItem.unsubscribe(this.onDataItemChanged);
+			this.dataItem.unsubscribe(this.onDataIn);
 		}
 
 		// datapath is only set externally
@@ -114,7 +113,7 @@ var	Class			= imports.Inheritance.Class
 
 		//track dataitem if flag is set
 		if(this.observeDataItem === true) {
-			this.dataItem.subscribe(this.onDataItemChanged,this);
+			this.dataItem.subscribe(this.onDataIn,this);
 		}
 
 		// invoke data-item handler
@@ -124,7 +123,6 @@ var	Class			= imports.Inheritance.Class
 			this.onDataOut(this.dataItem);
 	};
 
-  UIControl.prototype.onDataItemChanged = function(){}
 
   UIControl.prototype.processStyle = function(style){
         if(style == null || style == undefined) return;

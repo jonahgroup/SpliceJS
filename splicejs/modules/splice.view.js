@@ -464,7 +464,7 @@ function remove(view){
   		node.nodeValue = content.toString();
   		return this;
   	}
-  	return this;
+  	
   };
 
   View.removeContent = function removeContent(content, key){

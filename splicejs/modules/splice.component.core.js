@@ -27,7 +27,6 @@ var http = imports.Networking.http
 , 	Tokenizer = imports.Syntax.Tokenizer
 , 	View = imports.Views.View
 , 	DataItem = imports.Data.DataItem
-, 	DataItemStub = imports.Data.DataItemStub
 ,	log	= imports.Utils.log
 ,	debug = imports.Utils.log.debug
 ;
