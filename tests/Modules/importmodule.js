@@ -4,12 +4,12 @@ definition:function(){
 
     var scope = this;
     
-    function saySomething(){
-        console.info('Hi i am an import module');
+    function sayHi(){
+        console.info('Hi i am an importmodule.js');
     }
     
     scope.exports(
-        saySomething
+        sayHi
     );
     
 }});

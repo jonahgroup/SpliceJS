@@ -7,7 +7,7 @@
 			"request": "launch",
 			"program": "${workspaceRoot}/splicejs/splice.js",
 			"stopOnEntry": false,
-			"args": ["../tests/Events/test-events.js"],
+			"args": ["../tests/Modules/test-modules.js"],
 			"cwd": "${workspaceRoot}/splicejs",
 			"preLaunchTask": null,
 			"runtimeExecutable": null,

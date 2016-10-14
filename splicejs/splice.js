@@ -331,43 +331,43 @@ function Namespace(){
 }
 
 Namespace.prototype = {
-		add : function(path, obj, isSealed){
-			if(typeof(path)=='object' || typeof(path) == 'function'){
-				for(var i=0; i < arguments.length; i++){
-					var arg = arguments[i];
+	add : function(path, obj, isSealed){
+		if(typeof(path)=='object' || typeof(path) == 'function'){
+			for(var i=0; i < arguments.length; i++){
+				var arg = arguments[i];
 
-					if(typeof arg === 'function' ){
-						_namespaceAdd.call(this, fname(arg),arg,isSealed);
-						continue;
-					}
-
-					if(typeof arg == 'object') {
-						var keys = Object.keys(arg);
-						for(var key in keys){
-							_namespaceAdd.call(this, keys[key],arg[keys[key]],isSealed);
-						}
-						continue;
-					}
+				if(typeof arg === 'function' ){
+					_namespaceAdd.call(this, fname(arg),arg,isSealed);
+					continue;
 				}
-				return this;
-			}
 
-			if(typeof(path) == 'string'){
-				_namespaceAdd.call(this, path,obj,isSealed);
+				if(typeof arg == 'object') {
+					var keys = Object.keys(arg);
+					for(var key in keys){
+						_namespaceAdd.call(this, keys[key],arg[keys[key]],isSealed);
+					}
+					continue;
+				}
 			}
 			return this;
-		},
-		lookup:function(path){
-			if(!path) return null;
-			var parts = path.split('.');
-			var target = this;
-			for(var i=0; i<parts.length-1; i++){
-				if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
-				target = target[parts[i]];
-				if(target == null) break;
-			}
-			return target[parts[parts.length-1]];
 		}
+
+		if(typeof(path) == 'string'){
+			_namespaceAdd.call(this, path,obj,isSealed);
+		}
+		return this;
+	},
+	lookup:function(path){
+		if(!path) return null;
+		var parts = path.split('.');
+		var target = this;
+		for(var i=0; i<parts.length-1; i++){
+			if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
+			target = target[parts[i]];
+			if(target == null) break;
+		}
+		return target[parts[parts.length-1]];
+	}
 };
 
 function currentScript(){
@@ -898,7 +898,7 @@ function initScope(scope, moduleSpec){
 		var loader = new Loader();
 		loader.pending = 1;
 		loader.root = [pseudoName];
-		loader.onitemloaded(pseudoName);		
+		loader.onitemloaded(pseudoName);
 	};
 
 	scope.imports.$js.setvar = function(n, v){

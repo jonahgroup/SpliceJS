@@ -4,7 +4,7 @@ imports:[
 ],    
 definition:function(){
     "use strict"
-    
+
     var scope = this
     ,   $js = this.imports.$js;
 
@@ -30,7 +30,7 @@ definition:function(){
     if(new scope.LocalClass().n + new scope.LocalClassES6().n == 20)
         console.log('Pass...');
 
-    scope.imports.UI.saySomething();
+    scope.imports.UI.sayHi();
     scope.imports.$js.load(
         [{'AdhocModule':'adhocmodule.js'}],
         function(){
