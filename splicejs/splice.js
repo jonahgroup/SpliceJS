@@ -684,6 +684,9 @@ Loader.prototype = {
 		//process dependencies for module specs
 		if(spec instanceof ModuleSpec){
 
+			//validate module structure
+			validateModuleFormat(spec);
+
 			//set scope URI
 			spec.scope.__sjs_uri__ = item; 
 
@@ -710,6 +713,11 @@ Loader.prototype = {
 			processFrame(this,this.root);
 		}
 	}
+}
+
+function validateModuleFormat(spec){
+	if(!spec.__sjs_module__) throw 'null module in ' + spec.fileName;
+	if(!spec.__sjs_module__.definition) throw 'Module must contain "definition" function in: ' + spec.fileName;
 }
 
 function processFrame(loader,frame, oncomplete){

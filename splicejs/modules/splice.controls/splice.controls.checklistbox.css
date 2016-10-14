@@ -1,9 +1,0 @@
-.-sjs-checklistbox-item {
-  padding-left:30px;
-}
-
-.-sjs-checklistbox-item.checked {
-    background-image: url('resources/checklistbox/black/checkmark.png');
-    background-position: 7px center;
-    background-repeat: no-repeat;
-}

@@ -3,6 +3,8 @@ imports:[
     {'UI':'importmodule.js'}      
 ],    
 definition:function(){
+    "use strict"
+    
     var scope = this
     ,   $js = this.imports.$js;
 
@@ -26,19 +28,16 @@ definition:function(){
 
     //read items from the scope
     if(new scope.LocalClass().n + new scope.LocalClassES6().n == 20)
-        console.info('Pass...');
+        console.log('Pass...');
 
     scope.imports.UI.saySomething();
     scope.imports.$js.load(
-        [{'Inheritance':'/{$jshome}/modules/splice.inheritance.js'}],
+        [{'AdhocModule':'adhocmodule.js'}],
         function(){
-            
-            var Class = this.imports.Inheritance.Class;
-
+            this.imports.AdhocModule.foo();
             console.debug('Pseudo import callback');
         }
     );
-
 
     scope.LocalClass;
 
