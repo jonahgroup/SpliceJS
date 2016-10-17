@@ -267,13 +267,7 @@ function fileExt(f){
 	return f.substring(f.lastIndexOf('.'));
 }
 
-function peek(a){
-	if(!a) return null;
-	if(a.length > 0) return a[a.length - 1];
-	return null;
-}
-
-//some browsers to not support trim function on strings
+//some browsers do not support trim function on strings
 function _trim(s){if(!s) return s;
 	if(String.prototype.trim) return s.trim();
 	return s.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
@@ -373,7 +367,7 @@ Namespace.prototype = {
 function currentScript(){
 	if(document.currentScript) return document.currentScript.src;
 	if(addedScript) {
-		return addedScript.src;
+		return addedScript;
 	}
 	if(document.scripts) {
 		for(var i=document.scripts.length-1; i>=0; i--){
@@ -411,7 +405,7 @@ var _fileHandlers = {
 					}
 				}
 			}
-			addedScript = script;
+			addedScript = script.src;
 			head.appendChild(script);
 			addedScript = null;
 		}
@@ -474,15 +468,6 @@ function _exports(scope){
 				continue;
 			}
 		}
-	}
-}
-
-function _acopy(s,t){
-	if(!s) return;
-	if(!(s instanceof Array)) return;
-	var keys = Object.keys(s);
-	for(var key in keys){
-		t[keys[key]] = s[keys[key]];
 	}
 }
 
@@ -667,7 +652,7 @@ Loader.prototype = {
 			handler.load(filename,this,spec);
 		}
 	},
-	onitemloaded:function(item){
+	onitemloaded:function(item, ctxScope){
 		var spec = importsMap[item];
 		//clear current module spec, resource loaded next may not be a module
 		if(spec instanceof ImportSpec && currentModuleSpec ) {
@@ -679,7 +664,7 @@ Loader.prototype = {
 
 		//mark import spec as loaded 
 		spec.isLoaded = true;
-		
+
 
 		//process dependencies for module specs
 		if(spec instanceof ModuleSpec){
@@ -688,11 +673,11 @@ Loader.prototype = {
 			validateModuleFormat(spec);
 
 			//set scope URI
-			spec.scope.__sjs_uri__ = item; 
+			spec.scope.__sjs_uri__ = item;  
 
 			//process resource spec that was just loaded
 			//get current module context
-			var ctx = context(spec.scope.__sjs_uri__);
+			var ctx = context(ctxScope ? ctxScope.__sjs_uri__ : spec.scope.__sjs_uri__);
 
 			//resolve prerequisites
 			var prereqs = spec.prerequisites = _dependencies(spec.__sjs_module__.prerequisite,ctx);
@@ -898,7 +883,7 @@ function initScope(scope, moduleSpec){
 		var loader = new Loader();
 		loader.pending = 1;
 		loader.root = [pseudoName];
-		loader.onitemloaded(pseudoName);
+		loader.onitemloaded(pseudoName,parentScope);
 	};
 
 	scope.imports.$js.setvar = function(n, v){

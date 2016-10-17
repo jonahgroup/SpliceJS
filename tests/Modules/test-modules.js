@@ -35,7 +35,7 @@ definition:function(){
         [{'AdhocModule':'adhocmodule.js'}],
         function(){
             this.imports.AdhocModule.foo();
-            console.debug('Pseudo import callback');
+            console.log('Pseudo import callback');
         }
     );
 
