@@ -1,12 +1,14 @@
 $js.module({
 imports:[
-    {'UI':'importmodule.js'}      
+    {'UI':'importmodule.js'},
+    'extension.js'      
 ],    
 definition:function(){
     "use strict"
 
     var scope = this
     ,   $js = this.imports.$js;
+
 
     function LocalClass(){
         this.n = 10;
@@ -32,7 +34,9 @@ definition:function(){
 
     scope.imports.UI.sayHi();
     scope.imports.$js.load(
-        [{'AdhocModule':'adhocmodule.js'}],
+        [{'AdhocModule':'adhocmodule.js'},
+          'adhocmodule2.js',
+        ],
         function(){
             this.imports.AdhocModule.foo();
             console.log('Pseudo import callback');

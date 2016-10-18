@@ -836,7 +836,7 @@ ModuleSpec.prototype.execute = function(){
 	//run the module definition	
 	this.__sjs_module__.definition.call(this.scope);
 }
-
+var pseudoCounter = 0;
 function initScope(scope, moduleSpec){
 
 	scope.add('imports',new Namespace());
@@ -845,6 +845,7 @@ function initScope(scope, moduleSpec){
 	scope.imports.add('$js',mixin(Object.create(null),_core),true);
 
 	scope.imports.$js.document = document;
+	scope.imports.$js.window = window;
 	scope.imports.$js.namespace = Namespace;
 	
 	//module scope calls only
@@ -858,11 +859,11 @@ function initScope(scope, moduleSpec){
 	 * being loaded
 	 * 
 	 */
-
+	
 	scope.imports.$js.load = function(resources,callback){
 				
 		//get pseudo module name
-		var pseudoName = '__sjs_pseudom__0'; 
+		var pseudoName = '__sjs_pseudom__' + pseudoCounter++; 
 		var parentScope = scope;
 		//compose pseudo module
 		mdl({
@@ -877,6 +878,8 @@ function initScope(scope, moduleSpec){
 				if(typeof callback === 'function'){
 					callback.call(parentScope);
 				}
+				//do not store pseudo modules into the global map
+				delete importsMap[pseudoName]; 
 			}
 		});
 
@@ -936,17 +939,22 @@ mdl.list= function list(){
 }
 
 
-function addTo(s,t){
+function addTo(s,t,unq){
 	var keys = Object.keys(s);
 	for(var key in keys) {
-		if(t[keys[key]]) continue;
+		if(t[keys[key]]) { 
+			if(unq === true) throw 'key ' + key + ' is already set';
+			continue;
+		}
 		t[keys[key]] = s[keys[key]];
 	}
 }
 
 var extension = mixin(Object.create(null), {
 	loader: function(obj){
-		addTo(obj,_fileHandlers);
+		//check if file handler is already set and do not 
+		//allow setting it again - by setting true flag on addTo
+		addTo(obj,_fileHandlers,true);
 	}
 });
 

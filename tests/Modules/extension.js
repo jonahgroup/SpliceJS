@@ -1,0 +1,3 @@
+$js.module({
+    definition:function(){}
+});

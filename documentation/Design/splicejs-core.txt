@@ -55,7 +55,7 @@
 
   * Module context
     
-    $js.extension - extension may only be set once per application instance
+    $js.extension - extension may only be set once per application instance, repetitive calls on extension method will fail with exception
     $js.context.resolve
     $js.context.absurl
     $js.load(resources) {
