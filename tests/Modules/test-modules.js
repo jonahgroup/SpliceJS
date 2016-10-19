@@ -43,6 +43,12 @@ definition:function(){
         }
     );
 
+    scope.imports.$js.load(
+        ['adhocmodule.js'], function(){
+            console.log('Repeat load on adhocmodule.js');
+        }
+    );
+
     scope.LocalClass;
 
 }});
