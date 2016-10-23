@@ -573,7 +573,6 @@ function _dependencies(items, ctx){
 function ImportSpec(fileName){
 	this.imports = null;
 	this.prerequisites = null;
-	this.frames = new Array();
 	this.fileName = fileName;
 }
 ImportSpec.prototype = { 
@@ -607,7 +606,10 @@ function to(array,fn){
 /*
 	Asynchronous loader
 */
-function Loader(){this.pending = 0; this.root = null;}
+function Loader(){
+	this.pending = 0; this.root = null;
+	this.queue = [];
+}
 Loader.prototype = {
 	loadFrame:function(frame){
 		var imports = frame;
@@ -625,6 +627,15 @@ Loader.prototype = {
 			}
 
 			var spec = importsMap[filename];
+
+			//we are trying to load a module that is being
+			//loaded by some other loader, go on a queue
+			
+			if(spec !=null && spec.status =="in-progress" && spec.loader != this){
+				this.isQueued = true;
+				spec.loader.queue.push(this);
+				return;
+			}
 
 			//resource has already been loaded
 			//check for null and undefined 
@@ -649,6 +660,8 @@ Loader.prototype = {
 			this.pending++;
 
 			//load file
+			spec.status = 'in-progress';
+			spec.loader = this;
 			handler.load(filename,this,spec);
 		}
 	},
@@ -663,7 +676,7 @@ Loader.prototype = {
 		this.pending--;
 
 		//mark import spec as loaded 
-		spec.isLoaded = true;
+		spec.status = 'loaded';
 
 
 		//process dependencies for module specs
@@ -694,7 +707,7 @@ Loader.prototype = {
 				this.loadFrame(imports);
 			}
 		}
-		if(this.pending == 0) {
+		if(this.pending == 0 && !this.isQueued) {
 			processFrame(this,this.root);
 		}
 	}
@@ -722,12 +735,12 @@ function processFrame(loader,frame, oncomplete){
 
 		var toLoad = {
 			imports: to(spec.imports,function(i){
-				if(importsMap[i.url] && importsMap[i.url].isLoaded) 
+				if(importsMap[i.url] && importsMap[i.url].status == 'loaded') 
 					return null;
 				return i;
 			}),
 			prereqs: to(spec.prerequisites,function(i){
-				if(importsMap[i.url] && importsMap[i.url].isLoaded) 
+				if(importsMap[i.url] && importsMap[i.url].status == 'loaded') 
 					return null;
 				return i;
 			})
@@ -787,6 +800,8 @@ function processFrame(loader,frame, oncomplete){
 			runCount++;
 		}
 	}
+	//process loader queue
+	while(loader.queue.length > 0){}
 	return runCount;
 }
 
