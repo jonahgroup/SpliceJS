@@ -5,6 +5,7 @@ imports:[
 ],    
 definition:function(){
     "use strict"
+     console.log('test-modules.js - loaded');
 
     var scope = this
     ,   $js = this.imports.$js;
@@ -32,6 +33,19 @@ definition:function(){
     if(new scope.LocalClass().n + new scope.LocalClassES6().n == 20)
         console.log('Pass...');
 
+    scope.imports.$js.load([
+        'importmodule.js'
+    ],function(){
+        console.log('test-modules.js 1. - inline loaded importmodule.js 1');
+    })
+
+
+    scope.imports.$js.load([
+        'importmodule.js'
+    ],function(){
+        console.log('test-modules.js 2. - inline loaded importmodule.js 2');
+    })
+
     scope.imports.UI.sayHi();
     scope.imports.$js.load(
         [{'AdhocModule':'adhocmodule.js'},
@@ -39,13 +53,13 @@ definition:function(){
         ],
         function(){
             this.imports.AdhocModule.foo();
-            console.log('Pseudo import callback');
+            console.log('test-modules.js 3. - inline loaded adhocmodule.js, adhocmodule2');
         }
     );
 
     scope.imports.$js.load(
         ['adhocmodule.js'], function(){
-            console.log('Repeat load on adhocmodule.js');
+            console.log('test-modules.js 4. - inline loaded adhocmodule.js');
         }
     );
 

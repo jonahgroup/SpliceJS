@@ -5,6 +5,7 @@ prerequisite:[
 definition:function(){
     console.log('adhocmodule.js - loaded');
     this.exports(function foo(){
-        console.log('Hi! I am function foo from adhocmodule.js');
+        console.log('adhocmodule.js - Hi! I am function foo');
     });
 }});
+

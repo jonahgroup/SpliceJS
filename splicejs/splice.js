@@ -35,7 +35,7 @@ try {
 "use strict";
 
 //plug console if it does not exist
-var console = window.console | {error:function(){}};
+var console = window.console || {error:function(){}};
 
 //path delimiter
 var _platform_ = window.__sjs_platform__;
@@ -380,14 +380,31 @@ function currentScript(){
 	return null;
 }
 
-
+var specLoaders = [];
+function notifyLoaders(spec){
+	var loaders = specLoaders[spec.fileName];
+	for(var i=0; i<loaders.length; i++){
+		loaders[i].onitemloaded(spec.fileName);
+	}
+}
+function addLoader(spec,loader){
+	var loaders = specLoaders[spec.fileName];
+	if(!loaders) {
+		loaders = specLoaders[spec.fileName] = [];
+	}
+	loaders.push(loader);
+}
 var _fileHandlers = {
 	'.js': {
 		importSpec:function(filename){
 			return new ImportSpec(filename);
 		},
-		load: function(filename,loader){
+		load: function(loader,spec){
+			//add to loaders
+			addLoader(spec,loader);
+
 			//document script loader
+			var filename = spec.fileName;
 			var head = document.head || document.getElementsByTagName('head')[0];
 			var script = document.createElement('script');
 			script.setAttribute("type", "text/javascript");
@@ -396,12 +413,16 @@ var _fileHandlers = {
 
 			if(script.onload !== undefined){
 				script.onload = function(e){
-					loader.onitemloaded(filename);
+					notifyLoaders(spec)
+					//spec.onloaded();
+					//loader.onitemloaded(filename);
 				};	
 			} else if(script.onreadystatechange !== undefined){
 				script.onreadystatechange = function(){
 					if(script.readyState == 'loaded' || script.readyState == 'complete') {
-						loader.onitemloaded(filename);
+						notifyLoaders(spec);
+						//spec.onloaded();
+						//loader.onitemloaded(filename);
 					}
 				}
 			}
@@ -606,7 +627,9 @@ function to(array,fn){
 /*
 	Asynchronous loader
 */
+var loaderOrdinal = 0;
 function Loader(){
+	this.id = loaderOrdinal++;
 	this.pending = 0; this.root = null;
 	this.queue = [];
 }
@@ -619,7 +642,7 @@ Loader.prototype = {
 
 		//loop through modules in the frame
 		//skip the already loaded ones
-		for(var i=0; i < imports.length; i++){
+		for(var i = 0; i < imports.length; i++){
 			var filename = imports[i];
 
 			if(filename instanceof ImportItem){
@@ -631,10 +654,10 @@ Loader.prototype = {
 			//we are trying to load a module that is being
 			//loaded by some other loader, go on a queue
 			
-			if(spec !=null && spec.status =="in-progress" && spec.loader != this){
-				this.isQueued = true;
-				spec.loader.queue.push(this);
-				return;
+			if(spec !=null && spec.status =="in-progress"){
+				addLoader(spec,this);
+				this.pending++;
+				continue;
 			}
 
 			//resource has already been loaded
@@ -662,8 +685,9 @@ Loader.prototype = {
 			//load file
 			spec.status = 'in-progress';
 			spec.loader = this;
-			handler.load(filename,this,spec);
+			handler.load(this,spec);
 		}
+		return this.pending;
 	},
 	onitemloaded:function(item, ctxScope){
 		var spec = importsMap[item];
@@ -728,8 +752,10 @@ function processFrame(loader,frame, oncomplete){
 		var url =  frame[i];
 		if(url instanceof ImportItem) url = url.url;
 
+		var dfsStack = getDfsStack(loader.id);
+
 		//check for cyclical dependency
-		isDfsCycle(url);
+		isDependencyCycle(url,dfsStack);
 
 		var spec = importsMap[url];
 
@@ -800,16 +826,20 @@ function processFrame(loader,frame, oncomplete){
 			runCount++;
 		}
 	}
-	//process loader queue
-	while(loader.queue.length > 0){}
 	return runCount;
 }
 
-var dfsStack = [];
-function isDfsCycle(spec){
+var dfsStacks = [];
+function getDfsStack(loaderId){
+	var stack = dfsStacks[loaderId];
+	if(!stack) 
+		stack = dfsStacks[loaderId] = [];
+	return stack;	
+}
+function isDependencyCycle(spec,stack){
 	var isCycle = false;
-	for(var i=(dfsStack.length -2); i>=0; i--){
-		if(spec === dfsStack[i]) {
+	for(var i=(stack.length -2); i>=0; i--){
+		if(spec === stack[i]) {
 			isCycle = true;
 			break;
 		}
@@ -818,8 +848,8 @@ function isDfsCycle(spec){
 	//print cycle and throw exception
 	if(isCycle === true) {
 		console.error(spec);
-		for(var i=(dfsStack.length-1); i>=0; i--){
-			console.error(dfsStack[i]);
+		for(var i=(stack.length-1); i>=0; i--){
+			console.error(stack[i]);
 		}
 		throw 'cyclical module dependency';
 	}

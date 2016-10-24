@@ -1,5 +1,5 @@
 $js.module({
     definition:function(){
-        console.log('Adhoc module 2 - loaded');
+        console.log('adhocmodule2 - loaded');
     }
 });

@@ -14,10 +14,9 @@ definition:function(){
         ],
         function(){
            // this.imports.AdhocModule.foo();
-            console.log('Pseudo import callback from importmodule.js');    
+            console.log('importmodule.js 1. - inline loaded adhocmodule2.js');    
         }
     );
-
 
     scope.exports(
         sayHi

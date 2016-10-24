@@ -1,3 +1,5 @@
 $js.module({
-    definition:function(){}
+    definition:function(){
+        console.log('extension.js - loaded');
+    }
 });
