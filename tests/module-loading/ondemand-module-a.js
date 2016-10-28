@@ -1,6 +1,6 @@
 $js.module({
 prerequisite:[
-    'adhocprerequisite.js'
+    'ondemand-module-a-prereq.js'
 ],
 definition:function(){
     console.log('adhocmodule.js - loaded');

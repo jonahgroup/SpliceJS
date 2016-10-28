@@ -1,7 +1,7 @@
 $js.module({
 imports:[
-    {'UI':'importmodule.js'},
-    'extension.js'      
+    {'UI':'import-module.js'},
+    'extension-module.js'      
 ],    
 definition:function(){
     "use strict"
@@ -33,32 +33,48 @@ definition:function(){
     if(new scope.LocalClass().n + new scope.LocalClassES6().n == 20)
         console.log('Pass...');
 
+
+    //test on demand loading
+
+    var inlineImports = scope.imports.add({inlineImports:{
+        count:3,
+        test:function(){
+            this.count--;
+            if(this.count == 0) console.log('On-demand loading passed.');
+        }
+    }});
+    
+
     scope.imports.$js.load([
-        'importmodule.js'
+        'import-module.js'
     ],function(){
+        this.imports.inlineImports.test();
         console.log('test-modules.js 1. - inline loaded importmodule.js 1');
     })
 
 
     scope.imports.$js.load([
-        'importmodule.js'
+        'import-module.js'
     ],function(){
+        this.imports.inlineImports.test();
         console.log('test-modules.js 2. - inline loaded importmodule.js 2');
     })
 
     scope.imports.UI.sayHi();
     scope.imports.$js.load(
-        [{'AdhocModule':'adhocmodule.js'},
-          'adhocmodule2.js',
+        [{'AdhocModule':'ondemand-module-a.js'},
+          'ondemand-module-b.js',
         ],
         function(){
             this.imports.AdhocModule.foo();
+            this.imports.inlineImports.test();
             console.log('test-modules.js 3. - inline loaded adhocmodule.js, adhocmodule2');
         }
     );
 
     scope.imports.$js.load(
-        ['adhocmodule.js'], function(){
+        ['ondemand-module-a.js'], function(){
+            this.imports.inlineImports.test();
             console.log('test-modules.js 4. - inline loaded adhocmodule.js');
         }
     );

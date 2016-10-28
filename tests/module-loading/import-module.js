@@ -10,7 +10,8 @@ definition:function(){
     
     scope.imports.$js.load(
         [
-          'adhocmodule2.js'
+          'ondemand-module-b.js',
+          'test-modules.js'
         ],
         function(){
            // this.imports.AdhocModule.foo();
