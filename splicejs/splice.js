@@ -80,15 +80,10 @@ function loadConfiguration(onLoad){
 		mode:		main.getAttribute('sjs-start-mode'),
 		debug:    	main.getAttribute('sjs-debug') == 'true' ? true:false
 	});
+	//set default start mode to onload
+	config.mode = config.mode || 'onload';
 
-	var sjsConfig = node.getAttribute('sjs-config');
-	//load external configuration if available
-	if(sjsConfig == null || !sjsConfig) {
-		//mixin(configuration, config);
-		onLoad(config);
-	} else {
-			//async load here
-	}
+	onLoad(config);	
 }
 
 function mixin(_t, _s){
