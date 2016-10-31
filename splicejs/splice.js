@@ -588,7 +588,7 @@ function _dependencies(items, ctx){
 
 function ImportSpec(fileName){
 	this.imports = null;
-	this.prerequisites = null;
+	this.preloads = null;
 	this.fileName = fileName;
 }
 ImportSpec.prototype = { 
@@ -665,7 +665,6 @@ Loader.prototype = {
 				_loaderStats.loadingIndicator.update(0,0,filename);
 			}
 
-
 			//get handler for current file
 			var handler = _fileHandlers[fileExt(filename)];
 
@@ -711,15 +710,15 @@ Loader.prototype = {
 			//get current module context
 			var ctx = context(ctxScope ? ctxScope.__sjs_uri__ : spec.scope.__sjs_uri__);
 
-			//resolve prerequisites
-			var prereqs = spec.prerequisites = _dependencies(spec.__sjs_module__.prerequisite,ctx);
+			//resolve preloads
+			var prereqs = spec.preloads = _dependencies(spec.__sjs_module__.preload,ctx);
 
 			//	resolve required resources relative to
 			//	current context
 			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.imports,ctx);
 
 
-			//if prerequisites are present, save current frame and create new frame
+			//if preloads are present, save current frame and create new frame
 			if(prereqs && prereqs.length > 0){
 				this.loadFrame(prereqs);	
 			} else if(imports && imports.length > 0) {
@@ -760,7 +759,7 @@ function processFrame(loader,frame, oncomplete){
 					return null;
 				return i;
 			}),
-			prereqs: to(spec.prerequisites,function(i){
+			prereqs: to(spec.preloads,function(i){
 				if(importsMap[i.url] && importsMap[i.url].status == 'loaded') 
 					return null;
 				return i;
@@ -774,7 +773,7 @@ function processFrame(loader,frame, oncomplete){
 					return null;
 				return i;
 			}),
-			prereqs: to(spec.prerequisites,function(i){
+			prereqs: to(spec.preloads,function(i){
 				if(importsMap[i.url] && importsMap[i.url].isProcessed) 
 					return null;
 				return i;
@@ -789,7 +788,7 @@ function processFrame(loader,frame, oncomplete){
 
 		var pEx = 0, pIm = 0;
 
-		//run prerequisites
+		//run preloads
 		if(toExec.prereqs.length > 0) {
 			//add current url onto stack to detect branching
 			dfsStack.push(url);
@@ -805,7 +804,7 @@ function processFrame(loader,frame, oncomplete){
 			continue;
 		}
 
-		//run prerequisites
+		//run preloads
 		if(toExec.imports.length > 0) {
 			//add current url onto stack to detect branching
 			dfsStack.push(url);
@@ -867,14 +866,14 @@ ModuleSpec.prototype.execute = function(){
 	initScope(this.scope,this);
 
 	///
-	if(this.prerequisites)
-		applyImports.call(this.scope,this.prerequisites);
+	if(this.preloads)
+		applyImports.call(this.scope,this.preloads);
 	
 	if(this.imports)
 		applyImports.call(this.scope,this.imports);
 
 	//run the module definition	
-	this.__sjs_module__.definition.call(this.scope);
+	this.__sjs_module__.definition.call(this.scope,this.scope);
 }
 var pseudoCounter = 0;
 function initScope(scope, moduleSpec){
@@ -895,7 +894,7 @@ function initScope(scope, moduleSpec){
 	};
 	/**
 	 * resources:string[] - module or other resources paths
-	 * all prerequisites are expected to be defined within the module
+	 * all preloads are expected to be defined within the module
 	 * being loaded
 	 * 
 	 */
