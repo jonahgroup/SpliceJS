@@ -1,5 +1,6 @@
 $js.module({
 imports:[
+    {'TestFixture':'../test-fixture/test-fixture.js'},
     {'UI':'import-module.js'},
     'extension-module.js'      
 ],    

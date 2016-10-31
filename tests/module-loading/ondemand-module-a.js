@@ -1,5 +1,5 @@
 $js.module({
-prerequisite:[
+preload:[
     'ondemand-module-a-prereq.js'
 ],
 definition:function(){

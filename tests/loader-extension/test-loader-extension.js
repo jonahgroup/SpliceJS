@@ -1,12 +1,12 @@
 $js.module({
-prerequisite:[
+preload:[
     '../module-loading/extension-module.js'
 ],
 imports:[
     {'virtual':'module.virt'}
 ],
 definition:function(){
-    var imports = this.scope.imports;
+    var imports = this.imports;
     imports.virtual.virtualCall();
 }
 });

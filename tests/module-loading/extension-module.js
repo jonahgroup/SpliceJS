@@ -12,11 +12,8 @@ definition:function(){
         ImportSpec.call(this,fileName);
     }
 
-    VirtualSpec.prototype = ImportSpec;
-    VirtualSpec.prototype.contructor = VirtualSpec;
-    VirtualSpec.prototype.execute = function(){
-        console.log('running');
-    }
+    VirtualSpec.prototype = new ImportSpec();
+    VirtualSpec.prototype.constructor = VirtualSpec;
 
     $js.extension.loader({
         '.virt':{
