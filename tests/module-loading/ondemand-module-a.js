@@ -2,10 +2,14 @@ $js.module({
 preload:[
     'ondemand-module-a-prereq.js'
 ],
-definition:function(){
-    console.log('adhocmodule.js - loaded');
+imports:[
+    {'Test':'../test-fixture/test-fixture.js'}
+],
+definition:function(scope){
+    var test = scope.imports.Test;
+    test.log('adhocmodule.js - loaded');
     this.exports(function foo(){
-        console.log('adhocmodule.js - Hi! I am function foo');
+        test.log('adhocmodule.js - Hi! I am function foo');
     });
 }});
 

@@ -1,16 +1,16 @@
 $js.module({
 imports:[
-    {'TestFixture':'../test-fixture/test-fixture.js'},
+    {'Test':'../test-fixture/test-fixture.js'},
     {'UI':'import-module.js'},
     'extension-module.js'      
 ],    
-definition:function(){
+definition:function(scope){
     "use strict"
-     console.log('test-modules.js - loaded');
+    
+    var $js = scope.imports.$js
+    ,   test = scope.imports.Test;
 
-    var scope = this
-    ,   $js = this.imports.$js;
-
+    test.log('test-modules.js - loaded');
 
     function LocalClass(){
         this.n = 10;
@@ -32,7 +32,8 @@ definition:function(){
 
     //read items from the scope
     if(new scope.LocalClass().n + new scope.LocalClassES6().n == 20)
-        console.log('Pass...');
+        test.log('Pass...');
+    
 
 
     //test on demand loading
@@ -41,7 +42,9 @@ definition:function(){
         count:3,
         test:function(){
             this.count--;
-            if(this.count == 0) console.log('On-demand loading passed.');
+            if(this.count == 0){
+                test.log('On-demand loading passed.');
+            }
         }
     }});
     
@@ -50,7 +53,7 @@ definition:function(){
         'import-module.js'
     ],function(){
         this.imports.inlineImports.test();
-        console.log('test-modules.js 1. - inline loaded importmodule.js 1');
+        test.log('test-modules.js 1. - inline loaded importmodule.js 1');
     })
 
 
@@ -58,7 +61,7 @@ definition:function(){
         'import-module.js'
     ],function(){
         this.imports.inlineImports.test();
-        console.log('test-modules.js 2. - inline loaded importmodule.js 2');
+        test.log('test-modules.js 2. - inline loaded importmodule.js 2');
     })
 
     scope.imports.UI.sayHi();
@@ -69,14 +72,14 @@ definition:function(){
         function(){
             this.imports.AdhocModule.foo();
             this.imports.inlineImports.test();
-            console.log('test-modules.js 3. - inline loaded adhocmodule.js, adhocmodule2');
+            test.log('test-modules.js 3. - inline loaded adhocmodule.js, adhocmodule2');
         }
     );
 
     scope.imports.$js.load(
         ['ondemand-module-a.js'], function(){
             this.imports.inlineImports.test();
-            console.log('test-modules.js 4. - inline loaded adhocmodule.js');
+            test.log('test-modules.js 4. - inline loaded adhocmodule.js');
         }
     );
 

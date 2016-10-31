@@ -1,11 +1,11 @@
 $js.module({
-//imports:[{'test':'test-modules.js'}],
-definition:function(){
-
-    var scope = this;
-    console.log('importmodule.js - loaded');
+imports:[{'Test':'../test-fixture/test-fixture.js'}],
+definition:function(scope){
+    
+    var test = scope.imports.Test; 
+    test.log('importmodule.js - loaded');
     function sayHi(){
-        console.info('Hi i am an importmodule.js');
+        test.log('Hi i am an importmodule.js');
     }
     
     scope.imports.$js.load(
@@ -15,7 +15,7 @@ definition:function(){
         ],
         function(){
            // this.imports.AdhocModule.foo();
-            console.log('importmodule.js 1. - inline loaded adhocmodule2.js');    
+            test.log('importmodule.js 1. - inline loaded adhocmodule2.js');    
         }
     );
 

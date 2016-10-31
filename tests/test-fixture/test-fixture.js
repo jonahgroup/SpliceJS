@@ -11,7 +11,9 @@ definition:function(scope){
     var logWindow = document.getElementById('logWindow');
     
     function log(text){
-        logWindow.appendChild(document.createTextNode(text));
+        var d = document.createElement('div');
+        d.appendChild(document.createTextNode(text));
+        logWindow.appendChild(d);
     }
 
     scope.exports(log);

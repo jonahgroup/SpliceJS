@@ -1,11 +1,15 @@
 $js.module({
+imports:[{'Test':'../test-fixture/test-fixture.js'}],
 definition:function(){
     
-    console.log('.virtual extension.js - loaded');
-
     var scope = this;
     var $js = scope.imports.$js;
     var ImportSpec = $js.ImportSpec;
+    var test = scope.imports.Test;
+   
+    test.log('.virtual extension.js - loaded');
+
+   
 
 
     function VirtualSpec(fileName){
@@ -22,7 +26,7 @@ definition:function(){
                 spec.scope = {
                     __sjs_module_exports__ : {
                         virtualCall:function(){
-                            console.log('this is a virtual call');
+                            test.log('this is a virtual call');
                         }
                     }
                 }

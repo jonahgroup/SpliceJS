@@ -1,5 +1,9 @@
 $js.module({
-    definition:function(){
-       console.log('adhocprerequisite.js - loaded'); 
-    }
+imports:[
+    {'Test':'../test-fixture/test-fixture.js'}
+],
+definition:function(scope){
+    var test = scope.imports.Test;
+    test.log('adhocprerequisite.js - loaded'); 
+}
 });
