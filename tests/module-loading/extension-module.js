@@ -1,6 +1,8 @@
-$js.module({
-imports:[{'Test':'../test-fixture/test-fixture.js'}],
-definition:function(){
+define([
+    {'Test':'../test-fixture/test-fixture.js'}
+],
+function(scope){
+    "use strict";
     
     var scope = this;
     var $js = scope.imports.$js;
@@ -34,5 +36,4 @@ definition:function(){
             }
         }
     })
-
-}});
+});

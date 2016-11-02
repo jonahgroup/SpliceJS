@@ -5,10 +5,11 @@
 			"name": "Launch",
 			"type": "node",
 			"request": "launch",
-			"program": "${workspaceRoot}/splicejs/splice.js",
+			// "program": "${workspaceRoot}/splicejs/splice.js",
+			"program": "${workspaceRoot}/tests/module-volume-loading/module-generator.js",
 			"stopOnEntry": false,
 			"args": ["../tests/Modules/test-modules.js"],
-			"cwd": "${workspaceRoot}/splicejs",
+			"cwd": "${workspaceRoot}/tests/module-volume-loading",
 			"preLaunchTask": null,
 			"runtimeExecutable": null,
 			"runtimeArgs": [

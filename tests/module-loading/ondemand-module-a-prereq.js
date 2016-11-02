@@ -1,9 +1,9 @@
-$js.module({
-imports:[
+define([
     {'Test':'../test-fixture/test-fixture.js'}
 ],
-definition:function(scope){
+function(scope){
+    "use strict";
+    
     var test = scope.imports.Test;
     test.log('Loading adhocprerequisite.js',true); 
-}
 });

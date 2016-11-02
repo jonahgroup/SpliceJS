@@ -1,6 +1,8 @@
-$js.module({
-definition:function(scope){
-
+/** 
+ * desc: Test fixture module, allow logging output to the document
+ * dependencies: none
+*/
+define(function(scope){
     var divHtml = '<div id="logWindow"></div>';
     var document = scope.imports.$js.document; 
     
@@ -19,8 +21,6 @@ definition:function(scope){
         var r = document.createElement('div');
 
         d.setAttribute('style', cssResultRow);
-        
-
         d.appendChild(document.createTextNode(text));
 
         if(result === true){
@@ -31,6 +31,7 @@ definition:function(scope){
             r.setAttribute('style', cssResultFail);
             r.appendChild(document.createTextNode('Fail'));
         }
+
         d.appendChild(r);
 
         d.onmouseover = function(){
@@ -43,10 +44,6 @@ definition:function(scope){
         logWindow.appendChild(d);
     }
 
-    function assert(){
-
-    }
-
+    //export the log function
     scope.exports(log);
-
-}});
+});

@@ -1,0 +1,28 @@
+body {
+        font-family: Arial, Verdana;
+}
+.-sjs-test-link {
+    font-size:1.5em;
+    color:#222222;
+    padding:0.2em;
+    padding-left:1em;
+}
+
+.-sjs-test-link:hover {
+    background-color:#222222;
+    color:#fefefe;
+}
+
+.-sjs-test-link a {
+    text-decoration: none;
+    color:inherit;
+}
+.-sjs-test-link a:visited {
+    text-decoration: none;
+    color:inherit;
+}
+
+.button {
+    background-color:#cecece;
+    border-radius: 3px;
+}

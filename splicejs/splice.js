@@ -725,7 +725,7 @@ Loader.prototype = {
 				this.loadFrame(imports);
 			}
 		}
-		if(this.pending == 0 && !this.isQueued) {
+		if(this.pending == 0) {
 			processFrame(this,this.root);
 		}
 	}
@@ -748,19 +748,21 @@ function processFrame(loader,frame, oncomplete){
 
 		var dfsStack = getDfsStack(loader.id);
 
-		//check for cyclical dependency
+		//skip dependency cycles
 		isDependencyCycle(url,dfsStack);
 
 		var spec = importsMap[url];
 
 		var toLoad = {
 			imports: to(spec.imports,function(i){
-				if(importsMap[i.url] && importsMap[i.url].status == 'loaded') 
+				if(importsMap[i.url] && (
+					importsMap[i.url].status == 'loaded' || importsMap[i.url].status == 'in-progress' )) 
 					return null;
 				return i;
 			}),
 			prereqs: to(spec.preloads,function(i){
-				if(importsMap[i.url] && importsMap[i.url].status == 'loaded') 
+				if(importsMap[i.url] && (
+					importsMap[i.url].status == 'loaded' || importsMap[i.url].status == 'in-progress')) 
 					return null;
 				return i;
 			})
@@ -804,7 +806,7 @@ function processFrame(loader,frame, oncomplete){
 			continue;
 		}
 
-		//run preloads
+		//run imports
 		if(toExec.imports.length > 0) {
 			//add current url onto stack to detect branching
 			dfsStack.push(url);
@@ -838,6 +840,8 @@ function isDependencyCycle(spec,stack){
 			break;
 		}
 	}
+	
+
 	if(!isCycle) return false;
 	//print cycle and throw exception
 	if(isCycle === true) {
@@ -847,7 +851,7 @@ function isDependencyCycle(spec,stack){
 		}
 		throw 'cyclical module dependency';
 	}
-	return false;
+	return isCycle;
 }
 
 /*
@@ -939,17 +943,80 @@ function initScope(scope, moduleSpec){
 	return scope;
 }
 
+function importsAndPreloads(a){
+	var imports = []
+	,	preload = [];
+
+	for(var i=0; i<a.length; i++){
+		var item = a[i]; 
+		var fileName = null;
+		if(typeof item == 'object'){
+			fileName = item[Object.keys(item)[0]];
+		} 
+		if(typeof item == 'string'){
+			fileName = item;
+		}
+		if(!fileName) continue;
+
+		var sp = fileName.split(':');
+		if(sp[0] == '!preload') {
+			if(typeof item == 'object') {
+				item[Object.keys(item)[0]] = sp[1];
+				preload.push(item);
+			} else {
+				preload.push(sp[1]);
+			}
+		}
+		else 
+			imports.push(item);	
+	}
+	return [imports,preload];
+}
+
+function decodeMdf(args){
+	var m = {};
+	if(args.length == 1) {
+		if(typeof(args[0]) === 'string') {
+			return importsMap[m];
+		}
+	
+		//annonymous body only module
+		if(typeof(args[0]) === 'function'){
+			m.definition = args[0];
+		} else {
+			throw 'Invalid module definition';
+		}
+	}
+	//name, function
+	//dependency, function
+	if(args.length == 2) {
+		//module and no dependencies
+		if(typeof(args[0]) === 'string') {
+			m.name = args[0];
+		} 
+		else if( args[0] instanceof Array){
+			var d = importsAndPreloads(args[0]);
+			m.imports = d[0];
+			m.preload = d[1];
+		}
+		if(typeof(args[1]) === 'function'){
+			m.definition = args[1];
+		} 
+	}
+	return m;
+}
 
 /*
 	Loads a module
 	m - module descriptor
+	string, array, array, function
 */
-function mdl(m){
+function mdl(){
+	var m = arguments[0];
+	//not an object definition
+	if(typeof(arguments[0]) !== 'object' || (arguments[0] instanceof Array))
+		m = decodeMdf(arguments);
 
-	if(typeof m === 'string') {
-		return importsMap[m];
-	}
-	
 	/*init module scope*/
 	var scope = new Namespace(null);
 
@@ -1008,7 +1075,7 @@ var _core = mixin(Object.create(null),{
 
 //publish global binding
 window.$js = global.$js = _core;
-
+window.define = mdl;
 
 //entry point
 loadConfiguration(function(config){

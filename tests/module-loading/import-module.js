@@ -1,6 +1,8 @@
-$js.module({
-imports:[{'Test':'../test-fixture/test-fixture.js'}],
-definition:function(scope){
+define([
+    {'Test':'../test-fixture/test-fixture.js'}
+],
+function(scope){
+    "use strict";
     
     var test = scope.imports.Test; 
     test.log('Loading importmodule.js', true);
@@ -12,7 +14,7 @@ definition:function(scope){
     scope.imports.$js.load(
         [
           'ondemand-module-b.js',
-          'test-modules.js'
+          'test.js'
         ],
         function(){
            // this.imports.AdhocModule.foo();
@@ -23,5 +25,4 @@ definition:function(scope){
     scope.exports(
         sayHi
     );
-    
-}});
+});

@@ -1,10 +1,9 @@
-$js.module({
-imports:[
+define([
     {'Test':'../test-fixture/test-fixture.js'},
     {'UI':'import-module.js'},
     'extension-module.js'      
 ],    
-definition:function(scope){
+function(scope){
     "use strict"
     
     var $js = scope.imports.$js
@@ -85,5 +84,5 @@ definition:function(scope){
 
     scope.LocalClass;
 
-}});
+});
 
