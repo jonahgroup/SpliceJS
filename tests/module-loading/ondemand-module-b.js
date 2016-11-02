@@ -4,5 +4,5 @@ imports:[
 ],
 definition:function(scope){
     var test = scope.imports.Test;
-    test.log('adhocmodule2 - loaded');
+    test.log('Loading ondemand-module-b.js',true);
 }});

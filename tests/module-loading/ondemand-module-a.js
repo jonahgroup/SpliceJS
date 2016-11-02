@@ -7,9 +7,9 @@ imports:[
 ],
 definition:function(scope){
     var test = scope.imports.Test;
-    test.log('adhocmodule.js - loaded');
+    test.log('Loading ondemand-module-a.js',true);
     this.exports(function foo(){
-        test.log('adhocmodule.js - Hi! I am function foo');
+        test.log('Calling function "foo" from ondemand-module-a.js',true);
     });
 }});
 

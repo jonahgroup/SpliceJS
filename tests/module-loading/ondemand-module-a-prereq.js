@@ -4,6 +4,6 @@ imports:[
 ],
 definition:function(scope){
     var test = scope.imports.Test;
-    test.log('adhocprerequisite.js - loaded'); 
+    test.log('Loading adhocprerequisite.js',true); 
 }
 });

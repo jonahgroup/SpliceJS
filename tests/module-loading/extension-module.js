@@ -7,10 +7,7 @@ definition:function(){
     var ImportSpec = $js.ImportSpec;
     var test = scope.imports.Test;
    
-    test.log('.virtual extension.js - loaded');
-
-   
-
+    test.log('Loading extension-module.js',true);
 
     function VirtualSpec(fileName){
         ImportSpec.call(this,fileName);
@@ -26,7 +23,7 @@ definition:function(){
                 spec.scope = {
                     __sjs_module_exports__ : {
                         virtualCall:function(){
-                            test.log('this is a virtual call');
+                            return true;
                         }
                     }
                 }

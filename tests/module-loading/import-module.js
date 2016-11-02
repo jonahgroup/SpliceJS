@@ -3,9 +3,10 @@ imports:[{'Test':'../test-fixture/test-fixture.js'}],
 definition:function(scope){
     
     var test = scope.imports.Test; 
-    test.log('importmodule.js - loaded');
+    test.log('Loading importmodule.js', true);
+    
     function sayHi(){
-        test.log('Hi i am an importmodule.js');
+        return true;
     }
     
     scope.imports.$js.load(
@@ -15,7 +16,7 @@ definition:function(scope){
         ],
         function(){
            // this.imports.AdhocModule.foo();
-            test.log('importmodule.js 1. - inline loaded adhocmodule2.js');    
+            test.log('Inline load adhocmodule2.js from import-module.js',true);    
         }
     );
 
