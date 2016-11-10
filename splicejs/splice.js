@@ -247,7 +247,10 @@ if(!ctx && config.appBase) ctx = config.appBase;
 		source:contextUrl,
 		resolve:function(url){
 			if(!url) return null;
-
+			if(!fileExt(url)){
+				url = url + '.js';
+			}
+			
 			url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
 			//resolve path variables
 			url = spv(url);
@@ -258,8 +261,10 @@ if(!ctx && config.appBase) ctx = config.appBase;
 	}
 }
 
+var fileExtRegex = /[0-9a-zA-Z-]+([.][0-9a-zA-Z]+)$/i;
 function fileExt(f){
-	return f.substring(f.lastIndexOf('.'));
+	var result = fileExtRegex.exec(f);
+	return result!=null ? result[1] : null;
 }
 
 //some browsers do not support trim function on strings
@@ -666,7 +671,12 @@ Loader.prototype = {
 			}
 
 			//get handler for current file
-			var handler = _fileHandlers[fileExt(filename)];
+			var fileType = fileExt(filename);
+			if(!fileType) { 
+				fileType = '.js';
+				filename = filename + '.js'; 
+			}
+			var handler = _fileHandlers[fileType];
 
 			//skip unknown files
 			if(!handler) continue;
