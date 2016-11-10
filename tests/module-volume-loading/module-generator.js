@@ -1,5 +1,5 @@
 
-var moduleCount = 60
+var moduleCount = 2000
 ,   moduleList = []
 ,   stack = [];
 
@@ -9,7 +9,7 @@ var fs = require('fs');
 //generates module's body
 function generateModule(m){
     var name = m.name;
-    var imports = "{'Test':'../../test-fixture/test-fixture.js'}";
+    var imports = "{'Test':'../../test-fixture/test-fixture.js'},{'ModuleCounter':'../module-counter.js'}";
     if(m && m.children.length > 0){        
         var sep = ',';
         for(var i=0; i<m.children.length; i++){
@@ -23,11 +23,18 @@ function generateModule(m){
 
     imports = '[' + imports+ '],';
 
+    var body = "";
+    for(var i=0; i<2048; i++){
+        body += "a";
+    }
+
     var code = 'define('+imports+'function(scope){'+
     
-        "scope.imports.Test.log('Loading module "+name+"',true);"
-    
-    +'});';
+        "scope.imports.Test.log('Loading module "+name+"',true);" +
+        "scope.imports.ModuleCounter.ModuleCounter.count();"+
+
+        "var body = '"+body+"';"+
+        '});';
     
     fs.writeFile('./modules/'+name,code,function(err){
         if(err) {console.log(err); return;}
@@ -59,6 +66,41 @@ function resolveCycles(m){
 }
 
 
+//returns next module fom the list
+function getNextItem(start){
+    for(var i=start; i<start+moduleList.length; i++){
+        if(!moduleList[i%moduleList.length].isVisited) {
+            moduleList[i%moduleList.length].isVisited = true;
+            return moduleList[i%moduleList.length];
+        }
+    }
+    return null;
+}
+
+
+
+function buildDependencyTree(root){
+
+    if(root == null){
+        root = getNextItem(Math.round(Math.random()*moduleCount));
+    }
+    
+    //get n children    
+    for(var i=0; i<Math.round(1+Math.random()*20); i++ ){
+        var child = getNextItem(Math.round(Math.random()*moduleCount));
+        if(!child) break;
+        root.children.push(child);
+    }
+    
+    for(var i=0; i<root.children.length; i++){
+        buildDependencyTree(root.children[i]);
+    }
+        
+    return root
+}
+
+
+
 
 //generate module names
 for(var i=0; i<moduleCount; i++){
@@ -68,57 +110,20 @@ for(var i=0; i<moduleCount; i++){
     moduleList.push({name:name, cycles:[],children:[],toString:function(){return this.name;}});
 }
 
-/**
- * 
- */
-function getNextItems(list,size){
-    var result = [];
-    var start = Math.round(Math.random()*list.length,0)%list.length;
-    for(var i=start; i < start+list.length; i++){
-        var item = list[i % list.length];
-        if(item.visited) continue;
-        
-        item.visited = true;
-        result.push(item);
-        if(result.length >= size) return result;
-    }
-    if(result.length == 0) return null;
-    return result;
+//build dependency tree
+var root = buildDependencyTree();
+
+//print root name
+console.log(root.name);
+
+for(var i=0; i<moduleCount; i++){
+    generateModule(moduleList[i]);
 }
 
-function buildDependencyTree(list){
-
-    Math.round(Math.random()*moduleCount,0)
-
-}
-
-var item =null;
-while(item = getNextItems(moduleList,10)){
-    console.log(item);
-}
-
-//generate random dependencies
-// for(var i=0; i < moduleCount/4; i++){
-//     //random number of imports
-//     var imports = Math.round(Math.random()*moduleCount,0);
-//     var children = [];
-//     for(var j=0; j<imports; j++){
-//         var randomImport = Math.round(Math.random()*1000,0)%moduleCount;
-//         //do not add itself as a dependency
-//         if(randomImport == i) continue;
-//         children.push(moduleList[randomImport]);
-//     }
-//     moduleList[i].children = children;    
-// }
-
-//remove cycles
-// for(var x=0; x < moduleList.length; x++){
-// }
-// var root = buildDependencyTree(moduleList); 
-
-// resolveCycles(moduleList[1]);
-// console.log(moduleList[1].name);
-// //write module files
-// for(var i = 0; i < moduleList.length; i++){
-//     generateModule(moduleList[i]);
-// }
+//write test file 
+fs.writeFile('./test.js',"define(["+
+     "{'Test':'../test-fixture/test-fixture.js'},"+
+     "'modules/"+root.name+"'"+
+    "],function(scope){})",function(err){
+        if(err) {console.log(err); return;}
+ });

@@ -1,6 +1,6 @@
 define([
-    '!preload:ondemand-module-a-prereq.js',
-    {'Test':'../test-fixture/test-fixture.js'}
+    '!preload:ondemand-module-a-prereq',
+    {'Test':'../test-fixture/test-fixture'}
 ],
 function(scope){
     "use strict";

@@ -1,5 +1,5 @@
 define([
-    {'Test':'../test-fixture/test-fixture.js'}
+    {'Test':'../test-fixture/test-fixture'}
 ],
 function(scope){
     "use strict";

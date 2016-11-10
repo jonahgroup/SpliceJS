@@ -1,7 +1,7 @@
 define([
-    {'Test':'../test-fixture/test-fixture.js'},
-    {'UI':'import-module.js'},
-    'extension-module.js'      
+    {'Test':'../test-fixture/test-fixture'},
+    {'UI':'import-module'},
+    'extension-module'      
 ],    
 function(scope){
     "use strict"

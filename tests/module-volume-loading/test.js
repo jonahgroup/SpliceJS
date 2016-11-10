@@ -1,6 +1,1 @@
-define([
-     {'Test':'../test-fixture/test-fixture.js'},
-     'modules/mod-test-n2.js'
-],function(scope){
-
-})
+define([{'Test':'../test-fixture/test-fixture.js'},'modules/mod-test-n1725.js'],function(scope){})

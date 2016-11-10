@@ -1,5 +1,5 @@
 define([
-    {'Test':'../test-fixture/test-fixture.js'}
+    {'Test':'../test-fixture/test-fixture'}
 ],
 function(scope){
     "use strict";
@@ -13,8 +13,8 @@ function(scope){
     
     scope.imports.$js.load(
         [
-          'ondemand-module-b.js',
-          'test.js'
+          'ondemand-module-b',
+          'test'
         ],
         function(){
            // this.imports.AdhocModule.foo();
