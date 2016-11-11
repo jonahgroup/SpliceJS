@@ -78,12 +78,24 @@ function loadConfiguration(onLoad){
 		sjsMain:	main.getAttribute('sjs-main'),
 		version:	main.getAttribute('sjs-version'),
 		mode:		main.getAttribute('sjs-start-mode'),
+		mFormat:	main.getAttribute('sjs-module-format'),
 		debug:    	main.getAttribute('sjs-debug') == 'true' ? true:false
 	});
 	//set default start mode to onload
 	config.mode = config.mode || 'onload';
 
+
+	//setup reserved modules
+	if(config.mFormat == 'amd')	setupReservedModules();
+	
 	onLoad(config);	
+}
+
+function setupReservedModules(){
+	importsMap['require.js'] = new ImportSpec('require.js');
+	importsMap['require.js'].status = 'loaded';
+	importsMap['exports.js'] = new ImportSpec('exports.js');
+	importsMap['exports.js'].status = 'loaded';
 }
 
 function mixin(_t, _s){
@@ -231,12 +243,12 @@ function context(contextUrl){
 	//context must end with /
 	var ctx = null;
 
-if(contextUrl) {
-	ctx = contextUrl.replace(new RegExp(_not_pd_,"g"),_pd_);
-	ctx = ctx.substring(0,ctx.lastIndexOf(_pd_)+1);
-}
+	if(contextUrl) {
+		ctx = contextUrl.replace(new RegExp(_not_pd_,"g"),_pd_);
+		ctx = ctx.substring(0,ctx.lastIndexOf(_pd_)+1);
+	}
 
-if(!ctx && config.appBase) ctx = config.appBase;
+	if(!ctx && config.appBase) ctx = config.appBase;
 
 	if(ctx != null && ctx && ctx.substr(ctx.length-1) != _pd_)
 		throw 'context URL must end with "'+ _pd_ +'"';
@@ -250,7 +262,10 @@ if(!ctx && config.appBase) ctx = config.appBase;
 			if(!fileExt(url)){
 				url = url + '.js';
 			}
-			
+
+			if(url == 'require.js') return url;
+			if(url == 'exports.js') return url;
+
 			url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
 			//resolve path variables
 			url = spv(url);
@@ -457,6 +472,7 @@ function applyImports(imports){
 	var scope = this;
 	if(!scope.imports) scope.add('imports',new Namespace());
 	if(!imports || imports.length <= 0) return;
+
 	for(var i=0; i<imports.length; i++){
 		if(!imports[i].namespace) continue;
 		var ns = imports[i].namespace;
@@ -465,9 +481,32 @@ function applyImports(imports){
 		x = x.scope.__sjs_module_exports__;
 		var keys = Object.keys(x);
 		for(var key in keys){
-			scope.add('imports.'+ns+'.'+keys[key],x[keys[key]]);
+			scope.add('imports.'+ns+'.'+keys[key], x[keys[key]]);
 		}
 	}
+	
+}
+
+function applyImportArguments(imports){
+	var result = [];
+	for(var i=0; i<imports.length; i++){
+		
+		if(imports[i].url == 'require.js'){
+			result.push(function(){});
+			continue;
+		}
+		
+		if(imports[i].url == 'exports.js'){
+			result.push(this.__sjs_module_exports__);
+			continue;
+		}
+
+		var x = importsMap[imports[i].url];
+		if(!x) continue;
+		
+		result.push(x.scope.__sjs_module_exports__);
+	}
+	return result;
 }
 
 function _exports(scope){
@@ -556,6 +595,8 @@ function _dependencies(items, ctx){
 	var r = {resources:[], imports:[]},
 	appCtx = context(config.appBase);
 
+	//iterate over import items and resolve their urls
+	//reserved modules are not resolved
 	for(var i=0; i < items.length; i++){
 		var item = items[i], url = '', ns = '';
 
@@ -883,11 +924,14 @@ ModuleSpec.prototype.execute = function(){
 	if(this.preloads)
 		applyImports.call(this.scope,this.preloads);
 	
-	if(this.imports)
+	var args = [];
+	if(this.imports) {
 		applyImports.call(this.scope,this.imports);
+		args = applyImportArguments.call(this.scope,this.imports);
+	}
 
 	//run the module definition	
-	this.__sjs_module__.definition.call(this.scope,this.scope);
+	this.__sjs_module__.definition.apply(this.scope,args);
 }
 var pseudoCounter = 0;
 function initScope(scope, moduleSpec){

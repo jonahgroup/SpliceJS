@@ -3,6 +3,7 @@
  * dependencies: none
 */
 define(function(scope){
+    var scope = this;
     var divHtml = '<div id="logWindow"></div>';
     var document = scope.imports.$js.document; 
     
