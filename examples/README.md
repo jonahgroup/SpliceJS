@@ -1,1 +1,0 @@
-BasicApplication - example of how to setup simple one page application
