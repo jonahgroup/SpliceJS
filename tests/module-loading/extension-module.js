@@ -1,7 +1,8 @@
 define([
+    'require','exports',
     {'Test':'../test-fixture/test-fixture'}
 ],
-function(scope){
+function(require,exports){
     "use strict";
     
     var scope = this;

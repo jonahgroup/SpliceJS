@@ -5,7 +5,7 @@ define([
 ],    
 function(scope){
     "use strict"
-    
+    var scope = this;
     var $js = scope.imports.$js
     ,   test = scope.imports.Test;
 

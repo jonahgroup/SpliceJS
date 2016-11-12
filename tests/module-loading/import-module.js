@@ -1,9 +1,11 @@
 define([
+    'require',
     {'Test':'../test-fixture/test-fixture'}
 ],
-function(scope){
+function(require){
     "use strict";
-    
+    var scope = this;
+
     var test = scope.imports.Test; 
     test.log('Loading importmodule.js', true);
     
@@ -21,6 +23,11 @@ function(scope){
             test.log('Inline load adhocmodule2.js from import-module.js',true);    
         }
     );
+
+    //promise me this
+    require(['ondemand-module-c']).then(function(){
+        console.log('promise fullfilled');
+    });
 
     scope.exports(
         sayHi

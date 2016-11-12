@@ -86,7 +86,7 @@ function loadConfiguration(onLoad){
 
 
 	//setup reserved modules
-	if(config.mFormat == 'amd')	setupReservedModules();
+	setupReservedModules();
 	
 	onLoad(config);	
 }
@@ -203,6 +203,7 @@ function collapseUrl(path){
 	var parts = path.split(_pd_);
 	for(var i=0; i<parts.length; i++){
 		if(!parts[i] && parts[i] == '') continue;
+		if(parts[i] === '.') continue;
 		if(parts[i] === '..' && stack.length >  0) {
 			stack.pop();
 			continue;
@@ -487,12 +488,46 @@ function applyImports(imports){
 	
 }
 
+function Promize(exer){
+	this.onok = null;
+	this.onfail = null;
+	//resolve
+	exer((function(okResult){
+		//ok
+		if(this.onok != null) this.onok(okResult);
+		else this.okResult = okResult;
+	}).bind(this),
+	//reject 
+	(function(failResult){
+		//fail
+		if(this.onfail != null) this.onfail(failResult);
+		else this.failResult = failResult;
+	}).bind(this));
+}
+Promize.prototype.then = function(fn){
+	this.onok = fn;
+	if(this.okResult !== undefined) fn(this.okResult);
+	return this;
+}
+Promize.prototype['catch'] = function(fn){
+	this.onfail = fn;
+	if(this.failResult !== undefined) fn(this.failResult);
+	return this;
+}
+
 function applyImportArguments(imports){
+	var scope = this;
 	var result = [];
 	for(var i=0; i<imports.length; i++){
 		
 		if(imports[i].url == 'require.js'){
-			result.push(function(){});
+			result.push(function(imports){
+				return new Promize(function(resolve,reject){
+					scope.imports.$js.load(imports,function(){
+						resolve(this);
+					});
+				});
+			});
 			continue;
 		}
 		
