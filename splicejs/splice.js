@@ -84,18 +84,11 @@ function loadConfiguration(onLoad){
 	//set default start mode to onload
 	config.mode = config.mode || 'onload';
 
-
 	//setup reserved modules
-	setupReservedModules();
+	importsMap['require.js'] = new ImportSpec('require.js','loaded');
+	importsMap['exports.js'] = new ImportSpec('exports.js','loaded');
 	
 	onLoad(config);	
-}
-
-function setupReservedModules(){
-	importsMap['require.js'] = new ImportSpec('require.js');
-	importsMap['require.js'].status = 'loaded';
-	importsMap['exports.js'] = new ImportSpec('exports.js');
-	importsMap['exports.js'].status = 'loaded';
 }
 
 function mixin(_t, _s){
@@ -260,8 +253,15 @@ function context(contextUrl){
 		source:contextUrl,
 		resolve:function(url){
 			if(!url) return null;
-			if(!fileExt(url)){
+			var ext = fileExt(url); 
+			//no extension or something looks like extension but does not have a handler
+			//gets a default .js extension
+			//does not apply for special resouce names, starting with !
+			if(url[0]!='!' && ext != '.js'){
 				url = url + '.js';
+			}
+			if(url[0]=='!'){
+				url = url.substring(1);
 			}
 
 			if(url == 'require.js') return url;
@@ -667,10 +667,11 @@ function _dependencies(items, ctx){
 	return r.imports;
 }
 
-function ImportSpec(fileName){
+function ImportSpec(fileName,status){
 	this.imports = null;
 	this.preloads = null;
 	this.fileName = fileName;
+	this.status = status;
 }
 ImportSpec.prototype = { 
 	execute : function(){
@@ -1047,8 +1048,8 @@ function importsAndPreloads(a){
 		}
 		if(!fileName) continue;
 
-		var sp = fileName.split(':');
-		if(sp[0] == '!preload') {
+		var sp = fileName.split('|');
+		if(sp[0] == 'preload') {
 			if(typeof item == 'object') {
 				item[Object.keys(item)[0]] = sp[1];
 				preload.push(item);

@@ -3,6 +3,6 @@ define([
     'exports',
     '../test-fixture/test-fixture'
 ],function(require,exports,test){
-    test.log('AMD sucks');
+    test.log('AMD style module loaded',true);
     console.log('test');
 });

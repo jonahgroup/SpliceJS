@@ -1,8 +1,8 @@
 define(
 [
-    '!preload:../module-loading/extension-module.js',
-    {'Test':'../test-fixture/test-fixture.js'},
-    {'virtual':'module.virt'}
+    'preload|../module-loading/extension-module',
+    {'Test':'../test-fixture/test-fixture'},
+    {'virtual':'!module.virt'}
 ],
 function(scope){
     var imports = this.imports;
