@@ -521,13 +521,16 @@ function applyImportArguments(imports){
 	for(var i=0; i<imports.length; i++){
 		
 		if(imports[i].url == 'require.js'){
-			result.push(function(imports){
+			
+			var fn = function(imports){
 				return new Promize(function(resolve,reject){
 					scope.imports.$js.load(imports,function(){
 						resolve(this);
 					});
 				});
-			});
+			};
+			fn.scope = scope;
+			result.push(fn);
 			continue;
 		}
 		
@@ -1073,6 +1076,7 @@ function decodeMdf(args){
 		//annonymous body only module
 		if(typeof(args[0]) === 'function'){
 			m.definition = args[0];
+			return m;
 		} else {
 			throw 'Invalid module definition';
 		}
@@ -1104,7 +1108,7 @@ function decodeMdf(args){
 function mdl(){
 	var m = arguments[0];
 	//not an object definition
-	if(typeof(arguments[0]) !== 'object' || (arguments[0] instanceof Array))
+	if(typeof(m) !== 'object' || (m instanceof Array))
 		m = decodeMdf(arguments);
 
 	/*init module scope*/
@@ -1112,7 +1116,7 @@ function mdl(){
 
 	// create module spec
 	var spec = new ModuleSpec(scope,m);
-	
+
 	//get current script
 	var current = currentScript();
 
@@ -1127,6 +1131,10 @@ function mdl(){
 	else {
 		currentModuleSpec = spec;
 	}
+
+	if(!m.preloads && !m.imports)	spec.execute();
+	
+	
 }
 
 mdl.list= function list(){
