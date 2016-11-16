@@ -532,7 +532,7 @@ function applyImportArguments(imports){
 			var fn = function(imports){
 				//scope object has been passed
 				if(imports instanceof Namespace){
-					return requireTemplate.bind(scope);
+					return requireTemplate.bind(imports);
 				}
 				//bind closure scope
 				return requireTemplate.call(scope,imports);
@@ -549,8 +549,8 @@ function applyImportArguments(imports){
 		}
 
 		var x = importsMap[imports[i].url];
-		if(!x) continue;
-		
+		//some imports specs do not have scope objects
+		if(!x || !x.scope) continue;
 		result.push(x.scope.__sjs_module_exports__);
 	}
 	return result;
@@ -1078,10 +1078,6 @@ function importsAndPreloads(a){
 function decodeMdf(args){
 	var m = {};
 	if(args.length == 1) {
-		if(typeof(args[0]) === 'string') {
-			return importsMap[m];
-		}
-	
 		//annonymous body only module
 		if(typeof(args[0]) === 'function'){
 			m.definition = args[0];
@@ -1116,6 +1112,13 @@ function decodeMdf(args){
 */
 function mdl(){
 	var m = arguments[0];
+
+	if(typeof(m) === 'string') {
+		var m = importsMap[m]; 
+		if(!m) throw 'Invalid resource lookup, resource ['+arguments[0]+'] is not loaded'
+		return m;
+	}
+
 	//not an object definition
 	if(typeof(m) !== 'object' || (m instanceof Array))
 		m = decodeMdf(arguments);
