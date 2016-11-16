@@ -20,13 +20,17 @@ function(require){
         ],
         function(){
            // this.imports.AdhocModule.foo();
-            test.log('Inline load adhocmodule2.js from import-module.js',true);    
+            test.log('Inline load ondemand-module-b from import-module',true);    
         }
     );
 
-    //promise me this
+    //load into current scope
     require(['ondemand-module-c']).then(function(){
-        console.log('promise fullfilled');
+        test.log('promise fullfilled',true);
+    });
+
+    require(scope)(['ondemand-module-c']).then(function(){
+        test.log('promise fullfilled',true);
     });
 
     scope.exports(

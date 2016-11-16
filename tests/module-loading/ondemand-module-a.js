@@ -1,5 +1,5 @@
 define([
-    '!preload:ondemand-module-a-prereq',
+    'preload|ondemand-module-a-prereq',
     {'Test':'../test-fixture/test-fixture'}
 ],
 function(){
