@@ -449,10 +449,6 @@ var _fileHandlers = {
 	}
 };
 
-
-/*
-	Loads resources on existing stack
-*/
 function load(resources){
 	// get base context
 	var ctx = context();
@@ -488,9 +484,10 @@ function applyImports(imports){
 	
 }
 
-function Promize(exer){
+function ScopedPromise(exer,scope){
 	this.onok = null;
 	this.onfail = null;
+	this.scope = scope;
 	//resolve
 	exer((function(okResult){
 		//ok
@@ -504,16 +501,26 @@ function Promize(exer){
 		else this.failResult = failResult;
 	}).bind(this));
 }
-Promize.prototype.then = function(fn){
+ScopedPromise.prototype.then = function(fn){
 	this.onok = fn;
 	if(this.okResult !== undefined) fn(this.okResult);
 	return this;
 }
-Promize.prototype['catch'] = function(fn){
+ScopedPromise.prototype['catch'] = function(fn){
 	this.onfail = fn;
 	if(this.failResult !== undefined) fn(this.failResult);
 	return this;
 }
+
+function requireTemplate(imports){
+	var scope = this;
+	return new ScopedPromise(function(resolve,reject){
+		scope.imports.$js.load(imports,function(){
+		resolve(this);
+		});
+	},scope);
+};
+
 
 function applyImportArguments(imports){
 	var scope = this;
@@ -523,12 +530,14 @@ function applyImportArguments(imports){
 		if(imports[i].url == 'require.js'){
 			
 			var fn = function(imports){
-				return new Promize(function(resolve,reject){
-					scope.imports.$js.load(imports,function(){
-						resolve(this);
-					});
-				});
+				//scope object has been passed
+				if(imports instanceof Namespace){
+					return requireTemplate.bind(scope);
+				}
+				//bind closure scope
+				return requireTemplate.call(scope,imports);
 			};
+			//retain module scope
 			fn.scope = scope;
 			result.push(fn);
 			continue;
