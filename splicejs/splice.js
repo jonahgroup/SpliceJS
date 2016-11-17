@@ -484,14 +484,19 @@ function applyImports(imports){
 	
 }
 
-function ScopedPromise(exer,scope){
-	this.onok = null;
-	this.onfail = null;
+function Promise(exer,scope){
+	this.onok = [];
+	this.onfail = [];
 	this.scope = scope;
 	//resolve
 	exer((function(okResult){
 		//ok
-		if(this.onok != null) this.onok(okResult);
+		this.okResult = okResult;
+		if(this.onok != null) {
+			for(var i=0; i<this.onok.length; i++) {
+				this.okResult = this.onok[i](this.okResult);
+			}
+		}
 		else this.okResult = okResult;
 	}).bind(this),
 	//reject 
@@ -501,12 +506,15 @@ function ScopedPromise(exer,scope){
 		else this.failResult = failResult;
 	}).bind(this));
 }
-ScopedPromise.prototype.then = function(fn){
-	this.onok = fn;
-	if(this.okResult !== undefined) fn(this.okResult);
+Promise.prototype.then = function(fn){
+	this.onok.push(fn);
+	if(this.okResult !== undefined) 
+		this.okResult = fn(this.okResult);
+	
+	
 	return this;
 }
-ScopedPromise.prototype['catch'] = function(fn){
+Promise.prototype['catch'] = function(fn){
 	this.onfail = fn;
 	if(this.failResult !== undefined) fn(this.failResult);
 	return this;
@@ -514,7 +522,7 @@ ScopedPromise.prototype['catch'] = function(fn){
 
 function requireTemplate(imports){
 	var scope = this;
-	return new ScopedPromise(function(resolve,reject){
+	return new Promise(function(resolve,reject){
 		scope.imports.$js.load(imports,function(){
 		resolve(this);
 		});
@@ -1115,7 +1123,7 @@ function mdl(){
 
 	if(typeof(m) === 'string') {
 		var m = importsMap[m]; 
-		if(!m) throw 'Invalid resource lookup, resource ['+arguments[0]+'] is not loaded'
+		//if(!m) throw 'Invalid resource lookup, resource ['+arguments[0]+'] is not loaded'
 		return m;
 	}
 
