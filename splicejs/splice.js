@@ -1000,7 +1000,8 @@ function initScope(scope, moduleSpec){
 	scope.imports.$js.document = document;
 	scope.imports.$js.window = window;
 	scope.imports.$js.namespace = Namespace;
-	
+	scope.imports.$js.fname = fname;
+
 	//module scope calls only
 	scope.imports.$js.setLoadingIndicator = function(splash){
 		_loaderStats.loadingIndicator = splash;
