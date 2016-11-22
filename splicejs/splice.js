@@ -416,8 +416,9 @@ var _fileHandlers = {
 			return new ImportSpec(filename);
 		},
 		load: function(loader,spec){
+			
 			//add to loaders
-			addLoader(spec,loader);
+			loader.add(spec);
 
 			//document script loader
 			var filename = spec.fileName;
@@ -429,14 +430,14 @@ var _fileHandlers = {
 
 			if(script.onload !== undefined){
 				script.onload = function(e){
-					notifyLoaders(spec)
+					loader.notify(spec);
 					//spec.onloaded();
 					//loader.onitemloaded(filename);
 				};	
 			} else if(script.onreadystatechange !== undefined){
 				script.onreadystatechange = function(){
 					if(script.readyState == 'loaded' || script.readyState == 'complete') {
-						notifyLoaders(spec);
+						loader.notify(spec);
 						//spec.onloaded();
 						//loader.onitemloaded(filename);
 					}
@@ -731,6 +732,13 @@ function Loader(){
 	this.queue = [];
 }
 Loader.prototype = {
+	add:function(spec){
+		//add to loaders
+		addLoader(spec,this);	
+	},
+	notify:function(spec){
+		notifyLoaders(spec);
+	},	
 	loadFrame:function(frame){
 		var imports = frame;
 
@@ -752,7 +760,7 @@ Loader.prototype = {
 			//loaded by some other loader, go on a queue
 			
 			if(spec !=null && spec.status =="in-progress"){
-				addLoader(spec,this);
+				this.add(spec);
 				this.pending++;
 				continue;
 			}
