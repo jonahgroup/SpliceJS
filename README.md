@@ -1,4 +1,4 @@
-#SpliceJS Module Loader - DRAFT
+#SpliceJS Module Loader - AMD [DRAFT]
 For background on AMD please refer to the AMD specfication:
 [AMD](https://github.com/amdjs/amdjs-api/blob/master/AMD.md)
 
@@ -56,7 +56,7 @@ Consider three JavaScript files named *__moduleA.js__*, *__moduleB.js__*, *__mod
 		b.greet();
 	});
 ```
-Lets assume all three files above are located within the same directory or URI. Each file represents a module. In AMD specfication these modules are knows as anonymous. 
+Lets assume all three files above are located within the same directory/URL. Each file represents a module. In AMD specfication these modules are knows as anonymous. 
 
 While AMD allows named modules, all modules in SpliceJS are anonymous.
 
@@ -121,6 +121,73 @@ define([
 ],function(require,exports,modulea){
 });
 ```
+
+## Sample Application
+index.html
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="lib/splicejs/splice.js" sjs-main="app.js"></script>
+		<title>Sample Application</title>
+	</head>
+	<body></body>
+</html>
+```
+app.js
+```javascript
+define([
+	greeter
+],function(g){
+	document.body.appendChild(
+		document.createTextNode(g.greet())
+	);
+});
+```
+greeter.js
+```javascript
+define(function(){
+	return function greet(){
+		return 'Hellow World';
+	}
+});
+```
+
+#SpliceJS - Scoped Module Definition
+```javascript
+define({
+imports:[
+	{'anim':'animation'},
+	{'utils':'string.utils'},
+	'!template.html',
+	'!template.css',
+	'preload|loader.extensions'
+],
+definition:function(){
+	//module's scope is bound to 'this'
+	var scope = this; 
+	
+	//imports are found
+	var n = this.imports.utils.format(12468796); 
+
+	var animation = this.imports.anim;
+	
+	//access to SpliceJS calls, may be used to extension implementation
+	var $js = scope.imports.$js;
+	
+	//sample function for export
+	function foo(){}
+	
+	//exports function foo and n under result
+	scope.exports(foo,{result:n});
+	
+	}
+});	
+```
+
+
+
+
 
 
 
