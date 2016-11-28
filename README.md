@@ -161,6 +161,7 @@ imports:[
 	{'utils':'string.utils'},
 	'!template.html',
 	'!template.css',
+	//below dependency is resolved before anything else on this list is loaded
 	'preload|loader.extensions'
 ],
 definition:function(){
