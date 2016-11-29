@@ -14,7 +14,9 @@ define(imports,callback);
 ```javascript
 require(imports,callback);
 ```
-
+```javascript
+require(modulename);
+```
 
 ##Terminology
 module definition:
@@ -60,7 +62,7 @@ Lets assume all three files above are located within the same directory/URL. Eac
 
 While AMD allows named modules, all modules in SpliceJS are anonymous.
 
-Above modules A and B are each exporting 'greet' function, which outputs module specific greeting text. Module C is importing content exported from modules A and B. Notice how import names are listed without file extensions, .js extension is implied and loader will be looking for file names moduleA.js and moduleB.js  
+Modules A and B above are each exporting 'greet' function, which outputs module specific greeting text. Module C is importing content exported from modules A and B. Notice how import names are listed without file extensions, .js extension is implied and loader will be looking for file names moduleA.js and moduleB.js  
 Generally the sequence of import dependencies matches the sequence of arguments to the factory function of the dependent modules.
 The imports-to-argument mapping is used to retrieve imported dependencies, hence 'greet' function for each imported module can be accessed through arguments 'a' and 'b' respectivelly.
 ### Special import words:
@@ -153,38 +155,6 @@ define(function(){
 });
 ```
 
-#SpliceJS - Scoped Module Definition
-```javascript
-define({
-imports:[
-	{'anim':'animation'},
-	{'utils':'string.utils'},
-	'!template.html',
-	'!template.css',
-	//below dependency is resolved before anything else on this list is loaded
-	'preload|loader.extensions'
-],
-definition:function(){
-	//module's scope is bound to 'this'
-	var scope = this; 
-	
-	//imports are found
-	var n = this.imports.utils.format(12468796); 
-
-	var animation = this.imports.anim;
-	
-	//access to SpliceJS calls, may be used to extension implementation
-	var $js = scope.imports.$js;
-	
-	//sample function for export
-	function foo(){}
-	
-	//exports function foo and n under result
-	scope.exports(foo,{result:n});
-	
-	}
-});	
-```
 
 
 

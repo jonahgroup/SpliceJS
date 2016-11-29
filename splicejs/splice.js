@@ -87,6 +87,7 @@ function loadConfiguration(onLoad){
 	//setup reserved modules
 	importsMap['require.js'] = new ImportSpec('require.js','loaded');
 	importsMap['exports.js'] = new ImportSpec('exports.js','loaded');
+	importsMap['scope.js'] = new ImportSpec('scope.js','loaded');
 	
 	onLoad(config);	
 }
@@ -266,6 +267,7 @@ function context(contextUrl){
 
 			if(url == 'require.js') return url;
 			if(url == 'exports.js') return url;
+			if(url == 'scope.js') return url;
 
 			url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
 			//resolve path variables
@@ -554,6 +556,11 @@ function applyImportArguments(imports){
 		
 		if(imports[i].url == 'exports.js'){
 			result.push(this.__sjs_module_exports__);
+			continue;
+		}
+
+		if(imports[i].url=="scope.js"){
+			result.push(scope);
 			continue;
 		}
 
