@@ -1,30 +1,34 @@
-#SpliceJS Module Loader - AMD [DRAFT]
+# SpliceJS Module Loader - AMD [DRAFT]
 For background on AMD please refer to the AMD specfication:
 [AMD](https://github.com/amdjs/amdjs-api/blob/master/AMD.md)
 
 SpliceJS module specification slightly differs from the AMD however is also asynchronous and tries to maintain compatibility with AMD.
 
-##API Elements 	
+## API Elements 	
 ### define() function
+Implements module definition
 ```javascript
 define(imports,callback);
 ```
 
 ### require() function
+Function is accessible only within a module definition and loads/resolves import dependencies in context of the containing module.
 ```javascript
 require(imports,callback);
 ```
+Invokes a callback after imports have been resolved
 ```javascript
-require(modulename);
+require(importname);
 ```
+Returns an object containing exports of the 'importname'. An import resource under 'importname' must be resolved for the function to return a value. If import is not resolved, null value is returned.
 
-##Terminology
-module definition:
-is a call to define function in the form: 
+## Terminology
+* module definition:
+is a call to 'define' function in the form: 
 ```javascript
 	define(imports,function(){});
 ```
-resolving module:
+* resolving module:
 	module is said to be resolved if all import requirements have been resolved and the module'body function has been executed
 
 ## Importing Dependencies
@@ -65,7 +69,7 @@ While AMD allows named modules, all modules in SpliceJS are anonymous.
 Modules A and B above are each exporting 'greet' function, which outputs module specific greeting text. Module C is importing content exported from modules A and B. Notice how import names are listed without file extensions, .js extension is implied and loader will be looking for file names moduleA.js and moduleB.js  
 Generally the sequence of import dependencies matches the sequence of arguments to the factory function of the dependent modules.
 The imports-to-argument mapping is used to retrieve imported dependencies, hence 'greet' function for each imported module can be accessed through arguments 'a' and 'b' respectivelly.
-### Special import words:
+### Special import words
 A few import words have a special meaning.
 * *require* - injects require function
 * *exports* - contains all module exports
@@ -88,7 +92,7 @@ define([
 	this.ModuleB.greet();
 });
 ```
-####Using scope
+## Using scope
 ```javascript
 define(['require','exports','scope',{'ModuleA':'moduleA'}],
 	function(require,exports,scope){
@@ -102,12 +106,26 @@ define(['require','exports',{'ModuleA':'moduleA'}],
 		var a = this.ModuleA;
 });
 ```
+## Using require()
+```javascript
+define([require,'moduleA'],function(require){
+
+	//both require() calls below run in the context of the enclosing module
+
+	//resolves moduleB and invokes the callback
+	require(['moduleB'],function(moduleB){
+
+	});
+
+	//return exports of the moduleA
+	var moduleA = require('moduleA');
+});
+```
+
+## Importing Other Dependencies
 
 
-### Importing Other Dependencies
-
-
-###Preloading Dependencies
+## Preloading Dependencies
 Imports prefixed with 'preload|' list will be resolved before any other item in the imports list is loaded
 ```javascript
 define(['require','exports','preload|import.extension'],
