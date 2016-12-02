@@ -766,7 +766,7 @@ Loader.prototype = {
 			//we are trying to load a module that is being
 			//loaded by some other loader, go on a queue
 			
-			if(spec !=null && spec.status =="in-progress"){
+			if(spec !=null && spec.status =="pending"){
 				this.add(spec);
 				this.pending++;
 				continue;
@@ -799,7 +799,7 @@ Loader.prototype = {
 			this.pending++;
 
 			//load file
-			spec.status = 'in-progress';
+			spec.status = 'pending';
 			spec.loader = this;
 			handler.load(this,spec);
 		}
@@ -878,13 +878,13 @@ function processFrame(loader,frame, oncomplete){
 		var toLoad = {
 			imports: to(spec.imports,function(i){
 				if(importsMap[i.url] && (
-					importsMap[i.url].status == 'loaded' || importsMap[i.url].status == 'in-progress' )) 
+					importsMap[i.url].status == 'loaded' || importsMap[i.url].status == 'pending' )) 
 					return null;
 				return i;
 			}),
 			prereqs: to(spec.preloads,function(i){
 				if(importsMap[i.url] && (
-					importsMap[i.url].status == 'loaded' || importsMap[i.url].status == 'in-progress')) 
+					importsMap[i.url].status == 'loaded' || importsMap[i.url].status == 'pending')) 
 					return null;
 				return i;
 			})

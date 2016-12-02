@@ -4,14 +4,30 @@ For background on AMD please refer to the AMD specfication:
 
 SpliceJS module specification slightly differs from the AMD however is also asynchronous and tries to maintain compatibility with AMD.
 
-## API Elements 	
-### define() function
-Implements module definition
+
+# Terminology
+* module definition -
+is a call to 'define' function, which may take a form: 
+```javascript
+// module defintion without dependencies
+define(function(){});
+
+//mode defintion with dependencies specified in the imports array
+define(imports,function(){});
+
+```
+* resolving module - 
+	module is said to be resolved if all its import requirements have been satisfied and module' body function has been executed
+
+
+# API Elements 	
+### __define()__
+Function implementing module definition
 ```javascript
 define(imports,callback);
 ```
 
-### require() function
+### __require()__
 Function is accessible only within a module definition and loads/resolves import dependencies in context of the containing module.
 ```javascript
 require(imports,callback);
@@ -22,45 +38,79 @@ require(importname);
 ```
 Returns an object containing exports of the 'importname'. An import resource under 'importname' must be resolved for the function to return a value. If import is not resolved, null value is returned.
 
-## Terminology
-* module definition:
-is a call to 'define' function in the form: 
-```javascript
-	define(imports,function(){});
-```
-* resolving module:
-	module is said to be resolved if all import requirements have been resolved and the module'body function has been executed
+---
+### __Namespace__
+Object of kind Namespace are property containers that provide API to help avoid name collisions when new properties are added to the namespace. 
 
-## Importing Dependencies
-### Simple Imports
+```javascript
+var ns = new Namespace();
+```
+### __Namespace.prototype.add(propertyName, value);__
+```javascript
+ns.add('print',function(){});
+```
+
+### __Namespace.prototype.lookup(propertyName);__
+```javascript
+ns.lookup('print');
+```
+---
+### __LoadingIndicator__
+This is an abstract type that can be implemented to get updates on the loader's progress
+
+### __LoadingIndicator.prototype.onBegin(fileName)__
+Called when file is set to start loading. Loader desides when to call this method, and does so before control is passed to the browser native routines. 
+
+### __LoadingIndicator.prototype.onComplete(fileName)__
+Function is called by the loader when a resource or file is has completed loading.
+
+---
+### __ImportSpec__
+Is an abstract base type representing a generic import. Specific imports such as modules implement derived types. For example to import .js files or javascript modules, SpliceJS implements ModuleSpec type which implemented ImportSpec interface.  
+### __ImportSpec.fileName__
+Returns an absolute URL of the resource being loaded.
+
+### __ImportSpec.status__
+Gets or sets the status of the ImportSpec instance 
+Value | Description
+-----------|-----------------
+pending | Indicates that the import has been added to the loading queue. Next status change from there is 'loaded'
+loaded | Indicates that import spec is loaded, however it may not be processed yet
+
+### __ImportSpec.prototype.execute()__
+Executes the loaded content of the ImportSpec. The result of this functions execution varies based on the type of the import spec. For instance ModuleSpec would run its factory functions when this method is invoked.
+
+
+# Importing Dependencies
+## Simple Imports
 Consider three JavaScript files named *__moduleA.js__*, *__moduleB.js__*, *__moduleC.js__* containing the following code:
 ```javascript
-	//moduleA.js
-	define(function(){
-		return function greet(){
-			console.log('Hi, I am module A');
-		}
-	});
+//moduleA.js
+define(function(){
+	return function greet(){
+		console.log('Hi, I am module A');
+	}
+});
 ```
 ```javascript
-	//moduleB.js
-	define(function(){
-		return function greet(){
-			console.log('Hi, I am module B');
-		}
-	});
+//moduleB.js
+define(function(){
+	return function greet(){
+		console.log('Hi, I am module B');
+	}
+});
 ```
 
 
 ```javascript
-	//moduleC.js
-	define([
-		'moduleA',
-		'moduleB'
-	],function(a,b){
-		a.greet();
-		b.greet();
-	});
+//moduleC.js
+define([
+	'moduleA',
+	'moduleB'
+],function(a,b){
+	a.greet();
+	b.greet();
+});
 ```
 Lets assume all three files above are located within the same directory/URL. Each file represents a module. In AMD specfication these modules are knows as anonymous. 
 
@@ -69,19 +119,47 @@ While AMD allows named modules, all modules in SpliceJS are anonymous.
 Modules A and B above are each exporting 'greet' function, which outputs module specific greeting text. Module C is importing content exported from modules A and B. Notice how import names are listed without file extensions, .js extension is implied and loader will be looking for file names moduleA.js and moduleB.js  
 Generally the sequence of import dependencies matches the sequence of arguments to the factory function of the dependent modules.
 The imports-to-argument mapping is used to retrieve imported dependencies, hence 'greet' function for each imported module can be accessed through arguments 'a' and 'b' respectivelly.
-### Special import words
-A few import words have a special meaning.
-* *require* - injects require function
+
+## Dependency paths
+
+By default dependcy paths are relative and resolved relative to the importing module.
+It is possible to specify absolute paths and parameterized paths also.
+
+Example of relative path
+```javascript
+define(['moduleA'],function(){});
+```
+Absolute paths are resolved against application context (location). By default it is a location of the file speficied in the "sjs-main" atrribute of the splice.js script import. 
+
+Example of an absolute path
+```javascript
+define(['/lib/moduleA'],function(){});
+```
+
+## Parameterized path
+
+Import paths may contain custom parameters. This is useful to reference modules or other resources in a centralized location that is configurable.
+
+Example
+```javascript
+define(['/{splicejs.modules}/splice.networking'],function(){});
+```
+
+
+
+## Special import words
+A few import words that looks like relative path modules have special meaning.
+* *require* - injects require() function
 * *exports* - contains all module exports
 * *scope* - provides reference to the module's scope.  Similer to exports object, however scope contains references to all the scoped imports (see below for scoped imports)  
-
+* *core* - supplies core API calls. See [core](#CoreReference) refence
 ```javascript
 define(['require','exports','scope','moduleA'],
 	function(require,exports,scope,modulea){
 });
 ```
 
-### Scoped Imports
+## Scoped Imports
 ```javascript
 define([
 	'require',
@@ -142,7 +220,7 @@ define([
 });
 ```
 
-## Sample Application
+# Sample Application
 index.html
 ```html
 <!DOCTYPE html>
@@ -172,11 +250,70 @@ define(function(){
 	}
 });
 ```
+# Core Reference
+This is an API provided the SpliceJS to allow controlling and extending behavior of the loader. API is available through importing special 'core' dependency.
+## Functions
+### core.setPathVar();
+Set path variable that will be resolved when module location is calculated. Path varibles are resolved though a direct substitution.
+```javascript
+core.setPathVar('{splice.modules}','/lib/SpliceJS.Modules/modules');
+```
+### core.setLoadingIndicator(indicator);
+Sets an object that will receive loader progress status for each item being loaded. See LoadingIndicator in the API Elements section.
+```javascript
+core.setLoadingIndicator({
+	begin:function(fileName){},
+	complete:function(fileName){}
+});
+```
+### core.setFileHandler(handler);
+```javascript
+core.setFileHandler({
+	importSpec:function(){},
+	load:function(){},
+
+});
+```
 
 
 
+## Properties
+```javascript
+core.ImportSpec;
+```
+
+```javascript
+core.Namespace;
+```
 
 
+# Running Tests
+## Simple Import
+
+## Large Module Tree (2000 modules )
+
+# Extending Loader
+```javascript
+var imageHandler = {
+	importSpec : function(filename, stackId){
+		return new ImportSpec();
+	},
+	load:function(filename,loader,spec){
+	var img = new Image();
+	img.onload = function(){
+		loader.onitemloaded(filename);
+	}
+	img.src = filename;
+	}
+}; 
+
+
+core.setFileHandler('.gif',imageHandler);
+core.setFileHandler('.png',imageHandler);
+core.setFileHandler('.jpg',imageHandler);
+
+
+```
 
 
 
