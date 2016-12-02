@@ -285,7 +285,7 @@ define(function(){
 });
 ```
 # Core Reference
-This is an API provided the SpliceJS to allow controlling and extending behavior of the loader. API is available through importing special 'core' dependency.
+This API allows controlling and extending behavior of the loader. API is available through importing special 'core' dependency.
 ## Functions
 ### core.setPathVar();
 Set path variable that will be resolved when module location is calculated. Path varibles are resolved though a direct substitution.
@@ -332,7 +332,7 @@ Such extension may be used to preload image files.
 
 ```javascript
 //myloaderextensions.js
-define(['core'],function(){
+define(['core'],function(core){
 	var imageHandler = {
 		importSpec : function(filename, stackId){
 			return new ImportSpec();
