@@ -2,12 +2,11 @@
 For background on AMD please refer to the AMD specfication:
 [AMD](https://github.com/amdjs/amdjs-api/blob/master/AMD.md)
 
-SpliceJS module specification slightly differs from the AMD however is also asynchronous and tries to maintain compatibility with AMD.
+SpliceJS module specification slightly differs from AMD however is also asynchronous.
 
 
 # Terminology
-* module definition -
-is a call to 'define' function, which may take a form: 
+__module definition__ - is a call to 'define' function, which may take a form: 
 ```javascript
 // module defintion without dependencies
 define(function(){});
@@ -16,27 +15,33 @@ define(function(){});
 define(imports,function(){});
 
 ```
-* resolving module - 
-	module is said to be resolved if all its import requirements have been satisfied and module' body function has been executed
+__resolving module__ - 
+	module is said to be resolved if all of its import requirements have been satisfied and module' factory function has been executed
+
+__resource__ - any item apearing within the import list.
 
 
-# API Elements 	
+# API	
 ### __define()__
-Function implementing module definition
+Global scope function implementing module definition
 ```javascript
 define(imports,callback);
 ```
 
 ### __require()__
-Function is accessible only within a module definition and loads/resolves import dependencies in context of the containing module.
+Global scope function resolves import dependencies in context of the containing module.
+
+Invokes a callback after imports have been resolved. This call is only available within module.
 ```javascript
 require(imports,callback);
 ```
-Invokes a callback after imports have been resolved
+
+Returns an object containing exports of the 'importname'. 
+This function call is accessible both globally and withing a module. An import resource under 'importname' must have been resolved for the function to return a value. 
+If the import has not been resolved, null is returned.
 ```javascript
 require(importname);
 ```
-Returns an object containing exports of the 'importname'. An import resource under 'importname' must be resolved for the function to return a value. If import is not resolved, null value is returned.
 
 ---
 ### __Namespace__
@@ -65,6 +70,35 @@ Called when file is set to start loading. Loader desides when to call this metho
 Function is called by the loader when a resource or file is has completed loading.
 
 ---
+### __Loader__
+Is a type of the framework loader. This type is internal to the framework. Object of this type is passed to the ImportHandler.prototype.load function to receive resource loading completion notifications. 
+
+See loader extension section below for the extension pattern.
+
+### __Loader__.prototype.notify(importSpec)
+Method is called to notify loader when a resource has finished loading. Parameter passed is an ImportSpec of the resource that has been loaded. This method will notify all the loaders registered to listen of the ImportSpec. Multiple loader may subscribe to a single ImportSpec in cases where define() or require() have been called synchronously to import same resource, as shown below.
+
+```javascript
+require(['moduleA'],function(a){
+
+});
+
+require(['moduleA','moduleB'], function(a,b){
+
+})
+```
+As a result of the code above, to loaders will be listening for the notifications on 'moduleA' ImportSpec. After notification fires, each respective loader will decide whether to proceed loading other modules or complete resolution of the module. 
+
+---
+### __ImportHandler__
+This interface allows implementing loader extensions. Instances of the ImportHandler are registered with the loader to support desired resource types.
+Resource type is decodes via file extension including the leading period, such as .png
+### __ImportHandler.prototype.importSpec(fileName);__
+ImportHandler is responsible to returning ImportSpec implementation which handles the content being imported.
+### __ImportHandler.prototype.load(loader,spec);__
+Implements import loading. This functions if invoked by the loader framework when module' imports are processed.
+
+---
 ### __ImportSpec__
 Is an abstract base type representing a generic import. Specific imports such as modules implement derived types. For example to import .js files or javascript modules, SpliceJS implements ModuleSpec type which implemented ImportSpec interface.  
 ### __ImportSpec.fileName__
@@ -73,7 +107,7 @@ Returns an absolute URL of the resource being loaded.
 ### __ImportSpec.status__
 Gets or sets the status of the ImportSpec instance 
 Value | Description
------------|-----------------
+---------------|-----------------
 pending | Indicates that the import has been added to the loading queue. Next status change from there is 'loaded'
 loaded | Indicates that import spec is loaded, however it may not be processed yet
 
@@ -293,27 +327,35 @@ core.Namespace;
 ## Large Module Tree (2000 modules )
 
 # Extending Loader
+Below is an example of extending module loader for loading .gif, .png and .jpg files.
+Such extension may be used to preload image files. 
+
 ```javascript
-var imageHandler = {
-	importSpec : function(filename, stackId){
-		return new ImportSpec();
-	},
-	load:function(filename,loader,spec){
-	var img = new Image();
-	img.onload = function(){
-		loader.onitemloaded(filename);
-	}
-	img.src = filename;
-	}
-}; 
+//myloaderextensions.js
+define(['core'],function(){
+	var imageHandler = {
+		importSpec : function(filename, stackId){
+			return new ImportSpec();
+		},
+		load:function(filename,loader,spec){
+		var img = new Image();
+		img.onload = function(){
+			loader.onitemloaded(filename);
+		}
+		img.src = filename;
+		}
+	}; 
 
 
-core.setFileHandler('.gif',imageHandler);
-core.setFileHandler('.png',imageHandler);
-core.setFileHandler('.jpg',imageHandler);
-
-
+	core.setImportHandler('.gif',imageHandler);
+	core.setImportHandler('.png',imageHandler);
+	core.setImportHandler('.jpg',imageHandler);
+}
 ```
+
+# Node.js Integration
+
+# TypeScript Integration
 
 
 
