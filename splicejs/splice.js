@@ -24,15 +24,24 @@ SOFTWARE.
 try {
 	!require;
 } catch(ex){
-	window.require = function(m){
+	window.require = function require(m){
 		if(m == 'splice.window.js') return window;
 		if(m == 'splice.document.js') return document;
 	}
 }
 
-(function(window, document, global){
-
+(function(window, document, global,require){
 "use strict";
+
+window.require = function(module){
+	var name = module + '.js';
+	var keys = Object.keys(importsMap);
+	for(var i=0; i<keys.length;i++){
+		if(importsMap[keys[i]].endsWith(name)) 
+			return importsMap[keys[i]];
+	}
+	return null;
+}
 
 //plug console if it does not exist
 var console = window.console || {error:function(){}};
@@ -52,7 +61,7 @@ var config = {platform: _platform_},
 	//version qualifier
 	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
 	addedScript = null,	currentModuleSpec = null,
-	importsMap = new Object(null), currentFrame = null, frameStack = new Array();
+	importsMap = {}, currentFrame = null, frameStack = new Array();
 
 
 function loadConfiguration(onLoad){
@@ -88,6 +97,7 @@ function loadConfiguration(onLoad){
 	importsMap['require.js'] = new ImportSpec('require.js','loaded');
 	importsMap['exports.js'] = new ImportSpec('exports.js','loaded');
 	importsMap['scope.js'] = new ImportSpec('scope.js','loaded');
+	importsMap['core.js'] = new ImportSpec('core.js','loaded');
 	
 	onLoad(config);	
 }
@@ -139,18 +149,6 @@ if(typeof Object.keys !== 'function' ){
 		}
 		return _keys;
 	};
-}
-
-function _parseVersion(version, isWild){
-	if(!version) return null;
-	var v = {target:'*'}, a = version.split(':');
-
-	if(a.length == 2) v.target = _trim(a[0]);
-	a = a[a.length-1].split('-');
-
-	v.min = _trim(!a[0]?(isWild?'*':undefined):a[0]);
-	v.max = _trim(!a[1]?(isWild?'*':undefined):a[1]);
-	return v;
 }
 
 var PATH_VARIABLES = {};
@@ -487,49 +485,14 @@ function applyImports(imports){
 	
 }
 
-function Promise(exer,scope){
-	this.onok = [];
-	this.onfail = [];
-	this.scope = scope;
-	//resolve
-	exer((function(okResult){
-		//ok
-		this.okResult = okResult;
-		if(this.onok != null) {
-			for(var i=0; i<this.onok.length; i++) {
-				this.okResult = this.onok[i](this.okResult);
-			}
-		}
-		else this.okResult = okResult;
-	}).bind(this),
-	//reject 
-	(function(failResult){
-		//fail
-		if(this.onfail != null) this.onfail(failResult);
-		else this.failResult = failResult;
-	}).bind(this));
-}
-Promise.prototype.then = function(fn){
-	this.onok.push(fn);
-	if(this.okResult !== undefined) 
-		this.okResult = fn(this.okResult);
-	
-	
-	return this;
-}
-Promise.prototype['catch'] = function(fn){
-	this.onfail = fn;
-	if(this.failResult !== undefined) fn(this.failResult);
-	return this;
-}
 
 function requireTemplate(imports){
 	var scope = this;
-	return new Promise(function(resolve,reject){
+	return (function(resolve,reject){
 		scope.imports.$js.load(imports,function(){
 		resolve(this);
 		});
-	},scope);
+	}).bind(scope);
 };
 
 
@@ -549,7 +512,6 @@ function applyImportArguments(imports){
 				return requireTemplate.call(scope,imports);
 			};
 			//retain module scope
-			fn.scope = scope;
 			result.push(fn);
 			continue;
 		}
@@ -594,64 +556,12 @@ function _exports(scope){
 	}
 }
 
-function _vercomp(v1,v2){
-	if(v1 == '*' || v2 == '*') return 0;
-	if(!v1 || !v2) return undefined;
-
-	v1 = _split(v1,/\./,true);
-	v2 = _split(v2,/\./,true);
-	//padd and compare version numbers
-	for(var i=0; i<3; i++){
-		//padd
-		if(v1[i] == null) v1[i] = 0;
-		if(v2[i] == null) v2[i] = 0;
-		// compare
-		var r = (+v1[i]-(+v2[i]));
-		if(r == 0) continue;
-		return r/Math.abs(r);
-	}
-	return 0;
-}
-
 
 function ImportItem(ns,url){
 	this.namespace = ns;
 	this.url = url;
 }
 
-function qualifyImport(url){
-	if(!url) return null;
-	var parts = url.split('|');
-	//nothing to qualify its just a URL
-	if(parts.length == 1) return url;
-	
-	//unable to qualify url since config version is not present
-	if(!config.version) return null;
-	
-
-	//parse config version
-	var rc = regexVer.exec(config.version);
-	//no mercy for invalid syntax
-	if(!rc) throw 'invalid version configuration parameter: ' + config.version;
-
-	//only version quallifier is supported
-	//qualify version at parts[0]
-	var r = regexVer.exec(_trim(parts[0]));
-	
-	//no mercy for invalid syntax	
-	if(r == null) throw 'invalid version qualifier: ' + url; 
-
-	//target platform
-	var v = {target : r[1],	min : r[2], max : r[4] || r[2]=='*'?'*':r[4]}; 
-	var vc = {target : rc[1], min : rc[2], max : rc[4]};
-
-	//targets dont match
-	if((v.target || null) != (vc.target || null)) return null;
-
-	var pass = (_vercomp(v.min, vc.min) <= 0 &&  _vercomp(v.max, vc.min) >= 0);
-	if(pass) 	return _trim(parts[parts.length -1]);
-	return null;
-}
 
 function _dependencies(items, ctx){
 	if(!items || items.length <= 0) return null;
@@ -677,8 +587,6 @@ function _dependencies(items, ctx){
 			url = item;
 		}
 
-		//check if import qualifes based on the url modifiers |
-		if(!(url = qualifyImport(url))) continue;
 
 		//this means that our url is relative to application context
 		//i.e. absolute to application's base url
@@ -997,12 +905,12 @@ ModuleSpec.prototype.execute = function(){
 	
 	var args = [];
 	if(this.imports) {
-		applyImports.call(this.scope,this.imports);
+		//applyImports.call(this.scope,this.imports);
 		args = applyImportArguments.call(this.scope,this.imports);
 	}
 
 	//run the module definition	
-	this.__sjs_module__.definition.apply(this.scope,args);
+	this.exports = this.__sjs_module__.definition.apply(this.scope,args);
 }
 var pseudoCounter = 0;
 function initScope(scope, moduleSpec){
@@ -1225,7 +1133,12 @@ loadConfiguration(function(config){
         _core.start = function(){start(config);}
     }
 });
-})( (require('splice.window.js')), (require('splice.document.js')),(function(){
-	try {return global;}
-	catch(e) {return {};}
-})());
+})( 
+	require('splice.window.js'), 
+	require('splice.document.js'),
+	(function(){
+		try {return global;}
+		catch(e) {return {};}
+	})(),
+	require
+);

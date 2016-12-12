@@ -1,44 +1,73 @@
 # SpliceJS Module Loader - AMD [DRAFT]
+SpliceJS is an AMD like module loader implementation. Module specification slightly differs from AMD however most importantly the asynchronous model is maintained.
+
 For background on AMD please refer to the AMD specfication:
 [AMD](https://github.com/amdjs/amdjs-api/blob/master/AMD.md)
 
-SpliceJS module specification slightly differs from AMD however is also asynchronous.
 
+# Getting Started
+1. Download and install package (some npm stuff here)
+
+2. Import splice.js script into your applications main page.
+Plase see [Sample Application](#sample-application) in the sections below.
+
+## Script Configuration Attributes
+SpliceJS currently supports a number of configuration attributes as shown below
+
+__sjs-main__ - name of the application' root module. This is the first module loaded.
+
+__sjs-debug__ - accepts values of true/false, enables/desables debug mode. At the moment this is a placeholder attribute. 
 
 # Terminology
-__module definition__ - is a call to 'define' function, which may take a form: 
-```javascript
-// module defintion without dependencies
-define(function(){});
+"__module definition__" 
 
-//mode defintion with dependencies specified in the imports array
-define(imports,function(){});
+Is a call to 'define' function. See API section for details. 
 
-```
-__resolving module__ - 
-	module is said to be resolved if all of its import requirements have been satisfied and module' factory function has been executed
+"__factory__"
 
-__resource__ - any item apearing within the import list.
+
+"__resolving module__"
+
+Module is said to be resolved if all of its import requirements have been satisfied and module' factory function has been executed. Modules are resolved only once, you should expect to have factory functions executed only once. 
+
+"__resource__" 
+
+Is any item apearing within the import list.
 
 
 # API	
 ### __define()__
 Global scope function implementing module definition
+
 ```javascript
-define(imports,callback);
+//module exports the object argument
+define(object);
+```
+
+
+```javascript
+//module has no dependencies, module exports function's return value
+define(function(){});
+```
+
+```javascript
+//module has dependencies 
+define(imports,function(){});
 ```
 
 ### __require()__
-Global scope function resolves import dependencies in context of the containing module.
+Resolves import dependencies in context of the containing module.
 
 Invokes a callback after imports have been resolved. This call is only available within module.
 ```javascript
 require(imports,callback);
 ```
 
-Returns an object containing exports of the 'importname'. 
+
+
+Global scope function, returns an object containing exports of the 'importname'. 
 This function call is accessible both globally and withing a module. An import resource under 'importname' must have been resolved for the function to return a value. 
-If the import has not been resolved, null is returned.
+otherwise, null is returned.
 ```javascript
 require(importname);
 ```
@@ -71,7 +100,7 @@ Function is called by the loader when a resource or file is has completed loadin
 
 ---
 ### __Loader__
-Is a type of the framework loader. This type is internal to the framework. Object of this type is passed to the ImportHandler.prototype.load function to receive resource loading completion notifications. 
+Is a type of the framework loader. This type is internal to the framework. Object of this type is passed to the ImportHandler.prototype.load() function to receive resource loading completion notifications. 
 
 See loader extension section below for the extension pattern.
 
@@ -79,13 +108,9 @@ See loader extension section below for the extension pattern.
 Method is called to notify loader when a resource has finished loading. Parameter passed is an ImportSpec of the resource that has been loaded. This method will notify all the loaders registered to listen of the ImportSpec. Multiple loader may subscribe to a single ImportSpec in cases where define() or require() have been called synchronously to import same resource, as shown below.
 
 ```javascript
-require(['moduleA'],function(a){
+require(['moduleA'],function(a){});
 
-});
-
-require(['moduleA','moduleB'], function(a,b){
-
-})
+require(['moduleA','moduleB'], function(a,b){})
 ```
 As a result of the code above, to loaders will be listening for the notifications on 'moduleA' ImportSpec. After notification fires, each respective loader will decide whether to proceed loading other modules or complete resolution of the module. 
 
@@ -114,10 +139,45 @@ loaded | Indicates that import spec is loaded, however it may not be processed y
 ### __ImportSpec.prototype.execute()__
 Executes the loaded content of the ImportSpec. The result of this functions execution varies based on the type of the import spec. For instance ModuleSpec would run its factory functions when this method is invoked.
 
+# Core API
+This API allows controlling and extending behavior of the loader. API is available through importing special 'core' dependency.
+## Functions
+### core.setPathVar();
+Set path variable that will be resolved when module location is calculated. Path varibles are resolved though a direct substitution.
+```javascript
+core.setPathVar('{splice.modules}','/lib/SpliceJS.Modules/modules');
+```
+### core.setLoadingIndicator(indicator);
+Sets an object that will receive loader progress status for each item being loaded. See LoadingIndicator in the API Elements section.
+```javascript
+core.setLoadingIndicator({
+	begin:function(fileName){},
+	complete:function(fileName){}
+});
+```
+### core.setFileHandler(handler);
+```javascript
+core.setFileHandler({
+	importSpec:function(){},
+	load:function(){},
+
+});
+```
+
+## Properties
+```javascript
+core.ImportSpec;
+```
+
+```javascript
+core.Namespace;
+```
+
 
 # Importing Dependencies
 ## Simple Imports
 Consider three JavaScript files named *__moduleA.js__*, *__moduleB.js__*, *__moduleC.js__* containing the following code:
+
 ```javascript
 //moduleA.js
 define(function(){
@@ -126,6 +186,7 @@ define(function(){
 	}
 });
 ```
+
 ```javascript
 //moduleB.js
 define(function(){
@@ -138,10 +199,7 @@ define(function(){
 
 ```javascript
 //moduleC.js
-define([
-	'moduleA',
-	'moduleB'
-],function(a,b){
+define(['moduleA','moduleB'],function(a,b){
 	a.greet();
 	b.greet();
 });
@@ -195,11 +253,8 @@ define(['require','exports','scope','moduleA'],
 
 ## Scoped Imports
 ```javascript
-define([
-	'require',
-	'exports',
-	'ModuleA',
-	{'ModuleB':'ModuleB'} //object literal to define import scope
+define(['require','exports','ModuleA',
+		{'ModuleB':'ModuleB'} //object literal to define import scope
 ],function(require,exports,a){
 	this.ModuleB.greet();
 });
@@ -212,9 +267,10 @@ define(['require','exports','scope',{'ModuleA':'moduleA'}],
 });
 ```
 alternative access to the scope object
+
 ```javascript
 define(['require','exports',{'ModuleA':'moduleA'}],
-	function(require,exports,scope){
+	function(require,exports){
 		var a = this.ModuleA;
 });
 ```
@@ -237,8 +293,10 @@ define([require,'moduleA'],function(require){
 ## Importing Other Dependencies
 
 
+
 ## Preloading Dependencies
 Imports prefixed with 'preload|' list will be resolved before any other item in the imports list is loaded
+
 ```javascript
 define(['require','exports','preload|import.extension'],
 	function(require,exports,modulea){
@@ -246,13 +304,25 @@ define(['require','exports','preload|import.extension'],
 ```
 
 ```javascript
-define([
-	'require','exports',
+define(['require','exports',
 	'preload|import.extension', // loader extension module, enables loading .html and .css files
 	'!template.html','!template.css'
 ],function(require,exports,modulea){
 });
 ```
+## Circular Dependencies
+In a large application it may be possible to encounter a circular dependency issues, where two or more modules reference each other mutually. Should this occur, SpliceJS will fail with an exception and stop the loading process. Exception information will list module stack to help debug the problem. Below is a simulation of such scenario.
+
+```javascript
+//moduleA.js
+define(['moduleB'],function(){});
+``` 
+
+```javascript
+//moduleB.js
+define(['moduleA'],function(){});
+``` 
+
 
 # Sample Application
 index.html
@@ -260,23 +330,23 @@ index.html
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="lib/splicejs/splice.js" sjs-main="app.js"></script>
+		<script src="lib/splicejs/splice.js" sjs-main="app"></script>
 		<title>Sample Application</title>
 	</head>
 	<body></body>
 </html>
 ```
 app.js
+
 ```javascript
-define([
-	greeter
-],function(g){
+define(['greeter'],function(g){
 	document.body.appendChild(
 		document.createTextNode(g.greet())
 	);
 });
 ```
 greeter.js
+
 ```javascript
 define(function(){
 	return function greet(){
@@ -284,47 +354,7 @@ define(function(){
 	}
 });
 ```
-# Core Reference
-This API allows controlling and extending behavior of the loader. API is available through importing special 'core' dependency.
-## Functions
-### core.setPathVar();
-Set path variable that will be resolved when module location is calculated. Path varibles are resolved though a direct substitution.
-```javascript
-core.setPathVar('{splice.modules}','/lib/SpliceJS.Modules/modules');
-```
-### core.setLoadingIndicator(indicator);
-Sets an object that will receive loader progress status for each item being loaded. See LoadingIndicator in the API Elements section.
-```javascript
-core.setLoadingIndicator({
-	begin:function(fileName){},
-	complete:function(fileName){}
-});
-```
-### core.setFileHandler(handler);
-```javascript
-core.setFileHandler({
-	importSpec:function(){},
-	load:function(){},
 
-});
-```
-
-
-
-## Properties
-```javascript
-core.ImportSpec;
-```
-
-```javascript
-core.Namespace;
-```
-
-
-# Running Tests
-## Simple Import
-
-## Large Module Tree (2000 modules )
 
 # Extending Loader
 Below is an example of extending module loader for loading .gif, .png and .jpg files.
@@ -353,9 +383,17 @@ define(['core'],function(core){
 }
 ```
 
-# Node.js Integration
+# [Node.js](http://www.nodejs.org) Integration
+```sh
+node splice.js app
+```
+# [TypeScript](http://www.typescriptlang.org) Integration
 
-# TypeScript Integration
+
+# Running Tests
+## Simple Import
+
+## Large Module Tree (2000 modules )
 
 
 
