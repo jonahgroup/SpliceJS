@@ -139,25 +139,25 @@ loaded | Indicates that import spec is loaded, however it may not be processed y
 ### __ImportSpec.prototype.execute()__
 Executes the loaded content of the ImportSpec. The result of this functions execution varies based on the type of the import spec. For instance ModuleSpec would run its factory functions when this method is invoked.
 
-# Core API
+# Loader API
 This API allows controlling and extending behavior of the loader. API is available through importing special 'core' dependency.
 ## Functions
-### core.setPathVar();
+### loader.setPathVar();
 Set path variable that will be resolved when module location is calculated. Path varibles are resolved though a direct substitution.
 ```javascript
-core.setPathVar('{splice.modules}','/lib/SpliceJS.Modules/modules');
+loader.setPathVar('{splice.modules}','/lib/SpliceJS.Modules/modules');
 ```
-### core.setLoadingIndicator(indicator);
+### loader.setLoadingIndicator(indicator);
 Sets an object that will receive loader progress status for each item being loaded. See LoadingIndicator in the API Elements section.
 ```javascript
-core.setLoadingIndicator({
+loader.setLoadingIndicator({
 	begin:function(fileName){},
 	complete:function(fileName){}
 });
 ```
-### core.setFileHandler(handler);
+### loader.setFileHandler(handler);
 ```javascript
-core.setFileHandler({
+loader.setFileHandler({
 	importSpec:function(){},
 	load:function(){},
 
@@ -166,11 +166,7 @@ core.setFileHandler({
 
 ## Properties
 ```javascript
-core.ImportSpec;
-```
-
-```javascript
-core.Namespace;
+loader.ImportSpec;
 ```
 
 
@@ -251,27 +247,20 @@ define(['require','exports','scope','moduleA'],
 });
 ```
 
-## Scoped Imports
+## Namespace Imports
 ```javascript
 define(['require','exports','ModuleA',
-		{'ModuleB':'ModuleB'} //object literal to define import scope
-],function(require,exports,a){
-	this.ModuleB.greet();
+	{'modb':'ModuleB','modc':'ModuleC'} //object literal to define import scope
+],function(require,exports,a,util){
+	util.modb.greet();
+	util.modc.greet();
 });
 ```
-## Using scope
-```javascript
-define(['require','exports','scope',{'ModuleA':'moduleA'}],
-	function(require,exports,scope){
-		var a = scope.ModuleA;
-});
-```
-alternative access to the scope object
-
+## Using Namespace
 ```javascript
 define(['require','exports',{'ModuleA':'moduleA'}],
-	function(require,exports){
-		var a = this.ModuleA;
+	function(require,exports,utils){
+		var a = utils.ModuleA;
 });
 ```
 ## Using require()

@@ -174,8 +174,7 @@ function _split(s,regEx,skip){
 	return parts;
 }
 
-// returns URL context which allow further resolutions
-// / - page context
+
 function spv(url){
 	var parts = _split(url,/{[^}{]+}/);
 	var r = "";
@@ -267,7 +266,7 @@ function context(contextUrl){
 
 			if(url == 'require.js') return url;
 			if(url == 'exports.js') return url;
-			if(url == 'scope.js') return url;
+			if(url == 'core.js') return url;
 
 			url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
 			//resolve path variables
@@ -319,68 +318,6 @@ var name = _trim(match[1]);
 }
 
 
-function _namespaceAdd(path,obj,isSealed){
-	if(!path) return this;
-	if(this.__sjs_seal__[path]) throw 'namespace ' +path +' is sealed';
-	var parts = path.split('.');
-	var target = this;
-	for(var i=0; i<parts.length-1; i++){
-		if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
-		target = target[parts[i]];
-	}
-	if(target[parts[parts.length-1]] != null) throw "namespace conflict: " + path;
-	target[parts[parts.length-1]] = obj;
-
-	if(isSealed == true) this.__sjs_seal__[path] = true;
-}
-
-
-function Namespace(){
-	if(!(this instanceof Namespace) ) return new Namespace();
-	this.sequence = 0;
-	this.__sjs_seal__ = {};
-	this.children = null;
-}
-
-Namespace.prototype = {
-	add : function(path, obj, isSealed){
-		if(typeof(path)=='object' || typeof(path) == 'function'){
-			for(var i=0; i < arguments.length; i++){
-				var arg = arguments[i];
-
-				if(typeof arg === 'function' ){
-					_namespaceAdd.call(this, fname(arg),arg,isSealed);
-					continue;
-				}
-
-				if(typeof arg == 'object') {
-					var keys = Object.keys(arg);
-					for(var key in keys){
-						_namespaceAdd.call(this, keys[key],arg[keys[key]],isSealed);
-					}
-					continue;
-				}
-			}
-			return this;
-		}
-
-		if(typeof(path) == 'string'){
-			_namespaceAdd.call(this, path,obj,isSealed);
-		}
-		return this;
-	},
-	lookup:function(path){
-		if(!path) return null;
-		var parts = path.split('.');
-		var target = this;
-		for(var i=0; i<parts.length-1; i++){
-			if(target[parts[i]] == null) target[parts[i]] = Object.create(null);
-			target = target[parts[i]];
-			if(target == null) break;
-		}
-		return target[parts[parts.length-1]];
-	}
-};
 
 function currentScript(){
 	if(document.currentScript) return document.currentScript.src;
@@ -521,12 +458,6 @@ function applyImportArguments(imports){
 			result.push(this.__sjs_module_exports__);
 			continue;
 		}
-
-		//supply scope object
-		if(imports[i].url=="scope.js"){
-			result.push(scope);
-			continue;
-		}
 		
 		//supply copy of the core
 		if(imports[i].url == "core.js"){
@@ -574,8 +505,8 @@ function ImportItem(ns,url){
 
 function _dependencies(items, ctx){
 	if(!items || items.length <= 0) return null;
-	var r = {resources:[], imports:[]},
-	appCtx = context(config.appBase);
+	var imports = []
+	,	appCtx = context(config.appBase);
 
 	//iterate over import items and resolve their urls
 	//reserved modules are not resolved
@@ -606,10 +537,8 @@ function _dependencies(items, ctx){
 			url = ctx.resolve(url);
 		}
 
-		r.resources.push(url);
-		r.imports.push(new ImportItem(ns,url));
 	}
-	return r.imports;
+	return imports;
 }
 
 function ImportSpec(fileName,status){
@@ -905,9 +834,6 @@ function ModuleSpec(scope,m){
 ModuleSpec.prototype.execute = function(){
 	this.isProcessed = true;
 
-	//setup module scope
-	initScope(this.scope,this);
-
 	///
 	if(this.preloads)
 		applyImports.call(this.scope,this.preloads);
@@ -922,69 +848,7 @@ ModuleSpec.prototype.execute = function(){
 	this.exports = this.__sjs_module__.definition.apply(this.scope,args);
 }
 var pseudoCounter = 0;
-function initScope(scope, moduleSpec){
 
-	scope.add('imports',new Namespace());
-	scope.add('exports',_exports(scope));
-
-	scope.imports.add('$js',mixin(Object.create(null),_core),true);
-
-	scope.imports.$js.document = document;
-	scope.imports.$js.window = window;
-	scope.imports.$js.namespace = Namespace;
-	scope.imports.$js.fname = fname;
-
-	//module scope calls only
-	scope.imports.$js.setLoadingIndicator = function(splash){
-		_loaderStats.loadingIndicator = splash;
-		return splash;
-	};
-	/**
-	 * resources:string[] - module or other resources paths
-	 * all preloads are expected to be defined within the module
-	 * being loaded
-	 * 
-	 */
-	
-	scope.imports.$js.load = function(resources,callback){
-				
-		//get pseudo module name
-		var pseudoName = '__sjs_pseudom__' + pseudoCounter++; 
-		var parentScope = scope;
-		//compose pseudo module
-		mdl({
-			name : pseudoName,
-			imports : resources,
-			definition : function(){
-
-				//get loaded and processed spec
-				var spec = importsMap[pseudoName];
-				applyImports.call(parentScope,spec.imports);
-				
-				if(typeof callback === 'function'){
-					callback.call(parentScope);
-				}
-				//do not store pseudo modules into the global map
-				delete importsMap[pseudoName]; 
-			}
-		});
-
-		var loader = new Loader();
-		loader.pending = 1;
-		loader.root = [pseudoName];
-		loader.onitemloaded(pseudoName,parentScope);
-	};
-
-	scope.imports.$js.setvar = function(n, v){
-		setPathVar(n,v);
-	};
-
-	scope.imports.$js.context = context(scope.__sjs_uri__);
-	scope.imports.$js.ImportSpec = ImportSpec;
-	scope.imports.$js.extension = extension;
-
-	return scope;
-}
 
 function importsAndPreloads(a){
 	var imports = []
@@ -1065,7 +929,7 @@ function mdl(){
 		m = decodeMdf(arguments);
 
 	/*init module scope*/
-	var scope = new Namespace(null);
+	var scope = {};
 
 	// create module spec
 	var spec = new ModuleSpec(scope,m);
