@@ -36,8 +36,8 @@ try {
 window.require = function(module){
 	var name = module + '.js';
 	var keys = Object.keys(importsMap);
-	for(var i=0; i<keys.length;i++){
-		if(importsMap[keys[i]].endsWith(name)) 
+	for(var i=0; i<keys.length;i++){ 
+		if(keys[i].endsWith(name)) 
 			return importsMap[keys[i]];
 	}
 	return null;
@@ -61,7 +61,9 @@ var config = {platform: _platform_},
 	//version qualifier
 	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
 	addedScript = null,	currentModuleSpec = null,
-	importsMap = {}, currentFrame = null, frameStack = new Array();
+	importsMap = {}, currentFrame = null, 
+	frameStack = [], specLoaders = [];
+
 
 
 function loadConfiguration(onLoad){
@@ -396,7 +398,6 @@ function currentScript(){
 	return null;
 }
 
-var specLoaders = [];
 function notifyLoaders(spec){
 	var loaders = specLoaders[spec.fileName];
 	for(var i=0; i<loaders.length; i++){
@@ -521,14 +522,22 @@ function applyImportArguments(imports){
 			continue;
 		}
 
+		//supply scope object
 		if(imports[i].url=="scope.js"){
 			result.push(scope);
 			continue;
 		}
+		
+		//supply copy of the core
+		if(imports[i].url == "core.js"){
+		 	result.push(mixin({},_core));
+		 }
 
 		var x = importsMap[imports[i].url];
 		//some imports specs do not have scope objects
 		if(!x || !x.scope) continue;
+		if(imports[i].namespace != null) 
+			scope.add(imports[i].namespace,x.exports);
 		result.push(x.scope.__sjs_module_exports__);
 	}
 	return result;
