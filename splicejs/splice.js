@@ -33,12 +33,14 @@ try {
 (function(window, document, global,require){
 "use strict";
 
+if(!Object.keys) throw "Unsupported runtime";
+
 window.require = function(module){
 	var name = module + '.js';
 	var keys = Object.keys(importsMap);
 	for(var i=0; i<keys.length;i++){ 
-		if(keys[i].endsWith(name)) 
-			return importsMap[keys[i]];
+		if(!keys[i].endsWith(name)) continue; 
+		return importsMap[keys[i]].exports || importsMap[keys[i]];
 	}
 	return null;
 }
@@ -58,51 +60,16 @@ else if(_platform_ == 'WIN') _pd_ = '\\';
 var _not_pd_ = _pd_ == '/'?'\\\\':'/';
 
 var config = {platform: _platform_},
-	//version qualifier
-	regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
-	addedScript = null,	currentModuleSpec = null,
-	importsMap = {}, currentFrame = null, 
-	frameStack = [], specLoaders = [];
+//version qualifier
+regexVer = /([a-z]+:)*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*-*(([0-9]*\.[0-9]*\.[0-9]*)|\*)*/,
+addedScript = null,	currentModuleSpec = null,
+importsMap = {}, currentFrame = null, specLoaders = [], PATH_VARIABLES = {},
+loaderOrdinal = 0;
 
-
-
-function loadConfiguration(onLoad){
-	var main = null;
-	var head = document.head || document.getElementsByTagName('head')[0];
-	// cycle through all script elements in document's head
-	for(var i=0; i < head.childNodes.length; i++){
-		var node = head.childNodes[i];
-		if(!node.getAttribute) continue;
-		if(node.getAttribute('sjs-main') != null) {
-			main = node; break;
-		}
-	}
-
-	// splice js script must have sjs-main attribute
-	if(main == null) {
-		throw 'Application entry point is not defined, "splice.js" script must have "sjs-main" attribute';
-	}
-
-	mixin(config, {
-		appBase: 	context(window.location.href).path,
-		sjsHome:	context(main.getAttribute('src')).path,
-		sjsMain:	main.getAttribute('sjs-main'),
-		version:	main.getAttribute('sjs-version'),
-		mode:		main.getAttribute('sjs-start-mode'),
-		mFormat:	main.getAttribute('sjs-module-format'),
-		debug:    	main.getAttribute('sjs-debug') == 'true' ? true:false
-	});
-	//set default start mode to onload
-	config.mode = config.mode || 'onload';
-
-	//setup reserved modules
-	importsMap['require.js'] = new ImportSpec('require.js','loaded');
-	importsMap['exports.js'] = new ImportSpec('exports.js','loaded');
-	importsMap['scope.js'] = new ImportSpec('scope.js','loaded');
-	importsMap['core.js'] = new ImportSpec('core.js','loaded');
-	
-	onLoad(config);	
-}
+//reserved modules
+importsMap['require.js'] = new ImportSpec('require.js','loaded');
+importsMap['exports.js'] = new ImportSpec('exports.js','loaded');
+importsMap['loader.js']  = new ImportSpec('loader.js','loaded');
 
 function mixin(_t, _s){
 	if(!_s) return _t;
@@ -117,50 +84,7 @@ function mixin(_t, _s){
 	return _t;
 }
 
-
-
-/*
- * No support for Object.create
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create
- * */
-if (typeof Object.create != 'function') {
-	Object.create = (function() {
-	var Object = function() {};
-	return function (prototype) {
-		if (arguments.length > 1) {
-		throw Error('second argument not supported');
-		}
-		if (typeof prototype != 'object') {
-		throw TypeError('argument must be an object');
-		}
-		Object.prototype = prototype;
-		var result = new Object();
-		Object.prototype = null;
-		return result;
-	};
-	})();
-}
-
-/* IE Object.keys fill*/
-if(typeof Object.keys !== 'function' ){
-	Object.keys = function(obj){
-		if(!obj) return null;
-		var _keys = [];
-		for(var key in  obj){
-			if(obj.hasOwnProperty(key)) _keys.push(key);
-		}
-		return _keys;
-	};
-}
-
-var PATH_VARIABLES = {};
-function setPathVar(key, value){
-	//path variable may be initialized
-	if(PATH_VARIABLES[key]) throw 'Path variable may only be set once';
-	PATH_VARIABLES[key] = value;
-}
-
-function _split(s,regEx,skip){
+function slice(s,regEx,skip){
 	var parts = []
 	, match = null;
 	while(match = regEx.exec(s)){
@@ -174,9 +98,31 @@ function _split(s,regEx,skip){
 	return parts;
 }
 
+function to(array,fn,deep){
+	if(!array || (typeof fn != 'function') ) return deep;
+	if(typeof array != 'object') return deep;	
+	var	keys = Object.keys(array);
+	for(var key in keys ){
+		var item = null;
+		if(typeof array[keys[key]] == 'object' )
+			item = array[keys[key]];
+		else 
+			item = fn(array[keys[key]],keys[key],key,deep);
+		
+		if(deep instanceof Array) {
+			if(deep[keys[key]] != undefined ) deep[keys[key]] = item; 
+			else if(item) deep.push(item);
+		} else {
+			deep[keys[key]] = item;
+		}
+		if(typeof array[keys[key]] == 'object' )
+			to(array[keys[key]],fn,deep[keys[key]]);
+	}
+	return deep;
+}
 
 function spv(url){
-	var parts = _split(url,/{[^}{]+}/);
+	var parts = slice(url,/{[^}{]+}/);
 	var r = "";
 	for(var i=0; i < parts.length; i++){
 		var pv = PATH_VARIABLES[parts[i]];
@@ -266,13 +212,17 @@ function context(contextUrl){
 
 			if(url == 'require.js') return url;
 			if(url == 'exports.js') return url;
-			if(url == 'core.js') return url;
+			if(url == 'loader.js') return url;
 
 			url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
 			//resolve path variables
 			url = spv(url);
 			//not page context
 			if(isAbsUrl(url)) return collapseUrl(url) ;
+			//is application context
+			if(url[0]=="/")
+				return collapseUrl(config.appBase + url);
+			//relative context
 			return collapseUrl(ctx + url);
 		}
 	}
@@ -283,40 +233,6 @@ function fileExt(f){
 	var result = fileExtRegex.exec(f);
 	return result!=null ? result[1] : null;
 }
-
-//some browsers do not support trim function on strings
-function _trim(s){if(!s) return s;
-	if(String.prototype.trim) return s.trim();
-	return s.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
-}
-
-function fname(foo){
-	/*
-	-- support regular expression only
-	because MS Edge browser does not support the name property
-	if(foo.name != null) {
-		if(foo.name) return foo.name;
-		return 'anonymous';
-	}
-	*/
-if(typeof foo != 'function') throw 'unable to obtain function name, argument is not a function'
-//match function name
-var match = /function(\s*[A-Za-z0-9_\$]*)\(/.exec(foo.toString());
-//if no match found try ES6 function-class match
-if(!match)
-	match  = /function class(\s*[A-Za-z0-9_\$]*\s*)\{/.exec(foo.toString());
-if(!match) 
-	match  = /class(\s*[A-Za-z0-9_\$]*\s*)\{/.exec(foo.toString());
-
-
-if(!match) return 'anonymous';
-
-
-var name = _trim(match[1]);
-	if(!name) return 'anonymous';
-	return name;
-}
-
 
 
 function currentScript(){
@@ -398,31 +314,12 @@ function load(resources){
 	new Loader().loadFrame(to(resources,function(i){
 		if(!isAbsUrl(i)) return ctx.resolve(i);
 		return i;
-	}));
+	},[]));
 }
 
 /*
 	loader function
 */
-function applyImports(imports){
-	var scope = this;
-	if(!scope.imports) scope.add('imports',new Namespace());
-	if(!imports || imports.length <= 0) return;
-
-	for(var i=0; i<imports.length; i++){
-		if(!imports[i].namespace) continue;
-		var ns = imports[i].namespace;
-		var x = importsMap[imports[i].url];
-		if(!x || !x.scope) continue;
-		x = x.scope.__sjs_module_exports__;
-		var keys = Object.keys(x);
-		for(var key in keys){
-			scope.add('imports.'+ns+'.'+keys[key], x[keys[key]]);
-		}
-	}
-	
-}
-
 
 function requireTemplate(imports){
 	var scope = this;
@@ -434,124 +331,37 @@ function requireTemplate(imports){
 };
 
 
-function applyImportArguments(imports){
-	var scope = this;
-	var result = [];
-	for(var i=0; i<imports.length; i++){
-		
-		if(imports[i].url == 'require.js'){
-			
-			var fn = function(imports){
-				//scope object has been passed
-				if(imports instanceof Namespace){
-					return requireTemplate.bind(imports);
-				}
-				//bind closure scope
-				return requireTemplate.call(scope,imports);
-			};
-			//retain module scope
-			result.push(fn);
-			continue;
-		}
-		
-		if(imports[i].url == 'exports.js'){
-			result.push(this.__sjs_module_exports__);
-			continue;
-		}
-		
-		//supply copy of the core
-		if(imports[i].url == "core.js"){
-		 	result.push(mixin({},_core));
-		 }
-
-		var x = importsMap[imports[i].url];
-		//some imports specs do not have scope objects
-		if(!x || !x.scope) continue;
-		if(imports[i].namespace != null) 
-			scope.add(imports[i].namespace,x.exports);
-		result.push(x.scope.__sjs_module_exports__);
-	}
-	return result;
+function applyImports(imports, exports){
+	if(!imports) return;
+	return to(imports,function(url,pk){
+		if(url == 'exports.js') return exports;
+		return importsMap[url]!=null ? importsMap[url].exports : {};
+	},[]);
 }
 
-function _exports(scope){
-	scope.__sjs_module_exports__ = Object.create(null);
-	return function(){
-		var exports = scope.__sjs_module_exports__;
-		//if(!exports) exports = scope.__sjs_module_exports__ = Object.create(null);
-		for(var i=0; i < arguments.length; i++){
-			var arg = arguments[i];
-			if(typeof arg === 'function' ){
-				exports[fname(arg)] = arg;
-				continue;
-			}
-			if(typeof arg === 'object'){
-				var keys = Object.keys(arg);
-				for(var k=0; k < keys.length; k++){
-					exports[keys[k]] = arg[keys[k]];
-				}
-				continue;
-			}
-		}
-	}
-}
-
-
-function ImportItem(ns,url){
-	this.namespace = ns;
-	this.url = url;
-}
-
-
-function _dependencies(items, ctx){
-	if(!items || items.length <= 0) return null;
-	var imports = []
-	,	appCtx = context(config.appBase);
-
+function dependencies(imports, ctx){
+	if(!imports || imports.length <= 0) return {req:[],prereq:[]};
+	var req = [], prereq=[];
 	//iterate over import items and resolve their urls
 	//reserved modules are not resolved
-	for(var i=0; i < items.length; i++){
-		var item = items[i], url = '', ns = '';
-
-		//name space includes
-		if(typeof(item)  == 'object'){
-			for(var key in item){
-				if(item.hasOwnProperty(key)) {
-					url = item[key];
-					ns = key;
-					break;
-				}
-			}
-		}  //no namespace includes
-		else {
-			url = item;
-		}
-
-
-		//this means that our url is relative to application context
-		//i.e. absolute to application's base url
-		if(url[0] == '/') {
-			url = appCtx.resolve(url.substr(1));
-		}
-		else {
-			url = ctx.resolve(url);
-		}
-
-	}
-	return imports;
+	to(imports,function(item,pk){
+		var sp = item.split('|'),res = '';
+		if(sp[0] == 'preload')
+			return prereq[prereq.push(res = ctx.resolve(sp[1]))-1];
+		else
+			return req[req.push(res = ctx.resolve(item))-1];
+	},imports);
+	return {req:req,prereq:prereq};
 }
 
+
 function ImportSpec(fileName,status){
-	this.imports = null;
-	this.preloads = null;
 	this.fileName = fileName;
 	this.status = status;
 }
-ImportSpec.prototype = { 
-	execute : function(){
-		this.isProcessed = true;
-	}
-}
+ImportSpec.prototype.execute = function(){ 
+	this.isProcessed = true;
+};
 
 
 var _loaderStats = {
@@ -560,25 +370,7 @@ var _loaderStats = {
 	moduleSpec:null
 };
 
-
-function to(array,fn){
-	if(!array) return new Array();
-	if(typeof fn != 'function') return new Array();
-	var result = new Array()
-	,	keys = Object.keys(array);
-	for(var key in keys ){
-		var item = fn(array[keys[key]]);
-		//dont insert null or undefined
-		if(item == null) continue;
-		result.push(item);
-	}
-	return result;
-}
-
-/*
-	Asynchronous loader
-*/
-var loaderOrdinal = 0;
+//Asynchronous loader
 function Loader(){
 	this.id = loaderOrdinal++;
 	this.pending = 0; this.root = null;
@@ -601,12 +393,8 @@ Loader.prototype = {
 		//loop through modules in the frame
 		//skip the already loaded ones
 		for(var i = 0; i < imports.length; i++){
+
 			var filename = imports[i];
-
-			if(filename instanceof ImportItem){
-				filename = filename.url;
-			}
-
 			var spec = importsMap[filename];
 
 			//we are trying to load a module that is being
@@ -630,10 +418,7 @@ Loader.prototype = {
 
 			//get handler for current file
 			var fileType = fileExt(filename);
-			if(!fileType) { 
-				fileType = '.js';
-				filename = filename + '.js'; 
-			}
+			
 			var handler = _fileHandlers[fileType];
 
 			//skip unknown files
@@ -651,7 +436,7 @@ Loader.prototype = {
 		}
 		return this.pending;
 	},
-	onitemloaded:function(item, ctxScope){
+	onitemloaded:function(item){
 		var spec = importsMap[item];
 		//clear current module spec, resource loaded next may not be a module
 		if(spec instanceof ImportSpec && currentModuleSpec ) {
@@ -668,29 +453,24 @@ Loader.prototype = {
 		//process dependencies for module specs
 		if(spec instanceof ModuleSpec){
 
-			//validate module structure
-			validateModuleFormat(spec);
-
-			//set scope URI
-			spec.scope.__sjs_uri__ = item;  
-
 			//process resource spec that was just loaded
 			//get current module context
-			var ctx = context(ctxScope ? ctxScope.__sjs_uri__ : spec.scope.__sjs_uri__);
+			var ctx = context(item);
+
+			var dep = dependencies(spec.__mdf__.imports,ctx);
 
 			//resolve preloads
-			var prereqs = spec.preloads = _dependencies(spec.__sjs_module__.preload,ctx);
+			spec.prereq = dep.prereq; 
 
 			//	resolve required resources relative to
-			//	current context
-			var	imports = spec.imports = spec.scope.__sjs_module_imports__ = _dependencies(spec.__sjs_module__.imports,ctx);
+			spec.req = dep.req;
 
 
 			//if preloads are present, save current frame and create new frame
-			if(prereqs && prereqs.length > 0){
-				this.loadFrame(prereqs);	
-			} else if(imports && imports.length > 0) {
-				this.loadFrame(imports);
+			if(spec.prereq && spec.prereq.length > 0){
+				this.loadFrame(spec.prereq);	
+			} else if(spec.req && spec.req.length > 0) {
+				this.loadFrame(spec.req);
 			}
 		}
 		if(this.pending == 0) {
@@ -699,10 +479,6 @@ Loader.prototype = {
 	}
 }
 
-function validateModuleFormat(spec){
-	if(!spec.__sjs_module__) throw 'null module in ' + spec.fileName;
-	if(!spec.__sjs_module__.definition) throw 'Module must contain "definition" function in: ' + spec.fileName;
-}
 
 function processFrame(loader,frame, oncomplete){
 	if(!frame || frame.length == 0) {
@@ -712,7 +488,6 @@ function processFrame(loader,frame, oncomplete){
 	var runCount = 0;
 	for(var i=0; i<frame.length; i++){
 		var url =  frame[i];
-		if(url instanceof ImportItem) url = url.url;
 
 		var dfsStack = getDfsStack(loader.id);
 
@@ -722,32 +497,32 @@ function processFrame(loader,frame, oncomplete){
 		var spec = importsMap[url];
 
 		var toLoad = {
-			imports: to(spec.imports,function(i){
-				if(importsMap[i.url] && (
-					importsMap[i.url].status == 'loaded' || importsMap[i.url].status == 'pending' )) 
+			imports: to(spec.req,function(i){
+				if(importsMap[i] && (
+					importsMap[i].status == 'loaded' || importsMap[i].status == 'pending' )) 
 					return null;
 				return i;
-			}),
-			prereqs: to(spec.preloads,function(i){
-				if(importsMap[i.url] && (
-					importsMap[i.url].status == 'loaded' || importsMap[i.url].status == 'pending')) 
+			},[]),
+			prereqs: to(spec.prereq,function(i){
+				if(importsMap[i] && (
+					importsMap[i].status == 'loaded' || importsMap[i].status == 'pending')) 
 					return null;
 				return i;
-			})
+			},[])
 		};
 
 
 		var toExec = {
-			imports: to(spec.imports,function(i){
-				if(importsMap[i.url] && importsMap[i.url].isProcessed) 
+			imports: to(spec.req,function(i){
+				if(importsMap[i] && importsMap[i].isProcessed) 
 					return null;
 				return i;
-			}),
-			prereqs: to(spec.preloads,function(i){
-				if(importsMap[i.url] && importsMap[i.url].isProcessed) 
+			},[]),
+			prereqs: to(spec.prereq,function(i){
+				if(importsMap[i] && importsMap[i].isProcessed) 
 					return null;
 				return i;
-			})
+			},[])
 		};
 
 		//load prereqs if any
@@ -822,63 +597,20 @@ function isDependencyCycle(spec,stack){
 	return isCycle;
 }
 
-/*
-	Module processor
-*/
-function ModuleSpec(scope,m){
+function ModuleSpec(m){
 	//module scope reference 
-	this.scope = scope;
-	this.__sjs_module__ = m;
+	this.__mdf__ = m;
 }
 
 ModuleSpec.prototype.execute = function(){
 	this.isProcessed = true;
-
-	///
-	if(this.preloads)
-		applyImports.call(this.scope,this.preloads);
-	
-	var args = [];
-	if(this.imports) {
-		//applyImports.call(this.scope,this.imports);
-		args = applyImportArguments.call(this.scope,this.imports);
-	}
-
+	this.exports = {};
+	var	args = applyImports(this.__mdf__.imports,this.exports);
 	//run the module definition	
-	this.exports = this.__sjs_module__.definition.apply(this.scope,args);
+	this.exports = mixin(this.exports, this.__mdf__.definition.apply({},args));
 }
+
 var pseudoCounter = 0;
-
-
-function importsAndPreloads(a){
-	var imports = []
-	,	preload = [];
-
-	for(var i=0; i<a.length; i++){
-		var item = a[i]; 
-		var fileName = null;
-		if(typeof item == 'object'){
-			fileName = item[Object.keys(item)[0]];
-		} 
-		if(typeof item == 'string'){
-			fileName = item;
-		}
-		if(!fileName) continue;
-
-		var sp = fileName.split('|');
-		if(sp[0] == 'preload') {
-			if(typeof item == 'object') {
-				item[Object.keys(item)[0]] = sp[1];
-				preload.push(item);
-			} else {
-				preload.push(sp[1]);
-			}
-		}
-		else 
-			imports.push(item);	
-	}
-	return [imports,preload];
-}
 
 function decodeMdf(args){
 	var m = {};
@@ -899,9 +631,7 @@ function decodeMdf(args){
 			m.name = args[0];
 		} 
 		else if( args[0] instanceof Array){
-			var d = importsAndPreloads(args[0]);
-			m.imports = d[0];
-			m.preload = d[1];
+			m.imports = args[0];
 		}
 		if(typeof(args[1]) === 'function'){
 			m.definition = args[1];
@@ -910,29 +640,13 @@ function decodeMdf(args){
 	return m;
 }
 
-/*
-	Loads a module
-	m - module descriptor
-	string, array, array, function
-*/
-function mdl(){
-	var m = arguments[0];
 
-	if(typeof(m) === 'string') {
-		var m = importsMap[m]; 
-		//if(!m) throw 'Invalid resource lookup, resource ['+arguments[0]+'] is not loaded'
-		return m;
-	}
-
-	//not an object definition
-	if(typeof(m) !== 'object' || (m instanceof Array))
-		m = decodeMdf(arguments);
-
-	/*init module scope*/
-	var scope = {};
+//Moduler Definition Function
+function mdf(){
+	var	m = decodeMdf(arguments);
 
 	// create module spec
-	var spec = new ModuleSpec(scope,m);
+	var spec = new ModuleSpec(m);
 
 	//get current script
 	var current = currentScript();
@@ -950,62 +664,77 @@ function mdl(){
 	}
 
 	if(!m.preloads && !m.imports)	spec.execute();
-	
-	
 }
 
-mdl.list= function list(){
-	return mixin({},importsMap);
-}
+//set loader API
+importsMap['loader.js'].exports = {
+	add: function(ext,handler){
+		if(_fileHandlers[ext]) throw 'handler ' + key + ' is already set';
+		_fileHandlers[ext] = handler; 
+	}, 
+	list:function(){
+		return mixin({},importsMap);
+	},
+	setvar:function(key, value){
+		//path variable may be initialized
+		if(PATH_VARIABLES[key]) throw 'Path variable may only be set once';
+		PATH_VARIABLES[key] = value;
+	},
+	listvar:function(){
+		return mixin({},PATH_VARIABLES);
+	},
+	addlistener:function(listener){
 
-function addTo(s,t,unq){
-	var keys = Object.keys(s);
-	for(var key in keys) {
-		if(t[keys[key]]) { 
-			if(unq === true) throw 'key ' + key + ' is already set';
-			continue;
-		}
-		t[keys[key]] = s[keys[key]];
-	}
+	},
+	ImportSpec:ImportSpec
 }
-
-var extension = mixin(Object.create(null), {
-	loader: function(obj){
-		//check if file handler is already set and do not 
-		//allow setting it again - by setting true flag on addTo
-		addTo(obj,_fileHandlers,true);
-	}
-});
 
 function start(config){
-	//load main modules
 	if(config.sjsMain != null && config.sjsMain){
 		load([config.sjsMain]);
 	}
 }
 
-var _core = mixin(Object.create(null),{	
-	'module'    : mdl
+var main = null
+, 	head = document.head || document.getElementsByTagName('head')[0];
+// cycle through all script elements in document's head
+for(var i=0; i < head.childNodes.length; i++){
+	var node = head.childNodes[i];
+	if(!node.getAttribute) continue;
+	if(node.getAttribute('sjs-main') != null) {
+		main = node; break;
+	}
+}
+
+if(main == null) {
+	throw 'Application entry point is not defined, "splice.js" script must have "sjs-main" attribute';
+}
+
+mixin(config, {
+	appBase: 	context(window.location.href).path,
+	sjsHome:	context(main.getAttribute('src')).path,
+	sjsMain:	main.getAttribute('sjs-main'),
+	version:	main.getAttribute('sjs-version'),
+	mode:		main.getAttribute('sjs-start-mode'),
+	mFormat:	main.getAttribute('sjs-module-format'),
+	debug:    	main.getAttribute('sjs-debug') == 'true' ? true:false
 });
+//set default start mode to onload
+config.mode = config.mode || 'onload';
+
+
+//set framework home
+PATH_VARIABLES['{splice.home}'] = config.sjsHome;
 
 //publish global binding
-window.$js = global.$js = _core;
-window.define = mdl;
+window.define = mdf;
 
-//entry point
-loadConfiguration(function(config){
-    PATH_VARIABLES['{$jshome}'] = config.sjsHome;
-
-    if(config.mode == 'onload'){
-        window.onload = function(){ start(config);}
-    }
-    else if(config.mode == 'console'){
-        start(config);
-    }
-    else {
-        _core.start = function(){start(config);}
-    }
-});
+if(config.mode == 'onload')
+	window.onload = function(){ start(config);}
+else if(config.mode == 'console')
+	start(config);
+else
+	importsMap['loader.js'].exports.start = function(){start(config);}
 })( 
 	require('splice.window.js'), 
 	require('splice.document.js'),
