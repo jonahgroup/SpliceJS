@@ -103,20 +103,21 @@ function to(array,fn,deep){
 	if(typeof array != 'object') return deep;	
 	var	keys = Object.keys(array);
 	for(var key in keys ){
-		var item = null;
-		if(typeof array[keys[key]] == 'object' )
-			item = array[keys[key]];
-		else 
-			item = fn(array[keys[key]],keys[key],key,deep);
-		
+		var item = array[keys[key]];
+		if(typeof item == 'object' ){
+			deep[keys[key]] = item;
+			to(item,fn,deep[keys[key]]);
+			continue;
+		}
+		item = fn(item,keys[key],key,deep);
 		if(deep instanceof Array) {
 			if(deep[keys[key]] != undefined ) deep[keys[key]] = item; 
-			else if(item) deep.push(item);
+			else if(item !== false) deep.push(item);
 		} else {
 			deep[keys[key]] = item;
 		}
-		if(typeof array[keys[key]] == 'object' )
-			to(array[keys[key]],fn,deep[keys[key]]);
+		// if(typeof array[keys[key]] == 'object' )
+			
 	}
 	return deep;
 }
@@ -333,6 +334,7 @@ function requireTemplate(imports){
 
 function applyImports(imports, exports){
 	if(!imports) return;
+	var m = this;
 	return to(imports,function(url,pk){
 		if(url == 'exports.js') return exports;
 		return importsMap[url]!=null ? importsMap[url].exports : {};
@@ -500,27 +502,26 @@ function processFrame(loader,frame, oncomplete){
 			imports: to(spec.req,function(i){
 				if(importsMap[i] && (
 					importsMap[i].status == 'loaded' || importsMap[i].status == 'pending' )) 
-					return null;
+					return false;
 				return i;
 			},[]),
 			prereqs: to(spec.prereq,function(i){
 				if(importsMap[i] && (
 					importsMap[i].status == 'loaded' || importsMap[i].status == 'pending')) 
-					return null;
+					return false;
 				return i;
 			},[])
 		};
 
-
 		var toExec = {
 			imports: to(spec.req,function(i){
 				if(importsMap[i] && importsMap[i].isProcessed) 
-					return null;
+					return false;
 				return i;
 			},[]),
 			prereqs: to(spec.prereq,function(i){
 				if(importsMap[i] && importsMap[i].isProcessed) 
-					return null;
+					return false;
 				return i;
 			},[])
 		};
@@ -605,7 +606,7 @@ function ModuleSpec(m){
 ModuleSpec.prototype.execute = function(){
 	this.isProcessed = true;
 	this.exports = {};
-	var	args = applyImports(this.__mdf__.imports,this.exports);
+	var	args = applyImports.call(this,this.__mdf__.imports,this.exports);
 	//run the module definition	
 	this.exports = mixin(this.exports, this.__mdf__.definition.apply({},args));
 }
