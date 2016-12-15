@@ -72,22 +72,7 @@ otherwise, null is returned.
 require(importname);
 ```
 
----
-### __Namespace__
-Object of kind Namespace are property containers that provide API to help avoid name collisions when new properties are added to the namespace. 
 
-```javascript
-var ns = new Namespace();
-```
-### __Namespace.prototype.add(propertyName, value);__
-```javascript
-ns.add('print',function(){});
-```
-
-### __Namespace.prototype.lookup(propertyName);__
-```javascript
-ns.lookup('print');
-```
 ---
 ### __LoadingIndicator__
 This is an abstract type that can be implemented to get updates on the loader's progress
@@ -139,23 +124,23 @@ loaded | Indicates that import spec is loaded, however it may not be processed y
 ### __ImportSpec.prototype.execute()__
 Executes the loaded content of the ImportSpec. The result of this functions execution varies based on the type of the import spec. For instance ModuleSpec would run its factory functions when this method is invoked.
 
-# Loader API
+# Loader Static API
 This API allows controlling and extending behavior of the loader. API is available through importing special 'core' dependency.
 ## Functions
-### loader.setPathVar();
+### Loader.setVar();
 Set path variable that will be resolved when module location is calculated. Path varibles are resolved though a direct substitution.
 ```javascript
-loader.setPathVar('{splice.modules}','/lib/SpliceJS.Modules/modules');
+require('loader').setVar('{splice.modules}','/lib/SpliceJS.Modules/modules');
 ```
-### loader.setLoadingIndicator(indicator);
+### Loader.addListener(indicator);
 Sets an object that will receive loader progress status for each item being loaded. See LoadingIndicator in the API Elements section.
 ```javascript
-loader.setLoadingIndicator({
+require('loader').addListener({
 	begin:function(fileName){},
 	complete:function(fileName){}
 });
 ```
-### loader.setFileHandler(handler);
+### loader.add(string,handler);
 ```javascript
 loader.setFileHandler({
 	importSpec:function(){},
@@ -351,7 +336,7 @@ Such extension may be used to preload image files.
 
 ```javascript
 //myloaderextensions.js
-define(['core'],function(core){
+define(['loader'],function(core){
 	var imageHandler = {
 		importSpec : function(filename, stackId){
 			return new ImportSpec();
@@ -365,10 +350,9 @@ define(['core'],function(core){
 		}
 	}; 
 
-
-	core.setImportHandler('.gif',imageHandler);
-	core.setImportHandler('.png',imageHandler);
-	core.setImportHandler('.jpg',imageHandler);
+	loader.add('.gif',imageHandler);
+	loader.add('.png',imageHandler);
+	loader.add('.jpg',imageHandler);
 }
 ```
 
@@ -377,6 +361,15 @@ define(['core'],function(core){
 node splice.js app
 ```
 # [TypeScript](http://www.typescriptlang.org) Integration
+
+
+
+# Supported Platforms
+### Chrome
+### Firefox
+### Opera
+### Safari
+### Internet Explorer 9+
 
 
 # Running Tests

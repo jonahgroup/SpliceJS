@@ -37,9 +37,10 @@ if(!Object.keys) throw "Unsupported runtime";
 
 window.require = function(module){
 	var name = module + '.js';
+	var ew =  new RegExp(name+'$');
 	var keys = Object.keys(importsMap);
 	for(var i=0; i<keys.length;i++){ 
-		if(!keys[i].endsWith(name)) continue; 
+		if(!ew.test(keys[i])) continue; 
 		return importsMap[keys[i]].exports || importsMap[keys[i]];
 	}
 	return null;
@@ -116,8 +117,6 @@ function to(array,fn,deep){
 		} else {
 			deep[keys[key]] = item;
 		}
-		// if(typeof array[keys[key]] == 'object' )
-			
 	}
 	return deep;
 }
@@ -286,15 +285,11 @@ var _fileHandlers = {
 			if(script.onload !== undefined){
 				script.onload = function(e){
 					loader.notify(spec);
-					//spec.onloaded();
-					//loader.onitemloaded(filename);
 				};	
 			} else if(script.onreadystatechange !== undefined){
 				script.onreadystatechange = function(){
 					if(script.readyState == 'loaded' || script.readyState == 'complete') {
 						loader.notify(spec);
-						//spec.onloaded();
-						//loader.onitemloaded(filename);
 					}
 				}
 			}
@@ -308,10 +303,6 @@ var _fileHandlers = {
 function load(resources){
 	// get base context
 	var ctx = context();
-
-	//setup frame
-	// check if resources are abs urls, if not resolve to abs url
-	// place resource urls onto a frame 
 	new Loader().loadFrame(to(resources,function(i){
 		if(!isAbsUrl(i)) return ctx.resolve(i);
 		return i;
@@ -321,22 +312,23 @@ function load(resources){
 /*
 	loader function
 */
-
-function requireTemplate(imports){
-	var scope = this;
-	return (function(resolve,reject){
-		scope.imports.$js.load(imports,function(){
-		resolve(this);
-		});
-	}).bind(scope);
-};
-
-
 function applyImports(imports, exports){
 	if(!imports) return;
 	var m = this;
 	return to(imports,function(url,pk){
 		if(url == 'exports.js') return exports;
+		if(url == 'require.js') return function(imports,callback){
+			if(!imports) return;
+			var ctx = context(m.fileName);
+			imports = to(imports,function(i){
+				return ctx.resolve(i);
+			},[]);
+			
+			new Loader(function(){
+				callback.apply({},applyImports(imports,{}));
+			}).loadFrame(imports);
+
+		};
 		return importsMap[url]!=null ? importsMap[url].exports : {};
 	},[]);
 }
@@ -373,10 +365,10 @@ var _loaderStats = {
 };
 
 //Asynchronous loader
-function Loader(){
+function Loader(oncomplete){
 	this.id = loaderOrdinal++;
-	this.pending = 0; this.root = null;
-	this.queue = [];
+	this.oncomplete = oncomplete;
+	this.pending = 0; this.execount = 0; this.root = null;
 }
 Loader.prototype = {
 	add:function(spec){
@@ -394,6 +386,7 @@ Loader.prototype = {
 
 		//loop through modules in the frame
 		//skip the already loaded ones
+		var skip = 0;
 		for(var i = 0; i < imports.length; i++){
 
 			var filename = imports[i];
@@ -410,7 +403,7 @@ Loader.prototype = {
 
 			//resource has already been loaded
 			//check for null and undefined 
-			if(spec != null) continue; 
+			if(spec != null) { skip++; continue; }
 			
 			
 			//update splash screen if available
@@ -430,12 +423,17 @@ Loader.prototype = {
 			spec = importsMap[filename] = handler.importSpec(filename); 
 
 			this.pending++;
+			this.execount++;
 
 			//load file
 			spec.status = 'pending';
 			spec.loader = this;
 			handler.load(this,spec);
 		}
+		//total skip
+		if(skip == imports.length && typeof this.oncomplete == 'function')
+			processFrame(this,imports);
+
 		return this.pending;
 	},
 	onitemloaded:function(item){
@@ -475,14 +473,13 @@ Loader.prototype = {
 				this.loadFrame(spec.req);
 			}
 		}
-		if(this.pending == 0) {
+		if(this.pending == 0)
 			processFrame(this,this.root);
-		}
 	}
 }
 
 
-function processFrame(loader,frame, oncomplete){
+function processFrame(loader,frame){
 	if(!frame || frame.length == 0) {
 		return;
 	}
@@ -498,33 +495,26 @@ function processFrame(loader,frame, oncomplete){
 
 		var spec = importsMap[url];
 
-		var toLoad = {
-			imports: to(spec.req,function(i){
-				if(importsMap[i] && (
-					importsMap[i].status == 'loaded' || importsMap[i].status == 'pending' )) 
-					return false;
-				return i;
-			},[]),
-			prereqs: to(spec.prereq,function(i){
-				if(importsMap[i] && (
-					importsMap[i].status == 'loaded' || importsMap[i].status == 'pending')) 
-					return false;
-				return i;
-			},[])
-		};
+		var toLoad = {prereqs:[],imports:[]};
+		var toExec = {prereqs:[],imports:[]};
 
-		var toExec = {
-			imports: to(spec.req,function(i){
-				if(importsMap[i] && importsMap[i].isProcessed) 
-					return false;
-				return i;
-			},[]),
-			prereqs: to(spec.prereq,function(i){
-				if(importsMap[i] && importsMap[i].isProcessed) 
-					return false;
-				return i;
-			},[])
-		};
+		to(spec.prereq,function(i){
+			var item = importsMap[i];
+			if(!item) return toLoad.prereqs.push(i);
+			if(item.status == 'loaded' && !item.isProcessed)
+				toExec.prereqs.push(i);
+			return false;
+		},[]);
+
+
+		to(spec.req,function(i){
+			var item = importsMap[i];
+			if(!item) return toLoad.imports.push(i);
+			if(item.status == 'loaded' && !item.isProcessed)
+				toExec.imports.push(i);
+			return false;
+		},[]);
+
 
 		//load prereqs if any
 		if(toLoad.prereqs.length > 0) {
@@ -532,7 +522,7 @@ function processFrame(loader,frame, oncomplete){
 			continue;
 		}
 
-		var pEx = 0, pIm = 0;
+		var pEx = 0, iEx = 0;
 
 		//run preloads
 		if(toExec.prereqs.length > 0) {
@@ -554,18 +544,27 @@ function processFrame(loader,frame, oncomplete){
 		if(toExec.imports.length > 0) {
 			//add current url onto stack to detect branching
 			dfsStack.push(url);
-			pIm = processFrame(loader,toExec.imports);
+			iEx = processFrame(loader,toExec.imports);
 			//pop the top on branch exit
 			dfsStack.pop();
-			if(pIm < toExec.imports.length ) continue;
+			if(iEx < toExec.imports.length ) continue;
 		}
 
+		
 		//nothing to load nothing to run then run the spec
-		if(	toExec.imports.length + toExec.prereqs.length - pEx - pIm === 0) {
-			if(!spec.isProcessed) spec.execute();
+		if(	toExec.imports.length + toExec.prereqs.length - pEx - iEx === 0) {
+			if(!spec.isProcessed) { 
+				spec.execute(); 
+				loader.execount--;
+				
+			}
 			runCount++;
 		}
 	}
+
+	if(loader.execount == 0 && typeof loader.oncomplete == 'function')
+		loader.oncomplete.call({});
+
 	return runCount;
 }
 
@@ -663,8 +662,6 @@ function mdf(){
 	else {
 		currentModuleSpec = spec;
 	}
-
-	if(!m.preloads && !m.imports)	spec.execute();
 }
 
 //set loader API
@@ -676,21 +673,21 @@ importsMap['loader.js'].exports = {
 	list:function(){
 		return mixin({},importsMap);
 	},
-	setvar:function(key, value){
+	setVar:function(key, value){
 		//path variable may be initialized
 		if(PATH_VARIABLES[key]) throw 'Path variable may only be set once';
 		PATH_VARIABLES[key] = value;
 	},
-	listvar:function(){
+	listVar:function(){
 		return mixin({},PATH_VARIABLES);
 	},
-	addlistener:function(listener){
+	addListener:function(listener){
 
 	},
 	ImportSpec:ImportSpec
 }
 
-function start(config){
+function start(){
 	if(config.sjsMain != null && config.sjsMain){
 		load([config.sjsMain]);
 	}
@@ -717,7 +714,6 @@ mixin(config, {
 	sjsMain:	main.getAttribute('sjs-main'),
 	version:	main.getAttribute('sjs-version'),
 	mode:		main.getAttribute('sjs-start-mode'),
-	mFormat:	main.getAttribute('sjs-module-format'),
 	debug:    	main.getAttribute('sjs-debug') == 'true' ? true:false
 });
 //set default start mode to onload
@@ -731,11 +727,11 @@ PATH_VARIABLES['{splice.home}'] = config.sjsHome;
 window.define = mdf;
 
 if(config.mode == 'onload')
-	window.onload = function(){ start(config);}
+	window.onload = function(){ start();}
 else if(config.mode == 'console')
-	start(config);
+	start();
 else
-	importsMap['loader.js'].exports.start = function(){start(config);}
+	importsMap['loader.js'].exports.start = function(){start();}
 })( 
 	require('splice.window.js'), 
 	require('splice.document.js'),
