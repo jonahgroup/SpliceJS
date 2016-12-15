@@ -666,7 +666,7 @@ function mdf(){
 
 //set loader API
 importsMap['loader.js'].exports = {
-	add: function(ext,handler){
+	addHandler: function(ext,handler){
 		if(_fileHandlers[ext]) throw 'handler ' + key + ' is already set';
 		_fileHandlers[ext] = handler; 
 	}, 
