@@ -1,14 +1,11 @@
 define([
-    'require','exports',
-    {'Test':'../test-fixture/test-fixture'}
+    'require','loader','exports',
+    '../test-fixture/test-fixture'
 ],
-function(require,exports){
+function(require,loader,exports, test){
     "use strict";
     
-    var scope = this;
-    var $js = scope.imports.$js;
-    var ImportSpec = $js.ImportSpec;
-    var test = scope.imports.Test;
+    var ImportSpec = loader.ImportSpec;
    
     test.log('Loading extension-module.js',true);
 
@@ -19,8 +16,8 @@ function(require,exports){
     VirtualSpec.prototype = new ImportSpec();
     VirtualSpec.prototype.constructor = VirtualSpec;
 
-    $js.extension.loader({
-        '.virt':{
+    loader.addHandler(
+        '.virt',{
             importSpec:function(fileName){
                 var spec = new VirtualSpec(fileName); 
                 spec.scope = {
@@ -36,5 +33,5 @@ function(require,exports){
                 loader.onitemloaded(spec.fileName);
             }
         }
-    })
+    );
 });

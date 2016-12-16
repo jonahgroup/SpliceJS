@@ -319,14 +319,17 @@ function applyImports(imports, exports){
 		if(url == 'exports.js') return exports;
 		if(url == 'require.js') return function(imports,callback){
 			if(!imports) return;
-			var ctx = context(m.fileName);
+			var ctx = context(m.fileName)
+			, 	frame = [];
 			imports = to(imports,function(i){
-				return ctx.resolve(i);
+				var url = ctx.resolve(i);
+				frame.push(url); 
+				return url;
 			},[]);
 			
 			new Loader(function(){
 				callback.apply({},applyImports(imports,{}));
-			}).loadFrame(imports);
+			}).loadFrame(frame);
 
 		};
 		return importsMap[url]!=null ? importsMap[url].exports : {};
@@ -724,7 +727,7 @@ config.mode = config.mode || 'onload';
 PATH_VARIABLES['{splice.home}'] = config.sjsHome;
 
 //publish global binding
-window.define = mdf;
+window.define = global.define = mdf;
 
 if(config.mode == 'onload')
 	window.onload = function(){ start();}

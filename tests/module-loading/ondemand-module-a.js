@@ -1,15 +1,15 @@
 define([
     'preload|ondemand-module-a-prereq',
-    {'Test':'../test-fixture/test-fixture'}
+    '../test-fixture/test-fixture'
 ],
-function(){
+function(a, test){
     "use strict";
-    var scope = this;
-    var test = scope.imports.Test;
     test.log('Loading ondemand-module-a.js',true);
-    this.exports(function foo(){
-        test.log('Calling function "foo" from ondemand-module-a.js',true);
-    });
-
+    
+    return {
+        foo:function(){
+            test.log('Calling function "foo" from ondemand-module-a.js',true);
+        }
+    }
 });
 

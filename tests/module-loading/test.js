@@ -1,13 +1,11 @@
 define([
-    {'Test':'../test-fixture/test-fixture'},
-    {'UI':'import-module'},
+    'require',
+    '../test-fixture/test-fixture',
+    'import-module',
     'extension-module'      
 ],    
-function(scope){
+function(require,test,ui,ext){
     "use strict"
-    var scope = this;
-    var $js = scope.imports.$js
-    ,   test = scope.imports.Test;
 
     test.log('Loading test-modules.js', true);
 
@@ -21,68 +19,58 @@ function(scope){
         }
     };
 
-    //add items to the scope
-    scope.add(LocalClassES6);
-    scope.add(LocalClass);
-
-    scope.add( 
-         {test:10}
-    );
-
-    //read items from the scope
-    test.log('Scope read',new scope.LocalClass().n + new scope.LocalClassES6().n == 20);
-
     //test on demand loading
-    var inlineImports = scope.imports.add({inlineImports:{
+    test.inlineImports = {
         count:4,
         test:function(){
             this.count--;
             if(this.count == 0)
                 test.log('On-demand loading', this.count == 0);
         }
-    }});
+    };
+    
     
     //inline-loading
-    scope.imports.$js.load([
+    require([
         'import-module.js'
-    ],function(scope){
-        this.imports.inlineImports.test();
+    ],function(m){
+        test.inlineImports.test();
         test.log('Inline loaded importmodule.js 1',true);
     })
 
     //inline-loading
     //repeat loading
-    scope.imports.$js.load([
+    require([
         'import-module.js'
-    ],function(scope){
-        this.imports.inlineImports.test();
+    ],function(i){
+        test.inlineImports.test();
         test.log('Repeat Inline loading importmodule.js',true);
     })
     //call and import function
-    scope.imports.UI.sayHi();
+    ui.sayHi();
     
     //inline-load
-    scope.imports.$js.load(
-        [{'AdhocModule':'ondemand-module-a.js'},
-                        'ondemand-module-b.js',
+    require(
+        [{'AdhocModule':'ondemand-module-a'},
+                        'ondemand-module-b',
         ],
-        function(){
-            this.imports.AdhocModule.foo();
-            this.imports.inlineImports.test();
+        function(imports){
+            imports.AdhocModule.foo();
+            test.inlineImports.test();
             test.log('Inline loading ondemand-module-a.js',true);
             test.log('Inline loading ondemand-module-b.js',true);
         }
     );
 
     //inline load
-    scope.imports.$js.load(
-        ['ondemand-module-a.js'], function(){
-            this.imports.inlineImports.test();
+    require(['ondemand-module-a.js'], 
+    function(){
+            test.inlineImports.test();
             test.log('Inline loading ondemand-module-a.js from test-modules.js',true);
         }
     );
 
-    scope.LocalClass;
+    
 
 });
 
