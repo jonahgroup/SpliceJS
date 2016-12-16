@@ -9,15 +9,6 @@ function(require,test,ui,ext){
 
     test.log('Loading test-modules.js', true);
 
-    function LocalClass(){
-        this.n = 10;
-    }
-    
-    class LocalClassES6 {
-       constructor() {
-            this.n = 10;
-        }
-    };
 
     //test on demand loading
     test.inlineImports = {

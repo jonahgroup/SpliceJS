@@ -25,11 +25,11 @@ function(require,test){
 
     //load into current scope
     require(['ondemand-module-c'],function(){
-        test.log('promise fullfilled',true);
+        test.log('from import-module.js inline load ondemand-module-c',true);
     });
 
     require(['ondemand-module-c'],function(){
-        test.log('promise fullfilled',true);
+        test.log('from import-module.js inline load ondemand-module-c',true);
     });
 
     return {
