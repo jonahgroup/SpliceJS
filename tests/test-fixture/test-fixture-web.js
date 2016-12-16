@@ -26,6 +26,8 @@ define(function(){
         if(result === true){
             r.setAttribute('style', cssResultOk);
             r.appendChild(document.createTextNode('OK'));
+        } else if(result == null){
+            r.setAttribute('style', cssResultOk);
         }
         else {
             r.setAttribute('style', cssResultFail);

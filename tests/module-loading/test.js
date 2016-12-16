@@ -32,7 +32,7 @@ function(require,test,ui,ext){
     
     //inline-loading
     require([
-        'import-module.js'
+        'import-module'
     ],function(m){
         test.inlineImports.test();
         test.log('Inline loaded importmodule.js 1',true);
@@ -41,8 +41,8 @@ function(require,test,ui,ext){
     //inline-loading
     //repeat loading
     require([
-        'import-module.js'
-    ],function(i){
+        'import-module'
+    ],function(){
         test.inlineImports.test();
         test.log('Repeat Inline loading importmodule.js',true);
     })
@@ -50,15 +50,28 @@ function(require,test,ui,ext){
     ui.sayHi();
     
     //torture load
-    for(var i=0; i<1; i++){
+    var tortureLoad = {count:200};
+    for(var i=0; i<100; i++){
       require(['ondemand-module-a'], 
         function(){
             test.inlineImports.test();
             test.log('Inline loading ondemand-module-a.js from test-modules.js',true);
+            tortureLoad.count--;
+                require([{'AdhocModule':'ondemand-module-a'},
+                           'ondemand-module-b',
+                           'import-module'
+                    ],
+                    function(imports,b,c){
+                        imports.AdhocModule.foo();
+                        test.inlineImports.test();
+                        test.log('nested require - Inline loading ondemand-module-a.js',true);
+                        test.log('nested require - Inline loading ondemand-module-b.js',true);
+                        tortureLoad.count--;
+                    }
+                );
         }
         );  
     }
-
 
     //inline-load
     require(

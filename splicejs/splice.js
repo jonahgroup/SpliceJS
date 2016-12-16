@@ -330,6 +330,12 @@ function applyImports(imports, exports){
 				return url;
 			},[]);
 			
+				
+			if(checkComplete(frame)){
+				callback.apply({},applyImports(imports,{}));
+				return;
+			}
+
 			new Loader(function(){
 				callback.apply({},applyImports(imports,{}));
 			}).loadFrame(frame);
@@ -374,7 +380,7 @@ var _loaderStats = {
 function Loader(oncomplete){
 	this.id = loaderOrdinal++;
 	this.oncomplete = oncomplete;
-	this.pending = 0; this.execount = 0; this.root = null;
+	this.pending = 0; this.root = null;
 }
 Loader.prototype = {
 	add:function(spec){
@@ -392,7 +398,6 @@ Loader.prototype = {
 
 		//loop through modules in the frame
 		//skip the already loaded ones
-		var skip = 0;
 		for(var i = 0; i < imports.length; i++){
 
 			var filename = imports[i];
@@ -404,13 +409,13 @@ Loader.prototype = {
 			if(spec !=null && spec.status =="pending"){
 				this.add(spec);
 				this.pending++;
-				this.execount++;
+				//this.execount++;
 				continue;
 			}
 
 			//resource has already been loaded
 			//check for null and undefined 
-			if(spec != null) { skip++; continue; }
+			if(spec != null) { continue; }
 			
 			
 			//update splash screen if available
@@ -430,17 +435,14 @@ Loader.prototype = {
 			spec = importsMap[filename] = handler.importSpec(filename); 
 
 			this.pending++;
-			this.execount++;
+			//this.execount++;
 
 			//load file
 			spec.status = 'pending';
 			spec.loader = this;
 			handler.load(this,spec);
 		}
-		//total skip
-		if(skip == imports.length && typeof this.oncomplete == 'function')
-			processFrame(this,imports);
-
+		
 		return this.pending;
 	},
 	onitemloaded:function(item){
@@ -480,11 +482,22 @@ Loader.prototype = {
 				this.loadFrame(spec.req);
 			}
 		}
-		if(this.pending == 0)
+		if(this.pending == 0) {
 			processFrame(this,this.root);
+			if(typeof this.oncomplete == 'function' && checkComplete(this.root)){
+				this.oncomplete.call({});
+			}
+		}
 	}
 }
 
+function checkComplete(items){	
+	for(var i=0;i<items.length; i++){
+		var spec = importsMap[items[i]];
+		if(!spec || !spec.isProcessed) return false;
+	}
+	return true;
+}
 
 function processFrame(loader,frame){
 	if(!frame || frame.length == 0) {
@@ -562,16 +575,10 @@ function processFrame(loader,frame){
 		if(	toExec.imports.length + toExec.prereqs.length - pEx - iEx === 0) {
 			if(!spec.isProcessed) { 
 				spec.execute(); 
-				loader.execount--;
-				
 			}
 			runCount++;
 		}
 	}
-
-	if(loader.execount == 0 && typeof loader.oncomplete == 'function')
-		loader.oncomplete.call({});
-
 	return runCount;
 }
 
