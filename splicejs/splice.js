@@ -25,8 +25,8 @@ try {
 	!require;
 } catch(ex){
 	window.require = function require(m){
-		if(m == 'splice.window.js') return window;
-		if(m == 'splice.document.js') return document;
+		if(m == 'splice.window') return window;
+		if(m == 'splice.document') return document;
 	}
 }
 
@@ -35,14 +35,17 @@ try {
 
 if(!Object.keys) throw "Unsupported runtime";
 
-window.require = function(module){
-	var name = module + '.js';
+window.require = function(modName){
+	var name = modName + '.js';
 	var ew =  new RegExp(name+'$');
 	var keys = Object.keys(importsMap);
 	for(var i=0; i<keys.length;i++){ 
 		if(!ew.test(keys[i])) continue; 
 		return importsMap[keys[i]].exports || importsMap[keys[i]];
 	}
+	try{
+		return require(modName)
+	} catch (ex){}
 	return null;
 }
 
@@ -401,6 +404,7 @@ Loader.prototype = {
 			if(spec !=null && spec.status =="pending"){
 				this.add(spec);
 				this.pending++;
+				this.execount++;
 				continue;
 			}
 
@@ -656,10 +660,12 @@ function mdf(){
 
 	if(current) { 
 		spec.fileName = current;
+		spec.status = importsMap[current].status;
 		importsMap[current] = spec; 
 	} 
 	else if(m.name){
 		spec.fileName = m.name;
+		spec.status = importsMap[current].status;
 		importsMap[m.name] = spec;
 	}
 	else {
@@ -687,7 +693,8 @@ importsMap['loader.js'].exports = {
 	addListener:function(listener){
 
 	},
-	ImportSpec:ImportSpec
+	ImportSpec:ImportSpec,
+	platform:config.platform
 }
 
 function start(){
@@ -728,7 +735,8 @@ PATH_VARIABLES['{splice.home}'] = config.sjsHome;
 
 //publish global binding
 window.define = global.define = mdf;
-
+window.global = global;
+global.require = window.require;
 if(config.mode == 'onload')
 	window.onload = function(){ start();}
 else if(config.mode == 'console')
@@ -736,8 +744,8 @@ else if(config.mode == 'console')
 else
 	importsMap['loader.js'].exports.start = function(){start();}
 })( 
-	require('splice.window.js'), 
-	require('splice.document.js'),
+	require('splice.window'), 
+	require('splice.document'),
 	(function(){
 		try {return global;}
 		catch(e) {return {};}

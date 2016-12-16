@@ -2,10 +2,11 @@
  * desc: Test fixture module, allow logging output to the document
  * dependencies: none
 */
-!function(loader){
-    loader.setVar('{test-fixture}','test-fixture-web');
-}(require('loader'));
-
-define(['{test-fixture}'],function(fixture){
+define([
+    (function(loader){
+        if(loader.platform == "WEB") return 'test-fixture-web';
+            return 'test-fixture-node';
+    })(global.require('loader'))
+],function(fixture){
     return fixture;
 });

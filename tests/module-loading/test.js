@@ -49,6 +49,17 @@ function(require,test,ui,ext){
     //call and import function
     ui.sayHi();
     
+    //torture load
+    for(var i=0; i<1; i++){
+      require(['ondemand-module-a'], 
+        function(){
+            test.inlineImports.test();
+            test.log('Inline loading ondemand-module-a.js from test-modules.js',true);
+        }
+        );  
+    }
+
+
     //inline-load
     require(
         [{'AdhocModule':'ondemand-module-a'},
@@ -70,7 +81,8 @@ function(require,test,ui,ext){
         }
     );
 
-    
+
+
 
 });
 
