@@ -9,16 +9,19 @@ var fs = require('fs');
 //generates module's body
 function generateModule(m){
     var name = m.name;
-    var imports = "{'Test':'../../test-fixture/test-fixture.js'},{'ModuleCounter':'../module-counter.js'}";
+    var imports = "{'Test':'../../test-fixture/test-fixture.js','ModuleCounter':'../module-counter.js'}";
     if(m && m.children.length > 0){        
-        var sep = ',';
+        imports += ',{';
+        var sep = '';
         for(var i=0; i<m.children.length; i++){
             if(m.cycles[i] == true) {
                 console.log('Cycle reference  - skipping');
                 continue;
             }
-            imports =  imports + sep +  "{'ns"+i+"':'" + m.children[i].name + "'}";
+            imports =  imports + sep +  "'ns"+i+"':'" + m.children[i].name + "'";
+            sep = ',';
         }
+        imports += '}';
     }
 
     imports = '[' + imports+ '],';
@@ -28,10 +31,10 @@ function generateModule(m){
         body += "a";
     }
 
-    var code = 'define('+imports+'function(scope){'+
+    var code = 'define('+imports+'function(imports){'+
     
-        "scope.imports.Test.log('Loading module "+name+"',true);" +
-        "scope.imports.ModuleCounter.ModuleCounter.count();"+
+        "imports.Test.log('Loading module "+name+"',true);" +
+        "imports.ModuleCounter.ModuleCounter.count();"+
 
         "var body = '"+body+"';"+
         '});';
@@ -122,8 +125,8 @@ for(var i=0; i<moduleCount; i++){
 
 //write test file 
 fs.writeFile('./test.js',"define(["+
-     "{'Test':'../test-fixture/test-fixture.js'},"+
+     "'../test-fixture/test-fixture.js',"+
      "'modules/"+root.name+"'"+
-    "],function(scope){})",function(err){
+    "],function(test){})",function(err){
         if(err) {console.log(err); return;}
  });

@@ -1,0 +1,1 @@
+define([{'Test':'../test-fixture/test-fixture.js'},'modules/mod-test-n1236.js'],function(scope){})
