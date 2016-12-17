@@ -322,6 +322,7 @@ function applyImports(imports, exports){
 		if(url == 'exports.js') return exports;
 		if(url == 'require.js') return function(imports,callback){
 			if(!imports) return;
+			if(!(imports instanceof Array)) imports = [imports];
 			var ctx = context(m.fileName)
 			, 	frame = [];
 			imports = to(imports,function(i){
@@ -401,6 +402,14 @@ Loader.prototype = {
 		for(var i = 0; i < imports.length; i++){
 
 			var filename = imports[i];
+
+			//get handler for current file
+			var fileType = fileExt(filename);
+			var handler = _fileHandlers[fileType];
+
+			//skip unknown resources
+			if(!handler) continue;
+
 			var spec = importsMap[filename];
 
 			//we are trying to load a module that is being
@@ -423,13 +432,7 @@ Loader.prototype = {
 				_loaderStats.loadingIndicator.update(0,0,filename);
 			}
 
-			//get handler for current file
-			var fileType = fileExt(filename);
 			
-			var handler = _fileHandlers[fileType];
-
-			//skip unknown files
-			if(!handler) continue;
 
 			//get import spec from the handler			
 			spec = importsMap[filename] = handler.importSpec(filename); 
