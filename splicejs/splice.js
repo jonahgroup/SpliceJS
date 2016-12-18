@@ -408,7 +408,10 @@ Loader.prototype = {
 			var handler = _fileHandlers[fileType];
 
 			//skip unknown resources
-			if(!handler) continue;
+			if(!handler) { 
+				console.warn('unrecognized resource type ' + filename);
+				continue;
+			}
 
 			var spec = importsMap[filename];
 
