@@ -704,7 +704,7 @@ importsMap['loader.js'].exports = {
 		return mixin({},PATH_VARIABLES);
 	},
 	addListener:function(listener){
-
+        _loaderStats.loadingIndicator = listener;
 	},
 	ImportSpec:ImportSpec,
 	platform:config.platform
