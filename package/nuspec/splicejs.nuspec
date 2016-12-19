@@ -17,6 +17,6 @@
     </dependencies>
   </metadata>
 	<files>
-		<file src="..\..\splicejs\*" target="content\lib\splicejs"/>
+		<file src="..\..\splicejs\*" target="content\Scripts\splicejs"/>
 	</files>
 </package>

@@ -480,13 +480,12 @@ Loader.prototype = {
 			//	resolve required resources relative to
 			spec.req = dep.req;
 
-
-			//if preloads are present, save current frame and create new frame
+			//alway take the preload branch first
+            //when leaves of the branch are reached other dependencies
+            //will proceed from the root of the tree
 			if(spec.prereq && spec.prereq.length > 0){
 				this.loadFrame(spec.prereq);	
-			} else if(spec.req && spec.req.length > 0) {
-				this.loadFrame(spec.req);
-			}
+			} 
 		}
 		if(this.pending == 0) {
 			processFrame(this,this.root);
@@ -526,7 +525,7 @@ function processFrame(loader,frame){
 
 		to(spec.prereq,function(i){
 			var item = importsMap[i];
-			if(!item) return toLoad.prereqs.push(i);
+			if(!item || item.status == 'pending') return toLoad.prereqs.push(i);
 			if(item.status == 'loaded' && !item.isProcessed)
 				toExec.prereqs.push(i);
 			return false;
@@ -535,7 +534,7 @@ function processFrame(loader,frame){
 
 		to(spec.req,function(i){
 			var item = importsMap[i];
-			if(!item) return toLoad.imports.push(i);
+			if(!item || item.status == 'pending') return toLoad.imports.push(i);
 			if(item.status == 'loaded' && !item.isProcessed)
 				toExec.imports.push(i);
 			return false;
