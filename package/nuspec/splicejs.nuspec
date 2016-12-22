@@ -2,15 +2,15 @@
 <package >
   <metadata>
     <id>SpliceJS</id>
-    <version>1.0.0</version>
+    <version>0.0.0.482</version>
     <authors>Dmitry Rogozhkin (JonahGroup)</authors>
     <owners>Dmitry Rogozhkin</owners>
-    <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>http://www.splicejs.org</projectUrl>
     <iconUrl>http://github.com/jonahgroup/SpliceJS/raw/master/splicejs.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>JavaScript librarcy </description>
-    <releaseNotes>Initial release</releaseNotes>
+    <description>JavaScript library </description>
+    <releaseNotes>Pre-release</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>JavaScript</tags>
     <dependencies>

@@ -1,5 +1,5 @@
 /*
-SpliceJS
+SpliceJS v.0.0.0.482
 
 The MIT License (MIT)
 
@@ -74,6 +74,7 @@ loaderOrdinal = 0;
 importsMap['require.js'] = new ImportSpec('require.js','loaded');
 importsMap['exports.js'] = new ImportSpec('exports.js','loaded');
 importsMap['loader.js']  = new ImportSpec('loader.js','loaded');
+importsMap['context.js'] = new ImportSpec('context.js','loaded');
 
 function mixin(_t, _s){
 	if(!_s) return _t;
@@ -182,7 +183,7 @@ function isAbsUrl(url){
 	}
 }
 
-function context(contextUrl){
+function context(contextUrl,asIs){
 	//context must end with /
 	var ctx = null;
 
@@ -206,7 +207,7 @@ function context(contextUrl){
 			//no extension or something looks like extension but does not have a handler
 			//gets a default .js extension
 			//does not apply for special resouce names, starting with !
-			if(url[0]!='!' && ext != '.js'){
+			if(url[0]!='!' && ext != '.js' && !asIs){
 				url = url + '.js';
 			}
 			if(url[0]=='!'){
@@ -216,6 +217,7 @@ function context(contextUrl){
 			if(url == 'require.js') return url;
 			if(url == 'exports.js') return url;
 			if(url == 'loader.js') return url;
+            if(url == 'context.js') return url;
 
 			url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
 			//resolve path variables
@@ -320,8 +322,16 @@ function applyImports(imports, exports){
 	var m = this;
 	return to(imports,function(url,pk){
 		if(url == 'exports.js') return exports;
+        if(url == 'context.js') return context(m.fileName);
+        if(url == 'loader.js')  return importsMap['loader.js'].exports; 
 		if(url == 'require.js') return function(imports,callback){
 			if(!imports) return;
+            //single import is requested
+            if(typeof imports == 'string'){
+                 if(imports == 'exports') return exports;
+                 if(imports == 'context') return context(m.fileName);
+                 if(imports == 'loader')  return importsMap['loader.js'].exports; 
+            }
 			if(!(imports instanceof Array)) imports = [imports];
 			var ctx = context(m.fileName)
 			, 	frame = [];
@@ -333,12 +343,12 @@ function applyImports(imports, exports){
 			
 				
 			if(checkComplete(frame)){
-				callback.apply({},applyImports(imports,{}));
+				callback.apply({},applyImports.call(m,imports,{}));
 				return;
 			}
 
 			new Loader(function(){
-				callback.apply({},applyImports(imports,{}));
+				callback.apply({},applyImports.call(m,imports,{}));
 			}).loadFrame(frame);
 
 		};
@@ -705,9 +715,11 @@ importsMap['loader.js'].exports = {
 	addListener:function(listener){
         _loaderStats.loadingIndicator = listener;
 	},
+    context: context,
 	ImportSpec:ImportSpec,
 	platform:config.platform
 }
+
 
 function start(){
 	if(config.sjsMain != null && config.sjsMain){
@@ -741,6 +753,7 @@ mixin(config, {
 //set default start mode to onload
 config.mode = config.mode || 'onload';
 
+importsMap['context.js'].exports = context(config.appBase);
 
 //set framework home
 PATH_VARIABLES['{splice.home}'] = config.sjsHome;

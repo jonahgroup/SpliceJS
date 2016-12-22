@@ -1,7 +1,7 @@
  
 <img src="splicejs.png" width=80/> 
 
-# SpliceJS Module Loader - AMD [DRAFT]
+# SpliceJS Module Loader
 SpliceJS is an AMD like module loader implementation. Module specification slightly differs from AMD however most importantly the asynchronous model is maintained.
 
 For background on AMD please refer to the AMD specfication:
@@ -227,15 +227,15 @@ define(['/{splicejs.modules}/splice.networking'],function(){});
 A few import words that looks like relative path modules have special meaning.
 * *require* - injects require() function
 * *exports* - contains all module exports
-* *scope* - provides reference to the module's scope.  Similer to exports object, however scope contains references to all the scoped imports (see below for scoped imports)  
-* *core* - supplies core API calls. See [core](#CoreReference) refence
+* *loader* - exposes loader API, use this import to extend module functionality  
+* *context* - context object describing module's location, this import can be used to resolve resources relative to the module at runtime
 ```javascript
 define(['require','exports','scope','moduleA'],
 	function(require,exports,scope,modulea){
 });
 ```
 
-## Namespace Imports
+## Namespaced Imports
 ```javascript
 define(['require','exports','ModuleA',
 	{'modb':'ModuleB','modc':'ModuleC'} //object literal to define import scope
@@ -244,7 +244,7 @@ define(['require','exports','ModuleA',
 	util.modc.greet();
 });
 ```
-## Using Namespace
+
 ```javascript
 define(['require','exports',{'ModuleA':'moduleA'}],
 	function(require,exports,utils){
