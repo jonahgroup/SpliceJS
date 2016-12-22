@@ -7,7 +7,7 @@
     <owners>Dmitry Rogozhkin</owners>
     <licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>
     <projectUrl>http://www.splicejs.org</projectUrl>
-    <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
+    <iconUrl>http://github.com/jonahgroup/SpliceJS/raw/master/splicejs.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>JavaScript librarcy </description>
     <releaseNotes>Initial release</releaseNotes>
