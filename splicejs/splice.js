@@ -636,7 +636,14 @@ ModuleSpec.prototype.execute = function(){
 	this.exports = {};
 	var	args = applyImports.call(this,this.__mdf__.imports,this.exports);
 	//run the module definition	
-	this.exports = mixin(this.exports, this.__mdf__.definition.apply({},args));
+    var returnExports = this.__mdf__.definition.apply({},args);
+
+    //return export override argument exports
+    //todo: describe what may cause exports conflict and why
+    if(returnExports != null) { 
+        if(Object.keys(this.exports).length > 0) console.warn('Export override by "return" in ' + this.fileName);
+        this.exports = returnExports;
+    }
 }
 
 var pseudoCounter = 0;
