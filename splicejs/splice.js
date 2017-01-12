@@ -1,5 +1,5 @@
 /*
-SpliceJS v.0.0.0.482
+SpliceJS v.0.0.0.485
 
 The MIT License (MIT)
 
