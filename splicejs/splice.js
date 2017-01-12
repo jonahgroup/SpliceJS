@@ -36,7 +36,8 @@ try {
 if(!Object.keys) throw "Unsupported runtime";
 
 window.require = function(modName){
-	var name = modName + '.js';
+    var ctx = context();
+    var name = ctx.resolve(modName);
 	var ew =  new RegExp(name+'$');
 	var keys = Object.keys(importsMap);
 	for(var i=0; i<keys.length;i++){ 
