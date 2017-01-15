@@ -467,6 +467,7 @@ Loader.prototype = {
 		//clear current module spec, resource loaded next may not be a module
 		if(spec instanceof ImportSpec && currentModuleSpec ) {
 			spec = importsMap[item] = currentModuleSpec;
+            spec.fileName = item;
 			currentModuleSpec = null;
 		}
 		
