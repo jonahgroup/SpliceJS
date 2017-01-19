@@ -203,6 +203,9 @@ function context(contextUrl,asIs){
 		path:ctx,
 		source:contextUrl,
 		resolve:function(url){
+            if(isAbsUrl(url)) {
+                return collapseUrl(url) ;
+            } 
 			if(!url) return null;
 			var ext = fileExt(url); 
 			//no extension or something looks like extension but does not have a handler
