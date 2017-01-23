@@ -229,7 +229,7 @@ function context(contextUrl,asIs){
 			//not page context
 			if(isAbsUrl(url)) return collapseUrl(url) ;
 			//is application context
-			if(url[0]=="/")
+			if(url[0]==_pd_)
 				return collapseUrl(config.appBase + url);
 			//relative context
 			return collapseUrl(ctx + url);
@@ -719,7 +719,8 @@ importsMap['loader.js'].exports = {
 	setVar:function(key, value){
 		//path variable may be initialized
 		if(PATH_VARIABLES[key]) throw 'Path variable may only be set once';
-		PATH_VARIABLES[key] = value;
+		PATH_VARIABLES[key] = value.replace(new RegExp(_not_pd_,"g"),_pd_);
+        return importsMap['loader.js'].exports;
 	},
 	listVar:function(){
 		return mixin({},PATH_VARIABLES);
