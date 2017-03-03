@@ -361,8 +361,11 @@ define(['loader'],function(core){
 
 # [Node.js](http://www.nodejs.org) Integration
 ```sh
-node splice.js app
+node splice.js app.js
 ```
+Application root is an absolute path and is resolved to the location of application's entry point, such as the location of app.js file in the command line example above.
+
+Application root could be referenced in templated paths using {app.root} placeholder.
 # [TypeScript](http://www.typescriptlang.org) Integration
 
 

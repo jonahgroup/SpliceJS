@@ -770,6 +770,7 @@ importsMap['context.js'].exports = context(config.appBase);
 
 //set framework home
 PATH_VARIABLES['{splice.home}'] = config.sjsHome;
+PATH_VARIABLES['{app.root}'] = config.appBase;
 
 //publish global binding
 window.define = global.define = mdf;
