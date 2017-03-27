@@ -237,7 +237,7 @@ function context(contextUrl,asIs){
 	}
 }
 
-var fileExtRegex = /[0-9a-zA-Z-]+([.][0-9a-zA-Z]+)$/i;
+var fileExtRegex = /[0-9a-zA-Z-:()]+([.][0-9a-zA-Z]+)$/i;
 function fileExt(f){
 	var result = fileExtRegex.exec(f);
 	return result!=null ? result[1] : null;
@@ -725,6 +725,9 @@ importsMap['loader.js'].exports = {
 	listVar:function(){
 		return mixin({},PATH_VARIABLES);
 	},
+    getVar:function(varName){
+        return PATH_VARIABLES[varName];
+    },
 	addListener:function(listener){
         _loaderStats.loadingIndicator = listener;
 	},
