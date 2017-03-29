@@ -476,12 +476,13 @@ Loader.prototype = {
 		
 		this.pending--;
 
-		//mark import spec as loaded 
-		spec.status = 'loaded';
+		// process dependencies for module specs
+        // check for status is needed because a dependency may have been already loaded 
+        // on another frame, in which case we do not process it's dependencies
+		if(spec instanceof ModuleSpec && spec.status != 'loaded'){
 
-
-		//process dependencies for module specs
-		if(spec instanceof ModuleSpec){
+            //mark import spec as loaded 
+		    spec.status = 'loaded';
 
 			//process resource spec that was just loaded
 			//get current module context
@@ -501,7 +502,10 @@ Loader.prototype = {
 			if(spec.prereq && spec.prereq.length > 0){
 				this.loadFrame(spec.prereq);	
 			} 
-		}
+		} else {
+            spec.status = 'loaded';
+        }
+
 		if(this.pending == 0) {
 			processFrame(this,this.root);
 			if(typeof this.oncomplete == 'function' && checkComplete(this.root)){
