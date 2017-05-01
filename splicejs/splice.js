@@ -723,7 +723,11 @@ importsMap['loader.js'].exports = {
 	setVar:function(key, value){
 		//path variable may be initialized
 		if(PATH_VARIABLES[key]) throw 'Path variable may only be set once';
-		PATH_VARIABLES[key] = value.replace(new RegExp(_not_pd_,"g"),_pd_);
+        if(typeof value  == 'string') {
+		    PATH_VARIABLES[key] = value.replace(new RegExp(_not_pd_,"g"),_pd_);
+        } else {
+            PATH_VARIABLES[key] = value;
+        }
         return importsMap['loader.js'].exports;
 	},
 	listVar:function(){
