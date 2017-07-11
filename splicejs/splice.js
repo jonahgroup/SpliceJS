@@ -184,7 +184,22 @@ function isAbsUrl(url){
 	}
 }
 
-function context(contextUrl,asIs){
+function subsRelativePaths(url) {
+	var keys = Object.keys(PATH_VARIABLES);
+	for(var i = 0; i < keys.length; i++) 
+	{
+		var key = keys[i];
+		var value = PATH_VARIABLES[key];
+		var was = url;
+		if(/\{.+\}/.exec(key) == null) {
+			url = url.replace(key, value);
+			if(url != was) return url;
+		}
+	}
+	return url;
+}
+
+function context(contextUrl,asIs) {
 	//context must end with /
 	var ctx = null;
 
@@ -224,8 +239,13 @@ function context(contextUrl,asIs){
             if(url == 'context.js') return url;
 
 			url = url.replace(new RegExp(_not_pd_,"g"),_pd_);
+			
+			//apply path substitution
+			url = subsRelativePaths(url);
+
 			//resolve path variables
 			url = spv(url);
+
 			//not page context
 			if(isAbsUrl(url)) return collapseUrl(url) ;
 			//is application context
