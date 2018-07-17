@@ -120,7 +120,13 @@ var document = new Document();
 
 var script = new HTMLScriptElement('script');
 script.setAttribute('src', process.argv[1]);
-script.setAttribute('sjs-main',process.argv[2]);
+if(process.argv[2] == '--init' || process.argv[2] == '-i' ) {
+    script.setAttribute('sjs-init',process.argv[3]);
+    script.setAttribute('sjs-main',process.argv[4]);
+} else {
+    script.setAttribute('sjs-main',process.argv[2]);
+}
+
 script.setAttribute('sjs-start-mode','console');
 document.head.appendChild(script);
 module.exports = document;

@@ -25,8 +25,8 @@ try {
 	!require;
 } catch(ex){
 	window.require = function require(m){
-		if(m == 'splice.window') return window;
-		if(m == 'splice.document') return document;
+		if(m == './splice.window') return window;
+		if(m == './splice.document') return document;
 	}
 }
 
@@ -329,10 +329,18 @@ var _fileHandlers = {
 	}
 };
 
-function load(resources){
+function load(resources,oncomplete){
 	// get base context
 	var ctx = context();
-	new Loader().loadFrame(to(resources,function(i){
+	new Loader(function(){
+		var imps = applyImports.call({fileName:''},
+		to(resources,function(url){
+			return ctx.resolve(url);
+		},[]));
+		if(typeof(oncomplete) == 'function') {
+			oncomplete.apply({},imps);
+		}
+	}).loadFrame(to(resources,function(i){
 		if(!isAbsUrl(i)) return ctx.resolve(i);
 		return i;
 	},[]));
@@ -766,6 +774,15 @@ importsMap['loader.js'].exports = {
 
 
 function start(){
+	if(config.sjsInit != null) {
+	
+		load([config.sjsInit],function(m){
+			m(importsMap['loader.js'].exports);
+			load([config.sjsMain]);
+		});
+	
+		return;
+	}
 	if(config.sjsMain != null && config.sjsMain){
 		load([config.sjsMain]);
 	}
@@ -790,6 +807,7 @@ mixin(config, {
 	appBase: 	context(window.location.href).path,
 	sjsHome:	context(main.getAttribute('src')).path,
 	sjsMain:	main.getAttribute('sjs-main'),
+	sjsInit:	main.getAttribute('sjs-init'),
 	version:	main.getAttribute('sjs-version'),
 	mode:		main.getAttribute('sjs-start-mode'),
 	debug:    	main.getAttribute('sjs-debug') == 'true' ? true:false
@@ -814,8 +832,8 @@ else if(config.mode == 'console')
 else
 	importsMap['loader.js'].exports.start = function(){start();}
 })( 
-	require('splice.window'), 
-	require('splice.document'),
+	require('./splice.window'), 
+	require('./splice.document'),
 	(function(){
 		try {return global;}
 		catch(e) {return {};}
