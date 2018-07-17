@@ -716,6 +716,7 @@ function decodeMdf(args){
 
 //Moduler Definition Function
 function mdf(){
+
 	var	m = decodeMdf(arguments);
 
 	// create module spec
@@ -737,6 +738,16 @@ function mdf(){
 	else {
 		currentModuleSpec = spec;
 	}
+
+	if(m.imports && m.imports.length == 1 && m.imports[0] == 'loader'){
+		m.definition(importsMap['loader.js'].exports);
+		return;
+	}
+
+	if(m.imports && m.imports.length > 0) {
+		load(m.imports,m.definition);
+	}
+
 }
 
 //set loader API
@@ -778,12 +789,14 @@ function start(){
 	
 		load([config.sjsInit],function(m){
 			m(importsMap['loader.js'].exports);
+			if(config.sjsMain == null || config.sjsMain == '' ) return;
 			load([config.sjsMain]);
 		});
 	
 		return;
 	}
-	if(config.sjsMain != null && config.sjsMain){
+	if(config.sjsMain != null && config.sjsMain != ""){
+		if(config.sjsMain == null) return;
 		load([config.sjsMain]);
 	}
 }
@@ -799,13 +812,12 @@ for(var i=0; i < head.childNodes.length; i++){
 	}
 }
 
-if(main == null) {
-	throw 'Application entry point is not defined, "splice.js" script must have "sjs-main" attribute';
-}
+// if(main == null) {
+// 	throw 'Application entry point is not defined, "splice.js" script must have "sjs-main" attribute';
+// }
 
 mixin(config, {
 	appBase: 	context(window.location.href).path,
-	sjsHome:	context(main.getAttribute('src')).path,
 	sjsMain:	main.getAttribute('sjs-main'),
 	sjsInit:	main.getAttribute('sjs-init'),
 	version:	main.getAttribute('sjs-version'),
@@ -816,10 +828,6 @@ mixin(config, {
 config.mode = config.mode || 'onload';
 
 importsMap['context.js'].exports = context(config.appBase);
-
-//set framework home
-PATH_VARIABLES['{splice.home}'] = config.sjsHome;
-PATH_VARIABLES['{app.root}'] = config.appBase;
 
 //publish global binding
 window.define = global.define = mdf;

@@ -119,12 +119,28 @@ class Document {
 var document = new Document();
 
 var script = new HTMLScriptElement('script');
-script.setAttribute('src', process.argv[1]);
-if(process.argv[2] == '--init' || process.argv[2] == '-i' ) {
-    script.setAttribute('sjs-init',process.argv[3]);
-    script.setAttribute('sjs-main',process.argv[4]);
+
+var argOffset = -1;
+var check = /splice.js$/;
+for(var i=0; i<process.argv.length; i++){
+    if(check.test(process.argv[i])){
+        argOffset = i;
+        argOffset--;
+        break;
+    }
+}
+
+script.setAttribute('src', process.argv[1+argOffset]);
+
+if(argOffset > -1) {
+    if(process.argv[2+argOffset] == '--init' || process.argv[2+argOffset] == '-i' ) {
+        script.setAttribute('sjs-init',process.argv[3+argOffset]);
+        script.setAttribute('sjs-main',process.argv[4+argOffset] || "");
+    } else {
+        script.setAttribute('sjs-main',process.argv[2+argOffset] || "");
+    }
 } else {
-    script.setAttribute('sjs-main',process.argv[2]);
+    script.setAttribute('sjs-main', '');
 }
 
 script.setAttribute('sjs-start-mode','console');

@@ -1,3 +1,5 @@
-define(function(){
+define([
+    'loader'
+],function(loader){
     console.log('test');
 });
