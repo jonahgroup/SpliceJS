@@ -739,14 +739,14 @@ function mdf(){
 		currentModuleSpec = spec;
 	}
 
-	if(m.imports && m.imports.length == 1 && m.imports[0] == 'loader'){
-		m.definition(importsMap['loader.js'].exports);
-		return;
-	}
+	// if(m.imports && m.imports.length == 1 && m.imports[0] == 'loader'){
+	// 	m.definition(importsMap['loader.js'].exports);
+	// 	return;
+	// }
 
-	if(m.imports && m.imports.length > 0) {
-		load(m.imports,m.definition);
-	}
+	// if(m.imports && m.imports.length > 0) {
+	// 	load(m.imports,m.definition);
+	// }
 
 }
 
